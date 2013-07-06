@@ -92,7 +92,7 @@
     <Compile Include="SiaqodbSyncMobileProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrialWP8.csproj">
+    <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28WP 8%29.csproj">
       <Project>{CA9BE4FC-54F1-4E41-8EF2-64B33C3CFB16}</Project>
       <Name>SiaqodbTrialWP8</Name>
     </ProjectReference>
@@ -109,7 +109,6 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
   <ProjectExtensions />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
