@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iPhoneSimulator\Trial\</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;TRIAL;</DefineConstants>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;TRIAL;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
@@ -40,7 +40,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iPhone\DebugTrial</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;TRIAL</DefineConstants>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;TRIAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>

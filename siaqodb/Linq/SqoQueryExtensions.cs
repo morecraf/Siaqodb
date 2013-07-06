@@ -40,7 +40,7 @@ namespace Sqo
             catch (Exceptions.LINQUnoptimizeException)
             {
                 SiaqodbConfigurator.LogMessage("Expression:" + expression.ToString() + " cannot be parsed, query runs un-optimized!",VerboseLevel.Warn);
-#if (WP7 || UNITY3D) && !MANGO
+				#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Func<TSource, bool> fn = (Func<TSource, bool>)ExpressionCompiler.ExpressionCompiler.Compile(expression);
 #else
 
@@ -68,7 +68,7 @@ namespace Sqo
 #else
             if (typeof(TSource) == typeof(TRet))
             {
-#if (WP7 || UNITY3D) && !MANGO
+				#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Func<TSource, TRet> fn = (Func<TSource, TRet>)ExpressionCompiler.ExpressionCompiler.Compile(selector);
 #else
 
@@ -87,7 +87,7 @@ namespace Sqo
 				}
 				QueryTranslatorProjection qp = new QueryTranslatorProjection();
 				TranslateResult result = qp.Translate(selector);
-#if (WP7 || UNITY3D) && !MANGO
+				#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Delegate projector = ExpressionCompiler.ExpressionCompiler.Compile(result.Projector);
 #else
 
@@ -107,7 +107,7 @@ namespace Sqo
 			catch (Exceptions.LINQUnoptimizeException ex3)
             {
                 SiaqodbConfigurator.LogMessage("Expression:" + selector.ToString() + " cannot be parsed, query runs un-optimized!", VerboseLevel.Warn);
-#if (WP7 || UNITY3D) && !MANGO
+				#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Func<TSource, TRet> fn = (Func<TSource, TRet>)ExpressionCompiler.ExpressionCompiler.Compile(selector);
 #else
 
@@ -146,7 +146,7 @@ namespace Sqo
                 QueryTranslatorProjection qp = new QueryTranslatorProjection();
 
                 TranslateResult result = qp.Translate(resultSelector);
-#if (WP7 || UNITY3D) && !MANGO
+				#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Delegate projector = ExpressionCompiler.ExpressionCompiler.Compile(result.Projector);
 #else
 
@@ -165,7 +165,7 @@ namespace Sqo
             catch (Exceptions.LINQUnoptimizeException ex3)
             {
                 SiaqodbConfigurator.LogMessage("Expression:" + resultSelector.ToString() + " cannot be parsed, query runs un-optimized!", VerboseLevel.Warn);
-#if (WP7 || UNITY3D) && !MANGO
+				#if (WP7 || UNITY3D) && !MANGO && !XIOS 
                 Func<TOuter, TKey> outerKeySelectorFN = (Func<TOuter, TKey>)ExpressionCompiler.ExpressionCompiler.Compile(outerKeySelector);
                 Func<TInner, TKey> innerKeySelectorFN = (Func<TInner, TKey>)ExpressionCompiler.ExpressionCompiler.Compile(innerKeySelector);
                 Func<TOuter, TInner, TResult> resultSelectorFN = (Func<TOuter, TInner, TResult>)ExpressionCompiler.ExpressionCompiler.Compile(resultSelector);
