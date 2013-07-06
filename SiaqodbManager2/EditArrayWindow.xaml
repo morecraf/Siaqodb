@@ -1,0 +1,11 @@
+﻿<Window x:Class="SiaqodbManager.EditArrayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EditArrayWindow" Height="236" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <Grid>
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Right" Name="btnCancel" VerticalAlignment="Bottom" Width="75" IsCancel="True" FlowDirection="RightToLeft" Margin="0,0,4,2" TabIndex="2" />
+        <Button Content="Save" Height="23" HorizontalAlignment="Left" Margin="6,0,0,3" Name="btnSave" VerticalAlignment="Bottom" Width="75" IsDefault="True" FlowDirection="RightToLeft" TabIndex="1" Click="btnSave_Click" />
+        <TextBox HorizontalAlignment="Stretch" Name="textBox1" VerticalAlignment="Stretch" Margin="3,24,3,31" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="Auto" AcceptsReturn="True" VerticalContentAlignment="Stretch" TabIndex="0" />
+        <Label Content="Edit array values (enter one element per line):" Height="28" HorizontalAlignment="Left" Margin="2,0,0,0" Name="label1" VerticalAlignment="Top" />
+    </Grid>
+</Window>

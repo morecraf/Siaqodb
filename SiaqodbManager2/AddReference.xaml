@@ -1,0 +1,38 @@
+﻿<Window x:Class="SiaqodbManager.AddReference"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AddReference" Height="352" Width="724" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="170"/>
+            <RowDefinition Height="*"/>
+
+        </Grid.RowDefinitions>
+        <TabControl Name="tabControl1" Margin="0,0,0,31" Grid.RowSpan="2">
+            <TabItem Header="References" Name="tabItem1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="170"/>
+                        <RowDefinition Height="80*" />
+                    </Grid.RowDefinitions>
+                    <ListBox Name="listBox1" Margin="0,0,0,38" Grid.RowSpan="2" />
+                    <Button Height="26" Grid.Row="1"  Width="66" Name="btnAdd" Content="Add" Click="btnAdd_Click"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="6,0,0,6" />
+                    <Button Height="26" Width="66"  Name="btnRemove" Content="Remove" Click="btnRemove_Click"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="78,0,0,6" Grid.Row="1" />
+<Button Content="Add default references" Height="26" HorizontalAlignment="Right" Margin="0,0,0,7" Name="btnAddDefault" VerticalAlignment="Bottom" Width="156" Grid.Row="1" Click="btnAddDefault_Click" FlowDirection="RightToLeft" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Namespaces" Name="tabItem2">
+                <Grid>
+                    <TextBox  Name="textBox1" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,33,0,0" />
+ <Label Content="Add a namespace per line:" Height="28" HorizontalAlignment="Left" Margin="0,-1,0,0" Name="label1" VerticalAlignment="Top" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+
+        <Button Grid.Row="1" Content="OK" Height="23" HorizontalAlignment="Right"  Name="btnOK" VerticalAlignment="Bottom" Width="75" Click="btnOK_Click" Margin="0,0,86,4" IsDefault="True" />
+        <Button  Grid.Row="1" Content="Cancel" Height="23" HorizontalAlignment="Right" Margin="0,0,5,4" Name="btnCancel" VerticalAlignment="Bottom" Width="75" IsCancel="True" />
+    </Grid>
+    
+    
+</Window>

@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "siaqodbCF", "siaqodb\siaqodbCF.csproj", "{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Linq.Expressions", "System.Linq.Expressions\System.Linq.Expressions.csproj", "{92FFA693-E97C-42AF-B479-E311BB4A7321}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDeviceProject2", "SmartDeviceProject2\SmartDeviceProject2.csproj", "{6009D5D6-2ADE-42C1-A4D5-F47726BB9750}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncCacheControllerCF", "SyncFramework\SyncCacheControllerCF\SyncCacheControllerCF.csproj", "{4C89C8FD-5E7E-475E-BB67-C33E3F55E950}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiaqodbSyncProviderCF", "SyncFramework\SiaqodbSyncProvider\SiaqodbSyncProviderCF.csproj", "{7A2F318D-2229-44EF-AE54-B9925539E163}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92FFA693-E97C-42AF-B479-E311BB4A7321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92FFA693-E97C-42AF-B479-E311BB4A7321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92FFA693-E97C-42AF-B479-E311BB4A7321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92FFA693-E97C-42AF-B479-E311BB4A7321}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6009D5D6-2ADE-42C1-A4D5-F47726BB9750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6009D5D6-2ADE-42C1-A4D5-F47726BB9750}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6009D5D6-2ADE-42C1-A4D5-F47726BB9750}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6009D5D6-2ADE-42C1-A4D5-F47726BB9750}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6009D5D6-2ADE-42C1-A4D5-F47726BB9750}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6009D5D6-2ADE-42C1-A4D5-F47726BB9750}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{4C89C8FD-5E7E-475E-BB67-C33E3F55E950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C89C8FD-5E7E-475E-BB67-C33E3F55E950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C89C8FD-5E7E-475E-BB67-C33E3F55E950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C89C8FD-5E7E-475E-BB67-C33E3F55E950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A2F318D-2229-44EF-AE54-B9925539E163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A2F318D-2229-44EF-AE54-B9925539E163}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A2F318D-2229-44EF-AE54-B9925539E163}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A2F318D-2229-44EF-AE54-B9925539E163}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

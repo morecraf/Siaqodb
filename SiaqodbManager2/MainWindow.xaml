@@ -1,0 +1,114 @@
+﻿<Window x:Class="SiaqodbManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SiaqodbManager 3.0" Height="700" Width="900" xmlns:my="clr-namespace:AvalonDock;assembly=AvalonDock" Loaded="Window_Loaded" Icon="/SiaqodbManager;component/managerIcon.ico">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="55"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Menu  HorizontalAlignment="Stretch" Name="menu1" VerticalAlignment="Stretch" Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="New LINQ Editor" Click="OnNewLINQ" InputGestureText="Ctrl+N" >
+                    <MenuItem.Icon>
+                        <Image Source="Resources/new.png" Height="20"/>
+                    </MenuItem.Icon>
+
+                </MenuItem>
+                <MenuItem Header="Open LINQ file" Name="menuOpen" Click="menuOpen_Click" InputGestureText="Ctrl+O">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/openlinq.png" Height="20"/>
+                    </MenuItem.Icon>
+
+                </MenuItem>
+                <MenuItem Header="Save" Name="menuSave" Click="menuSave_Click" InputGestureText="Ctrl+S">
+                    <MenuItem.Icon>
+                        <Image Source="Resources/save.png" Height="20"/>
+                    </MenuItem.Icon>
+
+                </MenuItem>
+                <MenuItem Header="Save as..." Name="menuSaveAs" Click="menuSaveAs_Click" />
+                <Separator />
+                <MenuItem Header="Exit" Name="menuExit" Click="menuExit_Click" />
+            </MenuItem>
+            <MenuItem Header="Query">
+                <MenuItem   Header="Execute" Name="menuExecute" Click="menuExecute_Click" InputGestureText="F5"  >
+                    
+                    <MenuItem.Icon>
+                        <Image Source="Resources/run.png" Height="20"/>
+                    </MenuItem.Icon>
+
+                </MenuItem>
+                <MenuItem Header="References ..." Name="menuReferences" Click="menuReferences_Click" />
+                <MenuItem Name="menuEncryption" Header="Encryption..." Click="menuEncryption_Click" />
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="Help" Name="menuHelp" Click="menuHelp_Click" />
+                <MenuItem Header="About" Name="menuAbout" Click="menuAbout_Click" />
+            </MenuItem>
+        </Menu>
+        <ToolBar Height="55"  Grid.Row="1" >
+            <Button  Name="btnNewLINQ" Click="btnNewLINQ_Click" VerticalContentAlignment="Top" Height="50" ToolTip="New linq editor">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image Source="Resources/new.png" Height="29"></Image>
+                    <TextBlock Text="New linq editor"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button  Name="btnOpenLINQ" Click="btnOpenLINQ_Click" Height="50" ToolTip="Open linq file">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image Source="Resources/openlinq.png" Height="29"></Image>
+                    <TextBlock Text="Open linq file"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button   Name="btnSave" Click="btnSave_Click" Height="50" ToolTip="Save" >
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image Source="Resources/save.png" Height="29"></Image>
+                    <TextBlock Text="Save linq file"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Name="btnExecute" Click="btnExecute_Click" Height="50" ToolTip="Run linq">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image Source="Resources/run.png" Height="29"></Image>
+                    <TextBlock Text="Run linq "></TextBlock>
+                </StackPanel>
+            </Button>
+           
+        </ToolBar>
+        <ToolBar Height="35"  Grid.Row="2" >
+            <Button  Name="btnOpenDB" Click="btnOpenDB_Click" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Height="30" >
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image Source="Resources/opendb.png" Height="23" ToolTip="Open database..."></Image>
+                    
+                </StackPanel>
+
+            </Button>
+            <ComboBox Name="cmbDBPath"  Width="230" IsEditable="True" Height="22" />
+            <Button  Name="btnConnect" Click="btnConnect_Click" Height="30">
+
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image Source="Resources/connect.png" Height="23" ToolTip="Connect to selected database"></Image>
+
+                </StackPanel>
+
+            </Button>
+        </ToolBar>
+
+        <my:DockingManager   Name="dockingManager1"  Grid.Row="3" >
+            <my:ResizingPanel Orientation="Horizontal" >
+                <my:DockablePane my:ResizingPanel.ResizeWidth="270" Name="dockablePane1" >
+                    <my:DockableContent Height="50" Name="dockableContent1" Width="100" Title="Database explorer">
+
+                        <TreeView  Name="treeView1" MouseDoubleClick="treeView1_MouseDoubleClick"></TreeView>
+                    </my:DockableContent>
+                </my:DockablePane>
+                <my:DocumentPane  Name="documentPane1"   >
+               
+                </my:DocumentPane>
+            </my:ResizingPanel>
+        </my:DockingManager>
+        
+    </Grid>
+    
+</Window>

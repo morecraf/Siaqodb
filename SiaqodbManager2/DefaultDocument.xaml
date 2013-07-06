@@ -1,0 +1,22 @@
+﻿<ad:DocumentContent x:Class="SiaqodbManager.DefaultDocument"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                     xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock" Height="422" Width="707">
+    <Grid>
+        <StackPanel Margin="0,0,90,31">
+            <DockPanel>
+        <Label Content="Visit forum" Foreground="#FF186BE8" Height="27" HorizontalAlignment="Left"  Name="label3" VerticalAlignment="Top" Width="90" MouseEnter="label3_MouseEnter" MouseLeave="label3_MouseLeave" MouseDown="label3_MouseDown" />
+        <Label Content="Visit blog" Foreground="#FF186BE8" Height="27" HorizontalAlignment="Left"  Name="label1" VerticalAlignment="Top" Width="90" MouseEnter="label1_MouseEnter" MouseLeave="label1_MouseLeave" MouseDown="label1_MouseDown" />
+        <Label Content="Send us an email" Foreground="#FF186BE8" Height="27" HorizontalAlignment="Left"  Name="label2" VerticalAlignment="Top" Width="107" MouseLeave="label2_MouseLeave" MouseEnter="label2_MouseEnter" MouseDown="label2_MouseDown" />
+            </DockPanel>
+
+            <DockPanel  >
+
+                <Image Source="pack://application:,,/Resources/FirstFrame.png" Height="353" MouseUp="Image_MouseUp" ></Image>
+            </DockPanel>
+        </StackPanel>
+        
+    </Grid>
+</ad:DocumentContent>
