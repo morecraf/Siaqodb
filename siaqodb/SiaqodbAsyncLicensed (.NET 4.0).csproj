@@ -205,6 +205,7 @@
     <Compile Include="Utilities\SqoLicenseProvider.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
     <Compile Include="Utilities\SqoTrialLicense.cs" />
+    <Compile Include="Utilities\SqoUnity3DLic.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

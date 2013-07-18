@@ -354,17 +354,22 @@ namespace Sqo
         {
             Sqo.Utilities.SqoTrialLicense.LicenseValid(licenseKey);
         }
-#elif UNITY3D || CF || MONOTOUCH || MONODROID
+
+#elif WinRT
+        public static void SetLicense(string licenseKey)
+        {
+            Sqo.WinRTLicenseChecker.LicenseValid(licenseKey);
+        }
+#elif SILVERLIGHT
+        public static void SetLicense(string licenseKey)
+        {
+            SilvLicenseChecker.LicenseValid(licenseKey);
+        }
+#else
         
         public static void SetLicense(string licenseKey)
         {
             Sqo.Utilities.SqoUnity3DLic.LicenseValid(licenseKey);
-        }
-
-#elif WINDOWS_PHONE
-        public static void SetLicense(string licenseKey)
-        {
-            SilvLicenseChecker.LicenseValid(licenseKey);
         }
 #endif
         /// <summary>
