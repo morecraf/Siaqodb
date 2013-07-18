@@ -163,6 +163,7 @@
     <Compile Include="StorageEngine.Loader.cs" />
     <Compile Include="StorageEngine.Saver.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
+    <Compile Include="Utilities\SqoUnity3DLic.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
     <Compile Include="Queries\And.cs" />
     <Compile Include="Queries\Where.cs" />

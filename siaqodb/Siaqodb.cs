@@ -28,7 +28,7 @@ namespace Sqo
     /// </summary>
 #if SILVERLIGHT || UNITY3D || TRIAL || CF || MONODROID || WinRT
 #else
-      
+
     [System.ComponentModel.LicenseProvider(typeof(SqoLicenseProvider))]
 #endif
     [Obfuscation(Feature = "Apply to member * when event: all", Exclude = false,ApplyToMembers=true)]
@@ -2938,8 +2938,15 @@ savedObject(this, e);
 #elif UNITY3D || CF || MONODROID
             SqoUnity3DLic.LicenseValid();
 #else
-            System.ComponentModel.License license = System.ComponentModel.LicenseManager.Validate(typeof(Siaqodb), this);
-
+            try
+            {
+                System.ComponentModel.License license = System.ComponentModel.LicenseManager.Validate(typeof(Siaqodb), this);
+            }
+            catch (Exception ex)
+            {
+                SqoUnity3DLic.LicenseValid();
+            }
+            
 #endif
         }
        
