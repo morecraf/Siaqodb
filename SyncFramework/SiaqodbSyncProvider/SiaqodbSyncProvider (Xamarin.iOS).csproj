@@ -65,7 +65,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="ExpressionCompilerMT">
-      <HintPath>..\..\ExpressionCompiler\ExpressionCompilerMT.dll</HintPath>
+      <HintPath>..\..\libs\ExpressionCompilerMT.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -81,13 +81,13 @@
     <Compile Include="SyncProviderLicense.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Siaqodb\Siaqodb %28Xamarin.iOS%29.csproj">
-      <Project>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE107}</Project>
-      <Name>Siaqodb (Xamarin.iOS)</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncCacheController\SyncCacheController %28Xamarin.iOS%29.csproj">
       <Project>{6EC0573E-CAAB-4B83-8474-99A42B6B16A8}</Project>
       <Name>SyncCacheController (Xamarin.iOS)</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28Xamarin.iOS%29.csproj">
+      <Project>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE107}</Project>
+      <Name>Siaqodb (Xamarin.iOS)</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

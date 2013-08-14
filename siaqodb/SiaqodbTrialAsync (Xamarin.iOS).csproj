@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iPhoneSimulator\Trial</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;ASYNC;TRIAL</DefineConstants>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC;TRIAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
@@ -40,7 +40,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iPhone\DebugTrial</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;ASYNC;TRIAL</DefineConstants>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC;TRIAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
@@ -62,7 +62,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="ExpressionCompilerMT">
-      <HintPath>..\ExpressionCompiler\ExpressionCompilerMT.dll</HintPath>
+      <HintPath>..\libs\ExpressionCompilerMT.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
