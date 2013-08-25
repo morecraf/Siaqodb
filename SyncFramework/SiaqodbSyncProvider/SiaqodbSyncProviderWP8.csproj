@@ -118,6 +118,10 @@
       <Project>{CA9BE4FC-54F1-4E41-8EF2-64B33C3CFB16}</Project>
       <Name>SiaqodbTrial %28WP 8%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SyncCacheController\SyncCacheControllerWP.csproj">
+      <Project>{C4D0C333-D6FA-46D5-A513-AC71E4805789}</Project>
+      <Name>SyncCacheControllerWP</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />

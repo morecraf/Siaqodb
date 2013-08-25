@@ -68,6 +68,10 @@
       <Project>{E8216F6B-D70E-48CE-B530-233B3DF36EFF}</Project>
       <Name>SiaqodbTrial %28WP 7.1%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SyncCacheController\SyncCacheControllerWP.csproj">
+      <Project>{C4D0C333-D6FA-46D5-A513-AC71E4805789}</Project>
+      <Name>SyncCacheControllerWP</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Condition=" '$(EAZFUSCATOR_NET_HOME)' != '' and Exists('$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets') " Project="$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
