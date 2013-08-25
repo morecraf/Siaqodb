@@ -21,7 +21,8 @@
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
-    <FileUpgradeFlags></FileUpgradeFlags>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -208,6 +209,7 @@
     <Compile Include="Utilities\SilvLicenseChecker.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
     <Compile Include="Utilities\SqoTrialLicense.cs" />
+    <Compile Include="Utilities\SqoUnity3DLic.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

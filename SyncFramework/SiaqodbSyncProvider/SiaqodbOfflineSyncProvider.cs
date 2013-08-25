@@ -110,7 +110,7 @@ namespace SiaqodbSyncProvider
 
             if (this.UseElevatedTrust)
             {
-                string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+                string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
                 FileStream phisicalFile = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 byte[] fullFile = new byte[phisicalFile.Length];
                 phisicalFile.Read(fullFile, 0, fullFile.Length);
@@ -121,7 +121,7 @@ namespace SiaqodbSyncProvider
             {
                 IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
 
-                IsolatedStorageFileStream phisicalFile = new IsolatedStorageFileStream(siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc", FileMode.OpenOrCreate, FileAccess.ReadWrite, isf);
+                IsolatedStorageFileStream phisicalFile = new IsolatedStorageFileStream(siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc", FileMode.OpenOrCreate, FileAccess.ReadWrite, isf);
                 byte[] fullFile = new byte[phisicalFile.Length];
 
                 phisicalFile.Read(fullFile, 0, fullFile.Length);
@@ -129,14 +129,14 @@ namespace SiaqodbSyncProvider
                 return fullFile;
             }
 #elif MONODROID
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
             RandomAccessFile phisicalFile = new RandomAccessFile(filePath, "rw");
             byte[] fullFile = new byte[phisicalFile.Length()];
             phisicalFile.Read(fullFile, 0, fullFile.Length);
             phisicalFile.Close();
             return fullFile;
 #else
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_"+CacheController.ControllerBehavior.ScopeName+".anc";
             FileStream phisicalFile = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             byte[] fullFile = new byte[phisicalFile.Length];
             phisicalFile.Read(fullFile, 0, fullFile.Length);
@@ -216,7 +216,7 @@ namespace SiaqodbSyncProvider
 #if SILVERLIGHT
             if (this.UseElevatedTrust)
             {
-                string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+                string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
                 FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 file.Seek(0, SeekOrigin.Begin);
                 file.Write(anchor, 0, anchor.Length);
@@ -226,19 +226,19 @@ namespace SiaqodbSyncProvider
             {
                 IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
 
-                IsolatedStorageFileStream phisicalFile = new IsolatedStorageFileStream(siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc", FileMode.OpenOrCreate, FileAccess.ReadWrite, isf);
+                IsolatedStorageFileStream phisicalFile = new IsolatedStorageFileStream(siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc", FileMode.OpenOrCreate, FileAccess.ReadWrite, isf);
                 phisicalFile.Seek(0, SeekOrigin.Begin);
                 phisicalFile.Write(anchor, 0, anchor.Length);
                 phisicalFile.Close();
             }
 #elif MONODROID
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
             RandomAccessFile file = new RandomAccessFile(filePath, "rw");
             file.Seek(0);
             file.Write(anchor, 0, anchor.Length);
             file.Close();
 #else
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
             FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             file.Seek(0, SeekOrigin.Begin);
             file.Write(anchor, 0, anchor.Length);
@@ -252,7 +252,7 @@ namespace SiaqodbSyncProvider
             {
                 if (this.UseElevatedTrust)
                 {
-                    string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+                    string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
                     if (File.Exists(fileName))
                     {
                         File.Delete(fileName);
@@ -263,7 +263,7 @@ namespace SiaqodbSyncProvider
                 else
                 {
                     IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
-                    string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+                    string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
                     if (isf.FileExists(fileName))
                     {
                         isf.DeleteFile(fileName);
@@ -281,7 +281,7 @@ namespace SiaqodbSyncProvider
             try
             {
 
-                string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+                string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
                 File file = new File(fileName);
                 if (file.Exists())
                 {
@@ -297,8 +297,8 @@ namespace SiaqodbSyncProvider
 #else
             try
             {
-                
-                string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchorr.anc";
+
+                string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
                
                 if (File.Exists(fileName))
                 {

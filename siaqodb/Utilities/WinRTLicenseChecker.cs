@@ -14,7 +14,7 @@ namespace Sqo
         private static bool? valid = null;
         internal static bool LicenseValid()
         {
-            
+
             if (valid.HasValue)
             {
                 if (valid.Value)
@@ -54,8 +54,8 @@ namespace Sqo
                     string sIV = "74W95wh%YL:2$*1C";
                     string keyD = Sqo.Utilities.Decryptor.DecryptRJ128(sKy, sIV, key);
                     string[] keyValues = keyD.Split('|');
-                   
-                    if (keyValues.Length>2)
+
+                    if (keyValues.Length > 2)
                     {
                         valid = true;
                         return true;
@@ -65,16 +65,57 @@ namespace Sqo
                         throw new InvalidLicenseException("License not valid!");
                     }
                     //Encoding.
-                    
+
                 }
                 catch
                 {
                     throw new InvalidLicenseException("License not valid!");
                 }
             }
-           
+
         }
-        
-       
+        internal static bool LicenseValid(string licenseKey)
+        {
+
+            if (valid.HasValue)
+            {
+                if (valid.Value)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new InvalidLicenseException("License not valid!");
+                }
+            }
+
+            try
+            {
+               string sKy = "lkikwfq_j8KLp@sE";
+                string sIV = "74W95wh%YL:2$*1C";
+                string keyD = Sqo.Utilities.Decryptor.DecryptRJ128(sKy, sIV, licenseKey);
+                string[] keyValues = keyD.Split('|');
+
+                if (keyValues.Length > 2)
+                {
+                    valid = true;
+                    return true;
+                }
+                else
+                {
+                    throw new InvalidLicenseException("License not valid!");
+                }
+                //Encoding.
+
+            }
+            catch
+            {
+                throw new InvalidLicenseException("License not valid!");
+            }
+
+
+
+
+        }
     }
 }
