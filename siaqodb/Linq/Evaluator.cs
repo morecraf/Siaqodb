@@ -147,7 +147,7 @@ namespace Sqo
 #endif
                 LambdaExpression lambda = Expression.Lambda(e);
 
-            #if (WP7 || UNITY3D) && !MANGO
+				#if (WP7 || UNITY3D) && !MANGO  && !XIOS
                 Delegate fn = ExpressionCompiler.ExpressionCompiler.Compile(lambda);
             #else
 
