@@ -14,7 +14,11 @@ namespace SiaqodbUnitTests
     public class LINQTests
     {
         StorageFolder dbFolder = ApplicationData.Current.LocalFolder;
-
+        public LINQTests()
+        {
+            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+          
+        }
         [TestMethod]
         public async Task TestBasicQuery()
         {

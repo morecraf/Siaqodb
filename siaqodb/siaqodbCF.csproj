@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\DebugCF\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Smartphone CF</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;Smartphone CF TRIAL</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncLocker\AsyncLock.cs" />
     <Compile Include="Attributes\IgnoreAttribute.cs" />
     <Compile Include="Attributes\Index.cs" />
     <Compile Include="Attributes\MaxLengthAttribute.cs" />
@@ -62,7 +63,9 @@
     <Compile Include="Cache\CacheCustomFileNames.cs" />
     <Compile Include="Cache\CacheForIndexes.cs" />
     <Compile Include="Cache\CacheForManager.cs" />
+    <Compile Include="Cache\CacheOIDs.cs" />
     <Compile Include="Cache\CircularRefCache.cs" />
+    <Compile Include="Cache\ConditionalWeakTable.cs" />
     <Compile Include="Cache\MetaCache.cs" />
     <Compile Include="Core\ByteConverter.cs" />
     <Compile Include="Core\ByteTransformers\ArrayByteTranformer.cs" />
@@ -101,10 +104,6 @@
     <Compile Include="Internal\_bs.cs" />
     <Compile Include="IObjectList.cs" />
     <Compile Include="ISqoDataObject.cs" />
-    <Compile Include="KeVaSt\BTree.cs" />
-    <Compile Include="KeVaSt\BTreeNode.cs" />
-    <Compile Include="KeVaSt\IndexInfo.cs" />
-    <Compile Include="KeVaSt\Kevastdb.cs" />
     <Compile Include="LazyObjectList.cs" />
     <Compile Include="Linq\Evaluator.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
@@ -167,6 +166,7 @@
     <Compile Include="Utilities\SqoSortableItem.cs" />
     <Compile Include="Utilities\SqoTrialLicense.cs" />
     <Compile Include="Utilities\SqoUnity3DLic.cs" />
+    <Compile Include="WinRTExtensions\TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\System.Linq.Expressions\System.Linq.Expressions.csproj">

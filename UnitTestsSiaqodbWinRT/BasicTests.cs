@@ -16,6 +16,11 @@ namespace SiaqodbUnitTests
     public class BasicTests
     {
         StorageFolder dbFolder = ApplicationData.Current.LocalFolder;
+        public BasicTests()
+        {
+            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+          
+        }
         [TestMethod]
         public async Task TestInsert()
         {
