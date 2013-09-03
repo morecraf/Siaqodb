@@ -15,50 +15,81 @@ namespace Sqo.Core
         protected StorageFile file;
         string folderPath;
         string fileName;
-        Stream streamReader;
-        Stream streamWriter;
+       // Stream streamReader;
+        //Stream streamWriter;
         FileRandomAccessStream fileStream;
         StorageFolder storageFolder;
         
         public virtual async Task WriteAsync(long pos, byte[] buf)
         {
-
-            streamWriter.Seek(pos,SeekOrigin.Begin);
-            await streamWriter.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
-            
+           
+            //streamWriter.Seek(pos,SeekOrigin.Begin);
+            //await streamWriter.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
+            fileStream.Seek((ulong)pos);
+            if (buf.Length > 0)
+            {
+                await fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf));
+            }
         }
         public virtual async Task WriteAsync(byte[] buf)
         {
 
-            await streamWriter.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
+            //await streamWriter.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
+            if (buf.Length > 0)
+            {
+                await fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf));
+            }
             
         }
         public virtual async Task<int> ReadAsync(long pos, byte[] buf)
         {
 
-            streamReader.Seek(pos,SeekOrigin.Begin);
-            return await streamReader.ReadAsync(buf, 0, buf.Length).ConfigureAwait(false);
-            
+            //streamReader.Seek(pos,SeekOrigin.Begin);
+            //return await streamReader.ReadAsync(buf, 0, buf.Length).ConfigureAwait(false);
+            fileStream.Seek((ulong)pos);
+            if (buf.Length > 0)
+            {
+                var rd = await fileStream.ReadAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf), (uint)buf.Length, InputStreamOptions.None);
+                rd.CopyTo(buf);
+            }
+            return (int)buf.Length;
+
+             
         }
         public virtual void Write(long pos, byte[] buf)
         {
 
-            streamWriter.Seek(pos, SeekOrigin.Begin);
-            streamWriter.WriteAsync(buf, 0, buf.Length).Wait();
+            //streamWriter.Seek(pos, SeekOrigin.Begin);
+            //streamWriter.WriteAsync(buf, 0, buf.Length).Wait();
+            fileStream.Seek((ulong)pos);
+            if (buf.Length > 0)
+            {
+                fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf)).AsTask().Wait();
+            }
 
         }
         public virtual void Write(byte[] buf)
         {
 
-            streamWriter.WriteAsync(buf, 0, buf.Length).Wait();
+           // streamWriter.WriteAsync(buf, 0, buf.Length).Wait();
+            if (buf.Length > 0)
+            {
+                fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf)).AsTask().Wait();
+            }
 
         }
         public virtual int Read(long pos, byte[] buf)
         {
 
-            streamReader.Seek(pos, SeekOrigin.Begin);
-            return streamReader.ReadAsync(buf, 0, buf.Length).Result;
-
+            //streamReader.Seek(pos, SeekOrigin.Begin);
+            //return streamReader.ReadAsync(buf, 0, buf.Length).Result;
+            fileStream.Seek((ulong)pos);
+            if (buf.Length > 0)
+            {
+                var rd = fileStream.ReadAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf), (uint)buf.Length, InputStreamOptions.None).AsTask().Result;
+                rd.CopyTo(buf);
+            }
+            return buf.Length;
         }
         public bool IsClosed
         {
@@ -70,7 +101,7 @@ namespace Sqo.Core
             {
                 if (fileStream != null)//possible some files are still pending in Serializer-> like TRansactionHeader, but are closed and not opened again
                 {
-                    streamWriter.FlushAsync().Wait();
+                    //streamWriter.FlushAsync().Wait();
                     fileStream.FlushAsync().AsTask().Wait();
                 }
             }
@@ -85,7 +116,7 @@ namespace Sqo.Core
             {
                 if (fileStream != null)//possible some files are still pending in Serializer-> like TRansactionHeader, but are closed and not opened again
                 {
-                    await streamWriter.FlushAsync().ConfigureAwait(false);
+                    //await streamWriter.FlushAsync().ConfigureAwait(false);
                     await fileStream.FlushAsync();
                 }
             }
@@ -122,8 +153,8 @@ namespace Sqo.Core
             storageFolder = StorageFolder.GetFolderFromPathAsync(folderPath).AsTask().Result;
             this.file = storageFolder.CreateFileAsync(this.fileName, CreationCollisionOption.OpenIfExists).AsTask().Result;
             this.fileStream = (FileRandomAccessStream)file.OpenAsync(FileAccessMode.ReadWrite).AsTask().Result;
-            this.streamWriter = fileStream.AsStreamForWrite();
-            this.streamReader = fileStream.AsStreamForRead();
+            //this.streamWriter = fileStream.AsStreamForWrite();
+            //this.streamReader = fileStream.AsStreamForRead();
 
         }
        
