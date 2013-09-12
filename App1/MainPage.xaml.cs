@@ -51,14 +51,36 @@ namespace App1
                 c.ID = i;
                 c.Name = "ad" + i.ToString();
                 //c.Vasiel = "momo" + i.ToString();
-                await nop.StoreObjectAsync(c);
+                nop.StoreObject(c);
             }
-            await nop.FlushAsync();
+            nop.Flush();
             string elapsedStore = (DateTime.Now - start).ToString();
             start = DateTime.Now;
-            IObjectList<Customer> listC = await nop.LoadAllAsync<Customer>();
+            IObjectList<Customer> listC = nop.LoadAll<Customer>();
             string elapsedRead= (DateTime.Now - start).ToString();
             nop.Close();
+
+
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var dbPath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "db.sqlite");
+            var db = new SQLite.SQLiteAsyncConnection(dbPath);
+
+            await db.CreateTableAsync<Person>();
+
+            DateTime start = DateTime.Now;
+            for (int i = 1; i < 10000; i++)
+            {
+               // await db.InsertAsync(new Person() { FirstName = "Tim", LastName = "Heuer" });
+            }
+
+            string elapsedStore = (DateTime.Now - start).ToString();
+            start = DateTime.Now;
+            IList<Person> sd = await db.QueryAsync<Person>("select * from Person where FirstName='Tim'", 1);
+            string elapsedRead = (DateTime.Now - start).ToString();
+            int g = 0;
 
 
         }
@@ -78,5 +100,12 @@ namespace App1
         }
         private ulong tickCount;
 
+    }
+    public class Person
+    {
+        [SQLite.AutoIncrement, SQLite.PrimaryKey]
+        public int ID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }
