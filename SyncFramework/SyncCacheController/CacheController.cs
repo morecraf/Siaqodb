@@ -522,6 +522,10 @@ namespace Microsoft.Synchronization.ClientServices
         /// <param name="e">Exception object to report to the user.</param>
         void CompleteAsyncWithException(Exception e)
         {
+            if (this._cancelled)
+            {
+                return;
+            }
             this._asyncWorkManager.EndChainedAsyncSession();
             this._asyncWorkManager.CompleteWorkRequest(this._refreshRequestWorker, e);
         }

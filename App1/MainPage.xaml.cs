@@ -51,9 +51,9 @@ namespace App1
                 c.ID = i;
                 c.Name = "ad" + i.ToString();
                 //c.Vasiel = "momo" + i.ToString();
-                nop.StoreObject(c);
+                await nop.StoreObjectAsync(c);
             }
-            nop.Flush();
+            await nop.FlushAsync();
             string elapsedStore = (DateTime.Now - start).ToString();
             start = DateTime.Now;
             IObjectList<Customer> listC = nop.LoadAll<Customer>();
@@ -71,9 +71,9 @@ namespace App1
             await db.CreateTableAsync<Person>();
 
             DateTime start = DateTime.Now;
-            for (int i = 1; i < 10000; i++)
+            for (int i = 1; i < 100; i++)
             {
-               // await db.InsertAsync(new Person() { FirstName = "Tim", LastName = "Heuer" });
+                await db.InsertAsync(new Person() { FirstName = "Tim", LastName = "Heuer" });
             }
 
             string elapsedStore = (DateTime.Now - start).ToString();
@@ -84,6 +84,11 @@ namespace App1
 
 
         }
+        public int Get<T>(T a) where T : ISiaqo
+        {
+           return a.OID;
+        }
+
     }
     public class Customer
     {
@@ -107,5 +112,10 @@ namespace App1
         public int ID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+    }
+    public abstract class ISiaqo : ISqoDataObject
+    {
+        public int OID { get; set; }
+
     }
 }
