@@ -151,11 +151,11 @@ namespace SiaqodbSyncMobile
         {
             throw new NotSupportedException("This method is not supported in SiaqodbMobile.");
         }
-        internal bool DeleteObjectByBase(string fieldName, ISqoDataObject obj)
+        internal bool DeleteObjectByBase(string fieldName, object obj)
         {
             return base.DeleteObjectBy(fieldName, obj);
         }
-        internal bool DeleteObjectByBase(ISqoDataObject obj, params string[] fieldNames)
+        internal bool DeleteObjectByBase(object obj, params string[] fieldNames)
         {
             return base.DeleteObjectBy(obj, fieldNames);
         }

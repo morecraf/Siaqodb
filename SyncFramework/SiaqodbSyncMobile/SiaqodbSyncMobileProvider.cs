@@ -238,6 +238,11 @@ namespace SiaqodbSyncMobile
                             object objEn= JsonConvert.DeserializeObject(((JObject)entity).ToString(), t);
                             siaqodbMobile.StoreDownloadedEntity(objEn);
                         }
+                        foreach (var delEntity in serverEntities.TombstoneList)
+                        {
+                            object objEn = JsonConvert.DeserializeObject(((JObject)delEntity).ToString(),t);
+                            bool deleted=siaqodbMobile.DeleteObjectByBase(objEn, "<UID>k__BackingField");
+                        }
                     }
                     finally
                     {
