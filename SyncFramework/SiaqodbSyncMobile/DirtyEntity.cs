@@ -43,5 +43,6 @@ namespace SiaqodbSyncMobile
        
         public DateTime TimeStamp{get;set;}
         public IList ItemsList{get;set;}
+        public IList TombstoneList { get; set; }
     }
 }

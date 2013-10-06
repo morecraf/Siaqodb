@@ -129,8 +129,18 @@ namespace SiaqodbSyncMobile
                     object entityFromDB = tuple.Item1;
                     var serObj = Newtonsoft.Json.JsonConvert.SerializeObject(entityFromDB);
                     JObject serializedObj = JObject.Parse(serObj.ToString());
+                    string timeStampValue = "";
+                    foreach (var props in serializedObj.Properties())
+                    {
+                        if (string.Compare(props.Name, "TimeStamp", StringComparison.InvariantCultureIgnoreCase) == 0)
+                        {
+                            timeStampValue = props.Value.ToString();
+                           
+                        }
+                    }
+                    
                     Dictionary<string,string> paramsAMS=GetParamsAMS();
-                    paramsAMS.Add("ENTimeStamp","add here entityTimeStamp");
+                    paramsAMS.Add("ENTimeStamp", timeStampValue);
                     await table.DeleteAsync(serializedObj,paramsAMS);
                     siaqodbMobile.DeleteBase(tuple.Item2);
                 }
@@ -203,14 +213,17 @@ namespace SiaqodbSyncMobile
                 IMobileServiceTable table = MobileService.GetTable(SyncedTypes[t]);
                 Anchor anchor = siaqodbMobile.Query<Anchor>().Where(anc => anc.EntityType == t.AssemblyQualifiedName).FirstOrDefault();//TODO
                 string filter = "";
+                string anchorJSON = "";
                 if (anchor != null)
                 {
                     string dateTimeString = new DateTime( anchor.TimeStamp.Ticks,DateTimeKind.Utc).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK",CultureInfo.InvariantCulture);
 
                     filter="$filter=(TimeStamp gt "+ string.Format(CultureInfo.InvariantCulture,"datetime'{0}'",dateTimeString)+")";
+                    anchorJSON = JsonConvert.SerializeObject(anchor.TimeStamp);
                 }
-                
-                var token = await table.ReadAsync(filter,GetParamsAMS());
+                Dictionary<string,string> paramAMS=GetParamsAMS();
+                paramAMS.Add("Anchor", anchorJSON);
+                var token = await table.ReadAsync(filter, paramAMS);
                 //Type typeIList = typeof(List<>).MakeGenericType(t);
                 //ConstructorInfo ctor = typeIList.GetConstructor(new Type[] { });
                 //IList list = (IList)ctor.Invoke(new object[]{});

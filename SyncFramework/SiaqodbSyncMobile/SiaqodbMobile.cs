@@ -28,7 +28,7 @@ namespace SiaqodbSyncMobile
             DirtyEntity dirtyEntity = new DirtyEntity();
             dirtyEntity.EntityOID = base.GetOID(obj);
             dirtyEntity.EntityType = obj.GetType().AssemblyQualifiedName;//TODO
-           
+            
             if (transaction != null)
             {
                 base.StoreObject(dirtyEntity, transaction);
@@ -48,6 +48,7 @@ namespace SiaqodbSyncMobile
             dirtyEntity.EntityOID = oid;
             dirtyEntity.EntityType = obj.GetType().AssemblyQualifiedName;
             dirtyEntity.IsTombstone = true;
+           
             if (transaction != null)
             {
                 base.StoreObject(dirtyEntity,transaction);

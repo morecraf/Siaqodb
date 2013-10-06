@@ -28,7 +28,11 @@ namespace PhoneApp3
         [JsonProperty(PropertyName = "UID")]
         public string UID { get; set; }
 
-          public object GetValue(System.Reflection.FieldInfo field)
+
+        [JsonProperty(PropertyName = "TimeStamp")]
+        public DateTime ServerTimeStamp { get; set; }
+
+        public object GetValue(System.Reflection.FieldInfo field)
         {
             return field.GetValue(this);
         }
@@ -57,20 +61,24 @@ namespace PhoneApp3
             nullableArray[1] = 1;
             Sqo.SiaqodbConfigurator.SetTrialLicense(@"KERjg6iuSq6MtlyRtahrgn4SnHgmQpCAnGWcDy195bOL2HVVea8396BNyZk0x+48");
             SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
-           "FxjfrcDbEQxdYzdIQVWPLyniMGYrcn61", "mydasbAl");
+           "FxjfrcDbEQxdYzdIQVWPLyniMGYrcn61", "mydasbA7");
             mob.AddSyncType<TodoItem>("TodoItem");
             for (int i = 0; i < 2; i++)
             {
                 TodoItem item = new TodoItem();
-                item.Text = "From Siaqodb"+i.ToString();
+                item.Text = "From OOBG"+i.ToString();
                 item.UID = Guid.NewGuid().ToString();
-                mob.StoreObject(item);
+                //mob.StoreObject(item);
             }
             var items2 = mob.LoadAll<TodoItem>();
             foreach (var ai in items2)
             {
-                ai.Text = "updated";
-               //mob.Delete(ai);
+                if (ai.Id == 48)
+                {
+                    //ai.Text = "updated";
+                    //ai.Complete = false;
+                    mob.Delete(ai);
+                }
             }
             mob.Flush();
             try
