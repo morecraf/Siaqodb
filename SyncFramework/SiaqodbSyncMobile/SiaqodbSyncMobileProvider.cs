@@ -112,6 +112,7 @@ namespace SiaqodbSyncMobile
                 await UploadUpdates(table, updates);
                 await UploadDeletes(table, deletes);
 
+                siaqodbMobile.Flush();
             }
             siaqodbMobile.DropType<DirtyEntity>();
            
@@ -126,9 +127,11 @@ namespace SiaqodbSyncMobile
                 {
                     Tuple<object, DirtyEntity> tuple = deletes[entityOID];
                     object entityFromDB = tuple.Item1;
-                    var serObj = MobileServiceTableSerializer.Serialize(entityFromDB);
+                    var serObj = Newtonsoft.Json.JsonConvert.SerializeObject(entityFromDB);
                     JObject serializedObj = JObject.Parse(serObj.ToString());
-                    await table.DeleteAsync(serializedObj);
+                    Dictionary<string,string> paramsAMS=GetParamsAMS();
+                    paramsAMS.Add("ENTimeStamp","add here entityTimeStamp");
+                    await table.DeleteAsync(serializedObj,paramsAMS);
                     siaqodbMobile.DeleteBase(tuple.Item2);
                 }
                
@@ -145,16 +148,18 @@ namespace SiaqodbSyncMobile
                 {
                     Tuple<object, DirtyEntity> tuple = updates[entityOID];
                     object entityFromDB = tuple.Item1;
-                    var serObj = MobileServiceTableSerializer.Serialize(entityFromDB);
-                    //JObject serializedObj = JObject.Parse(serObj.ToString());
-                    //await table.UpdateAsync(serializedObj);
-                    arr.Add(serObj);
+                    var serObj = Newtonsoft.Json.JsonConvert.SerializeObject(entityFromDB);
+                    JObject serializedObj = JObject.Parse(serObj.ToString());
+                   
+                    
+                    //var updated=await table.UpdateAsync(serializedObj);
+                    arr.Add(serializedObj);
                     tobeDeleted.Add(tuple.Item2);
                 }
 
                 var body = new JObject() { { "id", 1 }, { table.TableName, arr } };
-                var serializedArr = JObject.Parse(body.ToString());
-                await table.UpdateAsync(serializedArr);
+                //var serializedArr = JObject.Parse(body.ToString());
+                var upd=await table.UpdateAsync(body,GetParamsAMS());
                 tobeDeleted.ForEach(a => siaqodbMobile.DeleteBase(a));
             }
         }
@@ -169,16 +174,25 @@ namespace SiaqodbSyncMobile
                 {
                     Tuple<object, DirtyEntity> tuple = inserts[entityOID];
                     object entityFromDB = tuple.Item1;
-                    var serObj = MobileServiceTableSerializer.Serialize(entityFromDB);
-                    //JObject serializedObj = JObject.Parse(serObj.ToString());
+                    var serObj = Newtonsoft.Json.JsonConvert.SerializeObject(entityFromDB);
+                    JObject serializedObj = JObject.Parse(serObj.ToString());
+                    string IdPropName = "Id";
+                    foreach (var props in serializedObj.Properties())
+                    {
+                        if (string.Compare(props.Name, "id", StringComparison.InvariantCultureIgnoreCase) == 0)
+                        {
+                            IdPropName = props.Name;
+                        }
+                    }
+                    serializedObj.Remove(IdPropName);
                     //await table.InsertAsync(serializedObj);
                     tobeDeleted.Add(tuple.Item2);
-                    arr.Add(serObj);
+                    arr.Add(serializedObj);
                 }
 
                 var body = new JObject() { { table.TableName, arr } };
-                JObject serializedArr = JObject.Parse(body.ToString());
-                await table.InsertAsync(serializedArr);
+               
+                var r=await table.InsertAsync(body,GetParamsAMS());
                 tobeDeleted.ForEach(a => siaqodbMobile.DeleteBase(a));
             }
         }
@@ -195,7 +209,8 @@ namespace SiaqodbSyncMobile
 
                     filter="$filter=(TimeStamp gt "+ string.Format(CultureInfo.InvariantCulture,"datetime'{0}'",dateTimeString)+")";
                 }
-                var token = await table.ReadAsync(filter);
+                
+                var token = await table.ReadAsync(filter,GetParamsAMS());
                 //Type typeIList = typeof(List<>).MakeGenericType(t);
                 //ConstructorInfo ctor = typeIList.GetConstructor(new Type[] { });
                 //IList list = (IList)ctor.Invoke(new object[]{});
@@ -234,6 +249,12 @@ namespace SiaqodbSyncMobile
         public void AddAsyncType<T>(string azure_table)
         {
             SyncedTypes.Add(typeof(T),azure_table);
+        }
+        private Dictionary<string, string> GetParamsAMS()
+        {
+            Dictionary<string, string> params_toAMS = new Dictionary<string, string>();
+            params_toAMS.Add("IsSiaqodbSync", "true");
+            return params_toAMS;
         }
 
     }
