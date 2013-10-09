@@ -1730,12 +1730,12 @@ savedObject(this, e);
             }
         }
 #endif
-        /// <summary>
+         /// <summary>
         /// Delete an object from database by a criteria
         /// </summary>
         /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
         /// <returns>Number of objects deleted</returns>
-        public int DeleteObjectBy<T>(Dictionary<string,object> criteria)
+        public int DeleteObjectBy(Type objectType,Dictionary<string, object> criteria)
         {
             lock (_locker)
             {
@@ -1747,8 +1747,8 @@ savedObject(this, e);
                 {
                     throw new SiaqodbException("Database is closed, call method Open() to open it!");
                 }
-                
-                SqoTypeInfo ti = this.GetSqoTypeInfo(typeof(T));
+
+                SqoTypeInfo ti = this.GetSqoTypeInfo(objectType);
                 DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, -1);//we don't know it
                 this.OnDeletingObject(delEv);
                 if (delEv.Cancel)
@@ -1765,15 +1765,24 @@ savedObject(this, e);
                 return oidsDeleted.Count;
             }
         }
+        /// <summary>
+        /// Delete an object from database by a criteria
+        /// </summary>
+        /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
+        /// <returns>Number of objects deleted</returns>
+        public int DeleteObjectBy<T>(Dictionary<string,object> criteria)
+        {
+            return DeleteObjectBy(typeof(T), criteria);
+        }
 #if ASYNC
         /// <summary>
         /// Delete an object from database by a criteria
         /// </summary>
         /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
         /// <returns>Number of objects deleted</returns>
-        public async Task<int> DeleteObjectByAsync<T>(Dictionary<string, object> criteria)
-        {
 
+        public async Task<int> DeleteObjectByAsync(Type objectType,Dictionary<string, object> criteria)
+        {
             if (criteria == null || criteria.Keys.Count == 0)
             {
                 throw new ArgumentNullException("criteria");
@@ -1782,10 +1791,10 @@ savedObject(this, e);
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _locker.LockAsync(objectType, out locked);
             try
             {
-                SqoTypeInfo ti = this.GetSqoTypeInfo(typeof(T));
+                SqoTypeInfo ti = this.GetSqoTypeInfo(objectType);
                 DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, -1);//we don't know it
                 this.OnDeletingObject(delEv);
                 if (delEv.Cancel)
@@ -1800,12 +1809,23 @@ savedObject(this, e);
                     this.OnDeletedObject(deletedEv);
                 }
                 return oidsDeleted.Count;
-                
+
             }
             finally
             {
                 if (locked) _locker.Release();
             }
+        }
+
+        /// <summary>
+        /// Delete an object from database by a criteria
+        /// </summary>
+        /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
+        /// <returns>Number of objects deleted</returns>
+        public async Task<int> DeleteObjectByAsync<T>(Dictionary<string, object> criteria)
+        {
+            return await DeleteObjectByAsync(typeof(T), criteria);
+            
         }
 #endif
         

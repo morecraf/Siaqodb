@@ -16,15 +16,17 @@ namespace Sqo.Internal
 #endif
         static class _bs
     {
-        /// <summary>
+#if !WinRT
+            /// <summary>
         /// Do NOT use it!, it is used only internally
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static Siaqodb _b(string p)
+       public static Siaqodb _b(string p)
         {
             return new Siaqodb(p, false);
         }
+#endif
         /// <summary>
         /// Do NOT use it!, it is used only internally
         /// </summary>

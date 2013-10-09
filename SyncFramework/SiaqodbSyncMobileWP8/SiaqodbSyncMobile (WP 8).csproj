@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SiaqodbSyncMobile</RootNamespace>
-    <AssemblyName>SiaqodbSyncMobile</AssemblyName>
+    <AssemblyName>SiaqodbSyncMobileWP8</AssemblyName>
     <TargetFrameworkIdentifier>WindowsPhone</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
@@ -94,7 +94,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28WP 8%29.csproj">
       <Project>{CA9BE4FC-54F1-4E41-8EF2-64B33C3CFB16}</Project>
-      <Name>SiaqodbTrialWP8</Name>
+      <Name>SiaqodbTrial %28WP 8%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

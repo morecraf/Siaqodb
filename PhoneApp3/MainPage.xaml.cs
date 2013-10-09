@@ -61,7 +61,7 @@ namespace PhoneApp3
             nullableArray[1] = 1;
             Sqo.SiaqodbConfigurator.SetTrialLicense(@"KERjg6iuSq6MtlyRtahrgn4SnHgmQpCAnGWcDy195bOL2HVVea8396BNyZk0x+48");
             SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
-           "FxjfrcDbEQxdYzdIQVWPLyniMGYrcn61", "mydasbA7");
+           "FxjfrcDbEQxdYzdIQVWPLyniMGYrcn61", "mydasbA79");
             mob.AddSyncType<TodoItem>("TodoItem");
             for (int i = 0; i < 2; i++)
             {
@@ -71,14 +71,20 @@ namespace PhoneApp3
                 //mob.StoreObject(item);
             }
             var items2 = mob.LoadAll<TodoItem>();
+            var qq = (from TodoItem iss in mob
+                      where iss.Id == 37 || iss.Id == 44
+                      select iss).ToList();
+
+            int y = 0;
             foreach (var ai in items2)
             {
-                if (ai.Id == 48)
+                if (y==0)
                 {
-                    //ai.Text = "updated";
+                    ai.Text = "updated200";
                     //ai.Complete = false;
-                    mob.Delete(ai);
+                   // mob.StoreObject(ai);
                 }
+                y++;
             }
             mob.Flush();
             try

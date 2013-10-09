@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Sqo.Utilities;
 
 namespace SiaqodbSyncMobile
 {
@@ -219,7 +220,7 @@ namespace SiaqodbSyncMobile
                     string dateTimeString = new DateTime( anchor.TimeStamp.Ticks,DateTimeKind.Utc).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK",CultureInfo.InvariantCulture);
 
                     filter="$filter=(TimeStamp gt "+ string.Format(CultureInfo.InvariantCulture,"datetime'{0}'",dateTimeString)+")";
-                    anchorJSON = JsonConvert.SerializeObject(anchor.TimeStamp);
+                    anchorJSON = dateTimeString;//JsonConvert.SerializeObject(anchor.TimeStamp);
                 }
                 Dictionary<string,string> paramAMS=GetParamsAMS();
                 paramAMS.Add("Anchor", anchorJSON);
@@ -233,15 +234,25 @@ namespace SiaqodbSyncMobile
                     siaqodbMobile.StartBulkInsert(t);
                     try
                     {
-                        foreach (var entity in serverEntities.ItemsList)
+                        if (serverEntities.ItemsList != null)
                         {
-                            object objEn= JsonConvert.DeserializeObject(((JObject)entity).ToString(), t);
-                            siaqodbMobile.StoreDownloadedEntity(objEn);
+                            foreach (var entity in serverEntities.ItemsList)
+                            {
+                                object objEn = JsonConvert.DeserializeObject(((JObject)entity).ToString(), t);
+                                siaqodbMobile.StoreDownloadedEntity(objEn);
+                            }
                         }
-                        foreach (var delEntity in serverEntities.TombstoneList)
+                        if (serverEntities.TombstoneList != null)
                         {
-                            object objEn = JsonConvert.DeserializeObject(((JObject)delEntity).ToString(),t);
-                            bool deleted=siaqodbMobile.DeleteObjectByBase(objEn, "<UID>k__BackingField");
+                            foreach (var delEntity in serverEntities.TombstoneList)
+                            {
+                                var delEnJ = (JObject)delEntity;
+                                JToken ENId = delEnJ.GetValue("ENId");
+
+                                Dictionary<string, object> criteria = new Dictionary<string, object>();
+                                criteria.Add(ExternalMetaHelper.GetBackingField(ReflectionHelper.GetIdProperty(t)), Convert.ToInt32(ENId.ToString()));
+                                int nrDeleted = siaqodbMobile.DeleteObjectByBase(t, criteria);
+                            }
                         }
                     }
                     finally

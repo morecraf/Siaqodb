@@ -112,7 +112,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Folder Include="Internal\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLocker\AsyncLock.cs" />
@@ -162,6 +161,7 @@
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
     <Compile Include="Indexes\IndexInfo.cs" />
+    <Compile Include="Internal\_bs.cs" />
     <Compile Include="IObjectList.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="LazyObjectList.cs" />

@@ -159,6 +159,18 @@ namespace SiaqodbSyncMobile
         {
             return base.DeleteObjectBy(obj, fieldNames);
         }
+        public int DeleteObjectBy<T>(Dictionary<string, object> criteria)
+        {
+            throw new NotSupportedException("This method is not supported in SiaqodbMobile.");
+        }
+        public int DeleteObjectBy(Type objectType,Dictionary<string, object> criteria)
+        {
+            throw new NotSupportedException("This method is not supported in SiaqodbMobile.");
+        }
+        internal int DeleteObjectByBase(Type objectType, Dictionary<string, object> criteria)
+        {
+            return base.DeleteObjectBy(objectType, criteria);
+        }
         public void AddSyncType<T>(string azure_table)
         {
             SyncProvider.AddAsyncType<T>(azure_table);
