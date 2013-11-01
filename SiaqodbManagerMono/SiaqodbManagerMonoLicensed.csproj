@@ -12,7 +12,7 @@
     <AssemblyName>SiaqodbManagerMono</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ApplicationIcon>managerIcon.ico</ApplicationIcon>
+    <ApplicationIcon>siaqodb.ico</ApplicationIcon>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -162,9 +162,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="managerIcon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -186,6 +183,9 @@
       <Project>{243748A0-9797-4FA9-A805-D71127EAC3DA}</Project>
       <Name>SiaqodbLicensed %28.NET 3.5%29</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="siaqodb.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
