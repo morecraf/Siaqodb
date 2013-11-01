@@ -52,7 +52,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>managerIcon.ico</ApplicationIcon>
+    <ApplicationIcon>siaqodb.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>SiaqodbManager.App</StartupObject>
@@ -237,9 +237,6 @@
     <Resource Include="Resources\openlinq.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="managerIcon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\FirstFrame.png" />
   </ItemGroup>
   <ItemGroup>
@@ -247,6 +244,12 @@
       <Project>{F1A4918F-36C1-4B41-9D60-68BB8832B7FC}</Project>
       <Name>SiaqodbTrial %28.NET 3.5%29</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="siaqodb.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\siaqodbLogoFull.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

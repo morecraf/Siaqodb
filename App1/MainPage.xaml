@@ -9,6 +9,7 @@
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
         <Button Content="Button" HorizontalAlignment="Left" Margin="555,96,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="769,96,0,0" VerticalAlignment="Top" Click="Button_Click"/>
 
     </Grid>
 </Page>

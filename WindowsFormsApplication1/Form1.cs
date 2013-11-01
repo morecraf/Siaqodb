@@ -34,11 +34,54 @@ namespace WindowsFormsApplication1
             IList<Player> players = sqo.LoadAll<Player>();
             string d = "";
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            A a = new A(); a.Name = "AAA";
+            B b = new B(); b.Name = "BBB"; b.age = 10;
+            Z z = new Z();
+            z.a = a;
+            z.b = b;
+            z.items.Add(a);
+            z.items.Add(b);
+            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+           
+            Siaqodb sqo = new Siaqodb(@"e:\sqoo\temp\db\");
+
+            sqo.StoreObject(z);
+            int count = (from aBase aa in sqo select aa).Count();
+            string ass = "s";
+        }
     }
     public class Player
     {
         public string Name { get; set; }
         public int OID { get; set; }
         public int Age { get; set; }
+    }
+    public class aBase
+    {
+        public int OID{get;set;}
+    }
+    public class A : aBase
+    {
+        public string Name;
+
+        public A() { }
+    }
+    public class B : aBase
+    {
+        public string Name;
+        public int age;
+
+        public B() { }
+    }
+    public class Z
+    {
+        public A a;
+        public B b;
+        public List<aBase> items = new List<aBase>();
+
+        public Z() { }
     }
 }
