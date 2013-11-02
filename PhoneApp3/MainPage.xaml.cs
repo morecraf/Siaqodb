@@ -59,14 +59,14 @@ namespace PhoneApp3
             int?[] nullableArray = new int?[10];
             nullableArray[0] = null;
             nullableArray[1] = 1;
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"KERjg6iuSq6MtlyRtahrgn4SnHgmQpCAnGWcDy195bOL2HVVea8396BNyZk0x+48");
+            Sqo.SiaqodbConfigurator.SetTrialLicense(@"FSCVmMEntdr+nhefoUYc9n8KJFWa1I/GZ2key5jVmDA=");
             SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
            "FxjfrcDbEQxdYzdIQVWPLyniMGYrcn61", "mydasbA79");
             mob.AddSyncType<TodoItem>("TodoItem");
             for (int i = 0; i < 2; i++)
             {
                 TodoItem item = new TodoItem();
-                item.Text = "From OOBG"+i.ToString();
+                item.Text = "From OOBG" + i.ToString();
                 item.UID = Guid.NewGuid().ToString();
                 //mob.StoreObject(item);
             }
@@ -80,9 +80,9 @@ namespace PhoneApp3
             {
                 if (y==0)
                 {
-                    ai.Text = "updated200";
-                    //ai.Complete = false;
-                   // mob.StoreObject(ai);
+                    ai.Text = "updated2003";
+                    ai.Complete = false;
+                   mob.StoreObject(ai);
                 }
                 y++;
             }

@@ -90,17 +90,14 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28SL 4%29.csproj">
-      <Project>{34e8cd99-6f08-44a8-846c-157428805a00}</Project>
-      <Name>SiaqodbTrial %28SL 4%29</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SiaqodbSyncMobileWP8\DirtyEntity.cs">
       <Link>DirtyEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbSyncMobileWP8\Events.cs">
+      <Link>Events.cs</Link>
     </Compile>
     <Compile Include="..\SiaqodbSyncMobileWP8\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
@@ -115,7 +112,12 @@
       <Link>SiaqodbSyncMobileProvider.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\siaqodb\SiaqodbAsyncTrial %28SL 4%29.csproj">
+      <Project>{e7ecb5d9-5ace-4bb3-bfe6-099f695c82b5}</Project>
+      <Name>SiaqodbAsyncTrial %28SL 4%29</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

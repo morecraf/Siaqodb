@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Sqo.Utilities;
+using Sqo;
 
 namespace SiaqodbSyncMobile
 {
@@ -20,6 +21,11 @@ namespace SiaqodbSyncMobile
         private string applicationUrl;
         private string applicationKey;
         private MobileServiceClient MobileService;
+        public event EventHandler<SyncProgressEventArgs> SyncProgress;
+        public event EventHandler<SyncCompletedEventArgs> SyncCompleted;
+        private SyncStatistics syncStatistics;
+        private readonly AsyncLock _locker = new AsyncLock();
+
         public SiaqodbSyncMobileProvider(SiaqodbMobile siaqodbMobile, string applicationUrl, string applicationKey)
         {
             
@@ -29,26 +35,71 @@ namespace SiaqodbSyncMobile
             MobileService = new MobileServiceClient(applicationUrl,applicationKey,null );
             SyncedTypes = new Dictionary<Type, string>();
         }
+#region public API
         public async Task Synchronize()
         {
-            await UploadLocalChanges();
-            await DownloadChanges();
+            await _locker.LockAsync();
+            try
+            {
+                syncStatistics = new SyncStatistics();
+                syncStatistics.StartTime = DateTime.Now;
+
+
+                this.OnSyncProgress(new SyncProgressEventArgs("Synchronization started..."));
+                await UploadLocalChanges();
+                await DownloadChanges();
+                this.OnSyncProgress(new SyncProgressEventArgs("Synchronization finshed!"));
+                syncStatistics.EndTime = DateTime.Now;
+                this.OnSyncCompleted(new SyncCompletedEventArgs(null, syncStatistics));
+
+            }
+            catch (Exception ex)
+            {
+                syncStatistics.EndTime = DateTime.Now;
+                this.OnSyncCompleted(new SyncCompletedEventArgs(ex, syncStatistics));
+            }
+            finally
+            {
+                _locker.Release();
+            }
+            
+            
 
         }
         public async Task Reinitialize()
         {
-            foreach (Type t in SyncedTypes.Keys)
-            {
-                siaqodbMobile.DropType(t);
-            }
-            siaqodbMobile.DropType<DirtyEntity>();
-            siaqodbMobile.DropType<Anchor>();
+             await _locker.LockAsync();
+             try
+             {
+                 foreach (Type t in SyncedTypes.Keys)
+                 {
+                     await siaqodbMobile.DropTypeAsync(t);
+                 }
+                 await siaqodbMobile.DropTypeAsync<DirtyEntity>();
+                 await siaqodbMobile.DropTypeAsync<Anchor>();
+             }
+             finally
+             {
+                 _locker.Release();
+             }
         }
+        internal Dictionary<Type, string> SyncedTypes { get; set; }
+        public void AddAsyncType<T>(string azure_table)
+        {
+            SyncedTypes.Add(typeof(T), azure_table);
+        }
+
+#endregion
+
+        #region private area
         private async Task UploadLocalChanges()
         {
-            IList<DirtyEntity> allDirtyItems = siaqodbMobile.LoadAll<DirtyEntity>();
+            this.OnSyncProgress(new SyncProgressEventArgs("Get local changes..."));
+           
+            IList<DirtyEntity> allDirtyItems = await siaqodbMobile.LoadAllAsync<DirtyEntity>();
             ILookup<string,DirtyEntity> lookup= allDirtyItems.ToLookup(a => a.EntityType);
-            
+            this.OnSyncProgress(new SyncProgressEventArgs("Prepare uploads..."));
+           
             foreach (var item in lookup)
             {
                 IEnumerable<DirtyEntity> entities = lookup[item.Key];
@@ -105,18 +156,29 @@ namespace SiaqodbSyncMobile
                     }
                     
                 }
-             
 
 
+                this.OnSyncProgress(new SyncProgressEventArgs("Start upload changes..."));
                 IMobileServiceTable table = MobileService.GetTable(tableName);
-                await UploadInserts(table, inserts);
-                await UploadUpdates(table, updates);
-                await UploadDeletes(table, deletes);
 
-                siaqodbMobile.Flush();
+                this.OnSyncProgress(new SyncProgressEventArgs("Start upload inserts..."));
+                await UploadInserts(table, inserts);
+                this.OnSyncProgress(new SyncProgressEventArgs("Inserts uploads finished..."));
+               
+                this.OnSyncProgress(new SyncProgressEventArgs("Start upload updates..."));
+                await UploadUpdates(table, updates);
+                this.OnSyncProgress(new SyncProgressEventArgs("Updates uploads finished..."));
+
+                this.OnSyncProgress(new SyncProgressEventArgs("Start upload deletes..."));
+                await UploadDeletes(table, deletes);
+                this.OnSyncProgress(new SyncProgressEventArgs("Deletes uploads finished..."));
+
+
+                await siaqodbMobile.FlushAsync();
             }
-            siaqodbMobile.DropType<DirtyEntity>();
-           
+            await siaqodbMobile.DropTypeAsync<DirtyEntity>();
+            this.OnSyncProgress(new SyncProgressEventArgs("Uploads finsihed..."));
+
         }
 
         private async Task UploadDeletes(IMobileServiceTable table, Dictionary<int, Tuple<object, DirtyEntity>> deletes)
@@ -133,7 +195,7 @@ namespace SiaqodbSyncMobile
                     string timeStampValue = "";
                     foreach (var props in serializedObj.Properties())
                     {
-                        if (string.Compare(props.Name, "TimeStamp", StringComparison.InvariantCultureIgnoreCase) == 0)
+                        if (string.Compare(props.Name, "TimeStamp", StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             timeStampValue = props.Value.ToString();
                            
@@ -145,6 +207,7 @@ namespace SiaqodbSyncMobile
                     await table.DeleteAsync(serializedObj,paramsAMS);
                     siaqodbMobile.DeleteBase(tuple.Item2);
                 }
+                syncStatistics.TotalDeletedUploads = (uint)deletes.Count;
                
             }
         }
@@ -171,7 +234,13 @@ namespace SiaqodbSyncMobile
                 var body = new JObject() { { "id", 1 }, { table.TableName, arr } };
                 //var serializedArr = JObject.Parse(body.ToString());
                 var upd=await table.UpdateAsync(body,GetParamsAMS());
-                tobeDeleted.ForEach(a => siaqodbMobile.DeleteBase(a));
+                foreach (var a in tobeDeleted)
+                {
+                    siaqodbMobile.DeleteBase(a);
+                }
+                
+
+                syncStatistics.TotalUpdatedUploads = (uint)updates.Count;
             }
         }
 
@@ -190,7 +259,7 @@ namespace SiaqodbSyncMobile
                     string IdPropName = "Id";
                     foreach (var props in serializedObj.Properties())
                     {
-                        if (string.Compare(props.Name, "id", StringComparison.InvariantCultureIgnoreCase) == 0)
+                        if (string.Compare(props.Name, "id", StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             IdPropName = props.Name;
                         }
@@ -204,11 +273,16 @@ namespace SiaqodbSyncMobile
                 var body = new JObject() { { table.TableName, arr } };
                
                 var r=await table.InsertAsync(body,GetParamsAMS());
-                tobeDeleted.ForEach(a => siaqodbMobile.DeleteBase(a));
+                foreach (var a in tobeDeleted)
+                {
+                    siaqodbMobile.DeleteBase(a);
+                }
+                syncStatistics.TotalInsertedUploads = (uint)inserts.Count;
             }
         }
         private async Task DownloadChanges()
         {
+            this.OnSyncProgress(new SyncProgressEventArgs("Downloading changes from server..."));
             foreach (Type t in SyncedTypes.Keys)
             {
                 IMobileServiceTable table = MobileService.GetTable(SyncedTypes[t]);
@@ -228,6 +302,8 @@ namespace SiaqodbSyncMobile
                 //Type typeIList = typeof(List<>).MakeGenericType(t);
                 //ConstructorInfo ctor = typeIList.GetConstructor(new Type[] { });
                 //IList list = (IList)ctor.Invoke(new object[]{});
+                this.OnSyncProgress(new SyncProgressEventArgs("Items downloaded,start store locally..."));
+           
                 DownloadedBatch serverEntities = JsonConvert.DeserializeObject(token.ToString(), typeof(DownloadedBatch)) as DownloadedBatch;
                 if (serverEntities != null)
                 {
@@ -236,6 +312,7 @@ namespace SiaqodbSyncMobile
                     {
                         if (serverEntities.ItemsList != null)
                         {
+                            syncStatistics.TotalDownloads = (uint)serverEntities.ItemsList.Count;
                             foreach (var entity in serverEntities.ItemsList)
                             {
                                 object objEn = JsonConvert.DeserializeObject(((JObject)entity).ToString(), t);
@@ -244,6 +321,8 @@ namespace SiaqodbSyncMobile
                         }
                         if (serverEntities.TombstoneList != null)
                         {
+                            syncStatistics.TotalDownloads += (uint)serverEntities.TombstoneList.Count;
+                           
                             foreach (var delEntity in serverEntities.TombstoneList)
                             {
                                 var delEnJ = (JObject)delEntity;
@@ -271,20 +350,34 @@ namespace SiaqodbSyncMobile
 
                 }
             }
-            siaqodbMobile.Flush();
+            await siaqodbMobile.FlushAsync();
+            this.OnSyncProgress(new SyncProgressEventArgs("Download and store locally finished..."));
+           
         }
 
-        internal Dictionary<Type,string> SyncedTypes { get; set; }
-        public void AddAsyncType<T>(string azure_table)
-        {
-            SyncedTypes.Add(typeof(T),azure_table);
-        }
+        
         private Dictionary<string, string> GetParamsAMS()
         {
             Dictionary<string, string> params_toAMS = new Dictionary<string, string>();
             params_toAMS.Add("IsSiaqodbSync", "true");
             return params_toAMS;
         }
+        #endregion
 
+        
+        internal void OnSyncProgress(SyncProgressEventArgs args)
+        {
+            if (this.SyncProgress != null)
+            {
+                this.SyncProgress(this, args);
+            }
+        }
+        internal void OnSyncCompleted(SyncCompletedEventArgs args)
+        {
+            if (this.SyncCompleted != null)
+            {
+                this.SyncCompleted(this, args);
+            }
+        }
     }
 }

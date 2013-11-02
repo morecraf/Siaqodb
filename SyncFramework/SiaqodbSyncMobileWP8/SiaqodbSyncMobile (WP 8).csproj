@@ -86,16 +86,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DirtyEntity.cs" />
+    <Compile Include="Events.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="SiaqodbMobile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SiaqodbSyncMobileProvider.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28WP 8%29.csproj">
-      <Project>{CA9BE4FC-54F1-4E41-8EF2-64B33C3CFB16}</Project>
-      <Name>SiaqodbTrial %28WP 8%29</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Threading.Tasks">
@@ -131,6 +126,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\siaqodb\SiaqodbAsyncTrial %28WP 8%29.csproj">
+      <Project>{93284803-057B-4ADA-97CC-83E073A85C1D}</Project>
+      <Name>SiaqodbAsyncTrial %28WP 8%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />

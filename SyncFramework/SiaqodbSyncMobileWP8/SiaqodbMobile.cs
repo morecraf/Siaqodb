@@ -10,13 +10,21 @@ namespace SiaqodbSyncMobile
     public class SiaqodbMobile:Siaqodb
     {
 
-
-        readonly object _locker = new object();
         
+        readonly object _locker = new object();
+#if !NETFX_CORE
         public SiaqodbMobile(string applicationUrl,string applicationKey,string dbPath):base(dbPath)
         {
             this.SyncProvider = new SiaqodbSyncMobileProvider(this,applicationUrl,applicationKey);
         }
+#else
+        public SiaqodbMobile(string applicationUrl, string applicationKey, Windows.Storage.StorageFolder databaseFolder): base()
+        {
+            this.Open(databaseFolder);
+            this.SyncProvider = new SiaqodbSyncMobileProvider(this, applicationUrl, applicationKey);
+
+        }
+#endif
         public SiaqodbSyncMobileProvider SyncProvider { get; set; }
       
         private void CreateDirtyEntity(object obj)
@@ -185,5 +193,6 @@ namespace SiaqodbSyncMobile
                 base.StoreObject(obj);
             }
         }
+      
     }
 }

@@ -152,6 +152,10 @@
       <Project>{CA9BE4FC-54F1-4E41-8EF2-64B33C3CFB16}</Project>
       <Name>SiaqodbTrial %28WP 8%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SyncFramework\SiaqodbSyncMobileWP8\SiaqodbSyncMobile %28WP 8%29.csproj">
+      <Project>{31F348A7-D2F9-4507-8033-40AF2D19269E}</Project>
+      <Name>SiaqodbSyncMobile %28WP 8%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

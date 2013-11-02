@@ -135,6 +135,9 @@
     <Compile Include="..\SiaqodbSyncMobileWP8\DirtyEntity.cs">
       <Link>DirtyEntity.cs</Link>
     </Compile>
+    <Compile Include="..\SiaqodbSyncMobileWP8\Events.cs">
+      <Link>Events.cs</Link>
+    </Compile>
     <Compile Include="..\SiaqodbSyncMobileWP8\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
