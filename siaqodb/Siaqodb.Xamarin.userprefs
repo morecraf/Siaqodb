@@ -1,0 +1,14 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../SyncFramework/SiaqodbSyncMobileWP8/ReflectionHelper.cs">
+    <Files>
+      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbSyncMobileProvider.cs" Line="1" Column="1" />
+      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/ReflectionHelper.cs" Line="8" Column="36" />
+      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/Properties/AssemblyInfo.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
