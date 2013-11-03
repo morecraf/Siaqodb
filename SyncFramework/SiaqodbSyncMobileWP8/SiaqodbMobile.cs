@@ -35,7 +35,7 @@ namespace SiaqodbSyncMobile
         {
             DirtyEntity dirtyEntity = new DirtyEntity();
             dirtyEntity.EntityOID = base.GetOID(obj);
-            dirtyEntity.EntityType = obj.GetType().AssemblyQualifiedName;//TODO
+            dirtyEntity.EntityType = ReflectionHelper.GetDiscoveringTypeName(obj.GetType());
             
             if (transaction != null)
             {
@@ -54,7 +54,7 @@ namespace SiaqodbSyncMobile
         {
             DirtyEntity dirtyEntity = new DirtyEntity();
             dirtyEntity.EntityOID = oid;
-            dirtyEntity.EntityType = obj.GetType().AssemblyQualifiedName;
+            dirtyEntity.EntityType = ReflectionHelper.GetDiscoveringTypeName(obj.GetType());
             dirtyEntity.IsTombstone = true;
            
             if (transaction != null)
@@ -193,6 +193,7 @@ namespace SiaqodbSyncMobile
                 base.StoreObject(obj);
             }
         }
+
       
     }
 }

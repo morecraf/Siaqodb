@@ -106,7 +106,7 @@ namespace SiaqodbSyncMobile
                 Dictionary<int, Tuple<object, DirtyEntity>> inserts = new Dictionary<int, Tuple<object, DirtyEntity>>();
                 Dictionary<int, Tuple<object, DirtyEntity>> updates = new Dictionary<int, Tuple<object, DirtyEntity>>();
                 Dictionary<int, Tuple<object, DirtyEntity>> deletes = new Dictionary<int, Tuple<object, DirtyEntity>>();
-                Type type=Type.GetType(entities.First<DirtyEntity>().EntityType);
+                Type type=ReflectionHelper.GetTypeByDiscoveringName(entities.First<DirtyEntity>().EntityType);
                 if (!this.SyncedTypes.ContainsKey(type))
                 {
                     continue;
@@ -286,7 +286,7 @@ namespace SiaqodbSyncMobile
             foreach (Type t in SyncedTypes.Keys)
             {
                 IMobileServiceTable table = MobileService.GetTable(SyncedTypes[t]);
-                Anchor anchor = siaqodbMobile.Query<Anchor>().Where(anc => anc.EntityType == t.AssemblyQualifiedName).FirstOrDefault();//TODO
+                Anchor anchor = siaqodbMobile.Query<Anchor>().Where(anc => anc.EntityType == ReflectionHelper.GetDiscoveringTypeName(t)).FirstOrDefault();
                 string filter = "";
                 string anchorJSON = "";
                 if (anchor != null)
@@ -344,7 +344,7 @@ namespace SiaqodbSyncMobile
                     }
                     else
                     {
-                        anchor = new Anchor() { EntityType = t.AssemblyQualifiedName, TimeStamp = serverEntities.TimeStamp };
+                        anchor = new Anchor() { EntityType = ReflectionHelper.GetDiscoveringTypeName(t), TimeStamp = serverEntities.TimeStamp };
                     }
                     siaqodbMobile.StoreObjectBase(anchor);
 
