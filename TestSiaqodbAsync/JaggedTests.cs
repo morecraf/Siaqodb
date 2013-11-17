@@ -15,7 +15,7 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class JaggedTests
     {
-        string dbFolder = @"c:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
+        string dbFolder = @"e:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
 		
         [TestMethod]
         public async Task TestStoreSimpleJagged()

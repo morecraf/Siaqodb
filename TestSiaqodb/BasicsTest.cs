@@ -20,7 +20,7 @@ namespace TestSiaqodb
 	[TestClass]
 	public class BasicsTest
 	{
-        string objPath = @"c:\apps\OpenSource projects\sqoo\tests\unitests\";
+        string objPath = @"e:\apps\OpenSource projects\sqoo\tests\unitests\";
 		
 		public BasicsTest()
 		{

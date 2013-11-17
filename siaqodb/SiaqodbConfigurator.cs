@@ -402,13 +402,13 @@ namespace Sqo
                 LoggingMethod(message, level);
             }
         }
-        private static int bufferingChunkPercent = 10;
-        public static int BufferingChunkPercent
+        private static decimal bufferingChunkPercent = 10;
+        public static decimal BufferingChunkPercent
         {
             get { return bufferingChunkPercent; }
             set
             {
-                if (value > 100)
+                if (value > 100 || value<=0)
                 {
                     throw new SiaqodbException("Max percent must be 100");
                 }

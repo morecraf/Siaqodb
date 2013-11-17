@@ -13,7 +13,7 @@ namespace TestSiaqodb
 	[TestClass]
 	public class LINQTest
 	{
-        string objPath = @"c:\apps\OpenSource projects\sqoo\tests\unitests\";
+        string objPath = @"e:\apps\OpenSource projects\sqoo\tests\unitests\";
 		
 		public LINQTest()
 		{

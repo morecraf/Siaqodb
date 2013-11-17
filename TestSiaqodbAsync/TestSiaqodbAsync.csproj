@@ -35,10 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SiaqodbAsync, Version=3.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\temp22\SiaqodbAsync.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -60,6 +56,12 @@
     <Compile Include="LINQTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\siaqodb\SiaqodbAsyncTrial %28.NET 4.5%29.csproj">
+      <Project>{d6ff4b4a-05aa-43d1-9022-96506a0a329d}</Project>
+      <Name>SiaqodbAsyncTrial %28.NET 4.5%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

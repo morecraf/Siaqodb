@@ -13,7 +13,7 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class ComplexTypesTests
     {
-        string dbFolder = @"c:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
+        string dbFolder = @"e:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
         public ComplexTypesTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = false;

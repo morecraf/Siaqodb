@@ -17,10 +17,10 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class BasicTests
     {
-        string dbFolder = @"c:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
+        string dbFolder = @"e:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
         public BasicTests()
         {
-            SiaqodbConfigurator.SetTrialLicense("sJEmFOD+mT15mwbLX2SXtJjAYiwiF9vALSIrNWZvnyu7l1eaS9gGwd8YGBGjm9ie");
+            SiaqodbConfigurator.SetTrialLicense("VkgrTzaU+uQTr9RQub6POYPdCSL0RaWKom3feRn8Rzs=");
         }
         [TestMethod]
         public async Task TestInsert()

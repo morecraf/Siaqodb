@@ -12,7 +12,7 @@ namespace TestSiaqodb.M.S
     [TestClass]
     public class ComplexTypesTest
     {
-        string objPath = @"c:\apps\OpenSource projects\sqoo\tests\unitests\";
+        string objPath = @"e:\apps\OpenSource projects\sqoo\tests\unitests\";
         public ComplexTypesTest()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;

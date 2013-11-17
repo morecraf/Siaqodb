@@ -71,7 +71,7 @@ namespace App1
             await db.CreateTableAsync<Person>();
 
             DateTime start = DateTime.Now;
-            for (int i = 1; i < 100; i++)
+            for (int i = 1; i < 10000; i++)
             {
                 await db.InsertAsync(new Person() { FirstName = "Tim", LastName = "Heuer" });
             }

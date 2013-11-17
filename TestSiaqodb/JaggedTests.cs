@@ -14,7 +14,7 @@ namespace TestSiaqodb
     [TestClass]
     public class JaggedTests
     {
-        string objPath = @"c:\apps\OpenSource projects\sqoo\tests\unitests\";
+        string objPath = @"e:\apps\OpenSource projects\sqoo\tests\unitests\";
         public JaggedTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;

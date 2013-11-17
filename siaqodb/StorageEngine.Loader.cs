@@ -33,11 +33,9 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = nrRecords;
-            if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-            {
-                rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-            }
+            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+            if (rangeSize < 1) rangeSize = 1;
+           
             for (int i = 0; i < nrRecords; i++)
             {
 
@@ -104,11 +102,9 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
             int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = nrRecords;
-            if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-            {
-                rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-            }
+            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+            if (rangeSize < 1) rangeSize = 1;
+           
             for (int i = 0; i < nrRecords; i++)
             {
 
@@ -181,11 +177,8 @@ namespace Sqo
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
 
             int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = nrRecords;
-            if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-            {
-                rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-            }
+            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+            if (rangeSize < 1) rangeSize = 1;
 
             obTable.Columns.Add("OID", 0);
             int j = 1;
@@ -230,12 +223,9 @@ namespace Sqo
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
 
             int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = nrRecords;
-            if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-            {
-                rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-            }
-
+            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+            if (rangeSize < 1) rangeSize = 1;
+            
             obTable.Columns.Add("OID", 0);
             int j = 1;
             foreach (FieldSqoInfo fi in ti.Fields)
@@ -435,11 +425,9 @@ namespace Sqo
                 }
                 else //full scann
                 {
-                    int rangeSize = nrRecords;
-                    if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-                    {
-                        rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-                    }
+                    int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+                    if (rangeSize < 1) rangeSize = 1;
+           
                     for (int i = 0; i < nrRecords; i++)
                     {
                         int oid = i + 1;
@@ -485,11 +473,9 @@ namespace Sqo
                 }
                 else //full scann
                 {
-                    int rangeSize = nrRecords;
-                    if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-                    {
-                        rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-                    }
+                    int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+                    if (rangeSize < 1) rangeSize = 1;
+           
                     for (int i = 0; i < nrRecords; i++)
                     {
                         int oid = i + 1;
@@ -1894,11 +1880,9 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
             int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = nrRecords;
-            if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-            {
-                rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-            }
+            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+            if (rangeSize < 1) rangeSize = 1;
+           
             int count = 0;
             for (int i = 0; i < nrRecords; i++)
             {
@@ -1923,11 +1907,9 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
             int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = nrRecords;
-            if (rangeSize > SiaqodbConfigurator.BufferingChunkPercent)
-            {
-                rangeSize = nrRecords / SiaqodbConfigurator.BufferingChunkPercent;
-            }
+            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
+            if (rangeSize < 1) rangeSize = 1;
+           
             int count = 0;
             for (int i = 0; i < nrRecords; i++)
             {
