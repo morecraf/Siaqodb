@@ -24,10 +24,15 @@ namespace SiaqodbSyncMobile
 #endif
 
         }
+        private static Dictionary<Type,string> idBackingFields=new Dictionary<Type,string>();
         public static string GetIdBackingField(Type type)
         {
-            PropertyInfo pi = GetIdProperty(type);
-            return ExternalMetaHelper.GetBackingField(pi);
+            if (!idBackingFields.ContainsKey(type))
+            {
+                PropertyInfo pi = GetIdProperty(type);
+                idBackingFields[type] = ExternalMetaHelper.GetBackingField(pi);
+            }
+            return idBackingFields[type];
         }
         public static PropertyInfo GetIdProperty(Type type)
         {
@@ -58,7 +63,7 @@ namespace SiaqodbSyncMobile
             {
                 return piId;
             }
-            throw new SiaqodbException("Type of object not have Id property required by Azure Mobile Services");
+            throw new SiaqodbException("Type of object does not have Id property required by Azure Mobile Services");
         }
        
         public static string GetDiscoveringTypeName(Type type)

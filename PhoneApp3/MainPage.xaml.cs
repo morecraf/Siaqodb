@@ -17,7 +17,7 @@ namespace PhoneApp3
     public class TodoItem
     {
         [JsonProperty(PropertyName = "id")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty(PropertyName = "text")]
         public string Text { get; set; }
@@ -25,12 +25,11 @@ namespace PhoneApp3
         [JsonProperty(PropertyName = "complete")]
         public bool Complete { get; set; }
 
-        [JsonProperty(PropertyName = "UID")]
-        public string UID { get; set; }
+        [JsonProperty(PropertyName = "__version")]
+        public string Version { get; set; }
 
-
-        [JsonProperty(PropertyName = "TimeStamp")]
-        public DateTime ServerTimeStamp { get; set; }
+        [JsonProperty(PropertyName = "__updatedAt")]
+        public DateTime ServerUpdatedAt { get; set; }
 
         public object GetValue(System.Reflection.FieldInfo field)
         {
@@ -61,32 +60,31 @@ namespace PhoneApp3
             nullableArray[1] = 1;
             Sqo.SiaqodbConfigurator.SetTrialLicense(@"FSCVmMEntdr+nhefoUYc9n8KJFWa1I/GZ2key5jVmDA=");
             SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
-           "FxjfrcDbEQxdYzdIQVWPLyniMGYrcn61", "mydasbA79");
+           "RLINABsktmvkzJMegbicNASWkzRzEW97", "mydasbA81");
             mob.AddSyncType<TodoItem>("TodoItem");
             for (int i = 0; i < 2; i++)
             {
                 TodoItem item = new TodoItem();
-                item.Text = "From OOBG" + i.ToString();
-                item.UID = Guid.NewGuid().ToString();
+                item.Text = "GSP" + i.ToString();
+                item.Id = Guid.NewGuid().ToString();
                 //mob.StoreObject(item);
             }
             var items2 = mob.LoadAll<TodoItem>();
-            var qq = (from TodoItem iss in mob
-                      where iss.Id == 37 || iss.Id == 44
-                      select iss).ToList();
-
+            
             int y = 0;
             foreach (var ai in items2)
             {
-                if (y==0)
+                if (ai.Id == "23AB5750-A61C-43F7-ACA3-1189E5E7FB1B")
                 {
-                    ai.Text = "updated2003";
+                    ai.Text = "ionescu77";
                     ai.Complete = false;
-                   mob.StoreObject(ai);
+                    mob.StoreObject(ai);
                 }
                 y++;
             }
             mob.Flush();
+            items2 = mob.LoadAll<TodoItem>();
+            
             try
             {
                 await mob.SyncProvider.Synchronize();

@@ -115,18 +115,18 @@ namespace SiaqodbSyncMobile
                 foreach (DirtyEntity en in entities)
                 {
                     
-                    if (en.IsTombstone)
+                    if (en.DirtyOp==DirtyOperation.Deleted)
                     {
                         if (inserts.ContainsKey(en.EntityOID))
                         {
-                            siaqodbMobile.DeleteBase(inserts[en.EntityOID]);
+                            siaqodbMobile.DeleteBase(inserts[en.EntityOID].Item1);
                             siaqodbMobile.DeleteBase(en);
                             inserts.Remove(en.EntityOID);
                             continue;
                         }
                         else if (updates.ContainsKey(en.EntityOID))
                         {
-                            siaqodbMobile.DeleteBase(updates[en.EntityOID]);
+                            siaqodbMobile.DeleteBase(updates[en.EntityOID].Item1);
                             updates.Remove(en.EntityOID);
                         }
                     }
@@ -141,16 +141,15 @@ namespace SiaqodbSyncMobile
 
 
                     object entityFromDB = _bs._lobjby(siaqodbMobile, type, en.EntityOID);
-                    int idValue = ReflectionHelper.GetIdValue(entityFromDB);
-                    if (idValue == 0)//insert
+                    if (en.DirtyOp==DirtyOperation.Inserted)
                     {
                         inserts.Add(en.EntityOID,new Tuple<object,DirtyEntity>( entityFromDB,en));
                     }
-                    else if (!en.IsTombstone)
+                    else if (en.DirtyOp == DirtyOperation.Updated)
                     {
                         updates.Add(en.EntityOID, new Tuple<object, DirtyEntity>(entityFromDB, en));
                     }
-                    else
+                    else if (en.DirtyOp == DirtyOperation.Deleted)
                     {
                         deletes.Add(en.EntityOID, new Tuple<object, DirtyEntity>(entityFromDB, en));
                     }
@@ -160,6 +159,7 @@ namespace SiaqodbSyncMobile
 
                 this.OnSyncProgress(new SyncProgressEventArgs("Start upload changes..."));
                 IMobileServiceTable table = MobileService.GetTable(tableName);
+                table.SystemProperties |= MobileServiceSystemProperties.All;
 
                 this.OnSyncProgress(new SyncProgressEventArgs("Start upload inserts..."));
                 await UploadInserts(table, inserts);
@@ -192,15 +192,8 @@ namespace SiaqodbSyncMobile
                     object entityFromDB = tuple.Item1;
                     var serObj = Newtonsoft.Json.JsonConvert.SerializeObject(entityFromDB);
                     JObject serializedObj = JObject.Parse(serObj.ToString());
-                    string timeStampValue = "";
-                    foreach (var props in serializedObj.Properties())
-                    {
-                        if (string.Compare(props.Name, "TimeStamp", StringComparison.OrdinalIgnoreCase) == 0)
-                        {
-                            timeStampValue = props.Value.ToString();
-                           
-                        }
-                    }
+                    string timeStampValue = serializedObj.Property("__version").Value.ToString();
+                    
                     
                     Dictionary<string,string> paramsAMS=GetParamsAMS();
                     paramsAMS.Add("ENTimeStamp", timeStampValue);
@@ -231,7 +224,7 @@ namespace SiaqodbSyncMobile
                     tobeDeleted.Add(tuple.Item2);
                 }
 
-                var body = new JObject() { { "id", 1 }, { table.TableName, arr } };
+                var body = new JObject() { { "id", Guid.NewGuid().ToString() }, { table.TableName, arr } };
                 //var serializedArr = JObject.Parse(body.ToString());
                 var upd=await table.UpdateAsync(body,GetParamsAMS());
                 foreach (var a in tobeDeleted)
@@ -256,16 +249,7 @@ namespace SiaqodbSyncMobile
                     object entityFromDB = tuple.Item1;
                     var serObj = Newtonsoft.Json.JsonConvert.SerializeObject(entityFromDB);
                     JObject serializedObj = JObject.Parse(serObj.ToString());
-                    string IdPropName = "Id";
-                    foreach (var props in serializedObj.Properties())
-                    {
-                        if (string.Compare(props.Name, "id", StringComparison.OrdinalIgnoreCase) == 0)
-                        {
-                            IdPropName = props.Name;
-                        }
-                    }
-                    serializedObj.Remove(IdPropName);
-                    //await table.InsertAsync(serializedObj);
+                    serializedObj.Remove("__version");
                     tobeDeleted.Add(tuple.Item2);
                     arr.Add(serializedObj);
                 }
@@ -286,6 +270,8 @@ namespace SiaqodbSyncMobile
             foreach (Type t in SyncedTypes.Keys)
             {
                 IMobileServiceTable table = MobileService.GetTable(SyncedTypes[t]);
+                table.SystemProperties |= MobileServiceSystemProperties.All;
+
                 Anchor anchor = siaqodbMobile.Query<Anchor>().Where(anc => anc.EntityType == ReflectionHelper.GetDiscoveringTypeName(t)).FirstOrDefault();
                 string filter = "";
                 string anchorJSON = "";
@@ -293,7 +279,7 @@ namespace SiaqodbSyncMobile
                 {
                     string dateTimeString = new DateTime( anchor.TimeStamp.Ticks,DateTimeKind.Utc).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK",CultureInfo.InvariantCulture);
 
-                    filter="$filter=(TimeStamp gt "+ string.Format(CultureInfo.InvariantCulture,"datetime'{0}'",dateTimeString)+")";
+                    filter="$filter=(__updatedAt gt "+ string.Format(CultureInfo.InvariantCulture,"datetime'{0}'",dateTimeString)+")";
                     anchorJSON = dateTimeString;//JsonConvert.SerializeObject(anchor.TimeStamp);
                 }
                 Dictionary<string,string> paramAMS=GetParamsAMS();
@@ -326,10 +312,10 @@ namespace SiaqodbSyncMobile
                             foreach (var delEntity in serverEntities.TombstoneList)
                             {
                                 var delEnJ = (JObject)delEntity;
-                                JToken ENId = delEnJ.GetValue("ENId");
+                                JToken ENId = delEnJ.GetValue("enid");
 
                                 Dictionary<string, object> criteria = new Dictionary<string, object>();
-                                criteria.Add(ExternalMetaHelper.GetBackingField(ReflectionHelper.GetIdProperty(t)), Convert.ToInt32(ENId.ToString()));
+                                criteria.Add(ExternalMetaHelper.GetBackingField(ReflectionHelper.GetIdProperty(t)), ENId.ToString());
                                 int nrDeleted = siaqodbMobile.DeleteObjectByBase(t, criteria);
                             }
                         }

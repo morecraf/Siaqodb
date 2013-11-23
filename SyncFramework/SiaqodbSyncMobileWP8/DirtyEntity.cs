@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace SiaqodbSyncMobile
 {
+    enum DirtyOperation { Inserted = 1, Updated = 2, Deleted = 3 }
     class DirtyEntity
     {
         public int OID { get; set; }
         public int EntityOID;
         [MaxLength(200)]
-        public string EntityType;                                                                                                                                                               
-        public bool IsTombstone;
+        public string EntityType;
+        public DirtyOperation DirtyOp;
         public object GetValue(System.Reflection.FieldInfo field)
         {
             return field.GetValue(this);
@@ -24,6 +25,7 @@ namespace SiaqodbSyncMobile
             field.SetValue(this, value);
         }
     }
+    
     class Anchor
     {
         public DateTime TimeStamp;
