@@ -184,8 +184,20 @@ namespace Sqo.Meta
                             maxLength = GetSizeOfField(MetaExtractor.byteID);//get byte type size(simulate array byte[])
                         }
                     }
-
-
+                    if (!isText)
+                    {
+                        //check config
+                        if (SiaqodbConfigurator.Texts != null)
+                        {
+                            if (SiaqodbConfigurator.Texts.ContainsKey(ti.Type))
+                            {
+                                if (SiaqodbConfigurator.Texts[ti.Type].Contains(fi[i].Name))
+                                {
+                                    isText = true;
+                                }
+                            }
+                        }
+                    }
                 }
                 #endregion
                 

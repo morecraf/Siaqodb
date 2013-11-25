@@ -20,6 +20,7 @@ namespace Sqo
         internal static Dictionary<Type, List<string>> Ignored;
         internal static Dictionary<Type, Dictionary<string,int>> MaxLengths;
         internal static Dictionary<Type, Dictionary<string, string>> PropertyMaps;
+        internal static Dictionary<Type, List<string>> Texts;
         internal static Dictionary<Type, bool> LazyLoaded;
         internal static bool RaiseLoadEvents;
         internal static DateTimeKind? DateTimeKindToSerialize;
@@ -212,6 +213,51 @@ namespace Sqo
                 throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
             }
         
+        }
+        /// <summary>
+        /// Mark field to be stored as a string with unlimited length 
+        /// </summary>
+        /// <param name="field">Name of field or automatic property</param>
+        /// <param name="type">Type that declare the field</param>
+        public static void AddText(string field, Type type)
+        {
+            if (Texts == null)
+            {
+                Texts = new Dictionary<Type, List<string>>();
+
+            }
+            if (!Texts.ContainsKey(type))
+            {
+                Texts.Add(type, new List<string>());
+            }
+            List<FieldInfo> fi = new List<FieldInfo>();
+            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
+            MetaExtractor.FindFields(fi, automaticProperties, type);
+            bool found = false;
+            foreach (FieldInfo f in fi)
+            {
+                if (f.Name == field)
+                {
+                    found = true;
+                    Texts[type].Add(f.Name);
+
+                    break;
+                }
+                else if (automaticProperties.ContainsKey(f))
+                {
+                    if (field == automaticProperties[f].Name)
+                    {
+                        found = true;
+                        Texts[type].Add(f.Name);
+                        break;
+                    }
+                }
+            }
+            if (!found)
+            {
+                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
+            }
+
         }
         /// <summary>
         /// Set the name of backing field for a property in case engine cannto discover it, this also can be set by attribute: Sqo.Attributes.UseVariable
