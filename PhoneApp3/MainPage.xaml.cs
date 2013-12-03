@@ -40,8 +40,29 @@ namespace PhoneApp3
             field.SetValue(this, value);
         }
     }
+
+    public class table2
+    {
+        [JsonProperty(PropertyName = "id")]
+        public string Id { get; set; }
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "__version")]
+        public string Version { get; set; }
+
       
-    
+        public object GetValue(System.Reflection.FieldInfo field)
+        {
+            return field.GetValue(this);
+        }
+        public void SetValue(System.Reflection.FieldInfo field, object value)
+        {
+            field.SetValue(this, value);
+        }
+    }
+      
     public partial class MainPage : PhoneApplicationPage
     {
         // Constructor
@@ -58,16 +79,17 @@ namespace PhoneApp3
             int?[] nullableArray = new int?[10];
             nullableArray[0] = null;
             nullableArray[1] = 1;
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"FSCVmMEntdr+nhefoUYc9n8KJFWa1I/GZ2key5jVmDA=");
+            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
             SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", "mydasbA81");
             mob.AddSyncType<TodoItem>("TodoItem");
+            mob.SyncProvider.SyncCompleted += SyncProvider_SyncCompleted;
             for (int i = 0; i < 2; i++)
             {
                 TodoItem item = new TodoItem();
-                item.Text = "GSP" + i.ToString();
+                item.Text = "FOS" + i.ToString();
                 item.Id = Guid.NewGuid().ToString();
-                //mob.StoreObject(item);
+                mob.StoreObject(item);
             }
             var items2 = mob.LoadAll<TodoItem>();
             
@@ -93,6 +115,49 @@ namespace PhoneApp3
             catch (Exception ex)
             { 
             
+            }
+        }
+
+        void SyncProvider_SyncCompleted(object sender, SyncCompletedEventArgs e)
+        {
+            
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+            SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
+           "RLINABsktmvkzJMegbicNASWkzRzEW97", "mydasbA81");
+            
+            
+            
+            
+            
+            mob.AddSyncType<table2>("table2");
+            for (int i = 0; i < 2; i++)
+            {
+                table2 item = new table2();
+                item.Name = "FOO" + i.ToString();
+                item.Id = Guid.NewGuid().ToString();
+                mob.StoreObject(item);
+            }
+            var items2 = mob.LoadAll<table2>();
+            foreach (var isd in items2)
+            {
+                isd.Name = "TO" + isd.Name;
+                mob.StoreObject(isd);
+            }
+            mob.Flush();
+            items2 = mob.LoadAll<table2>();
+
+            try
+            {
+                await mob.SyncProvider.Synchronize();
+                var items = mob.LoadAll<table2>();
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 
