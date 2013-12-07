@@ -40,10 +40,10 @@ namespace SiaqodbSyncMobile
             PropertyInfo[] pinfos = type.GetProperties(flags);
             foreach (PropertyInfo pi in pinfos)
             {
-                object[] customAttStr = pi.GetCustomAttributes(typeof(JsonProperty), false);
+                object[] customAttStr = pi.GetCustomAttributes(typeof(Newtonsoft.Json.JsonPropertyAttribute), false);
                 if (customAttStr.Length > 0)
                 {
-                    JsonProperty dm = customAttStr[0] as JsonProperty;
+                    Newtonsoft.Json.JsonPropertyAttribute dm = customAttStr[0] as Newtonsoft.Json.JsonPropertyAttribute;
                     if (string.Compare(dm.PropertyName, "Id", StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         return pi;
