@@ -1,34 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbSyncMobileProvider.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="SiaqodbConfigurator.cs">
     <Files>
       <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Extensions/MobileServiceClientExtensions.cs" Line="1" Column="1" />
       <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/ApplicationStorage.cs" Line="1" Column="1" />
       <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/CurrentPlatform.cs" Line="1" Column="1" />
       <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/PlatformInformation.cs" Line="1" Column="1" />
-      <File FileName="../../Examples/Xamarin.Android/Activity1.cs" Line="58" Column="30" />
+      <File FileName="../../Examples/Xamarin.Android/Activity1.cs" Line="1" Column="1" />
       <File FileName="../../Examples/Xamarin.iOS/SiaqodbMTDemo/MainWindow.xib.designer.cs" Line="1" Column="1" />
-      <File FileName="../../Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" Line="113" Column="5" />
-      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbMobile.cs" Line="94" Column="14" />
+      <File FileName="../../Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" Line="1" Column="1" />
+      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbMobile.cs" Line="1" Column="1" />
       <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbSyncMobileProvider.cs" Line="203" Column="22" />
+      <File FileName="SiaqodbConfigurator.cs" Line="23" Column="61" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="SyncFrameworkProvider" expanded="True">
-            <Node name="SiaqodbSyncMobileiOS" expanded="True">
-              <Node name="SiaqodbSyncMobileProvider.cs" selected="True" />
-            </Node>
-          </Node>
-          <Node name="Xamarin.Tests" expanded="True">
-            <Node name="Siaqodb.Xamarin.iOS.Examples" expanded="True">
-              <Node name="References" expanded="True" />
-              <Node name="MainWindow.xib" expanded="True" />
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
