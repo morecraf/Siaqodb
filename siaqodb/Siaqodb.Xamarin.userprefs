@@ -1,14 +1,25 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../SyncFramework/SiaqodbSyncMobileWP8/ReflectionHelper.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs">
     <Files>
+      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Extensions/MobileServiceClientExtensions.cs" Line="1" Column="1" />
+      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/ApplicationStorage.cs" Line="1" Column="1" />
+      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/CurrentPlatform.cs" Line="1" Column="1" />
+      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/PlatformInformation.cs" Line="1" Column="1" />
+      <File FileName="../../Examples/Xamarin.Android/Activity1.cs" Line="1" Column="1" />
+      <File FileName="../../Examples/Xamarin.iOS/SiaqodbMTDemo/MainWindow.xib.designer.cs" Line="1" Column="1" />
+      <File FileName="../../Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" Line="1" Column="1" />
+      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbMobile.cs" Line="1" Column="1" />
       <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbSyncMobileProvider.cs" Line="1" Column="1" />
-      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/ReflectionHelper.cs" Line="8" Column="36" />
-      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/Properties/AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="SiaqodbConfigurator.cs" Line="23" Column="61" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/cristiursachi/Downloads/azure-mobile-services-xamarin/sdk/managed/src/Microsoft.WindowsAzure.MobileServices/Http/MobileServiceHttpClient.cs" line="110" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="111" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="109" column="5" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

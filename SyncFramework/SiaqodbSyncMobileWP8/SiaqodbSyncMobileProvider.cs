@@ -174,9 +174,9 @@ namespace SiaqodbSyncMobile
                 this.OnSyncProgress(new SyncProgressEventArgs("Deletes uploads finished..."));
 
 
-                await siaqodbMobile.FlushAsync();
+                siaqodbMobile.Flush();
             }
-            await siaqodbMobile.DropTypeAsync<DirtyEntity>();
+            siaqodbMobile.DropType<DirtyEntity>();
             this.OnSyncProgress(new SyncProgressEventArgs("Uploads finsihed..."));
 
         }
@@ -336,7 +336,7 @@ namespace SiaqodbSyncMobile
 
                 }
             }
-            await siaqodbMobile.FlushAsync();
+            siaqodbMobile.Flush();
             this.OnSyncProgress(new SyncProgressEventArgs("Download and store locally finished..."));
            
         }

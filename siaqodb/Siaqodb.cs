@@ -42,10 +42,10 @@ namespace Sqo
 
         readonly object _syncRoot = new object();
 #if ASYNC
-        private readonly AsyncLock _locker = new AsyncLock();
-#else
-        private readonly object _locker = new object();
+        private readonly AsyncLock _lockerAsync = new AsyncLock();
 #endif
+        private readonly object _locker = new object();
+
         
 #if WinRT
         StorageFolder databaseFolder;
@@ -755,7 +755,7 @@ savedObject(this, e);
         /// <param name="obj">Object to be stored</param>
         public async Task StoreObjectAsync(object obj)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
 
             try
             {
@@ -792,7 +792,7 @@ savedObject(this, e);
             finally
             {
 
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
 
             }
 
@@ -850,7 +850,7 @@ savedObject(this, e);
         ///<param name="onlyReferences">if true,it will store only references to complex objects</param>
         public async Task StoreObjectPartiallyAsync(object obj, bool onlyReferences, params string[] properties)
         {
-             bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
              try
              {
                  this.storeOnlyReferencesOfListItems = onlyReferences;
@@ -866,7 +866,7 @@ savedObject(this, e);
              }
              finally
              {
-                 if (locked) _locker.Release();
+                 if (locked) _lockerAsync.Release();
              }
         }
 #endif
@@ -916,7 +916,7 @@ savedObject(this, e);
             {
                 throw new ArgumentNullException("transaction");
             }
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(obj);
@@ -938,7 +938,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1061,7 +1061,7 @@ savedObject(this, e);
         /// <returns></returns>
         internal async Task<IObjectList<T>> LoadAsync<T>(System.Linq.Expressions.Expression expression)
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             SqoTypeInfo ti = null;
             try
             {
@@ -1069,18 +1069,18 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
             List<int> oids = await LoadOidsAsync<T>(expression);
 
-            locked = false; await _locker.LockAsync(typeof(T), out locked);
+            locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 return await storageEngine.LoadByOIDsAsync<T>(oids, ti);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1109,7 +1109,7 @@ savedObject(this, e);
         /// <returns>List of objects retrieved from database</returns>
         public async Task<IObjectList<T>> LoadAllAsync<T>()
         {
-             bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
              try
              {
                  SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1117,7 +1117,7 @@ savedObject(this, e);
              }
              finally
              {
-                 if (locked) _locker.Release();
+                 if (locked) _lockerAsync.Release();
              }
         }
 #endif
@@ -1144,7 +1144,7 @@ savedObject(this, e);
         /// <returns>the object stored in database with oid provided</returns>
         public async Task<T> LoadObjectByOIDAsync<T>(int oid)
         {
-             bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
              try
              {
                  SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1152,7 +1152,7 @@ savedObject(this, e);
              }
              finally
              {
-                 if (locked) _locker.Release();
+                 if (locked) _lockerAsync.Release();
              }
 
         }
@@ -1169,7 +1169,7 @@ savedObject(this, e);
         internal async Task<T> LoadObjectByOIDAsync<T>(int oid, List<string> properties)
         {
             bool locked;
-            await _locker.LockAsync(typeof(T),out locked);
+            await _lockerAsync.LockAsync(typeof(T),out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1177,7 +1177,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
 
         }
@@ -1225,14 +1225,14 @@ savedObject(this, e);
         /// </summary>
         public async Task FlushAsync()
         {
-            await _locker.LockAsync();
+            await _lockerAsync.LockAsync();
             try
             {
                 await this.storageEngine.FlushAsync();
             }
             finally
             {
-                _locker.Release();
+                _lockerAsync.Release();
             }
         }
 #endif
@@ -1287,7 +1287,7 @@ savedObject(this, e);
         /// <returns>List of OIDs</returns>
         public async Task<List<int>> LoadOidsAsync<T>(System.Linq.Expressions.Expression expression)
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 if (expression == null)
@@ -1301,7 +1301,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1316,7 +1316,7 @@ savedObject(this, e);
 #if ASYNC
         internal async Task<List<int>> LoadAllOIDsAsync<T>()
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1324,7 +1324,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1489,12 +1489,12 @@ savedObject(this, e);
             }
             SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
             bool locked = false;
-            await _locker.LockAsync(tinf.Type,out locked);
+            await _lockerAsync.LockAsync(tinf.Type,out locked);
             try
             {
                 return await storageEngine.LoadValueAsync(oid, fieldName, tinf);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         /// <summary>
@@ -1521,7 +1521,7 @@ savedObject(this, e);
         /// <param name="obj">Object to be deleted</param>
         public async Task DeleteAsync(object obj)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (!opened)
@@ -1532,7 +1532,7 @@ savedObject(this, e);
                 SqoTypeInfo ti = this.GetSqoTypeInfo(t);
                 bool deleted = await DeleteObjInternalAsync(obj, ti, null);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         /// <summary>
@@ -1571,7 +1571,7 @@ savedObject(this, e);
         /// <param name="transaction">Transaction</param>
         public async Task DeleteAsync(object obj, Transactions.Transaction transaction)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (!opened)
@@ -1591,7 +1591,7 @@ savedObject(this, e);
                 await DeleteObjInternalAsync(obj, ti, transaction);
 
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         /// <summary>
@@ -1699,7 +1699,7 @@ savedObject(this, e);
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (transaction != null)
@@ -1726,7 +1726,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1791,7 +1791,7 @@ savedObject(this, e);
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            bool locked = false; await _locker.LockAsync(objectType, out locked);
+            bool locked = false; await _lockerAsync.LockAsync(objectType, out locked);
             try
             {
                 SqoTypeInfo ti = this.GetSqoTypeInfo(objectType);
@@ -1813,7 +1813,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 
@@ -2003,7 +2003,7 @@ savedObject(this, e);
         /// <returns></returns>
         public async Task<int> CountAsync<T>()
         {
-             bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
              try
              {
                  if (!opened)
@@ -2013,7 +2013,7 @@ savedObject(this, e);
                  SqoTypeInfo ti = this.GetSqoTypeInfo<T>();
                  return await storageEngine.CountAsync(ti);
              }
-             finally { if (locked) _locker.Release(); }
+             finally { if (locked) _lockerAsync.Release(); }
 
         }
 #endif
@@ -2185,7 +2185,7 @@ savedObject(this, e);
         /// <returns>true if object was updated and false if object was not found in database</returns>
         public async Task<bool> UpdateObjectByAsync(object obj, Sqo.Transactions.Transaction transaction, params string[] fieldNames)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (fieldNames == null || fieldNames.Length == 0)
@@ -2214,7 +2214,7 @@ savedObject(this, e);
                 }
                 return false;
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         internal bool UpdateField(int oid,MetaType metaType, string field, object value)
@@ -2345,7 +2345,7 @@ savedObject(this, e);
         internal async Task<List<object>> LoadDirtyObjectsAsync(Type type)
         {
             bool locked = false; 
-            await _locker.LockAsync(type,out locked);
+            await _lockerAsync.LockAsync(type,out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo(type);
@@ -2365,7 +2365,7 @@ savedObject(this, e);
 
                 return await this.storageEngine.LoadByOIDsAsync(oidsDirty, ti);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
 
@@ -2514,14 +2514,14 @@ savedObject(this, e);
         /// <returns>LazyObjectList of objects</returns>
         public async Task<IObjectList<T>> LoadAllLazyAsync<T>()
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
                 List<int> oids = await storageEngine.LoadAllOIDsAsync(ti);
                 return new LazyObjectList<T>(this, oids);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         internal void LoadObjectOIDAndTID(int oid, string fieldName, MetaType mt,ref List<int> listOIDs,ref int TID)

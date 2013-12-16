@@ -21,7 +21,7 @@
     <DefineConstants>TRACE;DEBUG;MONODROID;ASYNC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\SiaqodbMD.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Licensed\SiaqodbAsyncDroid.XML</DocumentationFile>
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
   </PropertyGroup>

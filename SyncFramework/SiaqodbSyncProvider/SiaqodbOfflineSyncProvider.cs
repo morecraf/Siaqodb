@@ -396,7 +396,7 @@ namespace SiaqodbSyncProvider
             foreach (PropertyInfo p in pi)
             {
 #if SILVERLIGHT
-                Type ty = typeof(System.ComponentModel.DataAnnotations.KeyAttribute);
+                Type ty = typeof(Microsoft.Synchronization.ClientServices.KeyAttribute);
 
 #else
                  Type ty = typeof(KeyAttribute);
@@ -453,6 +453,7 @@ namespace SiaqodbSyncProvider
         }
         public void Reinitialize()
         {
+            
             foreach (Type t in CacheController.ControllerBehavior.KnownTypes)
             {
                 siaqodb.DropType(t);

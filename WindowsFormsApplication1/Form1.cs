@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GameEntities;
 
 namespace WindowsFormsApplication1
 {
@@ -51,6 +52,31 @@ namespace WindowsFormsApplication1
             sqo.StoreObject(z);
             int count = (from aBase aa in sqo select aa).Count();
             string ass = "s";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+            SiaqodbUtil.ReIndex(@"C:\Users\cristi\Downloads\External (1)\External");
+            Siaqodb SIAQODB = new Siaqodb(@"C:\Users\cristi\Downloads\External (1)\External");
+
+            int truck = 1;
+            int upgrade_type = 3;
+
+            UpgradeAttached[] attached = (from UpgradeAttached u in SIAQODB
+                                          where u.truck == truck && u.type == upgrade_type
+                                          select u).ToArray();
+
+            foreach (UpgradeAttached u in attached)
+            {
+
+                //Debug.Log (u.ToString());
+
+                SIAQODB.Delete(u);
+
+            }
+
+            string g = "";
         }
     }
     public class Player

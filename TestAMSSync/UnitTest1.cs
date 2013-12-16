@@ -113,7 +113,7 @@ namespace TestAMSSync
                         select todo).FirstOrDefault();
             Assert.IsNull(deleted);
 
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+            
             SiaqodbMobile mob2 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", "db2");
             mob2.AddSyncType<TodoItem>("TodoItem");
@@ -171,8 +171,8 @@ namespace TestAMSSync
                                      select todo).FirstOrDefault();
 
 
-            Assert.AreEqual(todoItemMob1.Text, "UpdatedfromC1");
-            Assert.AreEqual(todoItemMob2.Text, "UpdatedfromC1");
+            Assert.AreEqual(todoItemMob1.Text, "UpdatedFromC1");
+            Assert.AreEqual(todoItemMob2.Text, "UpdatedFromC1");
             mob1.Close();
             mob2.Close();
 
@@ -185,7 +185,7 @@ namespace TestAMSSync
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
             mob1.AddSyncType<TodoItem>("TodoItem");
-
+            mob1.SyncProvider.SyncCompleted += SyncProvider_SyncCompleted;
             TodoItem item = new TodoItem();
             item.Text = "Testitem1";
             item.Id = Guid.NewGuid().ToString();
@@ -204,6 +204,7 @@ namespace TestAMSSync
              "RLINABsktmvkzJMegbicNASWkzRzEW97", "db2");
            
             mob2.AddSyncType<TodoItem>("TodoItem");
+           mob2.SyncProvider.SyncCompleted+=SyncProvider_SyncCompleted;
             await mob2.SyncProvider.Synchronize();
             TodoItem itemSyncedUpdate = (from TodoItem todo in mob2
                                     where todo.Id == item.Id
@@ -215,12 +216,14 @@ namespace TestAMSSync
             mob2.Flush();
 
             await mob1.SyncProvider.Synchronize();
-            await mob2.SyncProvider.Synchronize();
 
             TodoItem deleted = (from TodoItem todo in mob1
-                                         where todo.Id == item.Id
-                                         select todo).FirstOrDefault();
+                                where todo.Id == item.Id
+                                select todo).FirstOrDefault();
             Assert.IsNull(deleted);
+
+            await mob2.SyncProvider.Synchronize();
+            mob2.Flush();
 
             TodoItem deleted2 = (from TodoItem todo in mob2
                                 where todo.Id == item.Id
@@ -230,6 +233,14 @@ namespace TestAMSSync
             mob1.Close();
             mob2.Close();
 
+        }
+
+        void SyncProvider_SyncCompleted(object sender, SyncCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                throw e.Error;
+            }
         }
 
         [TestMethod]
