@@ -29,6 +29,12 @@ namespace Sqo.Queries
             get { return val; } 
             set { val = value; } 
         }
+        object val2;
+        public object Value2
+        {
+            get { return val2; }
+            set { val2 = value; }
+        }
         OperationType opType;
         public OperationType OperationType { get { return opType; } set { opType = value; } }
         public Where(string fieldName,OperationType opType,object val)

@@ -313,41 +313,63 @@ namespace Sqo.Indexes
             return foundValues;
         }
 #endif
-        public List<int> FindItemsStartsWith(T target_key, ref bool stop)
+        public List<int> FindItemsStartsWith(T target_key, bool defaultComparer, StringComparison stringComparison, ref bool stop)
         {
             if (typeof(T) != typeof(String))
                 throw new InvalidOperationException("Only string Keys may use this operation");
 
-            string target_keyStr =Convert.ToString(target_key)  ;
+            string target_keyStr =Convert.ToString(target_key);
             CheckChildren();
             List<int> foundValues = new List<int>();
 
             if (Children[NumKeysUsed] != null)
             {
-                foundValues.AddRange(Children[NumKeysUsed].FindItemsStartsWith(target_key, ref stop));
+                foundValues.AddRange(Children[NumKeysUsed].FindItemsStartsWith(target_key,defaultComparer,stringComparison, ref stop));
             }
             if (stop)
                 return foundValues;
 
             for (int i = NumKeysUsed - 1; i >= 0; i--)
             {
-                if (this.Compare(Keys[i],target_key) <= 0)
+                string keyStr = Convert.ToString(Keys[i]);
+                   
+                if (defaultComparer)
                 {
-                    if (Convert.ToString( Keys[i]).StartsWith(target_keyStr,StringComparison.CurrentCultureIgnoreCase))
+                    if (string.Compare(keyStr, target_keyStr) <= 0)
+                    {
+                        if (keyStr.StartsWith(target_keyStr))
+                        {
+                            foundValues.AddRange(Values[i]);
+                        }
+                        stop = true;
+                        return foundValues;
+
+                    }
+                    if (keyStr.StartsWith(target_keyStr))
                     {
                         foundValues.AddRange(Values[i]);
                     }
-                    stop = true;
-                    return foundValues;
-
                 }
-                if (Convert.ToString(Keys[i]).StartsWith(target_keyStr, StringComparison.CurrentCultureIgnoreCase))
+                else
                 {
-                    foundValues.AddRange(Values[i]);
+                    if (string.Compare(keyStr, target_keyStr, stringComparison) <= 0)
+                    {
+                        if (keyStr.StartsWith(target_keyStr, stringComparison))
+                        {
+                            foundValues.AddRange(Values[i]);
+                        }
+                        stop = true;
+                        return foundValues;
+
+                    }
+                    if (keyStr.StartsWith(target_keyStr, stringComparison))
+                    {
+                        foundValues.AddRange(Values[i]);
+                    }
                 }
                 if (Children[i] != null)
                 {
-                    foundValues.AddRange(Children[i].FindItemsStartsWith(target_key, ref stop));
+                    foundValues.AddRange(Children[i].FindItemsStartsWith(target_key,defaultComparer,stringComparison, ref stop));
 
                 }
 
@@ -356,7 +378,7 @@ namespace Sqo.Indexes
             return foundValues;
         }
 #if ASYNC
-        public async Task<List<int>> FindItemsStartsWithAsync(T target_key, StopIndicator stopInd)
+        public async Task<List<int>> FindItemsStartsWithAsync(T target_key,bool defaultComparer,StringComparison stringComparison, StopIndicator stopInd)
         {
             if (typeof(T) != typeof(String))
                 throw new InvalidOperationException("Only string Keys may use this operation");
@@ -367,30 +389,52 @@ namespace Sqo.Indexes
             await CheckChildrenAsync().ConfigureAwait(false);
             if (Children[NumKeysUsed] != null)
             {
-                foundValues.AddRange(await Children[NumKeysUsed].FindItemsStartsWithAsync(target_key, stopInd).ConfigureAwait(false));
+                foundValues.AddRange(await Children[NumKeysUsed].FindItemsStartsWithAsync(target_key, defaultComparer, stringComparison, stopInd).ConfigureAwait(false));
             }
             if (stopInd.Stop)
                 return foundValues;
 
             for (int i = NumKeysUsed - 1; i >= 0; i--)
             {
-                if (this.Compare(Keys[i], target_key) <= 0)
+                string keyStr = Convert.ToString(Keys[i]);
+
+                if (defaultComparer)
                 {
-                    if (Convert.ToString(Keys[i]).StartsWith(target_keyStr, StringComparison.CurrentCultureIgnoreCase))
+                    if (string.Compare(keyStr, target_keyStr) <= 0)
+                    {
+                        if (keyStr.StartsWith(target_keyStr))
+                        {
+                            foundValues.AddRange(Values[i]);
+                        }
+                        stopInd.Stop = true;
+                        return foundValues;
+
+                    }
+                    if (keyStr.StartsWith(target_keyStr))
                     {
                         foundValues.AddRange(Values[i]);
                     }
-                    stopInd.Stop = true;
-                    return foundValues;
-
                 }
-                if (Convert.ToString(Keys[i]).StartsWith(target_keyStr, StringComparison.CurrentCultureIgnoreCase))
+                else
                 {
-                    foundValues.AddRange(Values[i]);
+                    if (string.Compare(keyStr, target_keyStr, stringComparison) <= 0)
+                    {
+                        if (keyStr.StartsWith(target_keyStr, stringComparison))
+                        {
+                            foundValues.AddRange(Values[i]);
+                        }
+                        stopInd.Stop = true;
+                        return foundValues;
+
+                    }
+                    if (keyStr.StartsWith(target_keyStr, stringComparison))
+                    {
+                        foundValues.AddRange(Values[i]);
+                    }
                 }
                 if (Children[i] != null)
                 {
-                    foundValues.AddRange(await Children[i].FindItemsStartsWithAsync(target_key, stopInd).ConfigureAwait(false));
+                    foundValues.AddRange(await Children[i].FindItemsStartsWithAsync(target_key,defaultComparer,stringComparison, stopInd).ConfigureAwait(false));
 
                 }
 

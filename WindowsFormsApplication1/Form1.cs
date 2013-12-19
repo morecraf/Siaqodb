@@ -8,7 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GameEntities;
+
+using System.IO;
 
 namespace WindowsFormsApplication1
 {
@@ -34,6 +35,8 @@ namespace WindowsFormsApplication1
             }
             IList<Player> players = sqo.LoadAll<Player>();
             string d = "";
+            MemoryStream memStr=new MemoryStream();
+            ProtoBuf.Serializer.Serialize(memStr, new Player());
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -43,6 +46,7 @@ namespace WindowsFormsApplication1
             Z z = new Z();
             z.a = a;
             z.b = b;
+            //a.Name.Contains
             z.items.Add(a);
             z.items.Add(b);
             SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
@@ -54,30 +58,30 @@ namespace WindowsFormsApplication1
             string ass = "s";
         }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
-            SiaqodbUtil.ReIndex(@"C:\Users\cristi\Downloads\External (1)\External");
-            Siaqodb SIAQODB = new Siaqodb(@"C:\Users\cristi\Downloads\External (1)\External");
+        //private void button3_Click(object sender, EventArgs e)
+        //{
+        //    SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+        //    SiaqodbUtil.ReIndex(@"C:\Users\cristi\Downloads\External (1)\External");
+        //    Siaqodb SIAQODB = new Siaqodb(@"C:\Users\cristi\Downloads\External (1)\External");
 
-            int truck = 1;
-            int upgrade_type = 3;
+        //    int truck = 1;
+        //    int upgrade_type = 3;
 
-            UpgradeAttached[] attached = (from UpgradeAttached u in SIAQODB
-                                          where u.truck == truck && u.type == upgrade_type
-                                          select u).ToArray();
+        //    UpgradeAttached[] attached = (from UpgradeAttached u in SIAQODB
+        //                                  where u.truck == truck && u.type == upgrade_type
+        //                                  select u).ToArray();
 
-            foreach (UpgradeAttached u in attached)
-            {
+        //    foreach (UpgradeAttached u in attached)
+        //    {
 
-                //Debug.Log (u.ToString());
+        //        //Debug.Log (u.ToString());
 
-                SIAQODB.Delete(u);
+        //        SIAQODB.Delete(u);
 
-            }
+        //    }
 
-            string g = "";
-        }
+        //    string g = "";
+        //}
     }
     public class Player
     {

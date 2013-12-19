@@ -376,6 +376,14 @@ namespace Sqo
             Visit(mExpression);
             ConstantExpression c = m.Arguments[0] as ConstantExpression;
             Visit(c);
+            if (m.Arguments.Count == 2)
+            {
+                ConstantExpression c2 = m.Arguments[1] as ConstantExpression;
+                if (c2.Value != null && c2.Value.GetType() == typeof(StringComparison))
+                {
+                    w.Value2 = (StringComparison)c2.Value;
+                }
+            }
             
             switch (m.Method.Name)
             {

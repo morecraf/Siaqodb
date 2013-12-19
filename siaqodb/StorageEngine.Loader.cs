@@ -879,19 +879,40 @@ namespace Sqo
                 {
                     string wVal = w.Value as string;
                     string valObj = val as string;
-                    return valObj.IndexOf(wVal, StringComparison.OrdinalIgnoreCase) != -1;
+                    if (w.Value2 != null && w.Value2 is StringComparison)
+                    {
+                        return valObj.IndexOf(wVal, (StringComparison)w.Value2) != -1;
+                    }
+                    else
+                    {
+                        return valObj.Contains(wVal);
+                    }
                 }
                 else if (w.OperationType == OperationType.StartWith)
                 {
                     string wVal = w.Value as string;
                     string valObj = val as string;
-                    return valObj.StartsWith(wVal, StringComparison.OrdinalIgnoreCase);
+                    if (w.Value2 != null && w.Value2 is StringComparison)
+                    {
+                        return valObj.StartsWith(wVal, (StringComparison)w.Value2);
+                    }
+                    else
+                    {
+                        return valObj.StartsWith(wVal);
+                    }
                 }
                 else if (w.OperationType == OperationType.EndWith)
                 {
                     string wVal = w.Value as string;
                     string valObj = val as string;
-                    return valObj.EndsWith(wVal, StringComparison.OrdinalIgnoreCase);
+                    if (w.Value2 != null && w.Value2 is StringComparison)
+                    {
+                        return valObj.EndsWith(wVal, (StringComparison)w.Value2);
+                    }
+                    else
+                    {
+                        return valObj.EndsWith(wVal);
+                    }
                 }
 
             }
