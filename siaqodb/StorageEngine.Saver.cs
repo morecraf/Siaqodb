@@ -1135,7 +1135,7 @@ namespace Sqo
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             List<FieldSqoInfo> complexFields = (from FieldSqoInfo fi in ti.Fields
-                                                where fi.AttributeTypeId == MetaExtractor.complexID
+                                                where fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID
                                                 select fi).ToList();
             if (complexFields.Count > 0)
             {

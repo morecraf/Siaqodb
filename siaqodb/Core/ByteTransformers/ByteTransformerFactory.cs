@@ -12,7 +12,7 @@ namespace Sqo.Core
     {
         public static IByteTransformer GetByteTransformer(ObjectSerializer serializer, RawdataSerializer rawSerializer, FieldSqoInfo fi, SqoTypeInfo ti, int parentOID)
         {
-            if (fi.AttributeTypeId == MetaExtractor.complexID)
+            if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID)
             {
                 return new ComplexTypeTransformer(serializer, ti, fi);
             }

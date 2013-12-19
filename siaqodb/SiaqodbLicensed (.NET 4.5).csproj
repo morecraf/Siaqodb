@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\DocumentAttribute.cs" />
     <Compile Include="Attributes\IgnoreAttribute.cs" />
     <Compile Include="Attributes\Index.cs" />
     <Compile Include="Attributes\MaxLengthAttribute.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="MetaObjects\DictionaryInfo.cs" />
     <Compile Include="MetaObjects\RawdataInfo.cs" />
     <Compile Include="MetaObjects\RawdataManager.cs" />
+    <Compile Include="MetaObjects\DocumentInfo.cs" />
     <Compile Include="Obfuscation\ObfuscationAttributes.cs" />
     <Compile Include="PropertyResolver\MethodBasedRocks.cs" />
     <Compile Include="PropertyResolver\PropertyResolver.cs" />

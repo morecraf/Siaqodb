@@ -213,7 +213,7 @@ namespace Sqo.Core
                         MetaExtractor.FindAddIndexes(tInfo, ai);
 
                     }
-                    if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID)
+                    if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID || ai.AttributeTypeId==MetaExtractor.documentID)
                     {
                         if (loadRealType)
                         {

@@ -65,6 +65,9 @@
     <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -73,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLocker\AsyncLock.cs" />
+    <Compile Include="Attributes\DocumentAttribute.cs" />
     <Compile Include="Attributes\IgnoreAttribute.cs" />
     <Compile Include="Attributes\Index.cs" />
     <Compile Include="Attributes\MaxLengthAttribute.cs" />
@@ -145,6 +149,7 @@
     <Compile Include="MetaField.cs" />
     <Compile Include="MetaObjects\ArrayInfo.cs" />
     <Compile Include="MetaObjects\DictionaryInfo.cs" />
+    <Compile Include="MetaObjects\DocumentInfo.cs" />
     <Compile Include="MetaObjects\RawdataManager.cs" />
     <Compile Include="MetaType.cs" />
     <Compile Include="Meta\FieldSqoInfo.cs" />

@@ -2533,7 +2533,7 @@ savedObject(this, e);
             }
             SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
             FieldSqoInfo fi= MetaHelper.FindField(tinf.Fields, fieldName);
-            if (fi.AttributeTypeId == MetaExtractor.complexID)
+            if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId==MetaExtractor.documentID)
             {
                 KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
                 listOIDs.Add(kv.Key);
@@ -2563,7 +2563,7 @@ savedObject(this, e);
             }
             SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
             FieldSqoInfo fi = MetaHelper.FindField(tinf.Fields, fieldName);
-            if (fi.AttributeTypeId == MetaExtractor.complexID)
+            if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID)
             {
                 KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
                 TID = kv.Value;

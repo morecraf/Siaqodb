@@ -420,7 +420,7 @@ namespace Sqo.Core
                 foreach (FieldSqoInfo ai in ti.Fields)
                 {
                     byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
-                    if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId==MetaExtractor.dictionaryID)
+                    if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId==MetaExtractor.dictionaryID || ai.AttributeTypeId==MetaExtractor.documentID)
                     {
                         row[ai.Name] = field;
                     }
@@ -458,7 +458,7 @@ namespace Sqo.Core
             foreach (FieldSqoInfo ai in ti.Fields)
             {
                 byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
-                if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID)
+                if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID || ai.AttributeTypeId == MetaExtractor.documentID)
                 {
                     row[ai.Name] = field;
                 }

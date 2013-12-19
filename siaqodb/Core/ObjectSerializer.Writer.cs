@@ -177,7 +177,7 @@ namespace Sqo.Core
             foreach (FieldSqoInfo ai in oi.AtInfo.Keys)
             {
                 byte[] by = null;
-                if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.complexID))
+                if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.complexID) || ai.AttributeTypeId==MetaExtractor.documentID)
                 {
                     //to be able to cache for circular reference, we need to asign OID to it
                     if (!oidToParentSet)
@@ -222,7 +222,7 @@ namespace Sqo.Core
             foreach (FieldSqoInfo ai in oi.AtInfo.Keys)
             {
                 byte[] by = null;
-                if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.complexID))
+                if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.complexID) || ai.AttributeTypeId == MetaExtractor.documentID)
                 {
                     //to be able to cache for circular reference, we need to asign OID to it
                     if (!oidToParentSet)
@@ -469,7 +469,7 @@ namespace Sqo.Core
                     }
                     else
                     {
-                        if (ai.AttributeTypeId == MetaExtractor.complexID)
+                        if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId==MetaExtractor.documentID)
                         {
                             fieldVal = null;
                         }
@@ -501,7 +501,7 @@ namespace Sqo.Core
                             }
                         }
                     }
-                    if (ai.AttributeTypeId == MetaExtractor.complexID)
+                    if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId==MetaExtractor.documentID)
                     {
                         if (existed)
                         {
@@ -611,7 +611,7 @@ namespace Sqo.Core
                     }
                     else
                     {
-                        if (ai.AttributeTypeId == MetaExtractor.complexID)
+                        if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.documentID)
                         {
                             fieldVal = null;
                         }
@@ -643,7 +643,7 @@ namespace Sqo.Core
                             }
                         }
                     }
-                    if (ai.AttributeTypeId == MetaExtractor.complexID)
+                    if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.documentID)
                     {
                         if (existed)
                         {
