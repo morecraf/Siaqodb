@@ -691,6 +691,19 @@ namespace Sqo.Meta
                     }
                    
 				}
+                if (attKey.AttributeTypeId == MetaExtractor.documentID && objVal!=null )
+                {
+                    Sqo.MetaObjects.DocumentInfo dinfo = new Sqo.MetaObjects.DocumentInfo();
+                    dinfo.TypeName = attKey.AttributeType.AssemblyQualifiedName;
+
+                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                    {
+                        ProtoBuf.Serializer.NonGeneric.Serialize(ms, objVal);
+                        dinfo.Document = ms.ToArray();
+                        objVal = dinfo;
+                    }
+                    
+                }
 				oi.AtInfo[attKey] = objVal;
 
 

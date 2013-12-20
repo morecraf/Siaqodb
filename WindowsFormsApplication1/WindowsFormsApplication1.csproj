@@ -82,9 +82,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\siaqodb\SiaqodbLicensed %28Unity3D%29.csproj">
-      <Project>{19368999-dd20-4534-8377-3d58063f8cfd}</Project>
-      <Name>SiaqodbLicensed %28Unity3D%29</Name>
+    <ProjectReference Include="..\siaqodb\SiaqodbAsyncLicensed %28.NET 4.5%29.csproj">
+      <Project>{f5bd2e1f-dcdd-4a1c-8130-236c2d75ff93}</Project>
+      <Name>SiaqodbAsyncLicensed %28.NET 4.5%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

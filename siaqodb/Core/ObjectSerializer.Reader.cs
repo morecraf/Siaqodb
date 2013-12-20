@@ -46,7 +46,17 @@ namespace Sqo.Core
 
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
                 object fieldVal = byteTransformer.GetObject(field);
-
+                if (ai.AttributeTypeId == MetaExtractor.documentID)
+                { 
+                    DocumentInfo dinfo=fieldVal as DocumentInfo;
+                    if (dinfo != null)
+                    {
+                        using (MemoryStream ms = new MemoryStream(dinfo.Document))
+                        {
+                            fieldVal = ProtoBuf.Serializer.NonGeneric.Deserialize(ai.AttributeType, ms);
+                        }
+                    }
+                }
 
 #if SILVERLIGHT
 

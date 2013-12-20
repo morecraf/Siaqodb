@@ -22,21 +22,37 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SiaqodbConfigurator.EncryptedDatabase = true;
-            SiaqodbConfigurator.SetEncryptor(BuildInAlgorithm.AES);
-            SiaqodbConfigurator.SetEncryptionPassword("correct");
-            SiaqodbConfigurator.SetDatabaseFileName<Player>("myplayer");
+           // SiaqodbConfigurator.EncryptedDatabase = true;
+            //SiaqodbConfigurator.SetEncryptor(BuildInAlgorithm.AES);
+            //SiaqodbConfigurator.SetEncryptionPassword("correct");
+            //SiaqodbConfigurator.SetDatabaseFileName<Player>("myplayer");
 
             SiaqodbConfigurator.SetLicense(@"3XnXneBWc/FGTK9mZdpLVR7cUv1fplh11lH4Y60jNlQ=");
-            Siaqodb sqo=new Siaqodb(@"c:\apps\OpenSource projects\sqoo\tests\rty22\");
-            for (int i = 0; i < 10; i++)
+            Siaqodb sqo = new Siaqodb(@"e:\apps\OpenSource projects\sqoo\tests\rty22\");
+            DateTime start = DateTime.Now;
+            for (int i = 0; i < 10000; i++)
             {
-                sqo.StoreObject(new Player() { Name = "Andor" + i.ToString(), Age = i + 20 });
+                Player p = new Player() { Name = "Andor" + i.ToString(), Age = i + 20 };
+                p.blob = new byte[1000];
+                p.dict = new Dictionary<int, int>();
+                p.ListName = new List<string>();
+                for (int j = 0; j < 1000; j++)
+                {
+                    p.dict.Add(j, j);
+                    p.blob[j] = (byte)(j % 100);
+                    p.ListName.Add(j.ToString());
+                }
+                PlayerHost ph = new PlayerHost() { ThePlayer = p, SomeField = i };
+                sqo.StoreObject(ph);
             }
-            IList<Player> players = sqo.LoadAll<Player>();
+            string elapsed = (DateTime.Now - start).ToString();
+            start = DateTime.Now;
+            IList<PlayerHost> players = sqo.LoadAll<PlayerHost>();
+            elapsed = (DateTime.Now - start).ToString();
+           
             string d = "";
-            MemoryStream memStr=new MemoryStream();
-            ProtoBuf.Serializer.Serialize(memStr, new Player());
+        //    MemoryStream memStr=new MemoryStream();
+          //  ProtoBuf.Serializer.Serialize(memStr, new Player());
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -83,11 +99,22 @@ namespace WindowsFormsApplication1
         //    string g = "";
         //}
     }
+    [ProtoBuf.ProtoContract(ImplicitFields=ProtoBuf.ImplicitFields.AllPublic)]
     public class Player
     {
         public string Name { get; set; }
         public int OID { get; set; }
         public int Age { get; set; }
+        public List<string> ListName { get; set; }
+        public byte[] blob { get; set; }
+        public Dictionary<int,int> dict { get; set; }
+    }
+    public class PlayerHost
+    {
+        //[Sqo.Attributes.Document]
+        public Player ThePlayer { get; set; }
+        public int OID { get; set; }
+        public int SomeField { get; set; }
     }
     public class aBase
     {
