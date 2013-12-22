@@ -12,10 +12,11 @@ using System.Threading.Tasks;
 
 namespace Sqo
 {
-    public static class SqoQueryExtensions
+    
+    internal static class SqoQueryExtensionsImpl
     {
 
-        public static ISqoQuery<TSource> Where<TSource>(this ISqoQuery<TSource> self, Expression<Func<TSource, bool>> expression)
+        public static ISqoQuery<TSource> Where<TSource>(ISqoQuery<TSource> self, Expression<Func<TSource, bool>> expression)
         {
 
             try
@@ -58,7 +59,7 @@ namespace Sqo
             return Expression.Lambda<Func<TSource, bool>>
                   (Expression.AndAlso(((LambdaExpression)expr1).Body, invokedExpr), ((LambdaExpression)expr1).Parameters);
         }
-		public static ISqoQuery<TRet> Select<TSource, TRet>(this ISqoQuery<TSource> self, Expression<Func<TSource, TRet>> selector)
+		public static ISqoQuery<TRet> Select<TSource, TRet>(ISqoQuery<TSource> self, Expression<Func<TSource, TRet>> selector)
 		{
 #if ASYNC
             Func<TSource, TRet> fn = selector.Compile();
@@ -123,7 +124,7 @@ namespace Sqo
             #endif
 #endif
 		}
-		public static ISqoQuery<TResult> Join<TOuter, TInner, TKey, TResult>(this ISqoQuery<TOuter> outer, IEnumerable<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
+		public static ISqoQuery<TResult> Join<TOuter, TInner, TKey, TResult>(ISqoQuery<TOuter> outer, IEnumerable<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
 		{
 		    ISqoQuery<TOuter> SqoQueryOuter = (ISqoQuery<TOuter>)outer;
 		    ISqoQuery<TInner> SqoQueryInner = (ISqoQuery<TInner>)inner;
@@ -192,7 +193,7 @@ namespace Sqo
            
             
 		}
-        public static int Count<TSource>(this ISqoQuery<TSource> source)
+        public static int Count<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -218,7 +219,7 @@ namespace Sqo
         }
 
 #if ASYNC
-        public static async Task<int> CountAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<int> CountAsync<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -247,7 +248,7 @@ namespace Sqo
  
 
         
-        public static int Count<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static int Count<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -273,7 +274,7 @@ namespace Sqo
             return num;
         }
 #if ASYNC
-        public static async Task<int> CountAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<int> CountAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -300,7 +301,7 @@ namespace Sqo
         }
 #endif
 
-        public static TSource FirstOrDefault<TSource>(this ISqoQuery<TSource> source)
+        public static TSource FirstOrDefault<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -337,7 +338,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).FirstOrDefault<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> FirstOrDefaultAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<TSource> FirstOrDefaultAsync<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -375,7 +376,7 @@ namespace Sqo
 #endif
 
  
-        public static TSource FirstOrDefault<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static TSource FirstOrDefault<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -408,7 +409,7 @@ namespace Sqo
 
         }
 #if ASYNC
-        public static async Task<TSource> FirstOrDefaultAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<TSource> FirstOrDefaultAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -441,7 +442,7 @@ namespace Sqo
 
         }
 #endif
-        public static TSource First<TSource>(this ISqoQuery<TSource> source)
+        public static TSource First<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -477,7 +478,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).First<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> FirstAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<TSource> FirstAsync<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -513,7 +514,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).First<TSource>();
         }
 #endif
-        public static TSource First<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static TSource First<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -544,7 +545,7 @@ namespace Sqo
             throw new InvalidOperationException("The source sequence is empty.");
         }
 #if ASYNC
-        public static async Task<TSource> FirstAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<TSource> FirstAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -575,7 +576,7 @@ namespace Sqo
             throw new InvalidOperationException("The source sequence is empty.");
         }
 #endif
-        public static bool Any<TSource>(this ISqoQuery<TSource> source)
+        public static bool Any<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -605,7 +606,7 @@ namespace Sqo
             
         }
 #if ASYNC
-        public static async Task<bool> AnyAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<bool> AnyAsync<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -635,7 +636,7 @@ namespace Sqo
 
         }
 #endif
-        public static bool Any<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static bool Any<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -665,7 +666,7 @@ namespace Sqo
             return false;
         }
 #if ASYNC
-        public static async Task<bool> AnyAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<bool> AnyAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -695,7 +696,7 @@ namespace Sqo
             return false;
         }
 #endif
-        public static TSource Last<TSource>(this ISqoQuery<TSource> source)
+        public static TSource Last<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -710,7 +711,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).Last<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> LastAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<TSource> LastAsync<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -726,7 +727,7 @@ namespace Sqo
         }
 
 #endif
-        public static TSource Last<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static TSource Last<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -741,7 +742,7 @@ namespace Sqo
               return ((IEnumerable<TSource>)query).Last<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> LastAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<TSource> LastAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -756,7 +757,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)query).Last<TSource>();
         }
 #endif
-        public static TSource LastOrDefault<TSource>(this ISqoQuery<TSource> source)
+        public static TSource LastOrDefault<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -771,7 +772,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).LastOrDefault<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> LastOrDefaultAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<TSource> LastOrDefaultAsync<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -786,7 +787,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).LastOrDefault<TSource>();
         }
 #endif
-        public static TSource LastOrDefault<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static TSource LastOrDefault<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -801,7 +802,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)query).LastOrDefault<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> LastOrDefaultAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<TSource> LastOrDefaultAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -816,7 +817,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)query).LastOrDefault<TSource>();
         }
 #endif
-        public static TSource Single<TSource>(this ISqoQuery<TSource> source)
+        public static TSource Single<TSource>(ISqoQuery<TSource> source)
         {
 
             if (source == null)
@@ -871,7 +872,7 @@ namespace Sqo
 
         }
 #if ASYNC
-        public static async Task<TSource> SingleAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<TSource> SingleAsync<TSource>(ISqoQuery<TSource> source)
         {
 
             if (source == null)
@@ -927,7 +928,7 @@ namespace Sqo
 
         }
 #endif
-        public static TSource Single<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static TSource Single<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
 
             if (source == null)
@@ -957,7 +958,7 @@ namespace Sqo
             
         }
 #if ASYNC
-        public static async Task<TSource> SingleAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<TSource> SingleAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
 
             if (source == null)
@@ -987,7 +988,7 @@ namespace Sqo
 
         }
 #endif
-        public static TSource SingleOrDefault<TSource>(this ISqoQuery<TSource> source)
+        public static TSource SingleOrDefault<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -1041,7 +1042,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).SingleOrDefault<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> SingleOrDefaultAsync<TSource>(this ISqoQuery<TSource> source)
+        public static async Task<TSource> SingleOrDefaultAsync<TSource>(ISqoQuery<TSource> source)
         {
             if (source == null)
             {
@@ -1095,7 +1096,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)source).SingleOrDefault<TSource>();
         }
 #endif
-        public static TSource SingleOrDefault<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static TSource SingleOrDefault<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -1123,7 +1124,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)query).SingleOrDefault<TSource>();
         }
 #if ASYNC
-        public static async Task<TSource> SingleOrDefaultAsync<TSource>(this ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
+        public static async Task<TSource> SingleOrDefaultAsync<TSource>(ISqoQuery<TSource> source, Expression<Func<TSource, bool>> expression)
         {
             if (source == null)
             {
@@ -1151,7 +1152,7 @@ namespace Sqo
             return ((IEnumerable<TSource>)query).SingleOrDefault<TSource>();
         }
 #endif
-        public static ISqoQuery<TSource> Take<TSource>(this ISqoQuery<TSource> source, int count)
+        public static ISqoQuery<TSource> Take<TSource>(ISqoQuery<TSource> source, int count)
         {
             if (source == null)
             {
@@ -1212,7 +1213,7 @@ namespace Sqo
             return new SelectQuery<TSource>(((IEnumerable<TSource>)source).Take<TSource>(count));
         }
 #if ASYNC
-        public static async Task<ISqoQuery<TSource>> TakeAsync<TSource>(this ISqoQuery<TSource> source, int count)
+        public static async Task<ISqoQuery<TSource>> TakeAsync<TSource>(ISqoQuery<TSource> source, int count)
         {
             if (source == null)
             {
@@ -1256,7 +1257,7 @@ namespace Sqo
             return null;
         }
 #endif
-        public static ISqoQuery<TSource> Skip<TSource>(this ISqoQuery<TSource> source, int count)
+        public static ISqoQuery<TSource> Skip<TSource>(ISqoQuery<TSource> source, int count)
         {
             if (source == null)
             {
@@ -1325,7 +1326,7 @@ namespace Sqo
             return new SelectQuery<TSource>(((IEnumerable<TSource>)source).Skip<TSource>(count));
         }
 #if ASYNC
-        public static async Task<ISqoQuery<TSource>> SkipAsync<TSource>(this ISqoQuery<TSource> source, int count)
+        public static async Task<ISqoQuery<TSource>> SkipAsync<TSource>(ISqoQuery<TSource> source, int count)
         {
             if (source == null)
             {
@@ -1394,7 +1395,7 @@ namespace Sqo
             return null;
         }
 #endif
-        public static ISqoQuery<TSource> Include<TSource>(this ISqoQuery<TSource> source, string path)
+        public static ISqoQuery<TSource> Include<TSource>(ISqoQuery<TSource> source, string path)
         {
             if (source == null)
             {
@@ -1423,7 +1424,7 @@ namespace Sqo
         }
 #if !UNITY3D
 
-        public static ISqoOrderedQuery<TSource> OrderBy<TSource, TKey>(this ISqoQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
+        public static ISqoOrderedQuery<TSource> OrderBy<TSource, TKey>(ISqoQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
         {
             ISqoQuery<TKey> select = Select<TSource, TKey>(source, keySelector);
             ProjectionSelectReader<TKey, TSource> r = select as ProjectionSelectReader<TKey, TSource>;
@@ -1456,7 +1457,7 @@ namespace Sqo
             return new SqoObjOrderedQuery<TSource>(((IEnumerable<TSource>)source).OrderBy<TSource, TKey>(fn));
 
         }
-        public static ISqoOrderedQuery<TSource> OrderByDescending<TSource, TKey>(this ISqoQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
+        public static ISqoOrderedQuery<TSource> OrderByDescending<TSource, TKey>(ISqoQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
         {
             ISqoQuery<TKey> select = Select<TSource, TKey>(source, keySelector);
             ProjectionSelectReader<TKey, TSource> r = select as ProjectionSelectReader<TKey, TSource>;
@@ -1489,7 +1490,7 @@ namespace Sqo
             return new SqoObjOrderedQuery<TSource>(((IEnumerable<TSource>)source).OrderByDescending<TSource, TKey>(fn));
 
         }
-        public static ISqoOrderedQuery<TSource> ThenBy<TSource, TKey>(this ISqoOrderedQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
+        public static ISqoOrderedQuery<TSource> ThenBy<TSource, TKey>( ISqoOrderedQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
         {
             SqoOrderedQuery<TSource> orderedQuery = source as SqoOrderedQuery<TSource>;
             if (orderedQuery != null)
@@ -1518,7 +1519,7 @@ namespace Sqo
             return new SqoObjOrderedQuery<TSource>(((IOrderedEnumerable<TSource>)source).ThenBy<TSource, TKey>(fn));
           
         }
-        public static ISqoOrderedQuery<TSource> ThenByDescending<TSource, TKey>(this ISqoOrderedQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
+        public static ISqoOrderedQuery<TSource> ThenByDescending<TSource, TKey>( ISqoOrderedQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
         {
             SqoOrderedQuery<TSource> orderedQuery = source as SqoOrderedQuery<TSource>;
             if (orderedQuery != null)

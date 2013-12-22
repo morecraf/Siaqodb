@@ -64,6 +64,9 @@
     <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -71,12 +74,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\IgnoreAttribute.cs" />
-    <Compile Include="Attributes\Index.cs" />
-    <Compile Include="Attributes\MaxLengthAttribute.cs" />
-    <Compile Include="Attributes\TextAttribute.cs" />
-    <Compile Include="Attributes\UniqueConstraint.cs" />
-    <Compile Include="Attributes\UseVariable.cs" />
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
     <Compile Include="Cache\CacheForIndexes.cs" />
@@ -104,9 +101,7 @@
     <Compile Include="Core\SqoISFile.cs" />
     <Compile Include="Core\SqoISFile2.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
-    <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
-    <Compile Include="Events.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\NotSupportedTypeException.cs" />
@@ -122,13 +117,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Internal\_bs.cs" />
-    <Compile Include="IObjectList.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="LazyObjectList.cs" />
     <Compile Include="Linq\Evaluator.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
     <Compile Include="Linq\IncludeSqoQuery.cs" />
-    <Compile Include="Linq\ISqoQuery.cs" />
     <Compile Include="Linq\JoinTranslator.cs" />
     <Compile Include="Linq\LazyEnumerator.cs" />
     <Compile Include="Linq\LazySqoQuery.cs" />
@@ -140,11 +133,10 @@
     <Compile Include="Linq\SqoOrderedQuery.cs" />
     <Compile Include="Linq\SqoQuery.cs" />
     <Compile Include="Linq\SqoQueryExtensions.cs" />
-    <Compile Include="MetaField.cs" />
     <Compile Include="MetaObjects\ArrayInfo.cs" />
     <Compile Include="MetaObjects\DictionaryInfo.cs" />
+    <Compile Include="MetaObjects\DocumentInfo.cs" />
     <Compile Include="MetaObjects\RawdataManager.cs" />
-    <Compile Include="MetaType.cs" />
     <Compile Include="Meta\FieldSqoInfo.cs" />
     <Compile Include="Meta\MetaExtractor.cs" />
     <Compile Include="Meta\ObjectInfo.cs" />
@@ -205,6 +197,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

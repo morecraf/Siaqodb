@@ -462,7 +462,7 @@ namespace Sqo
             }
         }
     }
-    public enum BuildInAlgorithm {AES,XTEA}
-    public delegate void TraceListener(string traceMessage,VerboseLevel level);
-    public enum VerboseLevel { Off=1, Error=2, Warn=3, Info=4 }
+    //public enum BuildInAlgorithm {AES,XTEA}
+    //public delegate void TraceListener(string traceMessage,VerboseLevel level);
+    //public enum VerboseLevel { Off=1, Error=2, Warn=3, Info=4 }
 }

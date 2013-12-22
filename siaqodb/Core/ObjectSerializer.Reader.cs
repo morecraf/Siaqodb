@@ -55,6 +55,8 @@ namespace Sqo.Core
                         {
                             fieldVal = ProtoBuf.Serializer.NonGeneric.Deserialize(ai.AttributeType, ms);
                         }
+                        //put here  fieldVal and document.OID pair in WeakCache
+                        //(normally in StorageEngine.metaCache)
                     }
                 }
 

@@ -37,7 +37,7 @@ namespace Sqo
 #else
         public
 #endif
-        class Siaqodb  
+        class Siaqodb : Sqo.ISiaqodb
 	{
 
         readonly object _syncRoot = new object();
@@ -876,7 +876,7 @@ savedObject(this, e);
         /// <param name="obj">Object to be stored</param>
         /// <param name="transaction">Transaction object</param>
 		
-        public void StoreObject(object obj,Transactions.Transaction transaction)
+        public void StoreObject(object obj,Transactions.ITransaction transaction)
         {
             lock (_locker)
             {
@@ -887,7 +887,7 @@ savedObject(this, e);
                  SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj);
                 if (ti != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -895,7 +895,7 @@ savedObject(this, e);
                     //circularRefCache.Add(obj); 
 
                     //circularRefCache is filled with obj just before Commit in TransactionManager, so not need to be added here
-                    storageEngine.SaveObject(obj, ti, null, transaction);
+                    storageEngine.SaveObject(obj, ti, null, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     this.OnSavedObject(saved);
@@ -909,7 +909,7 @@ savedObject(this, e);
         /// <param name="obj">Object to be stored</param>
         /// <param name="transaction">Transaction object</param>
 
-        public async Task StoreObjectAsync(object obj, Transactions.Transaction transaction)
+        public async Task StoreObjectAsync(object obj, Transactions.ITransaction transaction)
         {
 
             if (transaction == null)
@@ -922,7 +922,7 @@ savedObject(this, e);
                 SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(obj);
                 if (ti != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -930,7 +930,7 @@ savedObject(this, e);
                     //circularRefCache.Add(obj); 
 
                     //circularRefCache is filled with obj just before Commit in TransactionManager, so not need to be added here
-                    await storageEngine.SaveObjectAsync(obj, ti, null, transaction);
+                    await storageEngine.SaveObjectAsync(obj, ti, null, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     this.OnSavedObject(saved);
@@ -1540,7 +1540,7 @@ savedObject(this, e);
         /// </summary>
         /// <param name="obj">Object to be deleted</param>
         /// <param name="transaction">Transaction</param>
-        public void Delete(object obj, Transactions.Transaction transaction)
+        public void Delete(object obj, Transactions.ITransaction transaction)
         {
             lock (_locker)
             {
@@ -1554,7 +1554,7 @@ savedObject(this, e);
                     throw new ArgumentNullException("transaction");
                 }
                
-                if (transaction.status == Transactions.TransactionStatus.Closed)
+                if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                 {
                     throw new SiaqodbException("Transaction closed!");
                 }
@@ -1569,7 +1569,7 @@ savedObject(this, e);
         /// </summary>
         /// <param name="obj">Object to be deleted</param>
         /// <param name="transaction">Transaction</param>
-        public async Task DeleteAsync(object obj, Transactions.Transaction transaction)
+        public async Task DeleteAsync(object obj, Transactions.ITransaction transaction)
         {
             bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
@@ -1582,7 +1582,7 @@ savedObject(this, e);
                 {
                     throw new ArgumentNullException("transaction");
                 }
-                if (transaction.status == Transactions.TransactionStatus.Closed)
+                if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                 {
                     throw new SiaqodbException("Transaction closed!");
                 }
@@ -1641,7 +1641,7 @@ savedObject(this, e);
         /// <param name="fieldNames">Names of fields that this method will lookup for object to delete it</param>
         /// <param name="transaction">Transaction object</param>
 
-        public bool DeleteObjectBy(object obj, Transactions.Transaction transaction, params string[] fieldNames)
+        public bool DeleteObjectBy(object obj, Transactions.ITransaction transaction, params string[] fieldNames)
         {
             lock (_locker)
             {
@@ -1657,7 +1657,7 @@ savedObject(this, e);
 
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -1672,7 +1672,7 @@ savedObject(this, e);
                     return false;
                 }
 
-                int OID_deleted = storageEngine.DeleteObjectBy(fieldNames, obj, ti, transaction);
+                int OID_deleted = storageEngine.DeleteObjectBy(fieldNames, obj, ti, (Transactions.Transaction)transaction);
                 DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, OID_deleted);
                 this.OnDeletedObject(deletedEv);
 
@@ -1687,7 +1687,7 @@ savedObject(this, e);
         /// <param name="fieldNames">Names of fields that this method will lookup for object to delete it</param>
         /// <param name="transaction">Transaction object</param>
 
-        public async Task<bool> DeleteObjectByAsync(object obj, Transactions.Transaction transaction, params string[] fieldNames)
+        public async Task<bool> DeleteObjectByAsync(object obj, Transactions.ITransaction transaction, params string[] fieldNames)
         {
 
 
@@ -1704,7 +1704,7 @@ savedObject(this, e);
             {
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -1718,7 +1718,7 @@ savedObject(this, e);
                     return false;
                 }
 
-                int OID_deleted = await storageEngine.DeleteObjectByAsync(fieldNames, obj, ti, transaction);
+                int OID_deleted = await storageEngine.DeleteObjectByAsync(fieldNames, obj, ti, (Transactions.Transaction)transaction);
                 DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, OID_deleted);
                 this.OnDeletedObject(deletedEv);
 
@@ -2142,7 +2142,7 @@ savedObject(this, e);
         /// <param name="obj">object that has all values but not OID to update it in database</param>
         /// <param name="transaction">Transaction object</param>
         /// <returns>true if object was updated and false if object was not found in database</returns>
-        public bool UpdateObjectBy(object obj, Sqo.Transactions.Transaction transaction, params string[] fieldNames)
+        public bool UpdateObjectBy(object obj, Sqo.Transactions.ITransaction transaction, params string[] fieldNames)
         {
             lock (_locker)
             {
@@ -2153,7 +2153,7 @@ savedObject(this, e);
 
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -2164,7 +2164,7 @@ savedObject(this, e);
                 if (ti != null)
                 {
 
-                    bool stored = storageEngine.UpdateObjectBy(fieldNames, obj, ti, transaction);
+                    bool stored = storageEngine.UpdateObjectBy(fieldNames, obj, ti, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     saved.Inserted = false;
@@ -2183,7 +2183,7 @@ savedObject(this, e);
         /// <param name="obj">object that has all values but not OID to update it in database</param>
         /// <param name="transaction">Transaction object</param>
         /// <returns>true if object was updated and false if object was not found in database</returns>
-        public async Task<bool> UpdateObjectByAsync(object obj, Sqo.Transactions.Transaction transaction, params string[] fieldNames)
+        public async Task<bool> UpdateObjectByAsync(object obj, Sqo.Transactions.ITransaction transaction, params string[] fieldNames)
         {
             bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
@@ -2194,7 +2194,7 @@ savedObject(this, e);
                 }
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -2204,7 +2204,7 @@ savedObject(this, e);
                 if (ti != null)
                 {
 
-                    bool stored = await storageEngine.UpdateObjectByAsync(fieldNames, obj, ti, transaction);
+                    bool stored = await storageEngine.UpdateObjectByAsync(fieldNames, obj, ti, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     saved.Inserted = false;
@@ -2236,7 +2236,7 @@ savedObject(this, e);
         
 
         #region private methods
-        private bool DeleteObjInternal(object obj, SqoTypeInfo ti,Transactions.Transaction transaction)
+        private bool DeleteObjInternal(object obj, SqoTypeInfo ti,Transactions.ITransaction transaction)
         {
             int oid = metaCache.GetOIDOfObject(obj, ti);
             if (oid <= 0 || oid > ti.Header.numberOfRecords)
@@ -2256,14 +2256,14 @@ savedObject(this, e);
             }
             else
             {
-                storageEngine.DeleteObject(obj,ti,transaction,null);
+                storageEngine.DeleteObject(obj, ti, (Transactions.Transaction)transaction, null);
             }
             DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
             this.OnDeletedObject(deletedEv);
             return true;
         }
 #if ASYNC
-        private async Task<bool> DeleteObjInternalAsync(object obj, SqoTypeInfo ti, Transactions.Transaction transaction)
+        private async Task<bool> DeleteObjInternalAsync(object obj, SqoTypeInfo ti, Transactions.ITransaction transaction)
         {
             int oid = metaCache.GetOIDOfObject(obj, ti);
             if (oid <= 0 || oid > ti.Header.numberOfRecords)
@@ -2283,7 +2283,7 @@ savedObject(this, e);
             }
             else
             {
-                await storageEngine.DeleteObjectAsync(obj, ti, transaction, null);
+                await storageEngine.DeleteObjectAsync(obj, ti, (Transactions.Transaction)transaction, null);
             }
             DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
             this.OnDeletedObject(deletedEv);
@@ -2381,7 +2381,7 @@ savedObject(this, e);
         /// Start a database Transaction to be used on insert/update/delete objects
         /// </summary>
         /// <returns> Transaction object</returns>
-        public Transactions.Transaction BeginTransaction()
+        public Transactions.ITransaction BeginTransaction()
         {
             this.circularRefCache.Clear();
             return Transactions.TransactionManager.BeginTransaction(this);

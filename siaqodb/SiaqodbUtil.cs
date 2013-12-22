@@ -236,17 +236,11 @@ namespace Sqo
 #if ASYNC
         private static async Task ShrinkNormalAsync(Siaqodb siaqodb)
         {
-#if UNITY3D
+
 			var allOrderByPos = (await (from RawdataInfo ri in siaqodb
                                  where ri.IsFree == false
                                  select ri).ToListAsync()).OrderBy(a=>a.Position).ToList();
-#else
-			var allOrderByPos = await (from RawdataInfo ri in siaqodb
-			                           where ri.IsFree == false
-			                           orderby ri.Position
-			                           select ri).ToListAsync();
 
-#endif
             ISqoFile file = siaqodb.GetRawFile();
             MemoryStream memStream = new MemoryStream();
             MemoryStream memStreamNew = new MemoryStream();

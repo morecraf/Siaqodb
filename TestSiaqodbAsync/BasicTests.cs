@@ -17,10 +17,10 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class BasicTests
     {
-        string dbFolder = @"e:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
+        string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
         public BasicTests()
         {
-            SiaqodbConfigurator.SetTrialLicense("VkgrTzaU+uQTr9RQub6POYPdCSL0RaWKom3feRn8Rzs=");
+            SiaqodbConfigurator.SetTrialLicense("G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
         }
         [TestMethod]
         public async Task TestInsert()
@@ -522,7 +522,7 @@ namespace SiaqodbUnitTests
                 c1.Age = 11;
                 c1.S = "cevaa";
 
-                Transaction tr = sq.BeginTransaction();
+                ITransaction tr = sq.BeginTransaction();
                 await sq.StoreObjectAsync(c1, tr);
                 await tr.CommitAsync();
 
@@ -1524,7 +1524,7 @@ namespace SiaqodbUnitTests
             Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
             await sq.DropTypeAsync<Customer>();
             IList<Customer> list = null;
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
             bool needRollback = false;
             try
             {
@@ -1594,7 +1594,7 @@ namespace SiaqodbUnitTests
             Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
             await sq.DropTypeAsync<Customer>();
             IList<Customer> list = null;
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1643,7 +1643,7 @@ namespace SiaqodbUnitTests
             Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
             await sq.DropTypeAsync<Customer>();
             IList<Customer> list = null;
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1704,7 +1704,7 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(list[0].Name, emp.Name);
 
             emp.Name = "ANOTHER";
-            Transaction tr = sq.BeginTransaction();
+            ITransaction tr = sq.BeginTransaction();
             await sq.UpdateObjectByAsync(emp, tr, "ID", "CustomerID");
 
             await tr.CommitAsync();
@@ -1739,7 +1739,7 @@ namespace SiaqodbUnitTests
             emp.ID = 100;
             emp.CustomerID = 30;
 
-            Transaction trans = sq.BeginTransaction();
+            ITransaction trans = sq.BeginTransaction();
 
             bool s = await sq.DeleteObjectByAsync(emp, trans, "ID", "CustomerID");
             Assert.IsTrue(s);
@@ -1799,7 +1799,7 @@ namespace SiaqodbUnitTests
             await sq.DropTypeAsync<Customer>();
             await sq.DropTypeAsync<Employee>();
 
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1820,7 +1820,7 @@ namespace SiaqodbUnitTests
             list2 = await sq.LoadAllAsync<Employee>();
             Assert.AreEqual(10, list2.Count);
 
-            Transaction transac2t = sq.BeginTransaction();
+            ITransaction transac2t = sq.BeginTransaction();
 
             await sq.DeleteAsync(list[5], transac2t);
             await sq.DeleteAsync(list2[5], transac2t);
@@ -1848,7 +1848,7 @@ namespace SiaqodbUnitTests
             await sq.DropTypeAsync<Customer>();
             await sq.DropTypeAsync<Employee>();
             await sq.DropTypeAsync<D40>();
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1875,7 +1875,7 @@ namespace SiaqodbUnitTests
             IList<D40> list3 = await sq.LoadAllAsync<D40>();
             Assert.AreEqual(10, list3.Count);
 
-            Transaction transac2t = sq.BeginTransaction();
+            ITransaction transac2t = sq.BeginTransaction();
 
             sq.DeleteAsync(list[5], transac2t);
             sq.DeleteAsync(list2[5], transac2t);
@@ -1945,7 +1945,7 @@ namespace SiaqodbUnitTests
             await sq.DropTypeAsync<Customer>();
             await sq.DropTypeAsync<Employee>();
             await sq.DropTypeAsync<D40WithLists>();
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1974,7 +1974,7 @@ namespace SiaqodbUnitTests
             IList<D40WithLists> list3 = await sq.LoadAllAsync<D40WithLists>();
             Assert.AreEqual(10, list3.Count);
 
-            Transaction transac2t = sq.BeginTransaction();
+            ITransaction transac2t = sq.BeginTransaction();
 
             sq.DeleteAsync(list[5], transac2t);
             sq.DeleteAsync(list2[5], transac2t);

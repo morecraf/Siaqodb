@@ -13,10 +13,10 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class LINQTests
     {
-        string dbFolder = @"e:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
+        string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
         public LINQTests()
         {
-            SiaqodbConfigurator.SetTrialLicense("VkgrTzaU+uQTr9RQub6POYPdCSL0RaWKom3feRn8Rzs=");
+            SiaqodbConfigurator.SetTrialLicense("G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
         }	
         [TestMethod]
         public async Task TestBasicQuery()
@@ -184,7 +184,7 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(query.Count, 1);
 
             query = await (from Customer c in nop
-                    where c.Name.StartsWith("a")
+                    where c.Name.StartsWith("A")
                     select c).ToListAsync();
             Assert.AreEqual(query.Count, 5);
             query = await (from Customer c in nop
@@ -198,7 +198,7 @@ namespace SiaqodbUnitTests
                     select c).ToListAsync();
             Assert.AreEqual(0, query.Count);
             query = await (from Customer c in nop
-                    where c.Name.EndsWith("TESt")
+                    where c.Name.EndsWith("TEST")
                     select c).ToListAsync();
             Assert.AreEqual(5, query.Count);
 
@@ -343,14 +343,14 @@ namespace SiaqodbUnitTests
             }
             await nop.FlushAsync();
             var query = await (from Customer c in nop
-                        where c.Name.Contains("a") && c.Name.Contains("3")
+                        where c.Name.Contains("A") && c.Name.Contains("3")
                         select c).ToListAsync();
 
             Assert.AreEqual(query.Count, 1);
             Assert.AreEqual(3, query[0].ID);
 
             query = await (from Customer c in nop
-                    where c.Name.Contains("a") && (c.Name.Contains("3") && c.ID == 3)
+                    where c.Name.Contains("A") && (c.Name.Contains("3") && c.ID == 3)
                     select c).ToListAsync();
 
             Assert.AreEqual(query.Count, 1);
@@ -380,7 +380,7 @@ namespace SiaqodbUnitTests
             }
             await nop.FlushAsync();
             var query = await (from Customer c in nop
-                        where c.Name.Contains("a") && c.Name.Contains("3")
+                        where c.Name.Contains("A") && c.Name.Contains("3")
                         select new CustomerAnony { Name = c.Name,ID  = c.ID }).ToListAsync();
             int s = 0;
             foreach (var a in query)
@@ -415,14 +415,14 @@ namespace SiaqodbUnitTests
             }
             await nop.FlushAsync();
             var query = await (from Customer c in nop
-                        where c.Name.Contains("a") || c.ID == 2
+                        where c.Name.Contains("A") || c.ID == 2
                         select c).ToListAsync();
 
             Assert.AreEqual(query.Count, 6);
 
 
             query = await (from Customer c in nop
-                    where c.Name.Contains("a") || (c.ID == 2 && c.Name.Contains("T")) || c.ID == 4
+                    where c.Name.Contains("A") || (c.ID == 2 && c.Name.Contains("T")) || c.ID == 4
                     select c).ToListAsync();
 
             Assert.AreEqual(query.Count, 7);

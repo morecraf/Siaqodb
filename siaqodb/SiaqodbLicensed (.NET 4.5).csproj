@@ -62,6 +62,10 @@
     <DocumentationFile>bin\Licensed\Release\.NET4.5\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -132,12 +136,10 @@
     <Compile Include="SiaqodbConfigurator.cs" />
     <Compile Include="SiaqodbUtil.cs" />
     <Compile Include="SqoDataObject.cs" />
-    <Compile Include="Events.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\SiaqodbException.cs" />
     <Compile Include="Exceptions\NotSupportedTypeException.cs" />
     <Compile Include="Exceptions\TypeChangedException.cs" />
-    <Compile Include="IObjectList.cs" />
     <Compile Include="LazyObjectList.cs" />
     <Compile Include="Linq\Evaluator.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
@@ -145,13 +147,10 @@
     <Compile Include="Linq\SqoColumn.cs" />
     <Compile Include="Linq\ProjectionSelect.cs" />
     <Compile Include="Linq\SelectQuery.cs" />
-    <Compile Include="Linq\ISqoQuery.cs" />
     <Compile Include="Linq\SqoQuery.cs" />
     <Compile Include="Linq\SqoQueryExtensions.cs" />
     <Compile Include="Linq\QueryTranslator.cs" />
     <Compile Include="Linq\ProjectionJoin.cs" />
-    <Compile Include="MetaField.cs" />
-    <Compile Include="MetaType.cs" />
     <Compile Include="Queries\ICriteria.cs" />
     <Compile Include="Queries\Or.cs" />
     <Compile Include="Meta\FieldSqoInfo.cs" />
@@ -205,6 +204,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="siaqodb.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

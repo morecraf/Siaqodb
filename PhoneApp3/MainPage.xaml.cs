@@ -89,8 +89,9 @@ namespace PhoneApp3
                 TodoItem item = new TodoItem();
                 item.Text = "FOS" + i.ToString();
                 item.Id = Guid.NewGuid().ToString();
-                mob.StoreObject(item);
+                await mob.StoreObjectAsync(item);
             }
+            await mob.FlushAsync();
             var items2 = mob.LoadAll<TodoItem>();
             
             int y = 0;
@@ -100,11 +101,11 @@ namespace PhoneApp3
                 {
                     ai.Text = "ionescu77";
                     ai.Complete = false;
-                    mob.StoreObject(ai);
+                    await mob.StoreObjectAsync(ai);
                 }
                 y++;
             }
-            mob.Flush();
+            await mob.FlushAsync();
             items2 = mob.LoadAll<TodoItem>();
             
             try

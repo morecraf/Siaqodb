@@ -654,46 +654,43 @@ namespace Sqo.Meta
                 return -1;
             }
         }
-		
-        public static ObjectInfo GetObjectInfo(object o, SqoTypeInfo ti,Sqo.Cache.MetaCache metaCache)
+
+        public static ObjectInfo GetObjectInfo(object o, SqoTypeInfo ti, Sqo.Cache.MetaCache metaCache)
         {
-            ObjectInfo oi = new ObjectInfo(ti,o);
+            ObjectInfo oi = new ObjectInfo(ti, o);
             oi.Oid = metaCache.GetOIDOfObject(o, ti);
             oi.TickCount = MetaHelper.GetTickCountOfObject(o, ti.Type);
 
             foreach (FieldSqoInfo attKey in ti.Fields)
             {
-				#if SILVERLIGHT
+#if SILVERLIGHT
+                object objVal=null;
 				try
 				{
 					object objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
-					if(attKey.FInfo.FieldType==typeof(string))
-					{
-						
-						if(objVal==null)
-						{
-						 objVal=string.Empty;
-						}
-					}
-					oi.AtInfo[attKey] = objVal;
+
 				}
 				catch (Exception ex)
 				{
 					throw new SiaqodbException("Override GetValue and SetValue methods of SqoDataObject-Silverlight limitation to private fields");
 				}
 #else
-				object objVal=attKey.FInfo.GetValue(o);
-				if (attKey.FInfo.FieldType==typeof(string))
-				{
+                object objVal = attKey.FInfo.GetValue(o);
+#endif
+                if (attKey.FInfo.FieldType == typeof(string))
+                {
                     if (objVal == null)
                     {
                         objVal = string.Empty;
                     }
-                   
-				}
-                if (attKey.AttributeTypeId == MetaExtractor.documentID && objVal!=null )
+
+                }
+                if (attKey.AttributeTypeId == MetaExtractor.documentID && objVal != null)
                 {
                     Sqo.MetaObjects.DocumentInfo dinfo = new Sqo.MetaObjects.DocumentInfo();
+                    //get here documein.OID from WeakCache
+                    //and assign to dinfo
+
                     dinfo.TypeName = attKey.AttributeType.AssemblyQualifiedName;
 
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
@@ -702,12 +699,12 @@ namespace Sqo.Meta
                         dinfo.Document = ms.ToArray();
                         objVal = dinfo;
                     }
-                    
+
                 }
-				oi.AtInfo[attKey] = objVal;
+                oi.AtInfo[attKey] = objVal;
 
 
-				#endif
+
             }
             return oi;
         }

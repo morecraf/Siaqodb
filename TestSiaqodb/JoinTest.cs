@@ -14,11 +14,12 @@ namespace TestSiaqodb
 	[TestClass]
 	public class JoinTest34
 	{
-        string objPath = @"e:\apps\OpenSource projects\sqoo\tests\unitests\";
+        string objPath = @"e:\sqoo\temp\tests_db\";
 		public JoinTest34()
 		{
             //SiaqodbConfigurator.SetTrialLicense("8roM1WSU/nmeKWoIahigyWMQWO6UENLECJGz6PT8O4I=");
             SiaqodbConfigurator.EncryptedDatabase = true;
+            SiaqodbConfigurator.SetTrialLicense("G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
 		}
 
 		private TestContext testContextInstance;

@@ -27,16 +27,16 @@ namespace WindowsFormsApplication1
             //SiaqodbConfigurator.SetEncryptionPassword("correct");
             //SiaqodbConfigurator.SetDatabaseFileName<Player>("myplayer");
 
-            SiaqodbConfigurator.SetLicense(@"3XnXneBWc/FGTK9mZdpLVR7cUv1fplh11lH4Y60jNlQ=");
-            Siaqodb sqo = new Siaqodb(@"e:\apps\OpenSource projects\sqoo\tests\rty22\");
+            SiaqodbConfigurator.SetTrialLicense(@"G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
+            Siaqodb sqo = new Siaqodb(@"e:\sqoo\temp\db\");
             DateTime start = DateTime.Now;
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 Player p = new Player() { Name = "Andor" + i.ToString(), Age = i + 20 };
-                p.blob = new byte[1000];
+                p.blob = new byte[100];
                 p.dict = new Dictionary<int, int>();
                 p.ListName = new List<string>();
-                for (int j = 0; j < 1000; j++)
+                for (int j = 0; j < 100; j++)
                 {
                     p.dict.Add(j, j);
                     p.blob[j] = (byte)(j % 100);
@@ -46,10 +46,14 @@ namespace WindowsFormsApplication1
                 sqo.StoreObject(ph);
             }
             string elapsed = (DateTime.Now - start).ToString();
+            MessageBox.Show("Inserted:"+elapsed);
             start = DateTime.Now;
             IList<PlayerHost> players = sqo.LoadAll<PlayerHost>();
+            var q = (from PlayerHost phh in sqo
+                    where phh.SomeField == 10
+                    select phh).ToList();
             elapsed = (DateTime.Now - start).ToString();
-           
+            MessageBox.Show("Read:" + elapsed);
             string d = "";
         //    MemoryStream memStr=new MemoryStream();
           //  ProtoBuf.Serializer.Serialize(memStr, new Player());
@@ -65,7 +69,7 @@ namespace WindowsFormsApplication1
             //a.Name.Contains
             z.items.Add(a);
             z.items.Add(b);
-            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+           // SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
            
             Siaqodb sqo = new Siaqodb(@"e:\sqoo\temp\db\");
 
@@ -111,7 +115,7 @@ namespace WindowsFormsApplication1
     }
     public class PlayerHost
     {
-        //[Sqo.Attributes.Document]
+        [Sqo.Attributes.Document]
         public Player ThePlayer { get; set; }
         public int OID { get; set; }
         public int SomeField { get; set; }
