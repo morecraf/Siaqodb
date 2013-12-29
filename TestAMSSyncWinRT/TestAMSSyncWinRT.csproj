@@ -133,10 +133,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\siaqodb\SiaqodbTrial %28WinRT%29.csproj">
-      <Project>{b3f49a00-c460-4c6d-8b24-73a049e1f529}</Project>
-      <Name>SiaqodbTrial %28WinRT%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncFramework\SiaqodbSyncMobileWinRT\SiaqodbSyncMobile %28WinRT%29.csproj">
       <Project>{d67dba15-d568-4be2-8714-2a58fa6c1753}</Project>
       <Name>SiaqodbSyncMobile %28WinRT%29</Name>

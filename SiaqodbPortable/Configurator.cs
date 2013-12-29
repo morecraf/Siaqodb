@@ -25,6 +25,8 @@ namespace Sqo
         internal bool encryptedDatabase = false;
         internal string encryptionPWD;
         internal BuildInAlgorithm encAlgorithm;
+        internal event EventHandler LoadRelatedObjectsPropetyChanged;
+        internal string LicenseKey;
         /// <summary>
         /// Add an index for a field or automatic property of a certain Type,an Index can be added also by using Attribute: Sqo.Attributes.Index;
         /// both ways of adding index are similar
@@ -186,8 +188,16 @@ namespace Sqo
         /// </summary>
         /// <typeparam name="T">Type of objects</typeparam>
         /// <param name="fileName">Name of database file on disk</param>
-
         public void SetDatabaseFileName<T>(string fileName)
+        {
+            SetDatabaseFileName(typeof(T), fileName);
+        }
+          /// <summary>
+        /// Set custom fileName on disk of database file for Type 
+        /// </summary>
+        /// <param name="type">Type of objects</param>
+        /// <param name="fileName">Name of database file on disk</param>
+        public void SetDatabaseFileName(Type type, string fileName)
         {
 
             if (DatabaseFileNames == null)
@@ -195,13 +205,12 @@ namespace Sqo
                 DatabaseFileNames = new Dictionary<Type, string>();
 
             }
-            if (!DatabaseFileNames.ContainsKey(typeof(T)))
+            if (!DatabaseFileNames.ContainsKey(type))
             {
-                DatabaseFileNames.Add(typeof(T), fileName);
+                DatabaseFileNames.Add(type, fileName);
             }
-
+        
         }
-
         public bool BuildIndexesAsync
         {
             get;
@@ -214,13 +223,31 @@ namespace Sqo
         /// <param name="loadRelatedObjects">true if related object need to be loaded, false if you want to load by Include(...) method</param>
         public void LoadRelatedObjects<T>(bool loadRelatedObjects)
         {
-            Type t = typeof(T);
+            LoadRelatedObjects(typeof(T), loadRelatedObjects);
+        }
+        /// <summary>
+        /// By default this is true for all types. Set this to false to not load childs entities of objects of Type provided
+        /// </summary>
+        /// <param name="type">Type for objects</param>
+        /// <param name="loadRelatedObjects">true if related object need to be loaded, false if you want to load by Include(...) method</param>
+        public void LoadRelatedObjects(Type type, bool loadRelatedObjects)
+        {
+           
             if (LazyLoaded == null)
             {
                 LazyLoaded = new Dictionary<Type, bool>();
             }
-            LazyLoaded[t] = !loadRelatedObjects;
+            LazyLoaded[type] = !loadRelatedObjects;
+            this.OnLoadRelatedObjectsPropetyChanged(EventArgs.Empty);
 
+        }
+        /// <summary>
+        /// Set the license key
+        /// </summary>
+        /// <param name="licenseKey">License key</param>
+        public void SetLicense(string licenseKey)
+        {
+            this.LicenseKey = licenseKey;
         }
 
         /// <summary>
@@ -246,13 +273,21 @@ namespace Sqo
         }
         public VerboseLevel VerboseLevel { get; set; }
 
-        public static decimal BufferingChunkPercent
+        public decimal BufferingChunkPercent
         {
             get;
             set;
+        }
+        protected void OnLoadRelatedObjectsPropetyChanged(EventArgs e)
+        {
+            if (this.LoadRelatedObjectsPropetyChanged != null)
+            {
+                this.LoadRelatedObjectsPropetyChanged(this,e);
+            }
         }
     }
     public enum BuildInAlgorithm {NONE, AES, XTEA }
     public delegate void TraceListener(string traceMessage, VerboseLevel level);
     public enum VerboseLevel { Off = 1, Error = 2, Warn = 3, Info = 4 }
+    
 }

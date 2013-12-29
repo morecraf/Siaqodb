@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if ASYNC
-using System.Threading.Tasks;
 using Sqo.Exceptions;
 using System.Linq.Expressions;
+#if ASYNC
+using System.Threading.Tasks;
+
 #endif
 
 namespace Sqo

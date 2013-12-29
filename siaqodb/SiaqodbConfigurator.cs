@@ -25,6 +25,8 @@ namespace Sqo
         internal static bool RaiseLoadEvents;
         internal static DateTimeKind? DateTimeKindToSerialize;
         internal static bool OptimisticConcurrencyEnabled=true;
+        internal static Configurator defaultConfigurator;
+        internal const int CurrentVersion = 40;
         /// <summary>
         /// Add an index for a field or automatic property of a certain Type,an Index can be added also by using Attribute: Sqo.Attributes.Index;
         /// both ways of adding index are similar
@@ -369,9 +371,25 @@ namespace Sqo
        
         public static void SetDatabaseFileName<T>(string fileName)
         {
-            
-            SqoTypeInfo ti = MetaExtractor.GetSqoTypeInfo(typeof(T));
+            SetDatabaseFileName(typeof(T), fileName);
+        }
+        /// <summary>
+        /// Set custom fileName on disk of database file for Type 
+        /// </summary>
+        /// <param name="type">Type of objects</typeparam>
+        /// <param name="fileName">Name of database file on disk</param>
+        public static void SetDatabaseFileName(Type type,string fileName)
+        {
+
+            SqoTypeInfo ti = MetaExtractor.GetSqoTypeInfo(type);
             Cache.CacheCustomFileNames.AddFileNameForType(ti.TypeName, fileName);
+
+        }
+        public static void SetDatabaseFileNameWithoutException(Type type, string fileName)
+        {
+
+            SqoTypeInfo ti = MetaExtractor.GetSqoTypeInfo(type);
+            Cache.CacheCustomFileNames.AddFileNameForType(ti.TypeName, fileName, false);
 
         }
         private static bool buildIndexesAsync = false;
@@ -387,37 +405,34 @@ namespace Sqo
         /// <param name="loadRelatedObjects">true if related object need to be loaded, false if you want to load by Include(...) method</param>
         public static void LoadRelatedObjects<T>(bool loadRelatedObjects)
         {
-            Type t = typeof(T);
+            LoadRelatedObjects(typeof(T), loadRelatedObjects);
+
+        }
+        /// <summary>
+        /// By default this is true for all types. Set this to false to not load childs entities of objects of Type provided
+        /// </summary>
+        /// <param name="type">Type for objects</param>
+        /// <param name="loadRelatedObjects">true if related object need to be loaded, false if you want to load by Include(...) method</param>
+        public static void LoadRelatedObjects(Type type, bool loadRelatedObjects)
+        {
+
             if (LazyLoaded == null)
             {
                 LazyLoaded = new Dictionary<Type, bool>();
             }
-            LazyLoaded[t] = !loadRelatedObjects;
+            LazyLoaded[type] = !loadRelatedObjects;
+           
 
         }
-#if TRIAL
-       public static void SetTrialLicense(string licenseKey)
+        /// <summary>
+        /// Set the license key
+        /// </summary>
+        /// <param name="licenseKey">License key</param>
+        public static void SetLicense(string licenseKey)
         {
-            Sqo.Utilities.SqoTrialLicense.LicenseValid(licenseKey);
+            Sqo.Utilities.SqoLicense.LicenseValid(licenseKey);
         }
 
-#elif WinRT
-        public static void SetLicense(string licenseKey)
-        {
-            Sqo.WinRTLicenseChecker.LicenseValid(licenseKey);
-        }
-#elif SILVERLIGHT
-        public static void SetLicense(string licenseKey)
-        {
-            SilvLicenseChecker.LicenseValid(licenseKey);
-        }
-#else
-        
-        public static void SetLicense(string licenseKey)
-        {
-            Sqo.Utilities.SqoUnity3DLic.LicenseValid(licenseKey);
-        }
-#endif
         /// <summary>
         /// Set true to raise Loading/Loaded events
         /// </summary>
@@ -461,8 +476,139 @@ namespace Sqo
                 bufferingChunkPercent = value;
             }
         }
+        /// <summary>
+        /// Apply default configurations
+        /// </summary>
+        /// <param name="config">Configurator instance</param>
+        public static void ApplyConfigurator(Configurator config)
+        {
+            if (config == null)
+                throw new ArgumentNullException();
+            ReInit();
+            defaultConfigurator = config;
+            defaultConfigurator.LoadRelatedObjectsPropetyChanged -= defaultConfigurator_LoadRelatedObjectsPropetyChanged;
+            defaultConfigurator.LoadRelatedObjectsPropetyChanged += defaultConfigurator_LoadRelatedObjectsPropetyChanged;
+            if (config.Indexes != null)
+            {
+                foreach (var item in config.Indexes.Keys)
+                {
+                    foreach (string field in config.Indexes[item])
+                    {
+                        AddIndex(field, item);
+                    }
+                }
+            }
+            if (config.Constraints != null)
+            {
+                foreach (var item in config.Constraints.Keys)
+                {
+                    foreach (string field in config.Constraints[item])
+                    {
+                        AddUniqueConstraint(field, item);
+                    }
+                }
+            }
+            if (config.MaxLengths != null)
+            {
+                foreach (var item in config.MaxLengths.Keys)
+                {
+                    foreach (string field in config.MaxLengths[item].Keys)
+                    {
+                        AddMaxLength(field,config.MaxLengths[item][field], item);
+                    }
+                }
+            }
+            if (config.Ignored != null)
+            {
+                foreach (var item in config.Ignored.Keys)
+                {
+                    foreach (string field in config.Ignored[item])
+                    {
+                        AddIgnore(field, item);
+                    }
+                }
+            }
+            if (config.Texts != null)
+            {
+                foreach (var item in config.Texts.Keys)
+                {
+                    foreach (string field in config.Texts[item])
+                    {
+                        AddText(field, item);
+                    }
+                }
+            }
+            if (config.PropertyMaps != null)
+            {
+                foreach (var item in config.PropertyMaps.Keys)
+                {
+                    foreach (string field in config.PropertyMaps[item].Keys)
+                    {
+                        PropertyUseField(field,config.PropertyMaps[item][field], item);
+                    }
+                }
+            }
+            EncryptedDatabase = config.EncryptedDatabase;
+            if (config.Encryptor != null)
+            {
+                SetEncryptor(config.Encryptor);
+            }
+            else if (config.encAlgorithm != BuildInAlgorithm.NONE)
+            {
+                SetEncryptor(config.encAlgorithm);
+            }
+            if (config.encryptionPWD != null)
+            {
+                SetEncryptionPassword(config.encryptionPWD);
+            }
+            if (config.DatabaseFileNames != null)
+            {
+                foreach (var item in config.DatabaseFileNames.Keys)
+                {
+                    SetDatabaseFileNameWithoutException(item, config.DatabaseFileNames[item]);
+                }
+            }
+            if (config.LazyLoaded != null)
+            {
+                foreach (var item in config.LazyLoaded.Keys)
+                {
+                    LoadRelatedObjects(item, !config.LazyLoaded[item]);
+                }
+            }
+            if (!string.IsNullOrEmpty(config.LicenseKey))
+            {
+                SetLicense(config.LicenseKey);
+            }
+            BuildIndexesAsync = config.BuildIndexesAsync;
+            SetRaiseLoadEvents(config.RaiseLoadEvents);
+            SpecifyStoredDateTimeKind(config.DateTimeKindToSerialize);
+            EnableOptimisticConcurrency(config.OptimisticConcurrencyEnabled);
+            LoggingMethod = config.LoggingMethod;
+            VerboseLevel = config.VerboseLevel;
+            BufferingChunkPercent = config.BufferingChunkPercent;
+        }
+
+        static void defaultConfigurator_LoadRelatedObjectsPropetyChanged(object sender, EventArgs e)
+        {
+            LazyLoaded = null;
+            if (defaultConfigurator.LazyLoaded != null)
+            {
+                foreach (var item in defaultConfigurator.LazyLoaded.Keys)
+                {
+                    LoadRelatedObjects(item, !defaultConfigurator.LazyLoaded[item]);
+                }
+            }
+        }
+        private static void ReInit()
+        {
+            Indexes = null;
+            Constraints = null;
+            MaxLengths = null;
+            Ignored = null;
+            Texts = null;
+            PropertyMaps = null;
+            LazyLoaded = null;
+        }
     }
-    //public enum BuildInAlgorithm {AES,XTEA}
-    //public delegate void TraceListener(string traceMessage,VerboseLevel level);
-    //public enum VerboseLevel { Off=1, Error=2, Warn=3, Info=4 }
+    
 }

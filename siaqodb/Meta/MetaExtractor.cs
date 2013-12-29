@@ -9,6 +9,7 @@ using Sqo.Exceptions;
 using Sqo.Utilities;
 using System.Collections;
 
+
 namespace Sqo.Meta
 {
 	class MetaExtractor
@@ -667,7 +668,7 @@ namespace Sqo.Meta
                 object objVal=null;
 				try
 				{
-					object objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
+					objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
 
 				}
 				catch (Exception ex)

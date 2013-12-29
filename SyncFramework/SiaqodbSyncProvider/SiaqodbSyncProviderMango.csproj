@@ -64,10 +64,6 @@
     <Compile Include="Utilities\TrialLicense.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28WP 7.1%29.csproj">
-      <Project>{E8216F6B-D70E-48CE-B530-233B3DF36EFF}</Project>
-      <Name>SiaqodbTrial %28WP 7.1%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncCacheController\SyncCacheControllerWP.csproj">
       <Project>{C4D0C333-D6FA-46D5-A513-AC71E4805789}</Project>
       <Name>SyncCacheControllerWP</Name>

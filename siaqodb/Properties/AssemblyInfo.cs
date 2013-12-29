@@ -10,13 +10,13 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dotissi")]
 [assembly: AssemblyProduct("siaqodb")]
-[assembly: AssemblyCopyright("Copyright © Dotissi 2013")]
+[assembly: AssemblyCopyright("Copyright © Dotissi 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-#if TRIAL || WP7 || UNITY3D || MONODROID || CF || WinRT
+#if UNITY3D || CF 
 #else
-[assembly:AssemblyKeyFile("siaqodb.pfx")]
+//[assembly:AssemblyKeyFile("siaqodb.pfx")]
 #endif
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

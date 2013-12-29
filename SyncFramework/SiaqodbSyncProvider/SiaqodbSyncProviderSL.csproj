@@ -21,7 +21,8 @@
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
-    <FileUpgradeFlags></FileUpgradeFlags>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <PublishUrl>publish\</PublishUrl>
@@ -101,10 +102,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28SL 4%29.csproj">
-      <Project>{34E8CD99-6F08-44A8-846C-157428805A00}</Project>
-      <Name>SiaqodbTrial %28SL 4%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncCacheController\SyncCacheControllerSL.csproj">
       <Project>{562ACF90-AB6B-428A-B510-7F8485802EEB}</Project>
       <Name>SyncCacheControllerSL</Name>

@@ -114,10 +114,6 @@
     <Compile Include="Utilities\Decryptor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbLicensed %28WP 8%29.csproj">
-      <Project>{48841A42-A73D-477D-B3CF-682AAA0919B1}</Project>
-      <Name>SiaqodbLicensed %28WP 8%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncCacheController\SyncCacheControllerWP.csproj">
       <Project>{C4D0C333-D6FA-46D5-A513-AC71E4805789}</Project>
       <Name>SyncCacheControllerWP</Name>

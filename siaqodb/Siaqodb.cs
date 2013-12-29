@@ -26,11 +26,7 @@ namespace Sqo
     /// <summary>
     /// Main class of siaqodb database engine responsible for storing, retrieving ,deleting objects on database files
     /// </summary>
-#if SILVERLIGHT || UNITY3D || TRIAL || CF || MONODROID || WinRT
-#else
 
-    [System.ComponentModel.LicenseProvider(typeof(SqoLicenseProvider))]
-#endif
     [Obfuscation(Feature = "Apply to member * when event: all", Exclude = false,ApplyToMembers=true)]
     #if KEVAST
     internal
@@ -235,7 +231,7 @@ namespace Sqo
      /// </summary>
         public Siaqodb()
         {
-            this.CheckLic();
+            
         }
         
         //TODO: add here WarningMessages and add for example Unoptimized queries
@@ -246,7 +242,7 @@ namespace Sqo
 #if !WinRT
         public Siaqodb(string path)
         {
-            this.CheckLic();
+            
             this.Open(path);
         }
 #endif
@@ -258,7 +254,7 @@ namespace Sqo
        /// <param name="specialFolder">special folder name for OOB mode ex.:MyDocuments, MyPictures, etc</param>
         public Siaqodb(string folderName,Environment.SpecialFolder specialFolder)
         {
-            this.CheckLic();
+           
             this.Open(folderName,specialFolder);
         }
 #endif
@@ -266,7 +262,7 @@ namespace Sqo
 #if !WinRT
         internal Siaqodb(string path, bool cacheTypes)
         {
-             this.CheckLic();
+             
             
             this.opened = true;
             this.path = path;
@@ -295,7 +291,7 @@ namespace Sqo
 
         internal Siaqodb(string path, string managerOption)
         {
-            this.CheckLic();
+            
             this.opened = true;
             this.path = path;
             
@@ -2947,28 +2943,7 @@ savedObject(this, e);
                 metaCache.SetOIDToObject(obj, oids[0], ti);
             }
         }
-        private void CheckLic()
-        {
-#if TRIAL
-
-#elif WinRT
-             bool li = WinRTLicenseChecker.LicenseValid();
-#elif SILVERLIGHT 
-            SilvLicenseChecker.LicenseValid();
-#elif UNITY3D || CF || MONODROID
-            SqoUnity3DLic.LicenseValid();
-#else
-            try
-            {
-                System.ComponentModel.License license = System.ComponentModel.LicenseManager.Validate(typeof(Siaqodb), this);
-            }
-            catch (Exception ex)
-            {
-                SqoUnity3DLic.LicenseValid();
-            }
-            
-#endif
-        }
+       
        
     }
    

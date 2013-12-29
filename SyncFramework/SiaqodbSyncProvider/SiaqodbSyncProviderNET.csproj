@@ -50,10 +50,6 @@
     <Compile Include="Utilities\TrialLicense.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28.NET 3.5%29.csproj">
-      <Project>{F1A4918F-36C1-4B41-9D60-68BB8832B7FC}</Project>
-      <Name>SiaqodbTrial %28.NET 3.5%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncCacheController\SyncCacheControllerNET.csproj">
       <Project>{46D6975E-C66B-4924-9CBA-6AB1A232C9C3}</Project>
       <Name>SyncCacheControllerNET</Name>

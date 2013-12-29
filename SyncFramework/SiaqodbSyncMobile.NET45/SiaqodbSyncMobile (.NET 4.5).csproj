@@ -73,12 +73,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbAsyncTrial %28.NET 4.5%29.csproj">
-      <Project>{d6ff4b4a-05aa-43d1-9022-96506a0a329d}</Project>
-      <Name>SiaqodbAsyncTrial %28.NET 4.5%29</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\SiaqodbSyncMobileWP8\DirtyEntity.cs">
       <Link>DirtyEntity.cs</Link>
     </Compile>

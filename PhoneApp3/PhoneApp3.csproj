@@ -148,10 +148,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\siaqodb\SiaqodbAsyncTrial %28WP 8%29.csproj">
-      <Project>{93284803-057B-4ADA-97CC-83E073A85C1D}</Project>
-      <Name>SiaqodbAsyncTrial %28WP 8%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncFramework\SiaqodbSyncMobileWP8\SiaqodbSyncMobile %28WP 8%29.csproj">
       <Project>{31F348A7-D2F9-4507-8033-40AF2D19269E}</Project>
       <Name>SiaqodbSyncMobile %28WP 8%29</Name>

@@ -147,13 +147,11 @@ namespace Sqo
 
         public StorageEngine(string path )
         {
-        #if TRIAL
-            if (!SqoTrialLicense.LicenseValid())
+       
+            if (!SqoLicense.LicenseValid())
             {
-                throw new InvalidLicenseException("Trial expired, visit http://siaqodb.com to buy a license");
+                throw new InvalidLicenseException("License not valid!");
             }
-
-#endif
             this.path = path;
             SerializerFactory.ClearCache(path);
             this.rawSerializer=new RawdataSerializer(this, useElevatedTrust);
@@ -162,12 +160,11 @@ namespace Sqo
        
         public StorageEngine(string path,bool useElevatedTrust)
         {
-            #if TRIAL
-            if (!Sqo.Utilities.SqoTrialLicense.LicenseValid())
+
+            if (!Sqo.Utilities.SqoLicense.LicenseValid())
             {
-                throw new InvalidLicenseException("Trial expired, visit http://siaqodb.com to buy a license");
+                throw new InvalidLicenseException("License not valid!");
             }
-#endif
             this.path = path;
             SerializerFactory.ClearCache(path);
             this.useElevatedTrust = useElevatedTrust;
@@ -178,12 +175,11 @@ namespace Sqo
 #if WinRT
         public StorageEngine(StorageFolder s)
         {
-#if TRIAL
-            if (!SqoTrialLicense.LicenseValid())
+
+            if (!SqoLicense.LicenseValid())
             {
-                 throw new InvalidLicenseException("Trial expired, visit http://siaqodb.com to buy a license");
+                  throw new InvalidLicenseException("License not valid!");
             }
-#endif
             this.storageFolder = s;
             this.path = storageFolder.Path;
             SerializerFactory.ClearCache(this.storageFolder.Path);

@@ -14,7 +14,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sqo</RootNamespace>
-    <AssemblyName>SiaqodbSLAsync</AssemblyName>
+    <AssemblyName>Siaqodb</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
@@ -48,13 +48,13 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Licensed\Debug\Silverlight\</OutputPath>
+    <OutputPath>bin\Debug\sl4\</OutputPath>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHT SL4 ASYNC</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Licensed\Debug\Silverlight\SiaqodbSLAsync.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\sl4\Siaqodb.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -67,25 +67,28 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Licensed\Release\Silverlight\SiaqodbSLAsync.XML</DocumentationFile>
+    <DocumentationFile>bin\Licensed\Release\Silverlight\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Threading.Tasks">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4\Microsoft.Threading.Tasks.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.165\lib\sl4\Microsoft.Threading.Tasks.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks.Extensions">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.165\lib\sl4\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Silverlight">
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4\Microsoft.Threading.Tasks.Extensions.Silverlight.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.165\lib\sl4\Microsoft.Threading.Tasks.Extensions.Silverlight.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\sl4-windowsphone71\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="system" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime">
@@ -94,17 +97,10 @@
     <Reference Include="System.Threading.Tasks">
       <HintPath>..\packages\Microsoft.Bcl.1.0.19\lib\sl4\System.Threading.Tasks.dll</HintPath>
     </Reference>
-    <Reference Include="System.Windows" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLocker\AsyncLock.cs" />
-    <Compile Include="Attributes\IgnoreAttribute.cs" />
-    <Compile Include="Attributes\Index.cs" />
-    <Compile Include="Attributes\MaxLengthAttribute.cs" />
-    <Compile Include="Attributes\TextAttribute.cs" />
-    <Compile Include="Attributes\UniqueConstraint.cs" />
-    <Compile Include="Attributes\UseVariable.cs" />
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
     <Compile Include="Cache\CacheForIndexes.cs" />
@@ -132,9 +128,7 @@
     <Compile Include="Core\SqoISFile.cs" />
     <Compile Include="Core\SqoISFile2.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
-    <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
-    <Compile Include="Events.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\NotSupportedTypeException.cs" />
@@ -148,13 +142,11 @@
     <Compile Include="Indexes\BTree\IndexManager.cs" />
     <Compile Include="Indexes\IndexInfo.cs" />
     <Compile Include="Internal\_bs.cs" />
-    <Compile Include="IObjectList.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="LazyObjectList.cs" />
     <Compile Include="Linq\Evaluator.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
     <Compile Include="Linq\IncludeSqoQuery.cs" />
-    <Compile Include="Linq\ISqoQuery.cs" />
     <Compile Include="Linq\JoinTranslator.cs" />
     <Compile Include="Linq\LazyEnumerator.cs" />
     <Compile Include="Linq\LazySqoQuery.cs" />
@@ -165,13 +157,12 @@
     <Compile Include="Linq\SqoColumn.cs" />
     <Compile Include="Linq\SqoOrderedQuery.cs" />
     <Compile Include="Linq\SqoQuery.cs" />
-    <Compile Include="Linq\SqoQueryExtensions.cs" />
-    <Compile Include="MetaField.cs" />
+    <Compile Include="Linq\SqoQueryExtensionsImpl.cs" />
     <Compile Include="MetaObjects\ArrayInfo.cs" />
     <Compile Include="MetaObjects\DictionaryInfo.cs" />
+    <Compile Include="MetaObjects\DocumentInfo.cs" />
     <Compile Include="MetaObjects\RawdataInfo.cs" />
     <Compile Include="MetaObjects\RawdataManager.cs" />
-    <Compile Include="MetaType.cs" />
     <Compile Include="Meta\FieldSqoInfo.cs" />
     <Compile Include="Meta\MetaExtractor.cs" />
     <Compile Include="Meta\ObjectInfo.cs" />
@@ -206,10 +197,8 @@
     <Compile Include="Utilities\ObjectRow.cs" />
     <Compile Include="Utilities\ObjectTable.cs" />
     <Compile Include="Utilities\ObjectTableHelper.cs" />
-    <Compile Include="Utilities\SilvLicenseChecker.cs" />
+    <Compile Include="Utilities\SqoLicense.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
-    <Compile Include="Utilities\SqoTrialLicense.cs" />
-    <Compile Include="Utilities\SqoUnity3DLic.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -230,7 +219,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="siaqodb.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.0%29.csproj">
+      <Project>{5529f692-514a-4dde-9b6c-f47ea888496b}</Project>
+      <Name>SiaqodbPortable %28.NET 4.0%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Condition=" '$(EAZFUSCATOR_NET_HOME)' != '' and Exists('$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets') " Project="$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
@@ -252,4 +248,14 @@
   <PropertyGroup>
     <PostBuildEvent>if /I "$(ConfigurationName)" == "Release" Eazfuscator.NET.exe "$(TargetPath)" --msbuild-project-path "$(ProjectPath)" --msbuild-project-configuration "$(ConfigurationName)" --msbuild-project-platform "$(PlatformName)" --msbuild-solution-path "$(SolutionPath)" -n --newline-flush -v 3.6</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
 </Project>

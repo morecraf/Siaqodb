@@ -102,10 +102,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbLicensed %28SL 4%29.csproj">
-      <Project>{da414c20-b5da-440e-aba1-f33a2851ea85}</Project>
-      <Name>SiaqodbLicensed %28SL 4%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SyncCacheController\SyncCacheControllerSL.csproj">
       <Project>{562ACF90-AB6B-428A-B510-7F8485802EEB}</Project>
       <Name>SyncCacheControllerSL</Name>

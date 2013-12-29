@@ -123,12 +123,6 @@
       <Link>SiaqodbSyncMobileProvider.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbAsyncTrial %28SL 4%29.csproj">
-      <Project>{e7ecb5d9-5ace-4bb3-bfe6-099f695c82b5}</Project>
-      <Name>SiaqodbAsyncTrial %28SL 4%29</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

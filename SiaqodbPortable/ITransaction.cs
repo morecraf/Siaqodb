@@ -1,5 +1,7 @@
 ﻿using System;
+#if ASYNC
 using System.Threading.Tasks;
+#endif
 using Sqo;
 namespace Sqo.Transactions
 {
