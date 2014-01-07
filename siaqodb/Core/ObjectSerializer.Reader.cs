@@ -55,8 +55,13 @@ namespace Sqo.Core
                         {
                             fieldVal = ProtoBuf.Serializer.NonGeneric.Deserialize(ai.AttributeType, ms);
                         }
-                        //put here  fieldVal and document.OID pair in WeakCache
-                        //(normally in StorageEngine.metaCache)
+                        //put in weak cache to be able to update the document
+                        DocumentEventArgs args = new DocumentEventArgs();
+                        args.ParentObject=obj;
+                        args.DocumentInfoOID=dinfo.OID;
+                        args.FieldName = ai.Name;
+                        args.TypeInfo = ti;
+                        this.OnNeedCacheDocument(args);
                     }
                 }
 
@@ -110,7 +115,25 @@ namespace Sqo.Core
 
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
                 object fieldVal = await byteTransformer.GetObjectAsync(field).ConfigureAwait(false);
-
+              
+                if (ai.AttributeTypeId == MetaExtractor.documentID)
+                {
+                    DocumentInfo dinfo = fieldVal as DocumentInfo;
+                    if (dinfo != null)
+                    {
+                        using (MemoryStream ms = new MemoryStream(dinfo.Document))
+                        {
+                            fieldVal = ProtoBuf.Serializer.NonGeneric.Deserialize(ai.AttributeType, ms);
+                        }
+                        //put in weak cache to be able to update the document
+                        DocumentEventArgs args = new DocumentEventArgs();
+                        args.ParentObject = obj;
+                        args.DocumentInfoOID = dinfo.OID;
+                        args.FieldName = ai.Name;
+                        args.TypeInfo = ti;
+                        this.OnNeedCacheDocument(args);
+                    }
+                }
 
 #if SILVERLIGHT
 
@@ -655,6 +678,41 @@ namespace Sqo.Core
             lock (_syncRoot)
             {
                 handler = needReadComplexObject;
+            }
+            if (handler != null)
+            {
+                handler(this, args);
+            }
+        }
+        [System.Reflection.Obfuscation(Exclude = true)]
+        private EventHandler<DocumentEventArgs> needCacheDocument;
+        [System.Reflection.Obfuscation(Exclude = true)]
+        public event EventHandler<DocumentEventArgs> NeedCacheDocument
+        {
+            add
+            {
+                lock (_syncRoot)
+                {
+                    if (needCacheDocument == null)
+                    {
+                        needCacheDocument += value;
+                    }
+                }
+            }
+            remove
+            {
+                lock (_syncRoot)
+                {
+                    needCacheDocument -= value;
+                }
+            }
+        }
+        protected void OnNeedCacheDocument(DocumentEventArgs args)
+        {
+            EventHandler<DocumentEventArgs> handler;
+            lock (_syncRoot)
+            {
+                handler = needCacheDocument;
             }
             if (handler != null)
             {

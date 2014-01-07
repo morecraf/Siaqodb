@@ -689,10 +689,8 @@ namespace Sqo.Meta
                 if (attKey.AttributeTypeId == MetaExtractor.documentID && objVal != null)
                 {
                     Sqo.MetaObjects.DocumentInfo dinfo = new Sqo.MetaObjects.DocumentInfo();
-                    //get here documein.OID from WeakCache
-                    //and assign to dinfo
-
-                    dinfo.TypeName = attKey.AttributeType.AssemblyQualifiedName;
+                    dinfo.OID = metaCache.GetDocumentInfoOID(ti, o, attKey.Name);
+                    dinfo.TypeName =MetaHelper.GetDiscoveringTypeName(attKey.AttributeType);
 
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                     {
@@ -742,6 +740,20 @@ namespace Sqo.Meta
                     if (objVal == null)
                     {
                         objVal = string.Empty;
+                    }
+
+                }
+                if (attKey.AttributeTypeId == MetaExtractor.documentID && objVal != null)
+                {
+                    Sqo.MetaObjects.DocumentInfo dinfo = new Sqo.MetaObjects.DocumentInfo();
+                    dinfo.OID = metaCache.GetDocumentInfoOID(ti, o, attKey.Name);
+                    dinfo.TypeName = MetaHelper.GetDiscoveringTypeName(attKey.AttributeType);
+
+                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                    {
+                        ProtoBuf.Serializer.NonGeneric.Serialize(ms, objVal);
+                        dinfo.Document = ms.ToArray();
+                        objVal = dinfo;
                     }
 
                 }

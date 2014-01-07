@@ -79,9 +79,7 @@ namespace SiaqodbSyncMobile
            string assemblyName = type.Assembly.GetName().Name;
 #endif
 
-            string[] tNames = new string[] { onlyTypeName, assemblyName };
-
-            return tNames[0] + ", " + tNames[1];
+            return onlyTypeName + ", " + assemblyName;
 
         }
         public static Type GetTypeByDiscoveringName(string typeName)

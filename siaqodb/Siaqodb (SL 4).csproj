@@ -103,6 +103,7 @@
     <Compile Include="AsyncLocker\AsyncLock.cs" />
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
+    <Compile Include="Cache\CacheDocuments.cs" />
     <Compile Include="Cache\CacheForIndexes.cs" />
     <Compile Include="Cache\CacheForManager.cs" />
     <Compile Include="Cache\CacheOIDs.cs" />

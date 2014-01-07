@@ -137,6 +137,16 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
+      <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
+      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28WP 8%29.csproj">
+      <Project>{7E436A50-A897-4599-A162-9FCA1673B3C2}</Project>
+      <Name>Siaqodb %28WP 8%29</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
   <ProjectExtensions />

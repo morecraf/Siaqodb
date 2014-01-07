@@ -32,6 +32,7 @@ namespace Sqo
             ObjectList<T> ol = new ObjectList<T>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
             int nrRecords = ti.Header.numberOfRecords;
             int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
             if (rangeSize < 1) rangeSize = 1;
@@ -101,6 +102,8 @@ namespace Sqo
             ObjectList<T> ol = new ObjectList<T>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
+          
             int nrRecords = ti.Header.numberOfRecords;
             int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
             if (rangeSize < 1) rangeSize = 1;
@@ -175,6 +178,7 @@ namespace Sqo
             ObjectTable obTable = new ObjectTable();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
 
             int nrRecords = ti.Header.numberOfRecords;
             int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
@@ -221,7 +225,8 @@ namespace Sqo
             ObjectTable obTable = new ObjectTable();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
+          
             int nrRecords = ti.Header.numberOfRecords;
             int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
             if (rangeSize < 1) rangeSize = 1;
@@ -359,6 +364,9 @@ namespace Sqo
             insideOids.Sort();
             int nrRecords = ti.Header.numberOfRecords;
             List<int> oids = new List<int>();
+            if (insideOids.Count == 0)
+                return oids;
+
             for (int i = 0; i < nrRecords; i++)
             {
                 int oid = i + 1;
@@ -412,6 +420,7 @@ namespace Sqo
             List<int> oids = new List<int>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
 
             int nrRecords = ti.Header.numberOfRecords;
             bool isOIDField = where.AttributeName[0] == "OID";
@@ -460,7 +469,8 @@ namespace Sqo
             List<int> oids = new List<int>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
+          
             int nrRecords = ti.Header.numberOfRecords;
             bool isOIDField = where.AttributeName[0] == "OID";
             if (!(await indexManager.LoadOidsByIndexAsync(ti, where.AttributeName[0], where, oids).ConfigureAwait(false)))
@@ -1096,6 +1106,7 @@ namespace Sqo
             ObjectList<T> ol = new ObjectList<T>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs> (serializer_NeedCacheDocument);
             //int nrRecords = ti.Header.numberOfRecords;
             foreach (int oid in oids)
             {
@@ -1128,12 +1139,19 @@ namespace Sqo
             }
             return ol;
         }
+
+        void serializer_NeedCacheDocument(object sender, DocumentEventArgs e)
+        {
+            metaCache.AddDocument(e.TypeInfo, e.ParentObject, e.FieldName, e.DocumentInfoOID);
+        }
 #if ASYNC
         internal async Task<IObjectList<T>> LoadByOIDsAsync<T>(List<int> oids, SqoTypeInfo ti)
         {
             ObjectList<T> ol = new ObjectList<T>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
+          
             //int nrRecords = ti.Header.numberOfRecords;
             foreach (int oid in oids)
             {
@@ -1252,7 +1270,7 @@ namespace Sqo
             List<object> ol = new List<object>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
-
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
 
             foreach (int oid in oids)
             {
@@ -1291,7 +1309,8 @@ namespace Sqo
             List<object> ol = new List<object>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
+          
 
             foreach (int oid in oids)
             {
@@ -1539,7 +1558,7 @@ namespace Sqo
             }
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
-
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
             return serializer.ReadFieldValue(ti, oid, fieldName, this.rawSerializer);
         }
 #if ASYNC
@@ -1551,7 +1570,8 @@ namespace Sqo
             }
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
+          
             return await serializer.ReadFieldValueAsync(ti, oid, fieldName, this.rawSerializer).ConfigureAwait(false);
         }
 #endif
@@ -1750,6 +1770,7 @@ namespace Sqo
             currentObj = Activator.CreateInstance(ti.Type);
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
 
             if (clearCache)
             {
@@ -1805,7 +1826,8 @@ namespace Sqo
             currentObj = Activator.CreateInstance(ti.Type);
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-
+            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
+          
             if (clearCache)
             {
                 circularRefCache.Clear();

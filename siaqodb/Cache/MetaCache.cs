@@ -10,9 +10,11 @@ namespace Sqo.Cache
     {
         private  Dictionary<Type, SqoTypeInfo> cacheOfTypes = new Dictionary<Type, SqoTypeInfo>();
         private CacheOIDs cacheOIDs;
+        private CacheDocuments cacheDocs;
         public MetaCache()
         {
             cacheOIDs = new CacheOIDs();
+            cacheDocs = new CacheDocuments();
         }
         public  void AddType(Type type, SqoTypeInfo ti)
         {
@@ -71,6 +73,15 @@ namespace Sqo.Cache
         public int GetOIDOfObject(object obj, SqoTypeInfo ti)
         {
             return cacheOIDs.GetOIDOfObject(obj, ti);
+        }
+        public void AddDocument(SqoTypeInfo ti, object parentObjOfDocument, string fieldName, int docinfoOid)
+        {
+            cacheDocs.AddDocument(ti, parentObjOfDocument, fieldName, docinfoOid);
+        }
+        
+        public int GetDocumentInfoOID(SqoTypeInfo ti, object parentObjOfDocument, string fieldName)
+        {
+            return cacheDocs.GetDocumentInfoOID(ti, parentObjOfDocument, fieldName);
         }
     }
 }

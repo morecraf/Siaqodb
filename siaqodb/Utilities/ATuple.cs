@@ -14,5 +14,6 @@ namespace Sqo.Utilities
             Name = name;
             Value = value;
         }
+        
     }
 }
