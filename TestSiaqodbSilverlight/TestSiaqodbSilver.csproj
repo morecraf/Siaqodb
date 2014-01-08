@@ -14,7 +14,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestnopSilv</RootNamespace>
     <AssemblyName>TestnopSilv</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <SilverlightApplication>true</SilverlightApplication>
     <SupportedCultures>
     </SupportedCultures>
@@ -65,6 +65,7 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,16 +76,14 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Silverlight.Testing">
-      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v4.0\Toolkit\Apr10\Testing\Microsoft.Silverlight.Testing.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v5.0\Toolkit\dec11\Testing\Microsoft.Silverlight.Testing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight">
-      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v4.0\Toolkit\Apr10\Testing\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll</HintPath>
-    </Reference>
-    <Reference Include="SiaqodbSLAsync">
-      <HintPath>..\..\all setup 3.0 final\packages\_ALLv3.7\SiaqodbSLv3.7\bin\Silverlight\SiaqodbSLAsync.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v5.0\Toolkit\dec11\Testing\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="mscorlib" />
@@ -142,6 +141,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\OutOfBrowserSettings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.0%29.csproj">
+      <Project>{5529f692-514a-4dde-9b6c-f47ea888496b}</Project>
+      <Name>SiaqodbPortable %28.NET 4.0%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\siaqodb\Siaqodb %28SL 4%29.csproj">
+      <Project>{d6a37a0e-f504-477b-903f-775d5e02b0a0}</Project>
+      <Name>Siaqodb %28SL 4%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

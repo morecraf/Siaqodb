@@ -17,7 +17,7 @@ namespace SiaqodbUnitTests
         public ComplexTypesTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = false;
-            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+            SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
           
         }
         [TestMethod]
@@ -129,7 +129,7 @@ namespace SiaqodbUnitTests
             await s_db.DropTypeAsync<A>();
             await s_db.DropTypeAsync<B>();
             await s_db.DropTypeAsync<C>();
-            Transaction transaction = s_db.BeginTransaction();
+            ITransaction transaction = s_db.BeginTransaction();
             for (int i = 0; i < 10; i++)
             {
                 A a = new A();
@@ -164,7 +164,7 @@ namespace SiaqodbUnitTests
             allA[0].BVar.bId = 100;
             allA[0].BVar.Ci.cId = 100;
            
-            Transaction transaction1 = s_db.BeginTransaction();
+            ITransaction transaction1 = s_db.BeginTransaction();
             await s_db.StoreObjectAsync(allA[0],transaction1);
             await transaction1.CommitAsync();
 
@@ -174,7 +174,7 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(100, allA1[0].BVar.Ci.cId);
 
             allC[1].cId = 200;
-            Transaction transaction2 = s_db.BeginTransaction();
+            ITransaction transaction2 = s_db.BeginTransaction();
             
             await s_db.StoreObjectAsync(allC[1],transaction2);
             s_db.DeleteAsync(allA1[9],transaction2);

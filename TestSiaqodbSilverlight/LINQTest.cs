@@ -253,7 +253,7 @@ namespace TestSiaqodbSilver
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
 
 			query = from Customer c in nop
-						where c.Name.StartsWith("a")
+						where c.Name.StartsWith("A")
 						select c;
 			 Assert.AreEqual(query.ToList<Customer>().Count, 5);
 			 query = from Customer c in nop
@@ -267,7 +267,7 @@ namespace TestSiaqodbSilver
 					select c;
 			Assert.AreEqual(0, query.ToList<Customer>().Count);
 			query = from Customer c in nop
-					where c.Name.EndsWith("TESt")
+					where c.Name.EndsWith("TEST")
 					select c;
 			Assert.AreEqual(5, query.ToList<Customer>().Count);
 
@@ -366,14 +366,14 @@ namespace TestSiaqodbSilver
 			}
 			nop.Flush();
 			var query = from Customer c in nop
-						where c.Name.Contains("a") && c.Name.Contains("3")
+						where c.Name.Contains("A") && c.Name.Contains("3")
 						select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
 			Assert.AreEqual(3, query.ToList<Customer>()[0].ID);
 
 			query = from Customer c in nop
-					where c.Name.Contains("a") && (c.Name.Contains("3") && c.ID==3)
+					where c.Name.Contains("A") && (c.Name.Contains("3") && c.ID==3)
 					select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
@@ -403,14 +403,14 @@ namespace TestSiaqodbSilver
 			}
 			nop.Flush();
 			var query = from Customer c in nop
-						where c.Name.Contains("a") || c.ID==2
+						where c.Name.Contains("A") || c.ID==2
 						select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 6);
 			
 
 			query = from Customer c in nop
-					where c.Name.Contains("a") || (c.ID == 2 && c.Name.Contains("T")) || c.ID==4
+					where c.Name.Contains("A") || (c.ID == 2 && c.Name.Contains("T")) || c.ID==4
 					select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 7);

@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SiaqodbSyncMobile")]
-[assembly: AssemblyCopyright("Copyright ©  Dotissi 2013")]
+[assembly: AssemblyCopyright("Copyright ©  Dotissi 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

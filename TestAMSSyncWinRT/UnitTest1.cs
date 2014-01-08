@@ -19,7 +19,7 @@ namespace TestAMSSyncWinRT
         {//Test insert
             StorageFolder db1=await dbFolder.CreateFolderAsync("db1",CreationCollisionOption.OpenIfExists);
             StorageFolder db2 = await dbFolder.CreateFolderAsync("db2", CreationCollisionOption.OpenIfExists);
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+             Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", db1);
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -53,7 +53,7 @@ namespace TestAMSSyncWinRT
         {
             StorageFolder db1 = await dbFolder.CreateFolderAsync("db1", CreationCollisionOption.OpenIfExists);
             StorageFolder db2 = await dbFolder.CreateFolderAsync("db2", CreationCollisionOption.OpenIfExists);
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+             Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", db1);
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -101,7 +101,7 @@ namespace TestAMSSyncWinRT
         {//Test delete
             StorageFolder db1 = await dbFolder.CreateFolderAsync("db1", CreationCollisionOption.OpenIfExists);
             StorageFolder db2 = await dbFolder.CreateFolderAsync("db2", CreationCollisionOption.OpenIfExists);
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+             Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", db1);
 
@@ -140,7 +140,7 @@ namespace TestAMSSyncWinRT
         {//update on C1 and C2 at same time->should be conflict
             StorageFolder db1 = await dbFolder.CreateFolderAsync("db1", CreationCollisionOption.OpenIfExists);
             StorageFolder db2 = await dbFolder.CreateFolderAsync("db2", CreationCollisionOption.OpenIfExists);
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+             Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", db1);
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -194,7 +194,7 @@ namespace TestAMSSyncWinRT
         {//delete on C1 and update on C2->conflict
             StorageFolder db1 = await dbFolder.CreateFolderAsync("db1", CreationCollisionOption.OpenIfExists);
             StorageFolder db2 = await dbFolder.CreateFolderAsync("db2", CreationCollisionOption.OpenIfExists);
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+             Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", db1);
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -253,7 +253,7 @@ namespace TestAMSSyncWinRT
             //update on C1 and delete on C2->conflict
             StorageFolder db1 = await dbFolder.CreateFolderAsync("db1", CreationCollisionOption.OpenIfExists);
             StorageFolder db2 = await dbFolder.CreateFolderAsync("db2", CreationCollisionOption.OpenIfExists);
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+             Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", db1);
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -312,7 +312,7 @@ namespace TestAMSSyncWinRT
                 //delete on C1 and delete on C2->conflict-> nothing happens on clients
                 StorageFolder db1 = await dbFolder.CreateFolderAsync("db1", CreationCollisionOption.OpenIfExists);
                 StorageFolder db2 = await dbFolder.CreateFolderAsync("db2", CreationCollisionOption.OpenIfExists);
-                Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+                 Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
                 SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
                 "RLINABsktmvkzJMegbicNASWkzRzEW97", db1);
                 mob1.AddSyncType<TodoItem>("TodoItem");
