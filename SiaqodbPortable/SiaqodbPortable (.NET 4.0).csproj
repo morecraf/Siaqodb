@@ -55,6 +55,7 @@
     <Compile Include="Configurator.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Encryption\IEncryptor.cs" />
+    <Compile Include="IDocumentSerializer.cs" />
     <Compile Include="IObjectList.cs" />
     <Compile Include="ISiaqodb.cs" />
     <Compile Include="ISqoQuery.cs" />

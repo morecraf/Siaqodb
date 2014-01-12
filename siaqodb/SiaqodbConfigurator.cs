@@ -22,6 +22,7 @@ namespace Sqo
         internal static Dictionary<Type, Dictionary<string, string>> PropertyMaps;
         internal static Dictionary<Type, List<string>> Texts;
         internal static Dictionary<Type, bool> LazyLoaded;
+        internal static Dictionary<Type, List<string>> Documents;
         internal static bool RaiseLoadEvents;
         internal static DateTimeKind? DateTimeKindToSerialize;
         internal static bool OptimisticConcurrencyEnabled=true;
@@ -262,6 +263,53 @@ namespace Sqo
 
         }
         /// <summary>
+        /// Mark a field or automatic property of a certain Type to be serialized as a Document ,it can be added also by using Attribute: Sqo.Attributes.Document;
+        /// both ways of set as Document are similar
+        /// </summary>
+        /// <param name="field">Field name or automatic property name</param>
+        /// <param name="type">Type that declare the field</param>
+        public static void AddDocument(string field, Type type)
+        {
+
+            if (Documents == null)
+            {
+                Documents = new Dictionary<Type, List<string>>();
+
+            }
+            if (!Documents.ContainsKey(type))
+            {
+                Documents.Add(type, new List<string>());
+            }
+            List<FieldInfo> fi = new List<FieldInfo>();
+            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
+            MetaExtractor.FindFields(fi, automaticProperties, type);
+            bool found = false;
+            foreach (FieldInfo f in fi)
+            {
+                if (f.Name == field)
+                {
+                    found = true;
+                    Documents[type].Add(f.Name);
+
+                    break;
+                }
+                else if (automaticProperties.ContainsKey(f))
+                {
+                    if (field == automaticProperties[f].Name)
+                    {
+                        found = true;
+                        Documents[type].Add(f.Name);
+                        break;
+                    }
+                }
+            }
+            if (!found)
+            {
+                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
+            }
+
+        }
+        /// <summary>
         /// Set the name of backing field for a property in case engine cannto discover it, this also can be set by attribute: Sqo.Attributes.UseVariable
         /// </summary>
         /// <param name="propertyName">Name of property</param>
@@ -476,6 +524,19 @@ namespace Sqo
                 bufferingChunkPercent = value;
             }
         }
+        internal static IDocumentSerializer DocumentSerializer;
+        /// <summary>
+        /// Set your custom document serializer
+        /// </summary>
+        /// <param name="documentSerializer">The instance of custom document serializer</param>
+        public static void SetDocumentSerializer(IDocumentSerializer documentSerializer)
+        {
+            if (documentSerializer == null)
+            {
+                throw new ArgumentNullException("documentSerializer");
+            }
+            DocumentSerializer = documentSerializer;
+        }
         /// <summary>
         /// Apply default configurations
         /// </summary>
@@ -538,6 +599,16 @@ namespace Sqo
                     }
                 }
             }
+            if (config.Documents != null)
+            {
+                foreach (var item in config.Documents.Keys)
+                {
+                    foreach (string field in config.Documents[item])
+                    {
+                        AddDocument(field, item);
+                    }
+                }
+            }
             if (config.PropertyMaps != null)
             {
                 foreach (var item in config.PropertyMaps.Keys)
@@ -578,6 +649,10 @@ namespace Sqo
             if (!string.IsNullOrEmpty(config.LicenseKey))
             {
                 SetLicense(config.LicenseKey);
+            }
+            if (config.DocumentSerializer != null)
+            {
+                SetDocumentSerializer(config.DocumentSerializer);
             }
             BuildIndexesAsync = config.BuildIndexesAsync;
             SetRaiseLoadEvents(config.RaiseLoadEvents);

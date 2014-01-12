@@ -11,6 +11,8 @@ using System.Windows.Forms;
 
 using System.IO;
 using Sqo.Attributes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 
 namespace WindowsFormsApplication1
 {
@@ -29,7 +31,9 @@ namespace WindowsFormsApplication1
             //SiaqodbConfigurator.SetDatabaseFileName<Player>("myplayer");
            // GetMemberBySwipe("");
             SiaqodbConfigurator.SetLicense(@"G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
+            SiaqodbConfigurator.SetDocumentSerializer(new ProtoBufSerializer());
             Siaqodb sqo = new Siaqodb(@"e:\sqoo\temp\db\");
+            sqo.DropType<PlayerHost>();
             //DateTime start = DateTime.Now;
             //for (int i = 0; i < 10; i++)
             //{ 
@@ -55,14 +59,14 @@ namespace WindowsFormsApplication1
                     p.ListName.Add(j.ToString());
                 }
                 PlayerHost ph = new PlayerHost() { ThePlayer = p, SomeField = i };
-                //sqo.StoreObject(ph);
+                sqo.StoreObject(ph);
                 LastPlayer = p;
             }
             string elapsed = (DateTime.Now - start).ToString();
             MessageBox.Show("Inserted:"+elapsed);
             start = DateTime.Now;
            // SiaqodbConfigurator.LoadRelatedObjects<PlayerHost>(false);
-           // IList<PlayerHost> players = sqo.LoadAll<PlayerHost>();
+            IList<PlayerHost> players = sqo.LoadAll<PlayerHost>();
             
             var q = (from PlayerHost phh in sqo
                     where phh.SomeField==10
@@ -147,6 +151,74 @@ namespace WindowsFormsApplication1
 
             return data;
         }
+    }
+    public class ProtoBufSerializer : IDocumentSerializer
+    {
+
+        #region IDocumentSerializer Members
+
+        public object Deserialize(Type type, byte[] objectBytes)
+        {
+            using (MemoryStream ms = new MemoryStream(objectBytes))
+            {
+                return  ProtoBuf.Serializer.NonGeneric.Deserialize(type, ms);
+            }
+        }
+
+        public byte[] Serialize(object obj)
+        {
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                ProtoBuf.Serializer.NonGeneric.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+        }
+
+        #endregion
+    }
+    public class BSONSerializer : IDocumentSerializer
+    {
+        #region IDocumentSerializer Members
+        readonly JsonSerializer serializer = new JsonSerializer();
+        public object Deserialize(Type type, byte[] objectBytes)
+        {
+            using (MemoryStream ms = new MemoryStream(objectBytes))
+            {
+                var jsonTextReader = new BsonReader(ms);
+                return serializer.Deserialize(jsonTextReader,type);
+            }
+        }
+
+        public byte[] Serialize(object obj)
+        {
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                BsonWriter writer = new BsonWriter(ms);
+                serializer.Serialize(writer, obj);
+             
+               return ms.ToArray();
+            }
+        }
+
+        #endregion
+    }
+    public class MsgPackSerializer : IDocumentSerializer
+    {
+        #region IDocumentSerializer Members
+        
+        public object Deserialize(Type type, byte[] objectBytes)
+        {
+            var serializer = MsgPack.Serialization.MessagePackSerializer.Create(type);
+            return serializer.UnpackSingleObject(objectBytes);
+        }
+
+        public byte[] Serialize(object obj)
+        {
+            var serializer = MsgPack.Serialization.MessagePackSerializer.Create(obj.GetType());
+            return serializer.PackSingleObject(obj);
+        }
+
+        #endregion
     }
     public class OMember : OBase<OMember>
     {
@@ -265,7 +337,7 @@ namespace WindowsFormsApplication1
         Female,
     }
     [ProtoBuf.ProtoContract(ImplicitFields=ProtoBuf.ImplicitFields.AllPublic)]
-    public class Player:IComparable
+    public class Player
     {
         public string Name { get; set; }
         public int OID { get; set; }
@@ -274,14 +346,6 @@ namespace WindowsFormsApplication1
         public byte[] blob { get; set; }
         public Dictionary<int,int> dict { get; set; }
 
-        #region IComparable Members
-
-        public int CompareTo(object obj)
-        {
-            return ((Player)obj).CompareTo(this);
-        }
-
-        #endregion
     }
     public class PlayerHost
     {

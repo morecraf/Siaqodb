@@ -203,7 +203,7 @@ namespace Sqo.Meta
                 }
                 #endregion
                 int fTypeId = -1;
-                if (FieldIsDocument(fi[i], automaticProperties))
+                if (FieldIsDocument(ti,fi[i], automaticProperties))
                 {
                     fTypeId = documentID;
                 }
@@ -292,7 +292,7 @@ namespace Sqo.Meta
 
         }
 
-        private static bool FieldIsDocument(FieldInfo fieldInfo, Dictionary<FieldInfo, PropertyInfo> automaticProperties)
+        private static bool FieldIsDocument(SqoTypeInfo ti, FieldInfo fieldInfo, Dictionary<FieldInfo, PropertyInfo> automaticProperties)
         {
 
             object[] customAtt = fieldInfo.GetCustomAttributes(typeof(DocumentAttribute), false);
@@ -309,16 +309,16 @@ namespace Sqo.Meta
                 }
             }
             //check config
-            //if (SiaqodbConfigurator.Ignored != null)
-            //{
-            //    if (SiaqodbConfigurator.Ignored.ContainsKey(ti.Type))
-            //    {
-            //        if (SiaqodbConfigurator.Ignored[ti.Type].Contains(fi[i].Name))
-            //        {
-            //            return true;
-            //        }
-            //    }
-            //}
+            if (SiaqodbConfigurator.Documents != null)
+            {
+                if (SiaqodbConfigurator.Documents.ContainsKey(ti.Type))
+                {
+                    if (SiaqodbConfigurator.Documents[ti.Type].Contains(fieldInfo.Name))
+                    {
+                        return true;
+                    }
+                }
+            }
 
             return false;
         }
@@ -691,13 +691,12 @@ namespace Sqo.Meta
                     Sqo.MetaObjects.DocumentInfo dinfo = new Sqo.MetaObjects.DocumentInfo();
                     dinfo.OID = metaCache.GetDocumentInfoOID(ti, o, attKey.Name);
                     dinfo.TypeName =MetaHelper.GetDiscoveringTypeName(attKey.AttributeType);
-
-                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                    if (SiaqodbConfigurator.DocumentSerializer == null)
                     {
-                        ProtoBuf.Serializer.NonGeneric.Serialize(ms, objVal);
-                        dinfo.Document = ms.ToArray();
-                        objVal = dinfo;
+                        throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
                     }
+                    dinfo.Document = SiaqodbConfigurator.DocumentSerializer.Serialize(objVal);
+                    objVal = dinfo;
 
                 }
                 oi.AtInfo[attKey] = objVal;
@@ -716,18 +715,11 @@ namespace Sqo.Meta
                 if (attKey.Name != fieldName)
                     continue;
 #if SILVERLIGHT
+                object objVal=null;
 				try
 				{
-					object objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
-					if(attKey.FInfo.FieldType==typeof(string))
-					{
-						
-						if(objVal==null)
-						{
-						 objVal=string.Empty;
-						}
-					}
-					return new ATuple<int,object>(oid, objVal);
+					objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
+
 				}
 				catch (Exception ex)
 				{
@@ -735,6 +727,7 @@ namespace Sqo.Meta
 				}
 #else
                 object objVal = attKey.FInfo.GetValue(o);
+#endif
                 if (attKey.FInfo.FieldType == typeof(string))
                 {
                     if (objVal == null)
@@ -749,18 +742,16 @@ namespace Sqo.Meta
                     dinfo.OID = metaCache.GetDocumentInfoOID(ti, o, attKey.Name);
                     dinfo.TypeName = MetaHelper.GetDiscoveringTypeName(attKey.AttributeType);
 
-                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+                    if (SiaqodbConfigurator.DocumentSerializer == null)
                     {
-                        ProtoBuf.Serializer.NonGeneric.Serialize(ms, objVal);
-                        dinfo.Document = ms.ToArray();
-                        objVal = dinfo;
+                        throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
                     }
+                    dinfo.Document = SiaqodbConfigurator.DocumentSerializer.Serialize(objVal);
+                    objVal = dinfo;
 
                 }
                 return new ATuple<int,object>(oid, objVal);
 
-
-#endif
             }
             return null;
         }

@@ -19,6 +19,7 @@ namespace Sqo
         internal  Dictionary<Type, List<string>> Texts;
         internal  Dictionary<Type, bool> LazyLoaded;
         internal  Dictionary<Type, string> DatabaseFileNames;
+        internal Dictionary<Type, List<string>> Documents;
         internal  bool RaiseLoadEvents;
         internal  DateTimeKind? DateTimeKindToSerialize;
         internal  bool OptimisticConcurrencyEnabled = true;
@@ -118,6 +119,25 @@ namespace Sqo
             if (!Texts.ContainsKey(type))
             {
                 Texts.Add(type, new List<string>());
+            }
+        }
+        /// <summary>
+        /// Mark a field or automatic property of a certain Type to be serialized as a Document ,it can be added also by using Attribute: Sqo.Attributes.Document;
+        /// both ways of set as Document are similar
+        /// </summary>
+        /// <param name="field">Field name or automatic property name</param>
+        /// <param name="type">Type that declare the field</param>
+        public void AddDocument(string field, Type type)
+        {
+
+            if (Documents == null)
+            {
+                Documents = new Dictionary<Type, List<string>>();
+
+            }
+            if (!Documents.ContainsKey(type))
+            {
+                Documents.Add(type, new List<string>());
             }
         }
         /// <summary>
@@ -284,6 +304,19 @@ namespace Sqo
             {
                 this.LoadRelatedObjectsPropetyChanged(this,e);
             }
+        }
+        internal IDocumentSerializer DocumentSerializer;
+        /// <summary>
+        /// Set your custom document serializer
+        /// </summary>
+        /// <param name="documentSerializer">The instance of custom document serializer</param>
+        public void SetDocumentSerializer(IDocumentSerializer documentSerializer)
+        {
+            if (documentSerializer == null)
+            {
+                throw new ArgumentNullException("documentSerializer");
+            }
+            DocumentSerializer = documentSerializer;
         }
     }
     public enum BuildInAlgorithm {NONE, AES, XTEA }

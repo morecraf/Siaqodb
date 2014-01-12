@@ -51,10 +51,11 @@ namespace Sqo.Core
                     DocumentInfo dinfo=fieldVal as DocumentInfo;
                     if (dinfo != null)
                     {
-                        using (MemoryStream ms = new MemoryStream(dinfo.Document))
+                        if (SiaqodbConfigurator.DocumentSerializer == null)
                         {
-                            fieldVal = ProtoBuf.Serializer.NonGeneric.Deserialize(ai.AttributeType, ms);
+                            throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
                         }
+                        fieldVal = SiaqodbConfigurator.DocumentSerializer.Deserialize(ai.AttributeType, dinfo.Document);
                         //put in weak cache to be able to update the document
                         DocumentEventArgs args = new DocumentEventArgs();
                         args.ParentObject=obj;
@@ -121,10 +122,13 @@ namespace Sqo.Core
                     DocumentInfo dinfo = fieldVal as DocumentInfo;
                     if (dinfo != null)
                     {
-                        using (MemoryStream ms = new MemoryStream(dinfo.Document))
+                        if (SiaqodbConfigurator.DocumentSerializer == null)
                         {
-                            fieldVal = ProtoBuf.Serializer.NonGeneric.Deserialize(ai.AttributeType, ms);
+                            throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
+                 
                         }
+                        fieldVal = SiaqodbConfigurator.DocumentSerializer.Deserialize(ai.AttributeType, dinfo.Document);
+                    
                         //put in weak cache to be able to update the document
                         DocumentEventArgs args = new DocumentEventArgs();
                         args.ParentObject = obj;
