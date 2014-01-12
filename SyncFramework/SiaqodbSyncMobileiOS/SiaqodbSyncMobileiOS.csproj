@@ -74,12 +74,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrialAsync %28Xamarin.iOS%29.csproj">
-      <Project>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE106}</Project>
-      <Name>SiaqodbTrialAsync (Xamarin.iOS)</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <XamarinComponentReference Include="azure-mobile-services">
       <Version>1.1.0</Version>
       <Visible>False</Visible>

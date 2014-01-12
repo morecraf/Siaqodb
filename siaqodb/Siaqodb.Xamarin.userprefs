@@ -1,25 +1,34 @@
-﻿<Properties>
+﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Linq/LazySqoQuery.cs">
     <Files>
-      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Extensions/MobileServiceClientExtensions.cs" Line="1" Column="1" />
-      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/ApplicationStorage.cs" Line="1" Column="1" />
-      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/CurrentPlatform.cs" Line="1" Column="1" />
-      <File FileName="../../../Downloads/azure-mobile-services-xamarin 4/sdk/xamarin/ios/Microsoft.WindowsAzure.Mobile.Ext.iOS/Platform/PlatformInformation.cs" Line="1" Column="1" />
-      <File FileName="../../Examples/Xamarin.Android/Activity1.cs" Line="1" Column="1" />
-      <File FileName="../../Examples/Xamarin.iOS/SiaqodbMTDemo/MainWindow.xib.designer.cs" Line="1" Column="1" />
-      <File FileName="../../Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" Line="1" Column="1" />
-      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbMobile.cs" Line="1" Column="1" />
-      <File FileName="../SyncFramework/SiaqodbSyncMobileWP8/SiaqodbSyncMobileProvider.cs" Line="1" Column="1" />
-      <File FileName="SiaqodbConfigurator.cs" Line="23" Column="61" />
+      <File FileName="Core/ObjectSerializer.Reader.cs" Line="56" Column="40" />
+      <File FileName="Linq/IncludeSqoQuery.cs" Line="24" Column="6" />
+      <File FileName="Linq/LazySqoQuery.cs" Line="17" Column="11" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/cristiursachi/Downloads/azure-mobile-services-xamarin/sdk/managed/src/Microsoft.WindowsAzure.MobileServices/Http/MobileServiceHttpClient.cs" line="110" column="1" />
-      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="111" column="1" />
-      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="109" column="5" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="98" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="96" column="5" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="80" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.iOS/SiaqodbMTDemo/Main.cs" line="93" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Siaqodb/SyncFramework/SiaqodbSyncMobileWP8/SiaqodbSyncMobileProvider.cs" line="23" column="51" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.Android/Activity1.cs" line="75" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Examples/Xamarin.Android/Activity1.cs" line="73" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Siaqodb/siaqodb/Siaqodb.cs" line="1169" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Siaqodb/siaqodb/Siaqodb.cs" line="1182" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Siaqodb/siaqodb/Siaqodb.cs" line="890" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Projects/Siaqodb/siaqodb/Siaqodb.cs" line="733" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Downloads/cristidot/cristidot/QSTodoListViewController.cs" line="142" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Downloads/cristidot/cristidot/QSTodoListViewController.cs" line="124" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Downloads/cristidot/cristidot/QSTodoListViewController.cs" line="138" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Downloads/cristidot/cristidot/QSTodoListViewController.cs" line="134" column="1" />
+      <Breakpoint file="/Users/cristiursachi/Downloads/cristidot/cristidot/QSTodoListViewController.cs" line="133" column="8" />
+      <Breakpoint file="/Users/cristiursachi/Downloads/cristidot/cristidot/QSTodoListViewController.cs" line="135" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Xamarin.Tests.Siaqodb.Xamarin.Android.Examples AndroidDeviceId-Debug="emulator-5554" />
 </Properties>

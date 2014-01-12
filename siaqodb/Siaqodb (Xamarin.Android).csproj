@@ -9,7 +9,7 @@
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>Sqo</RootNamespace>
-    <AssemblyName>SiaqodbAsyncDroid</AssemblyName>
+    <AssemblyName>Siaqodb</AssemblyName>
     <TargetFrameworkVersion>v2.3</TargetFrameworkVersion>
     <AndroidStoreUncompressedFileExtensions />
   </PropertyGroup>
@@ -17,18 +17,18 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\Licensed</OutputPath>
+    <OutputPath>bin\MonoAndroid\</OutputPath>
     <DefineConstants>TRACE;DEBUG;MONODROID;ASYNC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Licensed\SiaqodbAsyncDroid.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Licensed\Siaqodb.XML</DocumentationFile>
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\Licensed</OutputPath>
+    <OutputPath>bin\MonoAndroid\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,14 +40,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\..\Downloads\protobuf-net r668\Full\portable\protobuf-net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\IgnoreAttribute.cs" />
-    <Compile Include="Attributes\Index.cs" />
-    <Compile Include="Attributes\MaxLengthAttribute.cs" />
-    <Compile Include="Attributes\TextAttribute.cs" />
-    <Compile Include="Attributes\UniqueConstraint.cs" />
-    <Compile Include="Attributes\UseVariable.cs" />
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
     <Compile Include="Cache\CacheForIndexes.cs" />
@@ -75,9 +72,7 @@
     <Compile Include="Core\SqoISFile.cs" />
     <Compile Include="Core\SqoISFile2.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
-    <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
-    <Compile Include="Events.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\NotSupportedTypeException.cs" />
@@ -91,13 +86,11 @@
     <Compile Include="Indexes\BTree\IndexManager.cs" />
     <Compile Include="Indexes\IndexInfo.cs" />
     <Compile Include="Internal\_bs.cs" />
-    <Compile Include="IObjectList.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="LazyObjectList.cs" />
     <Compile Include="Linq\Evaluator.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
     <Compile Include="Linq\IncludeSqoQuery.cs" />
-    <Compile Include="Linq\ISqoQuery.cs" />
     <Compile Include="Linq\JoinTranslator.cs" />
     <Compile Include="Linq\LazyEnumerator.cs" />
     <Compile Include="Linq\LazySqoQuery.cs" />
@@ -108,13 +101,10 @@
     <Compile Include="Linq\SqoColumn.cs" />
     <Compile Include="Linq\SqoOrderedQuery.cs" />
     <Compile Include="Linq\SqoQuery.cs" />
-    <Compile Include="Linq\SqoQueryExtensions.cs" />
-    <Compile Include="MetaField.cs" />
     <Compile Include="MetaObjects\ArrayInfo.cs" />
     <Compile Include="MetaObjects\DictionaryInfo.cs" />
     <Compile Include="MetaObjects\RawdataInfo.cs" />
     <Compile Include="MetaObjects\RawdataManager.cs" />
-    <Compile Include="MetaType.cs" />
     <Compile Include="Meta\FieldSqoInfo.cs" />
     <Compile Include="Meta\MetaExtractor.cs" />
     <Compile Include="Meta\ObjectInfo.cs" />
@@ -154,13 +144,21 @@
     <Compile Include="Utilities\ObjectTable.cs" />
     <Compile Include="Utilities\ObjectTableHelper.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
-    <Compile Include="Utilities\SqoTrialLicense.cs" />
-    <Compile Include="Utilities\SqoUnity3DLic.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
     <Compile Include="AsyncLocker\AsyncLock.cs" />
+    <Compile Include="MetaObjects\DocumentInfo.cs" />
+    <Compile Include="Linq\SqoQueryExtensionsImpl.cs" />
+    <Compile Include="Cache\CacheDocuments.cs" />
+    <Compile Include="Utilities\SqoLicense.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AsyncLocker\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28Xamarin%29.csproj">
+      <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
+      <Name>SiaqodbPortable (Xamarin)</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

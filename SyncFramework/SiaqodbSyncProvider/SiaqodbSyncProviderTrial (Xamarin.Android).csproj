@@ -60,10 +60,6 @@
       <Project>{8F2D16BC-85FB-44DA-B28D-DC43A208D381}</Project>
       <Name>SyncCacheController (Xamarin.Android)</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrial %28Xamarin.Android%29.csproj">
-      <Project>{5244BC37-3892-43F5-BDC7-457D02B340A6}</Project>
-      <Name>SiaqodbTrial (Xamarin.Android)</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
