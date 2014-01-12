@@ -24,6 +24,7 @@
     <MtouchLink>None</MtouchLink>
     <GenerateDocumentation>True</GenerateDocumentation>
     <AssemblyName>Siaqodb</AssemblyName>
+    <DocumentationFile>bin\iPhoneSimulator\MonoTouch\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -61,9 +62,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\..\Downloads\protobuf-net r668\Full\unity\protobuf-net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

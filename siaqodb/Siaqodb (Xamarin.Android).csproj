@@ -21,9 +21,9 @@
     <DefineConstants>TRACE;DEBUG;MONODROID;ASYNC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Licensed\Siaqodb.XML</DocumentationFile>
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
+    <DocumentationFile>bin\MonoAndroid\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,9 +40,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\..\Downloads\protobuf-net r668\Full\portable\protobuf-net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\Cache.cs" />
