@@ -76,12 +76,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbAsyncTrial%28Xamarin.Android%29.csproj">
-      <Project>{5284BC37-9892-43F5-BDC7-457D02B340A8}</Project>
-      <Name>SiaqodbAsyncTrial(Xamarin.Android)</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <XamarinComponentReference Include="azure-mobile-services">
       <Version>1.1.0</Version>
       <Visible>False</Visible>
