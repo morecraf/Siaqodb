@@ -660,7 +660,10 @@ namespace Sqo
             EnableOptimisticConcurrency(config.OptimisticConcurrencyEnabled);
             LoggingMethod = config.LoggingMethod;
             VerboseLevel = config.VerboseLevel;
-            BufferingChunkPercent = config.BufferingChunkPercent;
+            if (config.BufferingChunkPercent > 0)
+            {
+                BufferingChunkPercent = config.BufferingChunkPercent;
+            }
         }
 
         static void defaultConfigurator_LoadRelatedObjectsPropetyChanged(object sender, EventArgs e)

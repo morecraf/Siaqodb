@@ -46,6 +46,7 @@ namespace Sqo
             {
                 Indexes.Add(type, new List<string>());
             }
+            Indexes[type].Add(field);
         }
         /// <summary>
         /// Add an UniqueConstraint for a field of a certain Type,an UniqueConstraint can be added also by using Attribute: Sqo.Attributes.UniqueConstraint;
@@ -65,7 +66,7 @@ namespace Sqo
             {
                 Constraints.Add(type, new List<string>());
             }
-           
+            Constraints[type].Add(field);
         }
         /// <summary>
         /// Put MaxLength for a string field or automatic property of a Type, MaxLength can be set also by using Attribute: Sqo.Attributes.MaxLength
@@ -84,7 +85,7 @@ namespace Sqo
             {
                 MaxLengths.Add(type, new Dictionary<string, int>());
             }
-
+            MaxLengths[type].Add(field,maxLength);
         }
         /// <summary>
         /// Ignore a field or automatic property to be stored
@@ -102,7 +103,7 @@ namespace Sqo
             {
                 Ignored.Add(type, new List<string>());
             }
-
+            Ignored[type].Add(field);
         }
         /// <summary>
         /// Mark field to be stored as a string with unlimited length 
@@ -120,6 +121,7 @@ namespace Sqo
             {
                 Texts.Add(type, new List<string>());
             }
+            Texts[type].Add(field);
         }
         /// <summary>
         /// Mark a field or automatic property of a certain Type to be serialized as a Document ,it can be added also by using Attribute: Sqo.Attributes.Document;
@@ -139,6 +141,7 @@ namespace Sqo
             {
                 Documents.Add(type, new List<string>());
             }
+            Documents[type].Add(field);
         }
         /// <summary>
         /// Set the name of backing field for a property in case engine cannto discover it, this also can be set by attribute: Sqo.Attributes.UseVariable
