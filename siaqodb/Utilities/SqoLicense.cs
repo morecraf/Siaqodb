@@ -11,6 +11,11 @@ namespace Sqo.Utilities
         private static bool? valid = null;
         internal static bool LicenseValid(string licenseKey)
         {
+            //temp BETA,remove afterwards
+            if (DateTime.Now <= new DateTime(2014, 02, 12))
+            {
+                valid = true;
+            }
 
             if (valid!=null)
             {
@@ -125,6 +130,12 @@ namespace Sqo.Utilities
         }
         internal static bool LicenseValid()
         {
+            //temp BETA,remove afterwards
+            if (DateTime.Now <= new DateTime(2014, 02, 12))
+            {
+                valid = true;
+            }
+
             if (valid.HasValue)
             {
                 if (valid.Value)

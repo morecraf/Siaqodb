@@ -80,6 +80,7 @@ namespace SiaqodbManager
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                 }
             }
+            //SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTalBSf7g8yhLLXTP4RKwmhg=");
 #if TRIAL
             string folder = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config";
             string trialFile = folder + System.IO.Path.DirectorySeparatorChar + "trial.lic";
@@ -89,7 +90,7 @@ namespace SiaqodbManager
                 try
                 {
 
-                    SiaqodbConfigurator.SetTrialLicense(text);
+                    SiaqodbConfigurator.SetLicense(text);
                     Sqo.Siaqodb siaqodbConfigTemp = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory);
                     siaqodbConfigTemp.Close();
                     TrialLicense.LicenseKey = text;

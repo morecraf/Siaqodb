@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("siaqodb")]
 [assembly: AssemblyProduct("SiaqodbManager")]
-[assembly: AssemblyCopyright("Copyright © Dotissi  2013")]
+[assembly: AssemblyCopyright("Copyright © Dotissi  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
