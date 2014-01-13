@@ -28,7 +28,10 @@ namespace SiaqodbSyncMobile
 
         public SiaqodbSyncMobileProvider(SiaqodbMobile siaqodbMobile, string applicationUrl, string applicationKey)
         {
-            
+            if (DateTime.Now >=new DateTime(2014, 02, 12))
+            {
+                throw new Exception("SiaqodbSyncMobile BETA version expired");
+            }
             this.siaqodbMobile = siaqodbMobile;
             this.applicationUrl = applicationUrl;
             this.applicationKey = applicationKey;
