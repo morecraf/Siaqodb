@@ -32,13 +32,13 @@ namespace Microsoft.Synchronization.ClientServices
         AsyncWorkRequest _refreshRequestWorker;
         AsyncWorkerManager _asyncWorkManager;
         CacheRequestHandler _cacheRequestHandler;
-
+         
         Guid changeSetId;
         CacheRefreshStatistics refreshStats;
         object _lockObject = new object(); // Object used for locking access to the cancelled flag
         bool _cancelled = false;
         bool _beginSessionComplete = false;
-
+        public static int HTTPRequestTimeout;
         bool Cancelled
         {
             get

@@ -172,7 +172,10 @@ namespace Microsoft.Synchronization.ClientServices
                 webRequest.ContentType = (base.SerializationFormat == SerializationFormat.ODataAtom) ? "application/atom+xml" : "application/json";
 
                 wrapper.WebRequest = webRequest;
-
+                if(CacheController.HTTPRequestTimeout>0)
+                {
+                    wrapper.WebRequest.Timeout = CacheController.HTTPRequestTimeout;
+                }
                 // Get the request stream
                 if (wrapper.CacheRequest.RequestType == CacheRequestType.UploadChanges)
                 {
