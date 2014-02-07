@@ -101,7 +101,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <ProjectReference Include="..\siaqodb\SiaqodbLicensed %28WinRT%29.csproj">
+    <ProjectReference Include="..\siaqodb\Siaqodb %28WinRT%29.csproj">
       <Project>{a909273f-5824-4024-a99a-827d4648c6e9}</Project>
       <Name>SiaqodbLicensed %28WinRT%29</Name>
     </ProjectReference>

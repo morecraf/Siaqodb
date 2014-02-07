@@ -151,6 +151,46 @@ namespace WindowsFormsApplication1
 
             return data;
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            SiaqodbConfigurator.SetLicense(@"G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
+            
+            Siaqodb sqo = new Siaqodb(@"e:\apps\do\");
+          
+            DateTime start = DateTime.Now;
+           
+            for (int i = 0; i < 100000; i++)
+            {
+                Tick t = new Tick();
+                t.mydate = DateTime.Now;
+                t.MyInt = i;
+                t.mylong = i;
+                t.mystring = "asdasd" + i.ToString();
+                //t.blob[i % (8 * 1024 + 500)] = (byte)(i % 100);
+                sqo.StoreObject(t);
+            }
+            sqo.Flush();
+
+            string elapsed = (DateTime.Now - start).ToString();
+           // MessageBox.Show("Inserted:" + elapsed);
+            start = DateTime.Now;
+            // SiaqodbConfigurator.LoadRelatedObjects<PlayerHost>(false);
+            IList<Tick> players = sqo.LoadAll<Tick>();
+            elapsed = (DateTime.Now - start).ToString();
+            string g = "";
+            
+        }
+    }
+    public class Tick
+    {
+        public int OID{get;set;}
+        public int MyInt;
+        public string mystring;
+        public DateTime mydate;
+        public long mylong;
+        //public byte[] blob = new byte[8 * 1024 + 500];
+
     }
     public class ProtoBufSerializer : IDocumentSerializer
     {
