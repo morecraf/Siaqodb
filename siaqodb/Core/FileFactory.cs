@@ -30,7 +30,7 @@ namespace Sqo.Core
 #elif WinRT
                 return new SqoWinRTFile(filePath, readOnly);
 #else
-                return new SqoFile(filePath, readOnly);
+                return new SqoFile(filePath,readOnly);
             
 #endif
             }
