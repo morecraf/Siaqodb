@@ -47,7 +47,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Bin\Debug</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHT SL4 TRIAL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT SL4</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -102,6 +102,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.0%29.csproj">
+      <Project>{5529f692-514a-4dde-9b6c-f47ea888496b}</Project>
+      <Name>SiaqodbPortable %28.NET 4.0%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28SL 4%29.csproj">
+      <Project>{d6a37a0e-f504-477b-903f-775d5e02b0a0}</Project>
+      <Name>Siaqodb %28SL 4%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SyncCacheController\SyncCacheControllerSL.csproj">
       <Project>{562ACF90-AB6B-428A-B510-7F8485802EEB}</Project>
       <Name>SyncCacheControllerSL</Name>

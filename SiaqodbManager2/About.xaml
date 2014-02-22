@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="About" Height="346" Width="451" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" >
     <Grid Margin="0,0,-6,-8">
-        <Label Content="SiaqodbManager version 3.0" Height="28" HorizontalAlignment="Left" Margin="42,121,0,0" Name="label1" VerticalAlignment="Top" Width="175" />
+        <Label Content="SiaqodbManager version 4.0" Height="28" HorizontalAlignment="Left" Margin="42,121,0,0" Name="label1" VerticalAlignment="Top" Width="175" />
         <Label Content="Copyright © Dotissi 2014" Height="28" HorizontalAlignment="Left" Margin="246,241,0,0" Name="label2" VerticalAlignment="Top" Width="167" HorizontalContentAlignment="Right" />
         <TextBox Height="65" HorizontalAlignment="Left" Margin="42,154,0,0" Name="textBox1" VerticalAlignment="Top" Width="371" Text="Manage siaqodb databases by loading objects data stored and also let possibility to developer to run LINQ queries over stored objects." TextWrapping="Wrap" IsReadOnly="True" />
         <Image Height="33" HorizontalAlignment="Left" Name="image1" Stretch="Fill" VerticalAlignment="Top" Width="36"  />

@@ -11,12 +11,6 @@ namespace Sqo.Utilities
         private static bool? valid = null;
         internal static bool LicenseValid(string licenseKey)
         {
-            //temp BETA,remove afterwards
-            if (DateTime.Now <= new DateTime(2014, 02, 12))
-            {
-                valid = true;
-            }
-
             if (valid!=null)
             {
                 if (valid.Value)
@@ -41,18 +35,23 @@ namespace Sqo.Utilities
                 {
                     if (System.Diagnostics.Debugger.IsAttached)
                     {
-                    #if !SL4 && !WinRT && !WP7
+#if !SL4 && !WinRT && !WP7 && !UNITY3D && !MONODROID && !CF
                         if (keyValues[2] != Environment.MachineName)
                         {
                             throw new InvalidLicenseException("License is generated from another machine, you have to use current machine to generate the license key!");
                         }
-                    #endif
+#endif
                     }
                     string licType = keyValues[3];
                     int vers = Convert.ToInt32(keyValues[4]);
-                    if (vers < SiaqodbConfigurator.CurrentVersion)
+                    int year = Convert.ToInt32(keyValues[5].Substring(0, 4));
+                    int month = Convert.ToInt32(keyValues[5].Substring(4, 2));
+                    int day = Convert.ToInt32(keyValues[5].Substring(6, 2));
+
+                    DateTime expiredSubscriptionDate = new DateTime(year+1, month, day);
+                    if (expiredSubscriptionDate<SiaqodbConfigurator.CurrentVersion.Value)
                     {
-                        throw new InvalidLicenseException("Your license is not valid for this version, you have to purchase the upgrade to use this version!");
+                        throw new InvalidLicenseException("Your license is not valid for this version, you have to renew your subscription to use this version!");
                     }
                     if (MatchLicType(licType))
                     {
@@ -130,11 +129,6 @@ namespace Sqo.Utilities
         }
         internal static bool LicenseValid()
         {
-            //temp BETA,remove afterwards
-            if (DateTime.Now <= new DateTime(2014, 02, 12))
-            {
-                valid = true;
-            }
 
             if (valid.HasValue)
             {

@@ -25,7 +25,37 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
-           // SiaqodbConfigurator.EncryptedDatabase = true;
+           
+            SiaqodbConfigurator.SetLicense (@"httexHqCtXdsK1yw6jbR2Fwlg5oZKA80sg2xPkd3etQ=");
+            Siaqodb siaqodb2 = new Siaqodb(Environment.GetFolderPath (Environment.SpecialFolder.Personal));
+            siaqodb2.DropType<EventSlot>();
+            for (int i = 0; i < 7000; i++) {
+
+                EventSlot evslot = new EventSlot ();
+                evslot.ApplicationID = i;
+                evslot.ID = i;
+                evslot.Index = i;
+                evslot.ClientID = i % 100;
+                evslot.SubClientID = i % 100;
+                evslot.CA_ClientID = i % 100;
+                evslot.Comment = "myslot"+i.ToString();
+                siaqodb2.StoreObject (evslot);
+            }
+            //siaqodb2.Flush ();
+            int id = 1000;
+            DateTime start22 = DateTime.Now;
+            var eventSlots = (from EventSlot es in siaqodb2
+                              where (es.ClientID == 99 && es.SubClientID == 99 && es.CA_ClientID == 99)
+                               orderby es.StartDate
+                              select es).Skip (20).Take (20).ToList();
+            string elapsed33 = (DateTime.Now - start22).ToString ();
+            //Log("Time elapsed before close " + elapsed);
+            SiaqodbConfigurator.VerboseLevel = VerboseLevel.Warn;
+            SiaqodbConfigurator.LoggingMethod = Logging;
+
+      
+            
+            // SiaqodbConfigurator.EncryptedDatabase = true;
             //SiaqodbConfigurator.SetEncryptor(BuildInAlgorithm.AES);
             //SiaqodbConfigurator.SetEncryptionPassword("correct");
             //SiaqodbConfigurator.SetDatabaseFileName<Player>("myplayer");
@@ -79,7 +109,10 @@ namespace WindowsFormsApplication1
         //    MemoryStream memStr=new MemoryStream();
           //  ProtoBuf.Serializer.Serialize(memStr, new Player());
         }
-
+        private void Logging(string msg, VerboseLevel vbl)
+        { 
+        
+        }
         private void button2_Click(object sender, EventArgs e)
         {
             A a = new A(); a.Name = "AAA";
@@ -151,6 +184,46 @@ namespace WindowsFormsApplication1
 
             return data;
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            SiaqodbConfigurator.SetLicense(@"G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
+
+            Siaqodb sqo = new Siaqodb(@"e:\sqoo\temp\db\");
+
+            DateTime start = DateTime.Now;
+
+            for (int i = 0; i < 100000; i++)
+            {
+                Tick t = new Tick();
+                t.mydate = DateTime.Now;
+                t.MyInt = i;
+                t.mylong = i;
+                t.mystring = "asdasd" + i.ToString();
+                t.blob[i % (8 * 1024 + 500)] = (byte)(i % 100);
+                sqo.StoreObject(t);
+            }
+            sqo.Flush();
+
+            string elapsed = (DateTime.Now - start).ToString();
+            // MessageBox.Show("Inserted:" + elapsed);
+            start = DateTime.Now;
+            // SiaqodbConfigurator.LoadRelatedObjects<PlayerHost>(false);
+            //IList<Tick> players = sqo.LoadAll<Tick>();
+           // elapsed = (DateTime.Now - start).ToString();
+            string g = "";
+
+        }
+    }
+    public class Tick
+    {
+        public int OID { get; set; }
+        public int MyInt;
+        public string mystring;
+        public DateTime mydate;
+        public long mylong;
+        public byte[] blob = new byte[8 * 1024 + 500];
+
     }
     public class ProtoBufSerializer : IDocumentSerializer
     {
@@ -493,5 +566,32 @@ namespace WindowsFormsApplication1
     {
         public int OID { get; set; }
     }
+    
+
+    public class EventSlot {
+        public int OID{get;set;}
+        [Sqo.Attributes.UniqueConstraint]
+        [Index]
+        public int ID{get;set;}
+        public int ApplicationID{ get; set;}
+        public int ClientID{ get; set; }
+        public int SubClientID{get;set;}
+        public int CA_ClientID{get;set;}
+        public int Index{ get; set; }
+        public int CategoryID{ get; set; }
+        public string DField{get;set;}
+        [Index]
+        public DateTime StartDate{get;set;}
+        public DateTime StartTime{ get; set; }
+        public DateTime EndTime{ get; set; }
+        public int TimeIncrement{get;set;}
+        public int MaxNOReservations {get;set;}
+        public bool Locked{get;set;}
+        public bool HasTimeSlotSeries{get;set;}
+        [Text] 
+        public String Comment{ get; set; }
+        //public List<TimeSlot> TimeSlots{get;set;}
+        public bool Modified{ get; set; }
+    }  
 
 }

@@ -34,7 +34,7 @@ namespace LicenseActivation
                 this.txtLic.Text = k;
                 if (!k.Trim().StartsWith("ERR"))
                 {
-                    this.btnSave.Enabled = true;
+                    txtCode.Text = @"Sqo.SiaqodbConfigurator.SetLicense(@"""+k+@""");";
                 }
             }
             catch (Exception ex)
