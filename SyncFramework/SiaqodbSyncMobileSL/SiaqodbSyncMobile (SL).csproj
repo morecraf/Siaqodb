@@ -28,13 +28,13 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>Bin\Debug\sl5\</OutputPath>
+    <OutputPath>..\SiaqodbSyncMobile\bin\Debug\sl5\</OutputPath>
     <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Bin\Debug\sl5\SiaqodbSyncMobile.xml</DocumentationFile>
+    <DocumentationFile>..\SiaqodbSyncMobile\bin\Debug\sl5\SiaqodbSyncMobile.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

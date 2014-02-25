@@ -30,14 +30,13 @@ namespace SiaqodbSyncProvider
 
         public SiaqodbOfflineSyncProvider(SiaqodbOffline siaqodb, Uri uri)
         {
-        #if TRIAL
+     
 
-            if (!Utilities.TrialLicense.LicenseValid())
+            if (!Sqo.Internal._bs._hsy())
             {
-                throw new Exception("Siaqodb SyncProvider License not valid!");
+                throw new Exception("Siaqodb Sync Provider License not valid!");
             }
 
-        #endif
             CacheController = new CacheController(uri, "DefaultScope", this);
             this.siaqodb = siaqodb;
             
@@ -45,14 +44,10 @@ namespace SiaqodbSyncProvider
         }
         public SiaqodbOfflineSyncProvider(SiaqodbOffline siaqodb, Uri uri,string syncScopeName)
         {
-#if TRIAL
-
-            if (!Utilities.TrialLicense.LicenseValid())
+            if (!Sqo.Internal._bs._hsy())
             {
-                throw new Exception("Siaqodb SyncProvider License not valid!");
+                throw new Exception("Siaqodb Sync Provider License not valid!");
             }
-
-#endif
             CacheController = new CacheController(uri, syncScopeName, this);
             this.siaqodb = siaqodb;
             

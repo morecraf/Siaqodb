@@ -99,5 +99,19 @@ namespace Sqo.Internal
         {
             return siaqodb.LoadObjectByOID(type, oid);
         }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static bool _hsy()
+        {
+            return Sqo.Utilities.SqoLicense.hasSync;
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static bool _hamssy()
+        {
+            return Sqo.Utilities.SqoLicense.hasAMSSync;
+        }
     }
 }

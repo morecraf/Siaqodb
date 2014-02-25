@@ -5,30 +5,32 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EC3E20B3-1592-472E-984C-2B13EE876BB4}</ProjectGuid>
+    <ProjectGuid>{25002B8B-343A-4BB7-9537-D2C7D9CCB76E}</ProjectGuid>
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SiaqodbSyncProviderWP7</RootNamespace>
-    <AssemblyName>SiaqodbSyncProviderWP7</AssemblyName>
+    <RootNamespace>SiaqodbSyncProvider</RootNamespace>
+    <AssemblyName>SiaqodbSyncProvider</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
-    <TargetFrameworkProfile>WindowsPhone</TargetFrameworkProfile>
+    <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
     <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>Bin\Debug</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;WINDOWS_PHONE;TRIAL</DefineConstants>
+    <OutputPath>Bin\wp71\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>Bin\wp71\SiaqodbSyncProvider.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,18 +43,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="SyncCacheControllerWP7">
-      <HintPath>..\SyncCacheController\bin\Debug\SyncCacheControllerWP7.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.DataAnnotations">
-      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v3.0\Libraries\Client\System.ComponentModel.DataAnnotations.dll</HintPath>
+    <Reference Include="System.ComponentModel.DataAnnotations, Version=2.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\System.ComponentModel.DataAnnotations.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Net" />
+    <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Events.cs" />
@@ -62,15 +62,24 @@
     <Compile Include="SiaqodbOfflineEntity.cs" />
     <Compile Include="SiaqodbOfflineSyncProvider.cs" />
     <Compile Include="SyncProviderLicense.cs" />
-    <Compile Include="Utilities\TrialLicense.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
+    <Compile Include="Utilities\TrialLicense.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\SiaqodbTrialWP7.csproj">
-      <Project>{CA9BE4FC-54F1-4E41-8EF2-64B33C3CFB16}</Project>
-      <Name>SiaqodbTrialWP7</Name>
+    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.0%29.csproj">
+      <Project>{5529F692-514A-4DDE-9B6C-F47EA888496B}</Project>
+      <Name>SiaqodbPortable %28.NET 4.0%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28WP 7.1%29.csproj">
+      <Project>{6F6C6312-D149-416D-8AD4-1B6DE197391B}</Project>
+      <Name>Siaqodb %28WP 7.1%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SyncCacheController\SyncCacheController %28WP%29.csproj">
+      <Project>{C4D0C333-D6FA-46D5-A513-AC71E4805789}</Project>
+      <Name>SyncCacheController %28WP%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Condition=" '$(EAZFUSCATOR_NET_HOME)' != '' and Exists('$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets') " Project="$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions />
@@ -81,4 +90,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PostBuildEvent>if /I "$(ConfigurationName)" == "Release" Eazfuscator.NET.exe "$(TargetPath)" --msbuild-project-path "$(ProjectPath)" --msbuild-project-configuration "$(ConfigurationName)" --msbuild-project-platform "$(PlatformName)" --msbuild-solution-path "$(SolutionPath)" -n --newline-flush -v 3.6</PostBuildEvent>
+  </PropertyGroup>
 </Project>

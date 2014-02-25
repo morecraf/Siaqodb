@@ -19,11 +19,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\netcore45\</OutputPath>
+    <OutputPath>..\SiaqodbSyncMobile\bin\Debug\netcore45\</OutputPath>
     <DefineConstants>DEBUG;TRACE;NETFX_CORE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\netcore45\SiaqodbSyncMobile.XML</DocumentationFile>
+    <DocumentationFile>..\SiaqodbSyncMobile\bin\Debug\netcore45\SiaqodbSyncMobile.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

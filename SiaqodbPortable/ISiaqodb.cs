@@ -25,7 +25,8 @@ namespace Sqo
         void ExportToXML<T>(System.Xml.XmlWriter writer, System.Collections.Generic.IList<T> objects);
         IObjectList<T> ImportFromXML<T>(System.Xml.XmlReader reader);
         IObjectList<T> ImportFromXML<T>(System.Xml.XmlReader reader, bool importIntoDB);
-        event EventHandler<IndexesSaveAsyncFinishedArgs> IndexesSaveAsyncFinished;
+#elif !CF && !UNITY3D
+         event EventHandler<IndexesSaveAsyncFinishedArgs> IndexesSaveAsyncFinished;
 #endif
         void Flush();
         System.Collections.Generic.List<MetaType> GetAllTypes();

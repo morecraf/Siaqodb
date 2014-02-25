@@ -7,8 +7,8 @@
     <ProjectGuid>{7A2F318D-2229-44EF-AE54-B9925539E163}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SiaqodbSyncProviderCF</RootNamespace>
-    <AssemblyName>SiaqodbSyncProviderCF</AssemblyName>
+    <RootNamespace>SiaqodbSyncProvider</RootNamespace>
+    <AssemblyName>SiaqodbSyncProvider</AssemblyName>
     <ProjectTypeGuids>{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PlatformFamilyName>Smartphone</PlatformFamilyName>
     <PlatformID>f27da329-3269-4191-98e0-c87d3d7f1db9</PlatformID>
@@ -23,14 +23,15 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\DebugCF\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Smartphone CF TRIAL</DefineConstants>
+    <OutputPath>bin\cf\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;Smartphone CF</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <FileAlignment>512</FileAlignment>
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <DocumentationFile>bin\cf\SiaqodbSyncProvider.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -65,17 +66,17 @@
     <Compile Include="Utilities\TrialLicense.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\siaqodb\siaqodbCF.csproj">
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28CF%29.csproj">
       <Project>{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}</Project>
-      <Name>siaqodbCF</Name>
+      <Name>Siaqodb %28CF%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\System.Linq.Expressions\System.Linq.Expressions.csproj">
       <Project>{92FFA693-E97C-42AF-B479-E311BB4A7321}</Project>
       <Name>System.Linq.Expressions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SyncCacheControllerCF\SyncCacheControllerCF.csproj">
+    <ProjectReference Include="..\SyncCacheControllerCF\SyncCacheController %28CF%29.csproj">
       <Project>{4C89C8FD-5E7E-475E-BB67-C33E3F55E950}</Project>
-      <Name>SyncCacheControllerCF</Name>
+      <Name>SyncCacheController %28CF%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />

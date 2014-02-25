@@ -9,6 +9,8 @@ namespace Sqo.Utilities
     class SqoLicense
     {
         private static bool? valid = null;
+        internal static bool hasSync;
+        internal static bool hasAMSSync;
         internal static bool LicenseValid(string licenseKey)
         {
             if (valid!=null)
@@ -30,7 +32,13 @@ namespace Sqo.Utilities
                 string key = Sqo.Utilities.Decryptor.DecryptRJ128(sKy, sIV, licenseKey);
                 string[] keyValues = key.Split('|');
                 int lcMode;
+#if !CF
                 bool notTrial = int.TryParse(keyValues[0], out lcMode);
+#else
+                bool notTrial=false;
+                try { lcMode = Convert.ToInt32(keyValues[0]); notTrial = true; }
+                finally { }
+#endif
                 if (notTrial && lcMode == 1)
                 {
                     if (System.Diagnostics.Debugger.IsAttached)
@@ -47,6 +55,8 @@ namespace Sqo.Utilities
                     int year = Convert.ToInt32(keyValues[5].Substring(0, 4));
                     int month = Convert.ToInt32(keyValues[5].Substring(4, 2));
                     int day = Convert.ToInt32(keyValues[5].Substring(6, 2));
+                    hasSync = keyValues[6] == "1";
+                    hasAMSSync = keyValues[7] == "1";
 
                     DateTime expiredSubscriptionDate = new DateTime(year+1, month, day);
                     if (expiredSubscriptionDate<SiaqodbConfigurator.CurrentVersion.Value)
@@ -79,6 +89,8 @@ namespace Sqo.Utilities
                     else
                     {
                         valid = true;
+                        hasAMSSync = true;
+                        hasSync = true;
                         return true;
                     }
                 }
