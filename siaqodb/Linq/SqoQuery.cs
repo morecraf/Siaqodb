@@ -446,7 +446,7 @@ namespace Sqo
             return SqoQueryExtensionsImpl.Include(this, path);
         }
 
-#if !UNITY3D
+		#if !UNITY3D  || XIOS
         public ISqoOrderedQuery<T> SqoOrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
         {
             return SqoQueryExtensionsImpl.OrderBy(this, keySelector);

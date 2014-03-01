@@ -1422,7 +1422,7 @@ namespace Sqo
             }
             
         }
-#if !UNITY3D
+	#if !UNITY3D || XIOS
 
         public static ISqoOrderedQuery<TSource> OrderBy<TSource, TKey>(ISqoQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
         {
@@ -1448,7 +1448,7 @@ namespace Sqo
                 return orderedQuery;
             }
             SiaqodbConfigurator.LogMessage("Expression:" + keySelector.ToString() + " cannot be parsed, query runs un-optimized!", VerboseLevel.Warn);
-#if (WP7 || UNITY3D) && !MANGO
+	#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Func<TSource, TKey> fn = (Func<TSource, TKey>)ExpressionCompiler.ExpressionCompiler.Compile(keySelector);
 #else
 
@@ -1481,7 +1481,7 @@ namespace Sqo
                 return orderedQuery;
             }
             SiaqodbConfigurator.LogMessage("Expression:" + keySelector.ToString() + " cannot be parsed, query runs un-optimized!", VerboseLevel.Warn);
-#if (WP7 || UNITY3D) && !MANGO
+	#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Func<TSource, TKey> fn = (Func<TSource,TKey >)ExpressionCompiler.ExpressionCompiler.Compile(keySelector);
 #else
 
@@ -1509,7 +1509,7 @@ namespace Sqo
 
             }
             SiaqodbConfigurator.LogMessage("Expression:" + keySelector.ToString() + " cannot be parsed, query runs un-optimized!", VerboseLevel.Warn);
-#if (WP7 || UNITY3D) && !MANGO
+	#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Func<TSource, TKey> fn = (Func<TSource, TKey>)ExpressionCompiler.ExpressionCompiler.Compile(keySelector);
 #else
 
@@ -1538,7 +1538,7 @@ namespace Sqo
 
             }
             SiaqodbConfigurator.LogMessage("Expression:" + keySelector.ToString() + " cannot be parsed, query runs un-optimized!", VerboseLevel.Warn);
-#if (WP7 || UNITY3D) && !MANGO
+	#if (WP7 || UNITY3D) && !MANGO && !XIOS
                 Func<TSource, TKey> fn = (Func<TSource, TKey>)ExpressionCompiler.ExpressionCompiler.Compile(keySelector);
 #else
 

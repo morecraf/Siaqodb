@@ -227,7 +227,7 @@ namespace Sqo
         {
             return source.SqoInclude(path);
         }
-#if !UNITY3D
+		#if !UNITY3D || XIOS
 
         public static ISqoOrderedQuery<TSource> OrderBy<TSource, TKey>(this ISqoQuery<TSource> source, Expression<Func<TSource, TKey>> keySelector)
         {

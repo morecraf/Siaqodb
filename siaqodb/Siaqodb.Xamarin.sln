@@ -125,6 +125,6 @@ Global
 		{61D969B7-00EC-43DD-8DD4-2A88AED3F122} = {A067D70F-EE42-40F8-A1DC-34EABBBF993D}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ..\..\Examples\Xamarin.Android\Siaqodb.Xamarin.Android.Examples.csproj
+		StartupItem = ..\..\Examples\Xamarin.iOS\SiaqodbMTDemo\Siaqodb.Xamarin.iOS.Examples.csproj
 	EndGlobalSection
 EndGlobal
