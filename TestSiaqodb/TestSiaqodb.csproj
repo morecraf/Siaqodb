@@ -57,7 +57,10 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Siaqodb, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SiaqodbSetup\nuget packages\net35\Siaqodb.dll</HintPath>
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\net45\Siaqodb.dll</HintPath>
+    </Reference>
+    <Reference Include="SiaqodbPortable">
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\net45\SiaqodbPortable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -79,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">

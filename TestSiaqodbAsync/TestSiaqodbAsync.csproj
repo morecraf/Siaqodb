@@ -37,11 +37,11 @@
   <ItemGroup>
     <Reference Include="Siaqodb, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SiaqodbSetup\nuget packages\net45\Siaqodb.dll</HintPath>
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\net45\Siaqodb.dll</HintPath>
     </Reference>
     <Reference Include="SiaqodbPortable, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SiaqodbSetup\nuget packages\portable-net45+wp8+win8\SiaqodbPortable.dll</HintPath>
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\net45\SiaqodbPortable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -64,6 +64,9 @@
     <Compile Include="LINQTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -4,7 +4,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
-[assembly: Obfuscation(Feature = "encrypt symbol names with password alisia_21", Exclude = false)]
+//[assembly: Obfuscation(Feature = "encrypt symbol names with password alisia_21", Exclude = false)]
 namespace System.Reflection
 {
     /// <summary>

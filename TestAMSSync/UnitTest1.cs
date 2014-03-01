@@ -13,7 +13,8 @@ namespace TestAMSSync
         [TestMethod]
         public async Task TestInsert()
         {//Test insert
-            Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
+            Sqo.SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
+              
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -45,7 +46,7 @@ namespace TestAMSSync
         [TestMethod]
         public async Task TestUpdate()
         {
-            Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
+            Sqo.SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -92,7 +93,7 @@ namespace TestAMSSync
         public async Task TestDelete()
         {//Test delete
 
-            Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
+            Sqo.SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
           
@@ -129,7 +130,7 @@ namespace TestAMSSync
         [TestMethod]
         public async Task TestConflictUpdateUpdate()
         {//update on C1 and C2 at same time->should be conflict
-            Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
+            Sqo.SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -181,7 +182,7 @@ namespace TestAMSSync
         [TestMethod]
         public async Task TestConflictDeleteUpdate()
         {//delete on C1 and update on C2->conflict
-            Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
+            Sqo.SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -247,7 +248,7 @@ namespace TestAMSSync
         public async Task TestConflictUpdateDelete()
         {
             //update on C1 and delete on C2->conflict
-            Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
+            Sqo.SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
             mob1.AddSyncType<TodoItem>("TodoItem");
@@ -302,7 +303,7 @@ namespace TestAMSSync
         public async Task TestConflictDeleteDelete()
         {
             //delete on C1 and delete on C2->conflict-> nothing happens on clients
-            Sqo.SiaqodbConfigurator.SetLicense(@"Gq28hR1vXcjfLE0L/2WyWF8+9x9h0f5hA0suJhJ2B79Zh6+jE0+ib30G7C1Wq9mp");
+            Sqo.SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
             SiaqodbMobile mob1 = new SiaqodbMobile(@"https://cristidot.azure-mobile.net/",
             "RLINABsktmvkzJMegbicNASWkzRzEW97", "db1");
             mob1.AddSyncType<TodoItem>("TodoItem");

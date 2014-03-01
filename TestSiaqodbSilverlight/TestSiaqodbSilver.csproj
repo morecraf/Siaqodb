@@ -85,6 +85,14 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight">
       <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v5.0\Toolkit\dec11\Testing\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll</HintPath>
     </Reference>
+    <Reference Include="Siaqodb, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\sl40\Siaqodb.dll</HintPath>
+    </Reference>
+    <Reference Include="SiaqodbPortable, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\sl40\SiaqodbPortable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="mscorlib" />
     <Reference Include="system" />
@@ -119,6 +127,7 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <EmbeddedResource Include="siaqodb.lic" />
   </ItemGroup>
@@ -141,16 +150,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\OutOfBrowserSettings.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.0%29.csproj">
-      <Project>{5529f692-514a-4dde-9b6c-f47ea888496b}</Project>
-      <Name>SiaqodbPortable %28.NET 4.0%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\siaqodb\Siaqodb %28SL 4%29.csproj">
-      <Project>{d6a37a0e-f504-477b-903f-775d5e02b0a0}</Project>
-      <Name>Siaqodb %28SL 4%29</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
