@@ -260,7 +260,7 @@ namespace Sqo
             return SqoQueryExtensionsImpl.Include(this, path);
         }
 
-#if !UNITY3D
+		#if !UNITY3D  || XIOS
         public ISqoOrderedQuery<T> SqoOrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
         {
             return SqoQueryExtensionsImpl.OrderBy(this, keySelector);
@@ -532,7 +532,7 @@ namespace Sqo
             return SqoQueryExtensionsImpl.Include(this, path);
         }
 
-#if !UNITY3D
+		#if !UNITY3D  || XIOS
         public ISqoOrderedQuery<V> SqoOrderBy<TKey>(Expression<Func<V, TKey>> keySelector)
         {
             return SqoQueryExtensionsImpl.OrderBy(this, keySelector);
@@ -806,7 +806,7 @@ namespace Sqo
             return SqoQueryExtensionsImpl.Include(this, path);
         }
 
-#if !UNITY3D
+		#if !UNITY3D  || XIOS
         public ISqoOrderedQuery<TResult> SqoOrderBy<TKeyO>(Expression<Func<TResult, TKeyO>> keySelector)
         {
             return SqoQueryExtensionsImpl.OrderBy(this, keySelector);
@@ -1093,7 +1093,7 @@ namespace Sqo
             return SqoQueryExtensionsImpl.Include(this, path);
         }
 
-#if !UNITY3D
+		#if !UNITY3D  || XIOS
         public ISqoOrderedQuery<T> SqoOrderBy<TKey>(Expression<Func<T, TKey>> keySelector)
         {
             return SqoQueryExtensionsImpl.OrderBy(this, keySelector);

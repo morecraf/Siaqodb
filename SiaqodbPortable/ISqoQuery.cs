@@ -19,7 +19,7 @@ namespace Sqo
        Task<int> SqoCountAsync();
 #endif
         int SqoCount(Expression<Func<T, bool>> expression);
-#if ASYNC
+		#if ASYNC
        Task<int> SqoCountAsync(Expression<Func<T, bool>> expression);
 #endif
         T SqoFirstOrDefault();
@@ -90,7 +90,7 @@ namespace Sqo
 #endif
        ISqoQuery<T> SqoInclude(string path);
 
-#if !UNITY3D
+		#if !UNITY3D || XIOS
        ISqoOrderedQuery<T> SqoOrderBy<TKey>(Expression<Func<T, TKey>> keySelector);
        ISqoOrderedQuery<T> SqoOrderByDescending<TKey>(Expression<Func<T, TKey>> keySelector);
        ISqoOrderedQuery<T> SqoThenBy<TKey>(Expression<Func<T, TKey>> keySelector);
