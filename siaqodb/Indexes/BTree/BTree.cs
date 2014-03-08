@@ -452,7 +452,10 @@ namespace Sqo.Indexes
            }
            else
            {
-               this.siaqodb.Delete(this.Root);
+               if (this.Root.OID > 0)
+               {
+                   this.siaqodb.Delete(this.Root);
+               }
                this.siaqodb.Delete(this.indexInfo);
            }
        }

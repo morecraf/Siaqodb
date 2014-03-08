@@ -100,7 +100,7 @@ namespace Microsoft.Synchronization.Services.Formatters
             }
 
             _document.Add(_root);
-
+           
             // Write the </feed> end element.
             writer.WriteNode(_document.CreateReader(), true);
             writer.Flush();
@@ -237,6 +237,11 @@ namespace Microsoft.Synchronization.Services.Formatters
             {
                 string edmType = FormatterUtilities.GetEdmType(fi.PropertyType);
                 object value = fi.GetValue(entity, null);
+                string valString = value as string;
+                if (valString != null)
+                {
+                    value=AtomHelper.CleanInvalidXmlChars(valString);
+                }
                 Type propType = fi.PropertyType;
                 if(fi.PropertyType.IsGenericType && fi.PropertyType.Name.Equals(FormatterConstants.NullableTypeName, StringComparison.InvariantCulture))
                 {

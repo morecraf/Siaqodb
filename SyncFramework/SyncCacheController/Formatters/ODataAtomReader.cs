@@ -46,7 +46,10 @@ namespace Microsoft.Synchronization.Services.Formatters
         public ODataAtomReader(Stream stream, Type[] knownTypes)
             : base(stream, knownTypes)
         {
-            _reader = XmlReader.Create(stream);
+            
+            XmlReaderSettings settings=new XmlReaderSettings();
+            settings.CheckCharacters=false;
+            _reader = XmlReader.Create(stream,settings);
         }
 
         /// <summary>

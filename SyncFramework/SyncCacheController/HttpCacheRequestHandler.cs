@@ -238,7 +238,10 @@ namespace Microsoft.Synchronization.ClientServices
 
                 if (base.SerializationFormat == SerializationFormat.ODataAtom)
                 {
-                    this._syncWriter.WriteFeed(XmlWriter.Create(requestStream));
+                    XmlWriterSettings settings=new XmlWriterSettings();
+                    settings.CheckCharacters=false;
+                    XmlWriter writer = XmlWriter.Create(requestStream,settings);
+                    this._syncWriter.WriteFeed(writer);
                 }
                 else
                 {
@@ -289,7 +292,10 @@ namespace Microsoft.Synchronization.ClientServices
 
                 if (base.SerializationFormat == SerializationFormat.ODataAtom)
                 {
-                    this._syncWriter.WriteFeed(XmlWriter.Create(requestStream));
+                    XmlWriterSettings settings = new XmlWriterSettings();
+                    settings.CheckCharacters = false;
+                    XmlWriter writer = XmlWriter.Create(requestStream, settings);
+                    this._syncWriter.WriteFeed(writer);
                 }
                 else
                 {
