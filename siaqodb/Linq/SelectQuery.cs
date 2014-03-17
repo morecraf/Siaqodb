@@ -834,14 +834,7 @@ namespace Sqo
 
 
 
-        #region IEnumerable<TResult> Members
-
-        IEnumerator<TResult> IEnumerable<TResult>.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+      
 
         #region ISqoQuery<TResult> Members
 
