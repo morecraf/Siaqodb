@@ -155,49 +155,58 @@ namespace SiaqodbSyncProvider
             }
             this.OnSyncProgress(new SyncProgressEventArgs("Upload finished,mark local entities as uploaded..."));
 
-            if (null != response.UpdatedItems && 0 != response.UpdatedItems.Count)
+            siaqodb.StartBulkInsert(CacheController.ControllerBehavior.KnownTypes.ToArray());
+            try
             {
-                foreach (var item in response.UpdatedItems)
+                if (null != response.UpdatedItems && 0 != response.UpdatedItems.Count)
                 {
-                    var offlineEntity = (SiaqodbOfflineEntity)item;
-                    this.SaveEntityByPK(offlineEntity);
-                }
-            }
-           
-            if (response.Conflicts != null && response.Conflicts.Count > 0)
-            {
-               ConflictsEventArgs ceArgs= new ConflictsEventArgs(response.Conflicts);
-                this.OnConflictOccur(ceArgs);
-                if (!ceArgs.CancelResolvingConflicts)
-                {
-
-                    foreach (var conflict in response.Conflicts)
+                    foreach (var item in response.UpdatedItems)
                     {
-                        var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
-                        this.SaveEntity(offlineEntity);
-            
+                        var offlineEntity = (SiaqodbOfflineEntity)item;
+                        this.SaveEntityByPK(offlineEntity);
+                    }
+                }
+
+                if (response.Conflicts != null && response.Conflicts.Count > 0)
+                {
+                    ConflictsEventArgs ceArgs = new ConflictsEventArgs(response.Conflicts);
+                    this.OnConflictOccur(ceArgs);
+                    if (!ceArgs.CancelResolvingConflicts)
+                    {
+
+                        foreach (var conflict in response.Conflicts)
+                        {
+                            var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
+                            this.SaveEntity(offlineEntity);
+
+                        }
+                    }
+                }
+
+                List<SiaqodbOfflineEntity> changesJustUploaded = this.GetChanges();
+                foreach (SiaqodbOfflineEntity en in changesJustUploaded)
+                {
+                    if (en.IsTombstone)
+                    {
+                        en.IsDirty = false;
+                        en.IsTombstone = false;
+                        //reset flags first
+                        siaqodb.StoreObjectBase(en);
+
+                        siaqodb.DeleteBase(en);
+
+                    }
+                    else
+                    {
+                        en.IsDirty = false;
+                        siaqodb.StoreObjectBase(en);
                     }
                 }
             }
-
-            List<SiaqodbOfflineEntity> changesJustUploaded = this.GetChanges();
-            foreach (SiaqodbOfflineEntity en in changesJustUploaded)
+            finally
             {
-                if (en.IsTombstone)
-                {
-                    en.IsDirty = false;
-                    en.IsTombstone = false;
-                    //reset flags first
-                    siaqodb.StoreObjectBase(en);
-
-                    siaqodb.DeleteBase(en);
-
-                }
-                else
-                {
-                    en.IsDirty = false;
-                    siaqodb.StoreObjectBase(en);
-                }
+                siaqodb.EndBulkInsert(CacheController.ControllerBehavior.KnownTypes.ToArray());
+                siaqodb.Flush();
             }
 
             this.SaveAnchor(response.ServerBlob);

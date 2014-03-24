@@ -99,11 +99,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations">
-      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v3.0\Libraries\Client\System.ComponentModel.DataAnnotations.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Events.cs" />
     <Compile Include="ObfuscationAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -123,9 +118,9 @@
       <Project>{7E436A50-A897-4599-A162-9FCA1673B3C2}</Project>
       <Name>Siaqodb %28WP 8%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SyncCacheController\SyncCacheController %28WP 8%29.csproj">
-      <Project>{87B199D5-1367-4015-A75E-74BCF53F07CB}</Project>
-      <Name>SyncCacheController %28WP 8%29</Name>
+    <ProjectReference Include="..\SyncCacheController\SyncCacheController %28WP%29.csproj">
+      <Project>{C4D0C333-D6FA-46D5-A513-AC71E4805789}</Project>
+      <Name>SyncCacheController %28WP%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />

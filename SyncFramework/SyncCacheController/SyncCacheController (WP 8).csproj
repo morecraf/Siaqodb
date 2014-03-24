@@ -97,11 +97,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Runtime.Serialization.Json">
-      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v3.0\Libraries\Client\System.Runtime.Serialization.Json.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="AsyncWorkerManager.cs" />
     <Compile Include="AsyncWorkManagerException.cs" />
     <Compile Include="AsyncWorkRequest.cs" />
