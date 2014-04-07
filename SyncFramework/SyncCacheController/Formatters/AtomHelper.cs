@@ -12,6 +12,7 @@
 // See the Apache 2 License for the specific language governing 
 // permissions and limitations under the License.
 
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -72,6 +73,19 @@ namespace Microsoft.Synchronization.Services.Formatters
             return reader.NodeType == XmlNodeType.Element &&
                    reader.LocalName == name &&
                    reader.NamespaceURI == FormatterConstants.SyncNamespace.NamespaceName;
+        }
+        /// <summary>
+        /// http://stackoverflow.com/questions/730133/invalid-characters-in-xml
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static string CleanInvalidXmlChars(string text)
+        {
+            // From xml spec valid chars: 
+            // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]     
+            // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. 
+            string re = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-u10FFFF]";
+            return Regex.Replace(text, re, "");
         }
     }
 }

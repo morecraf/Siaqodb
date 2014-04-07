@@ -26,26 +26,22 @@ namespace Sqo
     /// <summary>
     /// Main class of siaqodb database engine responsible for storing, retrieving ,deleting objects on database files
     /// </summary>
-#if SILVERLIGHT || UNITY3D || TRIAL || CF || MONODROID || WinRT
-#else
 
-    [System.ComponentModel.LicenseProvider(typeof(SqoLicenseProvider))]
-#endif
     [Obfuscation(Feature = "Apply to member * when event: all", Exclude = false,ApplyToMembers=true)]
     #if KEVAST
     internal
 #else
         public
 #endif
-        class Siaqodb  
+        class Siaqodb : Sqo.ISiaqodb
 	{
 
         readonly object _syncRoot = new object();
 #if ASYNC
-        private readonly AsyncLock _locker = new AsyncLock();
-#else
-        private readonly object _locker = new object();
+        private readonly AsyncLock _lockerAsync = new AsyncLock();
 #endif
+        private readonly object _locker = new object();
+
         
 #if WinRT
         StorageFolder databaseFolder;
@@ -235,7 +231,7 @@ namespace Sqo
      /// </summary>
         public Siaqodb()
         {
-            this.CheckLic();
+            
         }
         
         //TODO: add here WarningMessages and add for example Unoptimized queries
@@ -246,7 +242,7 @@ namespace Sqo
 #if !WinRT
         public Siaqodb(string path)
         {
-            this.CheckLic();
+            
             this.Open(path);
         }
 #endif
@@ -258,7 +254,7 @@ namespace Sqo
        /// <param name="specialFolder">special folder name for OOB mode ex.:MyDocuments, MyPictures, etc</param>
         public Siaqodb(string folderName,Environment.SpecialFolder specialFolder)
         {
-            this.CheckLic();
+           
             this.Open(folderName,specialFolder);
         }
 #endif
@@ -266,7 +262,7 @@ namespace Sqo
 #if !WinRT
         internal Siaqodb(string path, bool cacheTypes)
         {
-             this.CheckLic();
+             
             
             this.opened = true;
             this.path = path;
@@ -295,7 +291,7 @@ namespace Sqo
 
         internal Siaqodb(string path, string managerOption)
         {
-            this.CheckLic();
+            
             this.opened = true;
             this.path = path;
             
@@ -755,7 +751,7 @@ savedObject(this, e);
         /// <param name="obj">Object to be stored</param>
         public async Task StoreObjectAsync(object obj)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
 
             try
             {
@@ -792,7 +788,7 @@ savedObject(this, e);
             finally
             {
 
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
 
             }
 
@@ -850,7 +846,7 @@ savedObject(this, e);
         ///<param name="onlyReferences">if true,it will store only references to complex objects</param>
         public async Task StoreObjectPartiallyAsync(object obj, bool onlyReferences, params string[] properties)
         {
-             bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
              try
              {
                  this.storeOnlyReferencesOfListItems = onlyReferences;
@@ -866,7 +862,7 @@ savedObject(this, e);
              }
              finally
              {
-                 if (locked) _locker.Release();
+                 if (locked) _lockerAsync.Release();
              }
         }
 #endif
@@ -876,7 +872,7 @@ savedObject(this, e);
         /// <param name="obj">Object to be stored</param>
         /// <param name="transaction">Transaction object</param>
 		
-        public void StoreObject(object obj,Transactions.Transaction transaction)
+        public void StoreObject(object obj,Transactions.ITransaction transaction)
         {
             lock (_locker)
             {
@@ -887,7 +883,7 @@ savedObject(this, e);
                  SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj);
                 if (ti != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -895,7 +891,7 @@ savedObject(this, e);
                     //circularRefCache.Add(obj); 
 
                     //circularRefCache is filled with obj just before Commit in TransactionManager, so not need to be added here
-                    storageEngine.SaveObject(obj, ti, null, transaction);
+                    storageEngine.SaveObject(obj, ti, null, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     this.OnSavedObject(saved);
@@ -909,20 +905,20 @@ savedObject(this, e);
         /// <param name="obj">Object to be stored</param>
         /// <param name="transaction">Transaction object</param>
 
-        public async Task StoreObjectAsync(object obj, Transactions.Transaction transaction)
+        public async Task StoreObjectAsync(object obj, Transactions.ITransaction transaction)
         {
 
             if (transaction == null)
             {
                 throw new ArgumentNullException("transaction");
             }
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(obj);
                 if (ti != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -930,7 +926,7 @@ savedObject(this, e);
                     //circularRefCache.Add(obj); 
 
                     //circularRefCache is filled with obj just before Commit in TransactionManager, so not need to be added here
-                    await storageEngine.SaveObjectAsync(obj, ti, null, transaction);
+                    await storageEngine.SaveObjectAsync(obj, ti, null, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     this.OnSavedObject(saved);
@@ -938,7 +934,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1061,7 +1057,7 @@ savedObject(this, e);
         /// <returns></returns>
         internal async Task<IObjectList<T>> LoadAsync<T>(System.Linq.Expressions.Expression expression)
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             SqoTypeInfo ti = null;
             try
             {
@@ -1069,18 +1065,18 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
             List<int> oids = await LoadOidsAsync<T>(expression);
 
-            locked = false; await _locker.LockAsync(typeof(T), out locked);
+            locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 return await storageEngine.LoadByOIDsAsync<T>(oids, ti);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1109,7 +1105,7 @@ savedObject(this, e);
         /// <returns>List of objects retrieved from database</returns>
         public async Task<IObjectList<T>> LoadAllAsync<T>()
         {
-             bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
              try
              {
                  SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1117,7 +1113,7 @@ savedObject(this, e);
              }
              finally
              {
-                 if (locked) _locker.Release();
+                 if (locked) _lockerAsync.Release();
              }
         }
 #endif
@@ -1144,7 +1140,7 @@ savedObject(this, e);
         /// <returns>the object stored in database with oid provided</returns>
         public async Task<T> LoadObjectByOIDAsync<T>(int oid)
         {
-             bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
              try
              {
                  SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1152,7 +1148,7 @@ savedObject(this, e);
              }
              finally
              {
-                 if (locked) _locker.Release();
+                 if (locked) _lockerAsync.Release();
              }
 
         }
@@ -1169,7 +1165,7 @@ savedObject(this, e);
         internal async Task<T> LoadObjectByOIDAsync<T>(int oid, List<string> properties)
         {
             bool locked;
-            await _locker.LockAsync(typeof(T),out locked);
+            await _lockerAsync.LockAsync(typeof(T),out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1177,7 +1173,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
 
         }
@@ -1225,14 +1221,14 @@ savedObject(this, e);
         /// </summary>
         public async Task FlushAsync()
         {
-            await _locker.LockAsync();
+            await _lockerAsync.LockAsync();
             try
             {
                 await this.storageEngine.FlushAsync();
             }
             finally
             {
-                _locker.Release();
+                _lockerAsync.Release();
             }
         }
 #endif
@@ -1287,7 +1283,7 @@ savedObject(this, e);
         /// <returns>List of OIDs</returns>
         public async Task<List<int>> LoadOidsAsync<T>(System.Linq.Expressions.Expression expression)
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 if (expression == null)
@@ -1301,7 +1297,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1316,7 +1312,7 @@ savedObject(this, e);
 #if ASYNC
         internal async Task<List<int>> LoadAllOIDsAsync<T>()
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
@@ -1324,7 +1320,7 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
@@ -1489,12 +1485,12 @@ savedObject(this, e);
             }
             SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
             bool locked = false;
-            await _locker.LockAsync(tinf.Type,out locked);
+            await _lockerAsync.LockAsync(tinf.Type,out locked);
             try
             {
                 return await storageEngine.LoadValueAsync(oid, fieldName, tinf);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         /// <summary>
@@ -1521,7 +1517,7 @@ savedObject(this, e);
         /// <param name="obj">Object to be deleted</param>
         public async Task DeleteAsync(object obj)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (!opened)
@@ -1532,7 +1528,7 @@ savedObject(this, e);
                 SqoTypeInfo ti = this.GetSqoTypeInfo(t);
                 bool deleted = await DeleteObjInternalAsync(obj, ti, null);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         /// <summary>
@@ -1540,7 +1536,7 @@ savedObject(this, e);
         /// </summary>
         /// <param name="obj">Object to be deleted</param>
         /// <param name="transaction">Transaction</param>
-        public void Delete(object obj, Transactions.Transaction transaction)
+        public void Delete(object obj, Transactions.ITransaction transaction)
         {
             lock (_locker)
             {
@@ -1554,7 +1550,7 @@ savedObject(this, e);
                     throw new ArgumentNullException("transaction");
                 }
                
-                if (transaction.status == Transactions.TransactionStatus.Closed)
+                if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                 {
                     throw new SiaqodbException("Transaction closed!");
                 }
@@ -1569,9 +1565,9 @@ savedObject(this, e);
         /// </summary>
         /// <param name="obj">Object to be deleted</param>
         /// <param name="transaction">Transaction</param>
-        public async Task DeleteAsync(object obj, Transactions.Transaction transaction)
+        public async Task DeleteAsync(object obj, Transactions.ITransaction transaction)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (!opened)
@@ -1582,7 +1578,7 @@ savedObject(this, e);
                 {
                     throw new ArgumentNullException("transaction");
                 }
-                if (transaction.status == Transactions.TransactionStatus.Closed)
+                if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                 {
                     throw new SiaqodbException("Transaction closed!");
                 }
@@ -1591,7 +1587,7 @@ savedObject(this, e);
                 await DeleteObjInternalAsync(obj, ti, transaction);
 
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         /// <summary>
@@ -1641,7 +1637,7 @@ savedObject(this, e);
         /// <param name="fieldNames">Names of fields that this method will lookup for object to delete it</param>
         /// <param name="transaction">Transaction object</param>
 
-        public bool DeleteObjectBy(object obj, Transactions.Transaction transaction, params string[] fieldNames)
+        public bool DeleteObjectBy(object obj, Transactions.ITransaction transaction, params string[] fieldNames)
         {
             lock (_locker)
             {
@@ -1657,7 +1653,7 @@ savedObject(this, e);
 
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -1672,7 +1668,7 @@ savedObject(this, e);
                     return false;
                 }
 
-                int OID_deleted = storageEngine.DeleteObjectBy(fieldNames, obj, ti, transaction);
+                int OID_deleted = storageEngine.DeleteObjectBy(fieldNames, obj, ti, (Transactions.Transaction)transaction);
                 DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, OID_deleted);
                 this.OnDeletedObject(deletedEv);
 
@@ -1687,7 +1683,7 @@ savedObject(this, e);
         /// <param name="fieldNames">Names of fields that this method will lookup for object to delete it</param>
         /// <param name="transaction">Transaction object</param>
 
-        public async Task<bool> DeleteObjectByAsync(object obj, Transactions.Transaction transaction, params string[] fieldNames)
+        public async Task<bool> DeleteObjectByAsync(object obj, Transactions.ITransaction transaction, params string[] fieldNames)
         {
 
 
@@ -1699,12 +1695,12 @@ savedObject(this, e);
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -1718,7 +1714,7 @@ savedObject(this, e);
                     return false;
                 }
 
-                int OID_deleted = await storageEngine.DeleteObjectByAsync(fieldNames, obj, ti, transaction);
+                int OID_deleted = await storageEngine.DeleteObjectByAsync(fieldNames, obj, ti, (Transactions.Transaction)transaction);
                 DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, OID_deleted);
                 this.OnDeletedObject(deletedEv);
 
@@ -1726,16 +1722,16 @@ savedObject(this, e);
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
         }
 #endif
-        /// <summary>
+         /// <summary>
         /// Delete an object from database by a criteria
         /// </summary>
         /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
         /// <returns>Number of objects deleted</returns>
-        public int DeleteObjectBy<T>(Dictionary<string,object> criteria)
+        public int DeleteObjectBy(Type objectType,Dictionary<string, object> criteria)
         {
             lock (_locker)
             {
@@ -1747,8 +1743,8 @@ savedObject(this, e);
                 {
                     throw new SiaqodbException("Database is closed, call method Open() to open it!");
                 }
-                
-                SqoTypeInfo ti = this.GetSqoTypeInfo(typeof(T));
+
+                SqoTypeInfo ti = this.GetSqoTypeInfo(objectType);
                 DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, -1);//we don't know it
                 this.OnDeletingObject(delEv);
                 if (delEv.Cancel)
@@ -1765,15 +1761,24 @@ savedObject(this, e);
                 return oidsDeleted.Count;
             }
         }
+        /// <summary>
+        /// Delete an object from database by a criteria
+        /// </summary>
+        /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
+        /// <returns>Number of objects deleted</returns>
+        public int DeleteObjectBy<T>(Dictionary<string,object> criteria)
+        {
+            return DeleteObjectBy(typeof(T), criteria);
+        }
 #if ASYNC
         /// <summary>
         /// Delete an object from database by a criteria
         /// </summary>
         /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
         /// <returns>Number of objects deleted</returns>
-        public async Task<int> DeleteObjectByAsync<T>(Dictionary<string, object> criteria)
-        {
 
+        public async Task<int> DeleteObjectByAsync(Type objectType,Dictionary<string, object> criteria)
+        {
             if (criteria == null || criteria.Keys.Count == 0)
             {
                 throw new ArgumentNullException("criteria");
@@ -1782,10 +1787,10 @@ savedObject(this, e);
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(objectType, out locked);
             try
             {
-                SqoTypeInfo ti = this.GetSqoTypeInfo(typeof(T));
+                SqoTypeInfo ti = this.GetSqoTypeInfo(objectType);
                 DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, -1);//we don't know it
                 this.OnDeletingObject(delEv);
                 if (delEv.Cancel)
@@ -1800,12 +1805,23 @@ savedObject(this, e);
                     this.OnDeletedObject(deletedEv);
                 }
                 return oidsDeleted.Count;
-                
+
             }
             finally
             {
-                if (locked) _locker.Release();
+                if (locked) _lockerAsync.Release();
             }
+        }
+
+        /// <summary>
+        /// Delete an object from database by a criteria
+        /// </summary>
+        /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
+        /// <returns>Number of objects deleted</returns>
+        public async Task<int> DeleteObjectByAsync<T>(Dictionary<string, object> criteria)
+        {
+            return await DeleteObjectByAsync(typeof(T), criteria);
+            
         }
 #endif
         
@@ -1983,7 +1999,7 @@ savedObject(this, e);
         /// <returns></returns>
         public async Task<int> CountAsync<T>()
         {
-             bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
              try
              {
                  if (!opened)
@@ -1993,7 +2009,7 @@ savedObject(this, e);
                  SqoTypeInfo ti = this.GetSqoTypeInfo<T>();
                  return await storageEngine.CountAsync(ti);
              }
-             finally { if (locked) _locker.Release(); }
+             finally { if (locked) _lockerAsync.Release(); }
 
         }
 #endif
@@ -2122,7 +2138,7 @@ savedObject(this, e);
         /// <param name="obj">object that has all values but not OID to update it in database</param>
         /// <param name="transaction">Transaction object</param>
         /// <returns>true if object was updated and false if object was not found in database</returns>
-        public bool UpdateObjectBy(object obj, Sqo.Transactions.Transaction transaction, params string[] fieldNames)
+        public bool UpdateObjectBy(object obj, Sqo.Transactions.ITransaction transaction, params string[] fieldNames)
         {
             lock (_locker)
             {
@@ -2133,7 +2149,7 @@ savedObject(this, e);
 
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -2144,7 +2160,7 @@ savedObject(this, e);
                 if (ti != null)
                 {
 
-                    bool stored = storageEngine.UpdateObjectBy(fieldNames, obj, ti, transaction);
+                    bool stored = storageEngine.UpdateObjectBy(fieldNames, obj, ti, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     saved.Inserted = false;
@@ -2163,9 +2179,9 @@ savedObject(this, e);
         /// <param name="obj">object that has all values but not OID to update it in database</param>
         /// <param name="transaction">Transaction object</param>
         /// <returns>true if object was updated and false if object was not found in database</returns>
-        public async Task<bool> UpdateObjectByAsync(object obj, Sqo.Transactions.Transaction transaction, params string[] fieldNames)
+        public async Task<bool> UpdateObjectByAsync(object obj, Sqo.Transactions.ITransaction transaction, params string[] fieldNames)
         {
-            bool locked = false; await _locker.LockAsync(obj.GetType(), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
             try
             {
                 if (fieldNames == null || fieldNames.Length == 0)
@@ -2174,7 +2190,7 @@ savedObject(this, e);
                 }
                 if (transaction != null)
                 {
-                    if (transaction.status == Transactions.TransactionStatus.Closed)
+                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
                     {
                         throw new SiaqodbException("Transaction closed!");
                     }
@@ -2184,7 +2200,7 @@ savedObject(this, e);
                 if (ti != null)
                 {
 
-                    bool stored = await storageEngine.UpdateObjectByAsync(fieldNames, obj, ti, transaction);
+                    bool stored = await storageEngine.UpdateObjectByAsync(fieldNames, obj, ti, (Transactions.Transaction)transaction);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     saved.Inserted = false;
@@ -2194,7 +2210,7 @@ savedObject(this, e);
                 }
                 return false;
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         internal bool UpdateField(int oid,MetaType metaType, string field, object value)
@@ -2216,7 +2232,7 @@ savedObject(this, e);
         
 
         #region private methods
-        private bool DeleteObjInternal(object obj, SqoTypeInfo ti,Transactions.Transaction transaction)
+        private bool DeleteObjInternal(object obj, SqoTypeInfo ti,Transactions.ITransaction transaction)
         {
             int oid = metaCache.GetOIDOfObject(obj, ti);
             if (oid <= 0 || oid > ti.Header.numberOfRecords)
@@ -2236,14 +2252,14 @@ savedObject(this, e);
             }
             else
             {
-                storageEngine.DeleteObject(obj,ti,transaction,null);
+                storageEngine.DeleteObject(obj, ti, (Transactions.Transaction)transaction, null);
             }
             DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
             this.OnDeletedObject(deletedEv);
             return true;
         }
 #if ASYNC
-        private async Task<bool> DeleteObjInternalAsync(object obj, SqoTypeInfo ti, Transactions.Transaction transaction)
+        private async Task<bool> DeleteObjInternalAsync(object obj, SqoTypeInfo ti, Transactions.ITransaction transaction)
         {
             int oid = metaCache.GetOIDOfObject(obj, ti);
             if (oid <= 0 || oid > ti.Header.numberOfRecords)
@@ -2263,7 +2279,7 @@ savedObject(this, e);
             }
             else
             {
-                await storageEngine.DeleteObjectAsync(obj, ti, transaction, null);
+                await storageEngine.DeleteObjectAsync(obj, ti, (Transactions.Transaction)transaction, null);
             }
             DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
             this.OnDeletedObject(deletedEv);
@@ -2325,7 +2341,7 @@ savedObject(this, e);
         internal async Task<List<object>> LoadDirtyObjectsAsync(Type type)
         {
             bool locked = false; 
-            await _locker.LockAsync(type,out locked);
+            await _lockerAsync.LockAsync(type,out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo(type);
@@ -2345,7 +2361,7 @@ savedObject(this, e);
 
                 return await this.storageEngine.LoadByOIDsAsync(oidsDirty, ti);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
 
@@ -2361,7 +2377,7 @@ savedObject(this, e);
         /// Start a database Transaction to be used on insert/update/delete objects
         /// </summary>
         /// <returns> Transaction object</returns>
-        public Transactions.Transaction BeginTransaction()
+        public Transactions.ITransaction BeginTransaction()
         {
             this.circularRefCache.Clear();
             return Transactions.TransactionManager.BeginTransaction(this);
@@ -2494,14 +2510,14 @@ savedObject(this, e);
         /// <returns>LazyObjectList of objects</returns>
         public async Task<IObjectList<T>> LoadAllLazyAsync<T>()
         {
-            bool locked = false; await _locker.LockAsync(typeof(T), out locked);
+            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
             try
             {
                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
                 List<int> oids = await storageEngine.LoadAllOIDsAsync(ti);
                 return new LazyObjectList<T>(this, oids);
             }
-            finally { if (locked) _locker.Release(); }
+            finally { if (locked) _lockerAsync.Release(); }
         }
 #endif
         internal void LoadObjectOIDAndTID(int oid, string fieldName, MetaType mt,ref List<int> listOIDs,ref int TID)
@@ -2513,7 +2529,7 @@ savedObject(this, e);
             }
             SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
             FieldSqoInfo fi= MetaHelper.FindField(tinf.Fields, fieldName);
-            if (fi.AttributeTypeId == MetaExtractor.complexID)
+            if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId==MetaExtractor.documentID)
             {
                 KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
                 listOIDs.Add(kv.Key);
@@ -2543,7 +2559,7 @@ savedObject(this, e);
             }
             SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
             FieldSqoInfo fi = MetaHelper.FindField(tinf.Fields, fieldName);
-            if (fi.AttributeTypeId == MetaExtractor.complexID)
+            if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID)
             {
                 KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
                 TID = kv.Value;
@@ -2927,28 +2943,7 @@ savedObject(this, e);
                 metaCache.SetOIDToObject(obj, oids[0], ti);
             }
         }
-        private void CheckLic()
-        {
-#if TRIAL
-
-#elif WinRT
-             bool li = WinRTLicenseChecker.LicenseValid();
-#elif SILVERLIGHT 
-            SilvLicenseChecker.LicenseValid();
-#elif UNITY3D || CF || MONODROID
-            SqoUnity3DLic.LicenseValid();
-#else
-            try
-            {
-                System.ComponentModel.License license = System.ComponentModel.LicenseManager.Validate(typeof(Siaqodb), this);
-            }
-            catch (Exception ex)
-            {
-                SqoUnity3DLic.LicenseValid();
-            }
-            
-#endif
-        }
+       
        
     }
    

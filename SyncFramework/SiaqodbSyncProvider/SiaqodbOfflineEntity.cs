@@ -6,7 +6,7 @@ using Sqo;
 using Sqo.Attributes;
 using System.ComponentModel;
 #if SILVERLIGHT
-using System.ComponentModel.DataAnnotations;
+//using System.ComponentModel.DataAnnotations;
 #endif
 
 namespace SiaqodbSyncProvider
@@ -64,7 +64,7 @@ namespace SiaqodbSyncProvider
 
         [EditorBrowsable(EditorBrowsableState.Never)]
 #if SILVERLIGHT
-         [Display(AutoGenerateField = false)]
+        // [Display(AutoGenerateField = false)]
 #endif
         public OfflineEntityMetadata ServiceMetadata
         {

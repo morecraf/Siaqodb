@@ -25,7 +25,7 @@ namespace TestSiaqodbSilver
 		public BasicsTest()
 		{
             SiaqodbConfigurator.EncryptedDatabase = false;
-            //SiaqodbConfigurator.SetTrialLicense("thoifHnsZCLebOqrgEzO8PitCURHXso6TIK88vqWC94=");
+              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 long newSpace = isf.Quota + 100000;
@@ -749,7 +749,7 @@ namespace TestSiaqodbSilver
             c1.Age = 11;
             c1.S = "cevaa";
 
-            Transaction tr = sq.BeginTransaction();
+            ITransaction tr = sq.BeginTransaction();
             sq.StoreObject(c1, tr);
             tr.Commit();
 
@@ -1564,7 +1564,7 @@ namespace TestSiaqodbSilver
             Siaqodb sq = new Siaqodb(objPath);
             sq.DropType<Customer>();
             IList<Customer> list = null;
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
             try
             {
 
@@ -1626,7 +1626,7 @@ namespace TestSiaqodbSilver
             Siaqodb sq = new Siaqodb(objPath);
             sq.DropType<Customer>();
             IList<Customer> list = null;
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1670,7 +1670,7 @@ namespace TestSiaqodbSilver
             Siaqodb sq = new Siaqodb(objPath);
             sq.DropType<Customer>();
             IList<Customer> list = null;
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1727,7 +1727,7 @@ namespace TestSiaqodbSilver
             Assert.AreEqual(list[0].Name, emp.Name);
 
             emp.Name = "ANOTHER";
-            Transaction tr = sq.BeginTransaction();
+            ITransaction tr = sq.BeginTransaction();
             sq.UpdateObjectBy(emp, tr, "ID", "CustomerID");
 
             tr.Commit();
@@ -1762,7 +1762,7 @@ namespace TestSiaqodbSilver
             emp.ID = 100;
             emp.CustomerID = 30;
 
-            Transaction trans = sq.BeginTransaction();
+            ITransaction trans = sq.BeginTransaction();
 
             bool s = sq.DeleteObjectBy(emp, trans, "ID", "CustomerID");
             Assert.IsTrue(s);
@@ -1820,7 +1820,7 @@ namespace TestSiaqodbSilver
             sq.DropType<Customer>();
             sq.DropType<Employee>();
 
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1841,7 +1841,7 @@ namespace TestSiaqodbSilver
             list2 = sq.LoadAll<Employee>();
             Assert.AreEqual(10, list2.Count);
 
-            Transaction transac2t = sq.BeginTransaction();
+            ITransaction transac2t = sq.BeginTransaction();
 
             sq.Delete(list[5], transac2t);
             sq.Delete(list2[5], transac2t);
@@ -1868,7 +1868,7 @@ namespace TestSiaqodbSilver
             sq.DropType<Customer>();
             sq.DropType<Employee>();
             sq.DropType<D40>();
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1896,7 +1896,7 @@ namespace TestSiaqodbSilver
             IList<D40> list3 = sq.LoadAll<D40>();
             Assert.AreEqual(10, list3.Count);
 
-            Transaction transac2t = sq.BeginTransaction();
+            ITransaction transac2t = sq.BeginTransaction();
 
             sq.Delete(list[5], transac2t);
             sq.Delete(list2[5], transac2t);
@@ -1966,7 +1966,7 @@ namespace TestSiaqodbSilver
             sq.DropType<Customer>();
             sq.DropType<Employee>();
             sq.DropType<D40WithLists>();
-            Transaction transact = sq.BeginTransaction();
+            ITransaction transact = sq.BeginTransaction();
 
             for (int i = 0; i < 10; i++)
             {
@@ -1995,7 +1995,7 @@ namespace TestSiaqodbSilver
             IList<D40WithLists> list3 = sq.LoadAll<D40WithLists>();
             Assert.AreEqual(10, list3.Count);
 
-            Transaction transac2t = sq.BeginTransaction();
+            ITransaction transac2t = sq.BeginTransaction();
 
             sq.Delete(list[5], transac2t);
             sq.Delete(list2[5], transac2t);
@@ -2078,7 +2078,7 @@ namespace TestSiaqodbSilver
                     _db.StoreObject(m);
 
 
-                    Transaction t = _db.BeginTransaction();
+                    ITransaction t = _db.BeginTransaction();
                     _db.Delete(m, t);
                     t.Commit();
                 }

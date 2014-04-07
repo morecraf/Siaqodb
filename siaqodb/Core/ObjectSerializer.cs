@@ -213,7 +213,7 @@ namespace Sqo.Core
                         MetaExtractor.FindAddIndexes(tInfo, ai);
 
                     }
-                    if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID)
+                    if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID || ai.AttributeTypeId==MetaExtractor.documentID)
                     {
                         if (loadRealType)
                         {
@@ -416,6 +416,7 @@ namespace Sqo.Core
         public object ComplexObject { get; set; }
         public Type ParentType { get; set; }
         public string FieldName { get; set; }
+       
         public ComplexObjectEventArgs(object obj,bool returnOnlyOid)
         {
             this.ComplexObject = obj;
@@ -436,6 +437,13 @@ namespace Sqo.Core
         public int TID { get; set; }
         public bool ReturnOnlyOid_TID { get; set; }
         public bool JustSetOID { get; set; }
+    }
+    internal class DocumentEventArgs : EventArgs
+    {
+        public object ParentObject { get; set; }
+        public string FieldName { get; set; }
+        public int DocumentInfoOID { get; set; }
+        public SqoTypeInfo TypeInfo { get; set; }
     }
 #if ASYNC
     internal delegate Task ComplexObjectEventHandler(object sender, ComplexObjectEventArgs args);

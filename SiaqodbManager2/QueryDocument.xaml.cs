@@ -180,7 +180,7 @@ namespace SiaqodbManager
                                 ";
                 if (!string.IsNullOrEmpty(EncryptionSettings.Pwd))
                 {
-                    ifEncrypted += @"SiaqodbConfigurator.SetEncryptionPassword(" + EncryptionSettings.Pwd + ");";
+                    ifEncrypted += @"SiaqodbConfigurator.SetEncryptionPassword(""" + EncryptionSettings.Pwd + @""");";
 
                 }
             }

@@ -38,7 +38,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\DebugLicensed\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -91,6 +91,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SetTrialLicense.xaml.cs">
+      <DependentUpon>SetTrialLicense.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TrialLicense.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -156,6 +160,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SetTrialLicense.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MetaItems.cs" />
@@ -172,7 +180,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -236,16 +243,16 @@
     <Resource Include="Resources\FirstFrame.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\siaqodb\SiaqodbLicensed %28.NET 3.5%29.csproj">
-      <Project>{243748A0-9797-4FA9-A805-D71127EAC3DA}</Project>
-      <Name>SiaqodbLicensed %28.NET 3.5%29</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="siaqodb.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\siaqodbLogoFull.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 3.5%29.csproj">
+      <Project>{243748a0-9797-4fa9-a805-d71127eac3da}</Project>
+      <Name>Siaqodb %28.NET 3.5%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -142,13 +142,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="siaqodb.lic" />
+    <None Include="packages.config" />
     <None Include="UnitTestsSiaqodbWinRT_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\siaqodb\SiaqodbLicensed %28WinRT%29.csproj">
-      <Project>{a909273f-5824-4024-a99a-827d4648c6e9}</Project>
-      <Name>SiaqodbLicensed %28WinRT%29</Name>
-    </ProjectReference>
+    <Reference Include="Siaqodb, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\netcore45\Siaqodb.dll</HintPath>
+    </Reference>
+    <Reference Include="SiaqodbPortable, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\netcore45\SiaqodbPortable.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

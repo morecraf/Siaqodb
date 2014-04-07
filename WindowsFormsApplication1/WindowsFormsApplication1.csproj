@@ -32,6 +32,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MsgPack">
+      <HintPath>..\packages\MsgPack.Cli.0.4.1\lib\net40-client\MsgPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -64,6 +73,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -78,9 +88,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\siaqodb\SiaqodbLicensed %28.NET 3.5%29.csproj">
+    <ProjectReference Include="..\siaqodb\Siaqodb %28Unity3D%29.csproj">
+      <Project>{19368999-dd20-4534-8377-3d58063f8cfd}</Project>
+      <Name>Siaqodb %28Unity3D%29</Name>
+    <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 3.5%29.csproj">
       <Project>{243748a0-9797-4fa9-a805-d71127eac3da}</Project>
-      <Name>SiaqodbLicensed %28.NET 3.5%29</Name>
+      <Name>Siaqodb %28.NET 3.5%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -114,7 +114,7 @@ namespace TestSiaqodb
             s_db.DropType<A>();
             s_db.DropType<B>();
             s_db.DropType<C>();
-            Transaction transaction = s_db.BeginTransaction();
+            ITransaction transaction = s_db.BeginTransaction();
             for (int i = 0; i < 10; i++)
             {
                 A a = new A();
@@ -149,7 +149,7 @@ namespace TestSiaqodb
             allA[0].BVar.bId = 100;
             allA[0].BVar.Ci.cId = 100;
 
-            Transaction transaction1 = s_db.BeginTransaction();
+            ITransaction transaction1 = s_db.BeginTransaction();
             s_db.StoreObject(allA[0], transaction1);
             transaction1.Commit();
 
@@ -159,7 +159,7 @@ namespace TestSiaqodb
             Assert.AreEqual(100, allA1[0].BVar.Ci.cId);
 
             allC[1].cId = 200;
-            Transaction transaction2 = s_db.BeginTransaction();
+            ITransaction transaction2 = s_db.BeginTransaction();
 
             s_db.StoreObject(allC[1], transaction2);
             s_db.Delete(allA1[9], transaction2);

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Sqo.Transactions
 {
-    public class Transaction
+    public class Transaction:ITransaction
     {
         internal Guid ID;
         internal TransactionStatus status;

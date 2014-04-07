@@ -13,11 +13,12 @@ namespace TestSiaqodb
 	[TestClass]
 	public class LINQTest
 	{
-        string objPath = @"c:\apps\OpenSource projects\sqoo\tests\unitests\";
+        string objPath = @"e:\sqoo\temp\tests_db\";
 		
 		public LINQTest()
 		{
             SiaqodbConfigurator.EncryptedDatabase = true;
+              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
 		}
 
 		private TestContext testContextInstance;
@@ -228,7 +229,7 @@ namespace TestSiaqodb
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
 
 			query = from Customer c in nop
-						where c.Name.StartsWith("a")
+						where c.Name.StartsWith("A")
 						select c;
 			 Assert.AreEqual(query.ToList<Customer>().Count, 5);
 			 query = from Customer c in nop
@@ -242,7 +243,7 @@ namespace TestSiaqodb
 					select c;
 			Assert.AreEqual(0, query.ToList<Customer>().Count);
 			query = from Customer c in nop
-					where c.Name.EndsWith("TESt")
+					where c.Name.EndsWith("TEST")
 					select c;
 			Assert.AreEqual(5, query.ToList<Customer>().Count);
 
@@ -387,14 +388,14 @@ namespace TestSiaqodb
 			}
 			nop.Flush();
 			var query = from Customer c in nop
-						where c.Name.Contains("a") && c.Name.Contains("3")
+						where c.Name.Contains("A") && c.Name.Contains("3")
 						select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
 			Assert.AreEqual(3, query.ToList<Customer>()[0].ID);
 
 			query = from Customer c in nop
-					where c.Name.Contains("a") && (c.Name.Contains("3") && c.ID==3)
+					where c.Name.Contains("A") && (c.Name.Contains("3") && c.ID==3)
 					select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
@@ -424,7 +425,7 @@ namespace TestSiaqodb
 			}
 			nop.Flush();
 			var query = from Customer c in nop
-						where c.Name.Contains("a") && c.Name.Contains("3")
+						where c.Name.Contains("A") && c.Name.Contains("3")
 						select new { Name=c.Name, Som=c.ID};
 			int s=0;
 			foreach( var a in query)
@@ -459,14 +460,14 @@ namespace TestSiaqodb
 			}
 			nop.Flush();
 			var query = from Customer c in nop
-						where c.Name.Contains("a") || c.ID==2
+						where c.Name.Contains("A") || c.ID==2
 						select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 6);
 			
 
 			query = from Customer c in nop
-					where c.Name.Contains("a") || (c.ID == 2 && c.Name.Contains("T")) || c.ID==4
+					where c.Name.Contains("A") || (c.ID == 2 && c.Name.Contains("T")) || c.ID==4
 					select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 7);

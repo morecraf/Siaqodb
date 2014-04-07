@@ -109,7 +109,15 @@ namespace Sqo.Indexes
            }
            else if (where.OperationType == OperationType.StartWith)
            {
-               List<int> oidsFound = index.FindItemsStartsWith(where.Value);
+               List<int> oidsFound = null;
+               if (where.Value2 != null && where.Value2 is StringComparison)
+               {
+                   oidsFound = index.FindItemsStartsWith(where.Value, false, (StringComparison)where.Value2);
+               }
+               else
+               {
+                  oidsFound = index.FindItemsStartsWith(where.Value,true,StringComparison.Ordinal);
+               }
                if (oidsFound != null)
                {
                    oids.AddRange(oidsFound);
@@ -175,7 +183,15 @@ namespace Sqo.Indexes
            }
            else if (where.OperationType == OperationType.StartWith)
            {
-               List<int> oidsFound = await index.FindItemsStartsWithAsync(where.Value).ConfigureAwait(false);
+               List<int> oidsFound = null;
+               if (where.Value2 != null && where.Value2 is StringComparison)
+               {
+                   oidsFound = await index.FindItemsStartsWithAsync(where.Value, false, (StringComparison)where.Value2).ConfigureAwait(false);
+               }
+               else
+               {
+                   oidsFound = await index.FindItemsStartsWithAsync(where.Value, true, StringComparison.Ordinal).ConfigureAwait(false);
+               }
                if (oidsFound != null)
                {
                    oids.AddRange(oidsFound);

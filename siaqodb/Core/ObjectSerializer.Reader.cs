@@ -46,7 +46,25 @@ namespace Sqo.Core
 
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
                 object fieldVal = byteTransformer.GetObject(field);
-
+                if (ai.AttributeTypeId == MetaExtractor.documentID)
+                { 
+                    DocumentInfo dinfo=fieldVal as DocumentInfo;
+                    if (dinfo != null)
+                    {
+                        if (SiaqodbConfigurator.DocumentSerializer == null)
+                        {
+                            throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
+                        }
+                        fieldVal = SiaqodbConfigurator.DocumentSerializer.Deserialize(ai.AttributeType, dinfo.Document);
+                        //put in weak cache to be able to update the document
+                        DocumentEventArgs args = new DocumentEventArgs();
+                        args.ParentObject=obj;
+                        args.DocumentInfoOID=dinfo.OID;
+                        args.FieldName = ai.Name;
+                        args.TypeInfo = ti;
+                        this.OnNeedCacheDocument(args);
+                    }
+                }
 
 #if SILVERLIGHT
 
@@ -98,7 +116,28 @@ namespace Sqo.Core
 
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
                 object fieldVal = await byteTransformer.GetObjectAsync(field).ConfigureAwait(false);
-
+              
+                if (ai.AttributeTypeId == MetaExtractor.documentID)
+                {
+                    DocumentInfo dinfo = fieldVal as DocumentInfo;
+                    if (dinfo != null)
+                    {
+                        if (SiaqodbConfigurator.DocumentSerializer == null)
+                        {
+                            throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
+                 
+                        }
+                        fieldVal = SiaqodbConfigurator.DocumentSerializer.Deserialize(ai.AttributeType, dinfo.Document);
+                    
+                        //put in weak cache to be able to update the document
+                        DocumentEventArgs args = new DocumentEventArgs();
+                        args.ParentObject = obj;
+                        args.DocumentInfoOID = dinfo.OID;
+                        args.FieldName = ai.Name;
+                        args.TypeInfo = ti;
+                        this.OnNeedCacheDocument(args);
+                    }
+                }
 
 #if SILVERLIGHT
 
@@ -420,7 +459,7 @@ namespace Sqo.Core
                 foreach (FieldSqoInfo ai in ti.Fields)
                 {
                     byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
-                    if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId==MetaExtractor.dictionaryID)
+                    if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId==MetaExtractor.dictionaryID || ai.AttributeTypeId==MetaExtractor.documentID)
                     {
                         row[ai.Name] = field;
                     }
@@ -458,7 +497,7 @@ namespace Sqo.Core
             foreach (FieldSqoInfo ai in ti.Fields)
             {
                 byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
-                if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID)
+                if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID || ai.AttributeTypeId == MetaExtractor.documentID)
                 {
                     row[ai.Name] = field;
                 }
@@ -643,6 +682,41 @@ namespace Sqo.Core
             lock (_syncRoot)
             {
                 handler = needReadComplexObject;
+            }
+            if (handler != null)
+            {
+                handler(this, args);
+            }
+        }
+        [System.Reflection.Obfuscation(Exclude = true)]
+        private EventHandler<DocumentEventArgs> needCacheDocument;
+        [System.Reflection.Obfuscation(Exclude = true)]
+        public event EventHandler<DocumentEventArgs> NeedCacheDocument
+        {
+            add
+            {
+                lock (_syncRoot)
+                {
+                    if (needCacheDocument == null)
+                    {
+                        needCacheDocument += value;
+                    }
+                }
+            }
+            remove
+            {
+                lock (_syncRoot)
+                {
+                    needCacheDocument -= value;
+                }
+            }
+        }
+        protected void OnNeedCacheDocument(DocumentEventArgs args)
+        {
+            EventHandler<DocumentEventArgs> handler;
+            lock (_syncRoot)
+            {
+                handler = needCacheDocument;
             }
             if (handler != null)
             {

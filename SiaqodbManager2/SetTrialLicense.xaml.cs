@@ -28,7 +28,7 @@ namespace SiaqodbManager
         {
             try
             {
-                SiaqodbConfigurator.SetTrialLicense(this.textBox1.Text);
+                SiaqodbConfigurator.SetLicense(this.textBox1.Text);
                 Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory);
                 siaqodbConfig.Close();
                 TrialLicense.LicenseKey = textBox1.Text;

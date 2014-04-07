@@ -41,7 +41,7 @@ namespace App1
         {
             SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
             Siaqodb nop = new Siaqodb();
-
+            
             await nop.OpenAsync(ApplicationData.Current.LocalFolder);
             //await nop.DropTypeAsync<Customer>();
             DateTime start = DateTime.Now;
@@ -71,7 +71,7 @@ namespace App1
             await db.CreateTableAsync<Person>();
 
             DateTime start = DateTime.Now;
-            for (int i = 1; i < 100; i++)
+            for (int i = 1; i < 10000; i++)
             {
                 await db.InsertAsync(new Person() { FirstName = "Tim", LastName = "Heuer" });
             }

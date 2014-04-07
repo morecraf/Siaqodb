@@ -603,7 +603,7 @@ namespace TestSiaqodb
             s_db.DropType<WithDict>();
             s_db.DropType<JaggedTy>();
             s_db.DropType<NMatrixTy>();
-            Transaction transaction = s_db.BeginTransaction();
+            ITransaction transaction = s_db.BeginTransaction();
             for (int i = 0; i < 10; i++)
             {
                 WithDict dict = new WithDict();

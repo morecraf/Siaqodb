@@ -14,10 +14,11 @@ namespace TestSiaqodb
     [TestClass]
     public class JaggedTests
     {
-        string objPath = @"c:\apps\OpenSource projects\sqoo\tests\unitests\";
+        string objPath = @"e:\sqoo\temp\tests_db\";
         public JaggedTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;
+              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
         }
 
         private TestContext testContextInstance;
@@ -620,7 +621,7 @@ namespace TestSiaqodb
             s_db.DropType<WithDict>();
             s_db.DropType<JaggedTy>();
             s_db.DropType<NMatrixTy>();
-            Transaction transaction = s_db.BeginTransaction();
+            ITransaction transaction = s_db.BeginTransaction();
             for (int i = 0; i < 10; i++)
             {
                 WithDict dict = new WithDict();

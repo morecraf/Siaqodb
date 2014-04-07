@@ -589,7 +589,7 @@ namespace SiaqodbUnitTests
             await s_db.DropTypeAsync<WithDict>();
             await s_db.DropTypeAsync<JaggedTy>();
             await s_db.DropTypeAsync<NMatrixTy>();
-            Transaction transaction = s_db.BeginTransaction();
+            ITransaction transaction = s_db.BeginTransaction();
             for (int i = 0; i < 10; i++)
             {
                 WithDict dict = new WithDict();

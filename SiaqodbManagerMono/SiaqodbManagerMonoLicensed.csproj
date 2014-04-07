@@ -179,9 +179,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\siaqodb\SiaqodbLicensed %28.NET 3.5%29.csproj">
+    <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 3.5%29.csproj">
       <Project>{243748A0-9797-4FA9-A805-D71127EAC3DA}</Project>
-      <Name>SiaqodbLicensed %28.NET 3.5%29</Name>
+      <Name>Siaqodb %28.NET 3.5%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -20,10 +20,14 @@ namespace Sqo
         internal static Dictionary<Type, List<string>> Ignored;
         internal static Dictionary<Type, Dictionary<string,int>> MaxLengths;
         internal static Dictionary<Type, Dictionary<string, string>> PropertyMaps;
+        internal static Dictionary<Type, List<string>> Texts;
         internal static Dictionary<Type, bool> LazyLoaded;
+        internal static Dictionary<Type, List<string>> Documents;
         internal static bool RaiseLoadEvents;
         internal static DateTimeKind? DateTimeKindToSerialize;
         internal static bool OptimisticConcurrencyEnabled=true;
+        internal static Configurator defaultConfigurator;
+        internal static KeyValuePair<int,DateTime> CurrentVersion = new KeyValuePair<int,DateTime>(40,new DateTime(2014,2,25));
         /// <summary>
         /// Add an index for a field or automatic property of a certain Type,an Index can be added also by using Attribute: Sqo.Attributes.Index;
         /// both ways of adding index are similar
@@ -214,6 +218,98 @@ namespace Sqo
         
         }
         /// <summary>
+        /// Mark field to be stored as a string with unlimited length 
+        /// </summary>
+        /// <param name="field">Name of field or automatic property</param>
+        /// <param name="type">Type that declare the field</param>
+        public static void AddText(string field, Type type)
+        {
+            if (Texts == null)
+            {
+                Texts = new Dictionary<Type, List<string>>();
+
+            }
+            if (!Texts.ContainsKey(type))
+            {
+                Texts.Add(type, new List<string>());
+            }
+            List<FieldInfo> fi = new List<FieldInfo>();
+            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
+            MetaExtractor.FindFields(fi, automaticProperties, type);
+            bool found = false;
+            foreach (FieldInfo f in fi)
+            {
+                if (f.Name == field)
+                {
+                    found = true;
+                    Texts[type].Add(f.Name);
+
+                    break;
+                }
+                else if (automaticProperties.ContainsKey(f))
+                {
+                    if (field == automaticProperties[f].Name)
+                    {
+                        found = true;
+                        Texts[type].Add(f.Name);
+                        break;
+                    }
+                }
+            }
+            if (!found)
+            {
+                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
+            }
+
+        }
+        /// <summary>
+        /// Mark a field or automatic property of a certain Type to be serialized as a Document ,it can be added also by using Attribute: Sqo.Attributes.Document;
+        /// both ways of set as Document are similar
+        /// </summary>
+        /// <param name="field">Field name or automatic property name</param>
+        /// <param name="type">Type that declare the field</param>
+        public static void AddDocument(string field, Type type)
+        {
+
+            if (Documents == null)
+            {
+                Documents = new Dictionary<Type, List<string>>();
+
+            }
+            if (!Documents.ContainsKey(type))
+            {
+                Documents.Add(type, new List<string>());
+            }
+            List<FieldInfo> fi = new List<FieldInfo>();
+            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
+            MetaExtractor.FindFields(fi, automaticProperties, type);
+            bool found = false;
+            foreach (FieldInfo f in fi)
+            {
+                if (f.Name == field)
+                {
+                    found = true;
+                    Documents[type].Add(f.Name);
+
+                    break;
+                }
+                else if (automaticProperties.ContainsKey(f))
+                {
+                    if (field == automaticProperties[f].Name)
+                    {
+                        found = true;
+                        Documents[type].Add(f.Name);
+                        break;
+                    }
+                }
+            }
+            if (!found)
+            {
+                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
+            }
+
+        }
+        /// <summary>
         /// Set the name of backing field for a property in case engine cannto discover it, this also can be set by attribute: Sqo.Attributes.UseVariable
         /// </summary>
         /// <param name="propertyName">Name of property</param>
@@ -323,9 +419,25 @@ namespace Sqo
        
         public static void SetDatabaseFileName<T>(string fileName)
         {
-            
-            SqoTypeInfo ti = MetaExtractor.GetSqoTypeInfo(typeof(T));
+            SetDatabaseFileName(typeof(T), fileName);
+        }
+        /// <summary>
+        /// Set custom fileName on disk of database file for Type 
+        /// </summary>
+        /// <param name="type">Type of objects</typeparam>
+        /// <param name="fileName">Name of database file on disk</param>
+        public static void SetDatabaseFileName(Type type,string fileName)
+        {
+
+            SqoTypeInfo ti = MetaExtractor.GetSqoTypeInfo(type);
             Cache.CacheCustomFileNames.AddFileNameForType(ti.TypeName, fileName);
+
+        }
+        public static void SetDatabaseFileNameWithoutException(Type type, string fileName)
+        {
+
+            SqoTypeInfo ti = MetaExtractor.GetSqoTypeInfo(type);
+            Cache.CacheCustomFileNames.AddFileNameForType(ti.TypeName, fileName, false);
 
         }
         private static bool buildIndexesAsync = false;
@@ -341,37 +453,34 @@ namespace Sqo
         /// <param name="loadRelatedObjects">true if related object need to be loaded, false if you want to load by Include(...) method</param>
         public static void LoadRelatedObjects<T>(bool loadRelatedObjects)
         {
-            Type t = typeof(T);
+            LoadRelatedObjects(typeof(T), loadRelatedObjects);
+
+        }
+        /// <summary>
+        /// By default this is true for all types. Set this to false to not load childs entities of objects of Type provided
+        /// </summary>
+        /// <param name="type">Type for objects</param>
+        /// <param name="loadRelatedObjects">true if related object need to be loaded, false if you want to load by Include(...) method</param>
+        public static void LoadRelatedObjects(Type type, bool loadRelatedObjects)
+        {
+
             if (LazyLoaded == null)
             {
                 LazyLoaded = new Dictionary<Type, bool>();
             }
-            LazyLoaded[t] = !loadRelatedObjects;
+            LazyLoaded[type] = !loadRelatedObjects;
+           
 
         }
-#if TRIAL
-       public static void SetTrialLicense(string licenseKey)
+        /// <summary>
+        /// Set the license key
+        /// </summary>
+        /// <param name="licenseKey">License key</param>
+        public static void SetLicense(string licenseKey)
         {
-            Sqo.Utilities.SqoTrialLicense.LicenseValid(licenseKey);
+            Sqo.Utilities.SqoLicense.LicenseValid(licenseKey);
         }
 
-#elif WinRT
-        public static void SetLicense(string licenseKey)
-        {
-            Sqo.WinRTLicenseChecker.LicenseValid(licenseKey);
-        }
-#elif SILVERLIGHT
-        public static void SetLicense(string licenseKey)
-        {
-            SilvLicenseChecker.LicenseValid(licenseKey);
-        }
-#else
-        
-        public static void SetLicense(string licenseKey)
-        {
-            Sqo.Utilities.SqoUnity3DLic.LicenseValid(licenseKey);
-        }
-#endif
         /// <summary>
         /// Set true to raise Loading/Loaded events
         /// </summary>
@@ -402,21 +511,182 @@ namespace Sqo
                 LoggingMethod(message, level);
             }
         }
-        private static int bufferingChunkPercent = 10;
-        public static int BufferingChunkPercent
+        private static decimal bufferingChunkPercent = 10;
+        public static decimal BufferingChunkPercent
         {
             get { return bufferingChunkPercent; }
             set
             {
-                if (value > 100)
+                if (value > 100 || value<=0)
                 {
                     throw new SiaqodbException("Max percent must be 100");
                 }
                 bufferingChunkPercent = value;
             }
         }
+        internal static IDocumentSerializer DocumentSerializer;
+        /// <summary>
+        /// Set your custom document serializer
+        /// </summary>
+        /// <param name="documentSerializer">The instance of custom document serializer</param>
+        public static void SetDocumentSerializer(IDocumentSerializer documentSerializer)
+        {
+            if (documentSerializer == null)
+            {
+                throw new ArgumentNullException("documentSerializer");
+            }
+            DocumentSerializer = documentSerializer;
+        }
+        /// <summary>
+        /// Apply default configurations
+        /// </summary>
+        /// <param name="config">Configurator instance</param>
+        public static void ApplyConfigurator(Configurator config)
+        {
+            if (config == null)
+                throw new ArgumentNullException();
+            ReInit();
+            defaultConfigurator = config;
+            defaultConfigurator.LoadRelatedObjectsPropetyChanged -= defaultConfigurator_LoadRelatedObjectsPropetyChanged;
+            defaultConfigurator.LoadRelatedObjectsPropetyChanged += defaultConfigurator_LoadRelatedObjectsPropetyChanged;
+            if (config.Indexes != null)
+            {
+                foreach (var item in config.Indexes.Keys)
+                {
+                    foreach (string field in config.Indexes[item])
+                    {
+                        AddIndex(field, item);
+                    }
+                }
+            }
+            if (config.Constraints != null)
+            {
+                foreach (var item in config.Constraints.Keys)
+                {
+                    foreach (string field in config.Constraints[item])
+                    {
+                        AddUniqueConstraint(field, item);
+                    }
+                }
+            }
+            if (config.MaxLengths != null)
+            {
+                foreach (var item in config.MaxLengths.Keys)
+                {
+                    foreach (string field in config.MaxLengths[item].Keys)
+                    {
+                        AddMaxLength(field,config.MaxLengths[item][field], item);
+                    }
+                }
+            }
+            if (config.Ignored != null)
+            {
+                foreach (var item in config.Ignored.Keys)
+                {
+                    foreach (string field in config.Ignored[item])
+                    {
+                        AddIgnore(field, item);
+                    }
+                }
+            }
+            if (config.Texts != null)
+            {
+                foreach (var item in config.Texts.Keys)
+                {
+                    foreach (string field in config.Texts[item])
+                    {
+                        AddText(field, item);
+                    }
+                }
+            }
+            if (config.Documents != null)
+            {
+                foreach (var item in config.Documents.Keys)
+                {
+                    foreach (string field in config.Documents[item])
+                    {
+                        AddDocument(field, item);
+                    }
+                }
+            }
+            if (config.PropertyMaps != null)
+            {
+                foreach (var item in config.PropertyMaps.Keys)
+                {
+                    foreach (string field in config.PropertyMaps[item].Keys)
+                    {
+                        PropertyUseField(field,config.PropertyMaps[item][field], item);
+                    }
+                }
+            }
+            EncryptedDatabase = config.EncryptedDatabase;
+            if (config.Encryptor != null)
+            {
+                SetEncryptor(config.Encryptor);
+            }
+            else if (config.encAlgorithm != BuildInAlgorithm.NONE)
+            {
+                SetEncryptor(config.encAlgorithm);
+            }
+            if (config.encryptionPWD != null)
+            {
+                SetEncryptionPassword(config.encryptionPWD);
+            }
+            if (config.DatabaseFileNames != null)
+            {
+                foreach (var item in config.DatabaseFileNames.Keys)
+                {
+                    SetDatabaseFileNameWithoutException(item, config.DatabaseFileNames[item]);
+                }
+            }
+            if (config.LazyLoaded != null)
+            {
+                foreach (var item in config.LazyLoaded.Keys)
+                {
+                    LoadRelatedObjects(item, !config.LazyLoaded[item]);
+                }
+            }
+            if (!string.IsNullOrEmpty(config.LicenseKey))
+            {
+                SetLicense(config.LicenseKey);
+            }
+            if (config.DocumentSerializer != null)
+            {
+                SetDocumentSerializer(config.DocumentSerializer);
+            }
+            BuildIndexesAsync = config.BuildIndexesAsync;
+            SetRaiseLoadEvents(config.RaiseLoadEvents);
+            SpecifyStoredDateTimeKind(config.DateTimeKindToSerialize);
+            EnableOptimisticConcurrency(config.OptimisticConcurrencyEnabled);
+            LoggingMethod = config.LoggingMethod;
+            VerboseLevel = config.VerboseLevel;
+            if (config.BufferingChunkPercent > 0)
+            {
+                BufferingChunkPercent = config.BufferingChunkPercent;
+            }
+        }
+
+        static void defaultConfigurator_LoadRelatedObjectsPropetyChanged(object sender, EventArgs e)
+        {
+            LazyLoaded = null;
+            if (defaultConfigurator.LazyLoaded != null)
+            {
+                foreach (var item in defaultConfigurator.LazyLoaded.Keys)
+                {
+                    LoadRelatedObjects(item, !defaultConfigurator.LazyLoaded[item]);
+                }
+            }
+        }
+        private static void ReInit()
+        {
+            Indexes = null;
+            Constraints = null;
+            MaxLengths = null;
+            Ignored = null;
+            Texts = null;
+            PropertyMaps = null;
+            LazyLoaded = null;
+        }
     }
-    public enum BuildInAlgorithm {AES,XTEA}
-    public delegate void TraceListener(string traceMessage,VerboseLevel level);
-    public enum VerboseLevel { Off=1, Error=2, Warn=3, Info=4 }
+    
 }

@@ -97,13 +97,18 @@ namespace Sqo
             {
 
             }
-            else if (m.Method.DeclaringType == typeof(string))
+            else if (m.Method.DeclaringType == typeof(string) )
             {
 
 
                 HandleStringMethods(m);
                 return m;
 
+            }
+            else if ((m.Method.DeclaringType == typeof(SqoStringExtensions) && m.Method.Name == "Contains"))
+            {
+                HandleStringContainsMethod(m);
+                return m;
             }
             throw new Exceptions.LINQUnoptimizeException(string.Format("The method '{0}' is not supported", m.Method.Name));
 
@@ -376,6 +381,14 @@ namespace Sqo
             Visit(mExpression);
             ConstantExpression c = m.Arguments[0] as ConstantExpression;
             Visit(c);
+            if (m.Arguments.Count == 2)
+            {
+                ConstantExpression c2 = m.Arguments[1] as ConstantExpression;
+                if (c2.Value != null && c2.Value.GetType() == typeof(StringComparison))
+                {
+                    w.Value2 = (StringComparison)c2.Value;
+                }
+            }
             
             switch (m.Method.Name)
             {
@@ -398,6 +411,30 @@ namespace Sqo
                 default:
                     throw new Exceptions.LINQUnoptimizeException("Unsupported string filtering query expression detected. ");
             }
+        }
+        private void HandleStringContainsMethod(MethodCallExpression m)
+        {
+            Where w = new Where();
+            w.StorageEngine = this.engine;
+            w.ParentSqoTypeInfo = this.ti;
+            criteriaValues[m] = w;
+            currentWhere = w;
+            if (criteria == null)
+            {
+                criteria = w;
+            }
+            Visit(m.Arguments[0]);
+            ConstantExpression c = m.Arguments[1] as ConstantExpression;
+            Visit(c);
+
+            ConstantExpression c2 = m.Arguments[2] as ConstantExpression;
+            if (c2.Value != null && c2.Value.GetType() == typeof(StringComparison))
+            {
+                w.Value2 = (StringComparison)c2.Value;
+            }
+            w.OperationType = OperationType.Contains;
+
+
         }
         private void HandleAnd(BinaryExpression b)
         {
@@ -575,7 +612,7 @@ namespace Sqo
 
                         }
 						System.Reflection.PropertyInfo pi = m.Member as System.Reflection.PropertyInfo;
-#if SILVERLIGHT || CF || UNITY3D || WinRT
+						#if SILVERLIGHT || CF || UNITY3D || WinRT || MONODROID
                         string fieldName = SilverlightPropertyResolver.GetPrivateFieldName(pi, pi.DeclaringType);
                         if (fieldName != null)
                         {

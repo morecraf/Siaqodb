@@ -16,15 +16,17 @@ namespace Sqo.Internal
 #endif
         static class _bs
     {
-        /// <summary>
+#if !WinRT
+            /// <summary>
         /// Do NOT use it!, it is used only internally
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static Siaqodb _b(string p)
+       public static Siaqodb _b(string p)
         {
             return new Siaqodb(p, false);
         }
+#endif
         /// <summary>
         /// Do NOT use it!, it is used only internally
         /// </summary>
@@ -96,6 +98,20 @@ namespace Sqo.Internal
         public static object _lobjby(Siaqodb siaqodb, Type type, int oid)
         {
             return siaqodb.LoadObjectByOID(type, oid);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static bool _hsy()
+        {
+            return Sqo.Utilities.SqoLicense.hasSync;
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static bool _hamssy()
+        {
+            return Sqo.Utilities.SqoLicense.hasAMSSync;
         }
     }
 }

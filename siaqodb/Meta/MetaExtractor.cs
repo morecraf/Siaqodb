@@ -9,6 +9,7 @@ using Sqo.Exceptions;
 using Sqo.Utilities;
 using System.Collections;
 
+
 namespace Sqo.Meta
 {
 	class MetaExtractor
@@ -54,6 +55,7 @@ namespace Sqo.Meta
         public const int dictionaryID = 31;
 
         public const int jaggedArrayID = 32;
+        public const int documentID = 33;
 
         public const int FixedArrayTypeId = 50;
 
@@ -184,12 +186,31 @@ namespace Sqo.Meta
                             maxLength = GetSizeOfField(MetaExtractor.byteID);//get byte type size(simulate array byte[])
                         }
                     }
-
-
+                    if (!isText)
+                    {
+                        //check config
+                        if (SiaqodbConfigurator.Texts != null)
+                        {
+                            if (SiaqodbConfigurator.Texts.ContainsKey(ti.Type))
+                            {
+                                if (SiaqodbConfigurator.Texts[ti.Type].Contains(fi[i].Name))
+                                {
+                                    isText = true;
+                                }
+                            }
+                        }
+                    }
                 }
                 #endregion
-                
-                int fTypeId = GetAttributeType(fType);
+                int fTypeId = -1;
+                if (FieldIsDocument(ti,fi[i], automaticProperties))
+                {
+                    fTypeId = documentID;
+                }
+                else
+                {
+                    fTypeId = GetAttributeType(fType);
+                }
                 if (fTypeId == -1)
                 {
                     throw new NotSupportedTypeException(@"Field:" + fi[i].Name + " of class:" + t.Name + " has type:" + fType.Name + @" which is not supported , check documentation about types supported: http://siaqodb.com/?page_id=620 ");
@@ -203,7 +224,7 @@ namespace Sqo.Meta
                 ai.FInfo = fi[i];
                 ai.IsText = isText;
                 ai.Header.Length = maxLength == -1 ? GetSizeOfField(fTypeId) : MetaHelper.PaddingSize( maxLength);
-                if (fType.IsGenericType())
+                if (fType.IsGenericType() && fTypeId != documentID)
                 {
                     Type genericTypeDef = fType.GetGenericTypeDefinition();
                     if (genericTypeDef == typeof(Nullable<>))
@@ -216,7 +237,7 @@ namespace Sqo.Meta
                         ai.AttributeTypeId += MetaExtractor.ArrayTypeIDExtra;
                     }
                 }
-                else if (fType.IsArray)
+                else if (fType.IsArray && fTypeId != documentID)
                 {
                     if ( ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>) && (ai.Name == "Keys" || ai.Name == "_childrenOIDs"))
                     {
@@ -269,6 +290,37 @@ namespace Sqo.Meta
             //cacheOfTypes[t] = ti;
             return ti;
 
+        }
+
+        private static bool FieldIsDocument(SqoTypeInfo ti, FieldInfo fieldInfo, Dictionary<FieldInfo, PropertyInfo> automaticProperties)
+        {
+
+            object[] customAtt = fieldInfo.GetCustomAttributes(typeof(DocumentAttribute), false);
+            if (customAtt.Length > 0)
+            {
+                return true;
+            }
+            if (automaticProperties.ContainsKey(fieldInfo))
+            {
+                customAtt = automaticProperties[fieldInfo].GetCustomAttributes(typeof(DocumentAttribute), false);
+                if (customAtt.Length > 0)
+                {
+                    return true;
+                }
+            }
+            //check config
+            if (SiaqodbConfigurator.Documents != null)
+            {
+                if (SiaqodbConfigurator.Documents.ContainsKey(ti.Type))
+                {
+                    if (SiaqodbConfigurator.Documents[ti.Type].Contains(fieldInfo.Name))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static bool IsSpecialType(Type fType)
@@ -499,7 +551,7 @@ namespace Sqo.Meta
                         return 16;
                     else return blockSize;
                 }
-                else if (typeId == complexID)
+                else if (typeId == complexID || typeId==documentID)
                 {
                     return 8;
                 }
@@ -538,7 +590,7 @@ namespace Sqo.Meta
             {
                 return 1;
             }
-            else if (typeId == longID || typeId == ulongID || typeId == doubleID || typeId == TimeSpanID || typeId == DateTimeID || typeId == complexID)
+            else if (typeId == longID || typeId == ulongID || typeId == doubleID || typeId == TimeSpanID || typeId == DateTimeID || typeId == complexID || typeId==documentID)
             {
                 return 8;
             }
@@ -603,47 +655,54 @@ namespace Sqo.Meta
                 return -1;
             }
         }
-		
-        public static ObjectInfo GetObjectInfo(object o, SqoTypeInfo ti,Sqo.Cache.MetaCache metaCache)
+
+        public static ObjectInfo GetObjectInfo(object o, SqoTypeInfo ti, Sqo.Cache.MetaCache metaCache)
         {
-            ObjectInfo oi = new ObjectInfo(ti,o);
+            ObjectInfo oi = new ObjectInfo(ti, o);
             oi.Oid = metaCache.GetOIDOfObject(o, ti);
             oi.TickCount = MetaHelper.GetTickCountOfObject(o, ti.Type);
 
             foreach (FieldSqoInfo attKey in ti.Fields)
             {
-				#if SILVERLIGHT
+#if SILVERLIGHT
+                object objVal=null;
 				try
 				{
-					object objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
-					if(attKey.FInfo.FieldType==typeof(string))
-					{
-						
-						if(objVal==null)
-						{
-						 objVal=string.Empty;
-						}
-					}
-					oi.AtInfo[attKey] = objVal;
+					objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
+
 				}
 				catch (Exception ex)
 				{
 					throw new SiaqodbException("Override GetValue and SetValue methods of SqoDataObject-Silverlight limitation to private fields");
 				}
 #else
-				object objVal=attKey.FInfo.GetValue(o);
-				if (attKey.FInfo.FieldType==typeof(string))
-				{
+                object objVal = attKey.FInfo.GetValue(o);
+#endif
+                if (attKey.FInfo.FieldType == typeof(string))
+                {
                     if (objVal == null)
                     {
                         objVal = string.Empty;
                     }
-                   
-				}
-				oi.AtInfo[attKey] = objVal;
+
+                }
+                if (attKey.AttributeTypeId == MetaExtractor.documentID && objVal != null)
+                {
+                    Sqo.MetaObjects.DocumentInfo dinfo = new Sqo.MetaObjects.DocumentInfo();
+                    dinfo.OID = metaCache.GetDocumentInfoOID(ti, o, attKey.Name);
+                    dinfo.TypeName =MetaHelper.GetDiscoveringTypeName(attKey.AttributeType);
+                    if (SiaqodbConfigurator.DocumentSerializer == null)
+                    {
+                        throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
+                    }
+                    dinfo.Document = SiaqodbConfigurator.DocumentSerializer.Serialize(objVal);
+                    objVal = dinfo;
+
+                }
+                oi.AtInfo[attKey] = objVal;
 
 
-				#endif
+
             }
             return oi;
         }
@@ -656,18 +715,11 @@ namespace Sqo.Meta
                 if (attKey.Name != fieldName)
                     continue;
 #if SILVERLIGHT
+                object objVal=null;
 				try
 				{
-					object objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
-					if(attKey.FInfo.FieldType==typeof(string))
-					{
-						
-						if(objVal==null)
-						{
-						 objVal=string.Empty;
-						}
-					}
-					return new ATuple<int,object>(oid, objVal);
+					objVal=MetaHelper.CallGetValue(attKey.FInfo,o,ti.Type);
+
 				}
 				catch (Exception ex)
 				{
@@ -675,6 +727,7 @@ namespace Sqo.Meta
 				}
 #else
                 object objVal = attKey.FInfo.GetValue(o);
+#endif
                 if (attKey.FInfo.FieldType == typeof(string))
                 {
                     if (objVal == null)
@@ -683,10 +736,22 @@ namespace Sqo.Meta
                     }
 
                 }
+                if (attKey.AttributeTypeId == MetaExtractor.documentID && objVal != null)
+                {
+                    Sqo.MetaObjects.DocumentInfo dinfo = new Sqo.MetaObjects.DocumentInfo();
+                    dinfo.OID = metaCache.GetDocumentInfoOID(ti, o, attKey.Name);
+                    dinfo.TypeName = MetaHelper.GetDiscoveringTypeName(attKey.AttributeType);
+
+                    if (SiaqodbConfigurator.DocumentSerializer == null)
+                    {
+                        throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
+                    }
+                    dinfo.Document = SiaqodbConfigurator.DocumentSerializer.Serialize(objVal);
+                    objVal = dinfo;
+
+                }
                 return new ATuple<int,object>(oid, objVal);
 
-
-#endif
             }
             return null;
         }

@@ -15,7 +15,7 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class JaggedTests
     {
-        string dbFolder = @"c:\apps\OpenSource projects\sqoo\tests\unitestsAsync\";
+        string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
 		
         [TestMethod]
         public async Task TestStoreSimpleJagged()
@@ -590,7 +590,7 @@ namespace SiaqodbUnitTests
             await s_db.DropTypeAsync<WithDict>();
             await s_db.DropTypeAsync<JaggedTy>();
             await s_db.DropTypeAsync<NMatrixTy>();
-            Transaction transaction = s_db.BeginTransaction();
+            ITransaction transaction = s_db.BeginTransaction();
             for (int i = 0; i < 10; i++)
             {
                 WithDict dict = new WithDict();
@@ -615,7 +615,7 @@ namespace SiaqodbUnitTests
             try
             {
 
-                transaction = s_db.BeginTransaction();
+                transaction= s_db.BeginTransaction();
                 for (int i = 0; i < 10; i++)
                 {
                     WithDict dict = new WithDict();

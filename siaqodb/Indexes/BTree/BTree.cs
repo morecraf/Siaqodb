@@ -149,16 +149,16 @@ namespace Sqo.Indexes
             return await Root.FindItemsBiggerThanAsync(target_key, true, stop).ConfigureAwait(false);
         }
 #endif
-        public List<int> FindItemsStartsWith(T target_key)
+        public List<int> FindItemsStartsWith(T target_key,bool defaultComparer,StringComparison stringComparison)
         {
             bool stop = false;
-            return Root.FindItemsStartsWith(target_key, ref stop);
+            return Root.FindItemsStartsWith(target_key, defaultComparer, stringComparison, ref stop);
         }
 #if ASYNC
-        public async Task<List<int>> FindItemsStartsWithAsync(T target_key)
+        public async Task<List<int>> FindItemsStartsWithAsync(T target_key, bool defaultComparer, StringComparison stringComparison)
         {
             StopIndicator stop = new StopIndicator();
-            return await Root.FindItemsStartsWithAsync(target_key, stop).ConfigureAwait(false);
+            return await Root.FindItemsStartsWithAsync(target_key,defaultComparer,stringComparison, stop).ConfigureAwait(false);
         }
 #endif
         // Remove this item.
@@ -373,22 +373,22 @@ namespace Sqo.Indexes
            return await FindItemsBiggerThanOrEqualAsync((T)target_key).ConfigureAwait(false);
        }
 #endif
-       public List<int> FindItemsStartsWith(object target_key)
+       public List<int> FindItemsStartsWith(object target_key,bool defaultComparer,StringComparison stringComparison)
        {
            if (target_key.GetType() != typeof(T))
            {
                target_key = Sqo.Utilities.Convertor.ChangeType(target_key, typeof(T));
            }
-           return FindItemsStartsWith((T)target_key);
+           return FindItemsStartsWith((T)target_key, defaultComparer, stringComparison);
        }
 #if ASYNC
-       public async Task<List<int>> FindItemsStartsWithAsync(object target_key)
+       public async Task<List<int>> FindItemsStartsWithAsync(object target_key, bool defaultComparer, StringComparison stringComparison)
        {
            if (target_key.GetType() != typeof(T))
            {
                target_key = Sqo.Utilities.Convertor.ChangeType(target_key, typeof(T));
            }
-           return await FindItemsStartsWithAsync((T)target_key).ConfigureAwait(false);
+           return await FindItemsStartsWithAsync((T)target_key, defaultComparer,stringComparison).ConfigureAwait(false);
        }
 #endif
        public void RemoveItem(object target_key)
@@ -452,7 +452,10 @@ namespace Sqo.Indexes
            }
            else
            {
-               this.siaqodb.Delete(this.Root);
+               if (this.Root.OID > 0)
+               {
+                   this.siaqodb.Delete(this.Root);
+               }
                this.siaqodb.Delete(this.indexInfo);
            }
        }

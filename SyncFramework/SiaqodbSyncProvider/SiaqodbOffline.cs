@@ -66,7 +66,7 @@ namespace SiaqodbSyncProvider
 	            base.StoreObject(obj);
 			}
 		}
-        public new void StoreObject(object obj,Transaction transaction)
+        public new void StoreObject(object obj,ITransaction transaction)
         {
             lock (_locker)
             {
@@ -101,7 +101,7 @@ namespace SiaqodbSyncProvider
 	            base.Delete(obj);
 			}
         }
-        public new void Delete(object obj,Transaction transaction)
+        public new void Delete(object obj,ITransaction transaction)
         {	
 			lock (_locker)
             {
@@ -161,7 +161,7 @@ namespace SiaqodbSyncProvider
 	            return updated;
 			}
         }
-        public new bool UpdateObjectBy(object obj, Transaction transaction,params string[] fieldNames)
+        public new bool UpdateObjectBy(object obj, ITransaction transaction,params string[] fieldNames)
         {
             lock (_locker)
             {
@@ -212,7 +212,7 @@ namespace SiaqodbSyncProvider
 	            return deleted;
 			}
         }
-        public new bool DeleteObjectBy(object obj,Transaction transaction, params string[] fieldNames)
+        public new bool DeleteObjectBy(object obj,ITransaction transaction, params string[] fieldNames)
         {
             lock (_locker)
             {

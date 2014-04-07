@@ -40,7 +40,7 @@ namespace Sqo
 					else
 					{
                         System.Reflection.PropertyInfo pi = m.Member as System.Reflection.PropertyInfo;
-#if SILVERLIGHT || CF || UNITY3D || WinRT
+						#if SILVERLIGHT || CF || UNITY3D || WinRT || MONODROID
                         string fieldName = SilverlightPropertyResolver.GetPrivateFieldName(pi, pi.DeclaringType);
                         if (fieldName != null)
                         {

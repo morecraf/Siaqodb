@@ -31,7 +31,7 @@ namespace LicenseActivationMac
         public static string GetLicenseKey(string customerCode)
         {
             string hostname = Environment.MachineName;
-            WebRequest request = WebRequest.Create(@"http://siaqodb.com/licensor/licensor?c=" + customerCode + "&m=" + hostname + "&l=1");
+            WebRequest request = WebRequest.Create(@"http://siaqodb.com/licensor/licensorv40.php?c=" + customerCode + "&m=" + hostname + "&l=1");
             request.Credentials = CredentialCache.DefaultCredentials;
             WebResponse response = request.GetResponse();
             Console.WriteLine(((HttpWebResponse)response).StatusDescription);
