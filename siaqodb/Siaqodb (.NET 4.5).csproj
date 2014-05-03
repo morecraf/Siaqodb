@@ -100,6 +100,7 @@
     <Compile Include="Core\SqoFile.cs" />
     <Compile Include="Core\SqoISFile.cs" />
     <Compile Include="Core\SqoISFile2.cs" />
+    <Compile Include="DoDB.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Indexes\BTree\BTreeNode.cs" />
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
+    <Compile Include="Indexes\BTree\TagsIndexManager.cs" />
     <Compile Include="Indexes\IndexInfo.cs">
       <SubType>Code</SubType>
     </Compile>

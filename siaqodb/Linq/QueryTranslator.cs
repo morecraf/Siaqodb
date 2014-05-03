@@ -319,44 +319,68 @@ namespace Sqo
         }
         private void HandleDictionaryMethods(MethodCallExpression m)
         {
-            Where w = new Where();
-            w.StorageEngine = this.engine;
-            w.ParentSqoTypeInfo = this.ti;
-            criteriaValues[m] = w;
-            currentWhere = w;
-
-
-            if (criteria == null)
+            if (m.Method.Name == "get_Item")
             {
-                criteria = w;
-            }
-
-            MemberExpression mExpression = m.Object as MemberExpression;
-            if (mExpression == null)
-            {
-                throw new SiaqodbException("Must be a member that use IDictionary method:" + m.Method.Name);
-            }
-            Visit(mExpression);
-            ConstantExpression c = m.Arguments[0] as ConstantExpression;
-            Visit(c);
-
-            switch (m.Method.Name)
-            {
-                case "ContainsKey":
-                    {
-
-                        w.OperationType = OperationType.ContainsKey;
-                        break;
-                    }
-                case "ContainsValue":
-                    {
-
-                        w.OperationType = OperationType.ContainsValue;
-                        break;
-                    }
-                
-                default:
+                MemberExpression mExpression = m.Object as MemberExpression;
+                if (mExpression == null)
+                {
+                    throw new SiaqodbException("Must be a member that use IDictionary method:" + m.Method.Name);
+                }
+                Visit(mExpression);
+                ConstantExpression c2 = m.Arguments[0] as ConstantExpression;
+                if (c2.Value != null && c2.Value.GetType() == typeof(string) && (mExpression.Member.Name == "StrTags" || mExpression.Member.Name == "IntTags"))
+                {
+                    currentWhere.Value2 = c2.Value;//KEY of dictionary
+                }
+                else
+                {
                     throw new Exceptions.LINQUnoptimizeException("Unsupported string filtering query expression detected. ");
+                }
+
+            }
+            else
+            {
+                Where w = new Where();
+                w.StorageEngine = this.engine;
+                w.ParentSqoTypeInfo = this.ti;
+                criteriaValues[m] = w;
+                currentWhere = w;
+
+
+                if (criteria == null)
+                {
+                    criteria = w;
+                }
+
+                MemberExpression mExpression = m.Object as MemberExpression;
+                if (mExpression == null)
+                {
+                    throw new SiaqodbException("Must be a member that use IDictionary method:" + m.Method.Name);
+                }
+                Visit(mExpression);
+                ConstantExpression c = m.Arguments[0] as ConstantExpression;
+                Visit(c);
+
+
+                switch (m.Method.Name)
+                {
+                    case "ContainsKey":
+                        {
+
+                            w.OperationType = OperationType.ContainsKey;
+                            break;
+                        }
+                    case "ContainsValue":
+                        {
+
+                            w.OperationType = OperationType.ContainsValue;
+                            break;
+                        }
+
+
+                    default:
+                        throw new Exceptions.LINQUnoptimizeException("Unsupported string filtering query expression detected. ");
+                }
             }
         }
         private void HandleStringMethods(MethodCallExpression m)

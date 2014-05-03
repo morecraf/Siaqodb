@@ -426,8 +426,11 @@ namespace Sqo
             bool isOIDField = where.AttributeName[0] == "OID";
             if (!indexManager.LoadOidsByIndex(ti, where.AttributeName[0], where, oids))
             {
-
-                if (isOIDField)
+                if (tagsIndexManager != null && ti.Type == typeof(DotissiObject) && (where.AttributeName[0] == "intTags" || where.AttributeName[0] == "strTags") && tagsIndexManager.ExistsIndex(where.Value2.ToString()))
+                {
+                    tagsIndexManager.LoadOidsByIndex(where, oids);
+                }
+                else if (isOIDField)
                 {
                     this.FillOidsIndexed(oids, where, ti, serializer);
 
@@ -436,7 +439,7 @@ namespace Sqo
                 {
                     int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
                     if (rangeSize < 1) rangeSize = 1;
-           
+
                     for (int i = 0; i < nrRecords; i++)
                     {
                         int oid = i + 1;
