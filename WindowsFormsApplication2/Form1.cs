@@ -23,22 +23,66 @@ namespace WindowsFormsApplication2
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SiaqodbConfigurator.SetDocumentSerializer(new BSONSerializer());
-            DotissiDB db = new DotissiDB(@"c:\Users\Xofin\Documents\GitHub\Siaqodb\db_temp\");
+            //SiaqodbConfigurator.SetDocumentSerializer(new BSONSerializer());
+            SiaqodbConfigurator.SetLicense("ZWsshw4VXZbmQa8beHWlOAde6w4EqCYCOqUjgSS0Qi0=");
+            Siaqodb db = new Siaqodb(@"e:\temp\_clouddb\");
             for (int i = 0; i < 10; i++)
             {
 
-                Invoice inv=new Invoice() { InvoiceNumber = i, Customer = "MyCust" + i, Total = i * 10 };
-                db.Store
-                    (
-                    key: i.ToString(), 
-                    obj: inv,
-                    tags: new { Email = "mycust" + i % 2 + "@hope.ro" }
-                    );
+                //Invoice inv=new Invoice() { InvoiceNumber = i, Customer = "MyCust" + i, Total = i * 10 };
+                //db.Store
+                //    (
+                //    key: i.ToString(), 
+                //    obj: inv,
+                //    tags: new { Email = "mycust" + i % 2 + "@hope.ro" }
+                //    );
+                User b = new User() { UserName = "qq" + i.ToString() };
+                db.StoreObject(b);
+            }
+            db.Flush();
+            User result = db.Cast<User>().First(user => user.UserName.Contains( "name",StringComparison.OrdinalIgnoreCase)
+                &&  user.UserName.StartsWith( "name",StringComparison.OrdinalIgnoreCase)
+                && user.UserName.EndsWith("name", StringComparison.OrdinalIgnoreCase));
+            string s = "";
+           // var q = db.Query<DotissiObject>().Where(a => a.StrTags["Email"] == "mycust0@hope.ro").ToList();
+        }
+
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
+           
+            WisentClient.Wisent client = new WisentClient.Wisent();
+            DotissiObject doObj = new DotissiObject();
+            User book=new User();
+            book.UserName="2022";
+            book.author="Cristi Ursachi";
+            book.body="An amazing book...";
+            book.title="How tos";
+            book.copies_owned=7;
+            
+            doObj.SetValue<User>(book);
+            doObj.Key = book.UserName;
+            try
+            {
+                await client.Put("books", doObj);
+            }
+            catch(Exception ex)
+            {
                 
             }
-            var q = db.Query<DotissiObject>().Where(a => a.StrTags["Email"] == "mycust0@hope.ro").ToList();
+            DotissiObject obj = await client.Get("books", book.UserName);
+            string a = "";
+
         }
+    }
+    public class User
+    {
+        public string UserName;
+        public string title;
+        public string author;
+        public string body;
+        public int copies_owned;
+
     }
     public class Invoice
     {
@@ -46,28 +90,22 @@ namespace WindowsFormsApplication2
         public string Customer { get; set; }
         public decimal Total { get; set; }
     }
-    public class BSONSerializer : IDocumentSerializer
+    public class JsonCRSerializer : IDocumentSerializer
     {
         #region IDocumentSerializer Members
         readonly JsonSerializer serializer = new JsonSerializer();
         public object Deserialize(Type type, byte[] objectBytes)
         {
-            using (MemoryStream ms = new MemoryStream(objectBytes))
-            {
-                var jsonTextReader = new BsonReader(ms);
-                return serializer.Deserialize(jsonTextReader, type);
-            }
+            string jsonStr = Encoding.UTF8.GetString(objectBytes);
+            return JsonConvert.DeserializeObject(jsonStr,type);
         }
 
         public byte[] Serialize(object obj)
         {
-            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-            {
-                BsonWriter writer = new BsonWriter(ms);
-                serializer.Serialize(writer, obj);
-
-                return ms.ToArray();
-            }
+            JsonSerializerSettings sett=new JsonSerializerSettings();
+            
+            string jsonStr =JsonConvert.SerializeObject(obj);
+            return  Encoding.UTF8.GetBytes(jsonStr);
         }
 
         #endregion

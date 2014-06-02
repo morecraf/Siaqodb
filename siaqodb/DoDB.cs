@@ -209,6 +209,14 @@ namespace Sqo
         [Index]
         private string key;
         public int OID { get; set; }
+        public bool ShouldSerializeOID()
+        {
+            return false;
+        }
+        public bool ShouldSerializeIsDirty()
+        {
+            return false;
+        }
         public string Key
         {
             get
@@ -251,7 +259,7 @@ namespace Sqo
         }
         public void SetValue<T>(T obj)
         {
-            this.SetValue<T>(obj);
+            this.SetValue((object)obj);
         }
         public void SetValue(object obj)
         {
