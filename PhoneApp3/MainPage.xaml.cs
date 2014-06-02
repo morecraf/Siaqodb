@@ -79,7 +79,7 @@ namespace PhoneApp3
             int?[] nullableArray = new int?[10];
             nullableArray[0] = null;
             nullableArray[1] = 1;
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+            Sqo.SiaqodbConfigurator.SetLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
             SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", "mydasbA81");
             mob.AddSyncType<TodoItem>("TodoItem");
@@ -126,7 +126,7 @@ namespace PhoneApp3
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            Sqo.SiaqodbConfigurator.SetTrialLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
+            Sqo.SiaqodbConfigurator.SetLicense(@"SaZkK/2R2nqAjYg3udWHenOtS3b128RnUILgiTxuYRk=");
             SiaqodbMobile mob = new SiaqodbMobile("https://cristidot.azure-mobile.net/",
            "RLINABsktmvkzJMegbicNASWkzRzEW97", "mydasbA81");
             
