@@ -174,7 +174,9 @@ namespace Microsoft.Synchronization.ClientServices
                 wrapper.WebRequest = webRequest;
                 if(CacheController.HTTPRequestTimeout>0)
                 {
+#if !SILVERLIGHT
                     wrapper.WebRequest.Timeout = CacheController.HTTPRequestTimeout;
+#endif
                 }
                 // Get the request stream
                 if (wrapper.CacheRequest.RequestType == CacheRequestType.UploadChanges)
