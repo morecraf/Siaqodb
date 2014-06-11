@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Licensed", "Licensed", "{97AD602C-1FED-4EF9-BB11-341745224674}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb(Xamarin.iOS)", "Siaqodb(Xamarin.iOS).csproj", "{3B0C0A5E-87DC-49AB-A48B-EAC9100DE104}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb (Xamarin.iOS)", "Siaqodb (Xamarin.iOS).csproj", "{3B0C0A5E-87DC-49AB-A48B-EAC9100DE104}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb (Xamarin.Android)", "Siaqodb (Xamarin.Android).csproj", "{5244BC37-2892-43F5-BDC7-457D02B340A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiaqodbPortable (Xamarin)", "..\SiaqodbPortable\SiaqodbPortable (Xamarin).csproj", "{34780267-6FB3-4F87-B61D-04F81A9F83A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiaqodbSyncMobile (Xamarin.iOS)", "..\SyncFramework\SiaqodbSyncMobileiOS\SiaqodbSyncMobile (Xamarin.iOS).csproj", "{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiaqodbSyncMobile (Xamarin.Android)", "..\SyncFramework\SiaqodbSyncMobileDroid\SiaqodbSyncMobile (Xamarin.Android).csproj", "{1400389D-5116-458C-8F25-6F94A0ADCA92}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xamarin.Tests", "Xamarin.Tests", "{A067D70F-EE42-40F8-A1DC-34EABBBF993D}"
 EndProject
@@ -27,6 +31,18 @@ Global
 		AppStore|iPhone = AppStore|iPhone
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.AppStore|iPhone.Build.0 = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Release|iPhone.Build.0 = Release|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{1400389D-5116-458C-8F25-6F94A0ADCA92}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{34780267-6FB3-4F87-B61D-04F81A9F83A7}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
 		{34780267-6FB3-4F87-B61D-04F81A9F83A7}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
 		{34780267-6FB3-4F87-B61D-04F81A9F83A7}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
@@ -75,6 +91,18 @@ Global
 		{5E49B126-8D99-429B-A1B8-B079AC9A8E17}.Release|iPhone.Build.0 = Release|iPhone
 		{5E49B126-8D99-429B-A1B8-B079AC9A8E17}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{5E49B126-8D99-429B-A1B8-B079AC9A8E17}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.AppStore|iPhone.Build.0 = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Release|iPhone.Build.0 = Release|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{61D969B7-00EC-43DD-8DD4-2A88AED3F122}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
 		{61D969B7-00EC-43DD-8DD4-2A88AED3F122}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
 		{61D969B7-00EC-43DD-8DD4-2A88AED3F122}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
@@ -120,11 +148,13 @@ Global
 		{3B0C0A5E-87DC-49AB-A48B-EAC9100DE104} = {97AD602C-1FED-4EF9-BB11-341745224674}
 		{5244BC37-2892-43F5-BDC7-457D02B340A9} = {97AD602C-1FED-4EF9-BB11-341745224674}
 		{34780267-6FB3-4F87-B61D-04F81A9F83A7} = {97AD602C-1FED-4EF9-BB11-341745224674}
+		{60AF57E8-7C6E-429F-9EBC-468A3521FFB0} = {97AD602C-1FED-4EF9-BB11-341745224674}
+		{1400389D-5116-458C-8F25-6F94A0ADCA92} = {97AD602C-1FED-4EF9-BB11-341745224674}
 		{5E49B126-8D99-429B-A1B8-B079AC9A8E17} = {A067D70F-EE42-40F8-A1DC-34EABBBF993D}
 		{E6CA2A98-C42F-45AE-88B3-AD4E3F630334} = {A067D70F-EE42-40F8-A1DC-34EABBBF993D}
 		{61D969B7-00EC-43DD-8DD4-2A88AED3F122} = {A067D70F-EE42-40F8-A1DC-34EABBBF993D}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ..\..\Examples\Xamarin.iOS\SiaqodbMTDemo\Siaqodb.Xamarin.iOS.Examples.csproj
+		StartupItem = ..\..\Examples\Xamarin.Android\Siaqodb.Xamarin.Android.Examples.csproj
 	EndGlobalSection
 EndGlobal

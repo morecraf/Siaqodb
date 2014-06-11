@@ -80,10 +80,13 @@ publish
 
 # NuGet Packages Directory
 packages
+# Xamarin Components Directory
+siaqodb/Components
 
 # Windows Azure Build Output
 csx
 *.build.csdef
+
 
 # Windows Store app package directory
 AppPackages/
