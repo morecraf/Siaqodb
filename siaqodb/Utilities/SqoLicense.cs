@@ -11,6 +11,7 @@ namespace Sqo.Utilities
         private static bool? valid = null;
         internal static bool hasSync;
         internal static bool hasAMSSync;
+        internal static bool isStarterEdition;
         internal static bool LicenseValid(string licenseKey)
         {
             if (valid!=null)
@@ -61,6 +62,7 @@ namespace Sqo.Utilities
                     DateTime expiredSubscriptionDate = new DateTime(year+1, month, day);
                     if (expiredSubscriptionDate<SiaqodbConfigurator.CurrentVersion.Value)
                     {
+                        valid = false;
                         throw new InvalidLicenseException("Your license is not valid for this version, you have to renew your subscription to use this version!");
                     }
                     if (MatchLicType(licType))
@@ -70,6 +72,7 @@ namespace Sqo.Utilities
                     }
                     else
                     {
+                        valid = false;
                         throw new InvalidLicenseException("License not valid for this platform!");
                   
                     }
@@ -84,6 +87,7 @@ namespace Sqo.Utilities
                     trialExpiredDate = trialExpiredDate.AddDays(30);
                     if (DateTime.Now > trialExpiredDate)
                     {
+                        valid = false;
                         throw new InvalidLicenseException("Trial expired, visit http://siaqodb.com to buy a license");
                     }
                     else
@@ -104,7 +108,8 @@ namespace Sqo.Utilities
             }
             catch (Exception ex)
             {
-                return false;
+                valid = false;
+                throw new InvalidLicenseException("License not valid!");
             }
 
         }
@@ -113,28 +118,28 @@ namespace Sqo.Utilities
         {
 
 #if WP7
-       if (licType == "ALL" || licType == "BOTH" || licType == "WP")
+       if (licType.Contains("ALL") || licType.Contains("BOTH") || licType.Contains("WP"))
                 return true;
 #elif SL4
-       if (licType == "ALL" || licType == "BOTH" || licType == "SL" || licType == "SILV")
+       if (licType.Contains("ALL") || licType.Contains("BOTH") || licType.Contains("SL") || licType.Contains("SILV"))
                 return true;
 #elif XIOS
-       if (licType == "ALL" || licType == "MT")
+       if (licType.Contains("ALL") || licType.Contains("MT"))
                 return true;
 #elif MONODROID
-       if (licType == "ALL" || licType == "MD")
+       if (licType.Contains("ALL") || licType.Contains("MD"))
                 return true;
 #elif UNITY3D
-       if (licType == "ALL" || licType == "U3D")
+       if (licType.Contains("ALL") || licType.Contains("U3D"))
                 return true;
 #elif WinRT
-       if (licType == "ALL" || licType == "WinRT")
+       if (licType.Contains("ALL") || licType.Contains("WinRT"))
                 return true;
 #elif CF
-       if (licType == "ALL" || licType == "WM")
+       if (licType.Contains( "ALL") || licType.Contains("WM"))
                 return true;
 #else
-            if (licType == "ALL" || licType == "BOTH" || licType == "NET")
+            if (licType.Contains("ALL") || licType.Contains("BOTH") || licType.Contains("NET"))
                 return true;
 #endif
             return false;
@@ -148,9 +153,18 @@ namespace Sqo.Utilities
                 {
                     return true;
                 }
+                else
+                {
+                    throw new InvalidLicenseException("License not valid!");
+                }
 
             }
-            throw new InvalidLicenseException("License not valid!");
+            else
+            {
+                isStarterEdition = true;
+                return true;
+            }
+            
         }
     }
 }
