@@ -17,18 +17,18 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\MonoAndroid\</OutputPath>
+    <OutputPath>bin\xamarin.android</OutputPath>
     <DefineConstants>TRACE;DEBUG;MONODROID;ASYNC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
-    <DocumentationFile>bin\MonoAndroid\Siaqodb.xml</DocumentationFile>
+    <DocumentationFile>bin\xamarin.android\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\MonoAndroid\</OutputPath>
+    <OutputPath>bin\xamarin.android</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>

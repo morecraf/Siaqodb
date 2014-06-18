@@ -15,7 +15,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\iPhoneSimulator\MonoTouch\</OutputPath>
+    <OutputPath>bin\xamarin.ios</OutputPath>
     <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
     <MtouchLink>None</MtouchLink>
     <GenerateDocumentation>True</GenerateDocumentation>
     <AssemblyName>Siaqodb</AssemblyName>
-    <DocumentationFile>bin\iPhoneSimulator\MonoTouch\Siaqodb.xml</DocumentationFile>
+    <DocumentationFile>bin\xamarin.ios\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
