@@ -146,13 +146,13 @@
     <None Include="UnitTestsSiaqodbWinRT_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Siaqodb, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Siaqodb, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\netcore45\Siaqodb.dll</HintPath>
+      <HintPath>..\packages\Siaqodb.4.0.0.12\lib\netcore45\Siaqodb.dll</HintPath>
     </Reference>
-    <Reference Include="SiaqodbPortable, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SiaqodbPortable, Version=4.0.0.9, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\netcore45\SiaqodbPortable.dll</HintPath>
+      <HintPath>..\packages\Siaqodb.4.0.0.12\lib\netcore45\SiaqodbPortable.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">

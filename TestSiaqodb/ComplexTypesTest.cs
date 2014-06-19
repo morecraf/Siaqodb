@@ -16,7 +16,7 @@ namespace TestSiaqodb.M.S
         public ComplexTypesTest()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;
-              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
+              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
         }
         [TestMethod]
         public void TestStore()
@@ -478,6 +478,35 @@ namespace TestSiaqodb.M.S
 
 
         }
+        [TestMethod]
+        public void TestStorePartialOnIndexed()
+        {
+            SiaqodbConfigurator.AddIndex("cId", typeof(C));
+            Siaqodb s_db = new Siaqodb(objPath);
+            s_db.DropType<A>();
+            s_db.DropType<B>();
+            s_db.DropType<C>();
+            for (int i = 0; i < 10; i++)
+            {
+                A a = new A();
+                a.aId = i;
+                a.BVar = new B();
+                a.BVar.bId = 11;
+                a.BVar.Ci = new C();
+                a.BVar.Ci.ACircular = a;
+                a.BVar.Ci.cId = i%2;
+                s_db.StoreObject(a);
+            }
+            IList<A> lsA = s_db.LoadAll<A>();
+            lsA[0].BVar.Ci.cId = 3;
+            s_db.StoreObjectPartially(lsA[0].BVar, "Ci");
+            var q = (from C c in s_db
+                     where c.cId == 3
+                     select c).ToList();
+            Assert.AreEqual(1, q.Count);
+              
+        }
+      
     }
 
     public class A

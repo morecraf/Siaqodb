@@ -16,7 +16,7 @@ namespace SiaqodbUnitTests
         string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
         public LINQTests()
         {
-              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
+              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
         }	
         [TestMethod]
         public async Task TestBasicQuery()
@@ -175,7 +175,7 @@ namespace SiaqodbUnitTests
 
 
             var query = await (from Customer c in siaqodb
-                        where c.Name.Contains("Avanade")
+                        where c.Name.Contains("ADH")
                         select c).ToListAsync();
 
 
