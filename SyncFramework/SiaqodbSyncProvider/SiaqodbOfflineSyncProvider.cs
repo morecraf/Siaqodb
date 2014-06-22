@@ -471,10 +471,13 @@ namespace SiaqodbSyncProvider
                 this.SyncProgress(this, args);
             }
         }
+        #if !CF
         public void SetHTTPRequestTimeout(int timeout)
         {
+
             CacheController.HTTPRequestTimeout = timeout;
         }
+#endif
     }
     public class ConflictsEventArgs:EventArgs
     {

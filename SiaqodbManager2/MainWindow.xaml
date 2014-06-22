@@ -50,6 +50,13 @@
             </MenuItem>
         </Menu>
         <ToolBar Height="55"  Grid.Row="1" >
+            <Button Name="btnDBInfo" Click="btnDBInfo_Click"  Height="50" ToolTip="Current database info">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Image Source="Resources/info3.png" Height="29" RenderTransformOrigin="0.655,0.5"></Image>
+                    <TextBlock Text="DB info "></TextBlock>
+                </StackPanel>
+
+            </Button>
             <Button  Name="btnNewLINQ" Click="btnNewLINQ_Click" VerticalContentAlignment="Top" Height="50" ToolTip="New linq editor">
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/new.png" Height="29"></Image>
@@ -73,8 +80,10 @@
                     <Image Source="Resources/run.png" Height="29"></Image>
                     <TextBlock Text="Run linq "></TextBlock>
                 </StackPanel>
+                
             </Button>
-           
+            
+
         </ToolBar>
         <ToolBar Height="35"  Grid.Row="2" >
             <Button  Name="btnOpenDB" Click="btnOpenDB_Click" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Height="30" >

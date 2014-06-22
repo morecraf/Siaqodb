@@ -37,8 +37,9 @@ namespace Sqo.Utilities
                 bool notTrial = int.TryParse(keyValues[0], out lcMode);
 #else
                 bool notTrial=false;
+                lcMode = 0;
                 try { lcMode = Convert.ToInt32(keyValues[0]); notTrial = true; }
-                finally { }
+                catch { }
 #endif
                 if (notTrial && lcMode == 1)
                 {

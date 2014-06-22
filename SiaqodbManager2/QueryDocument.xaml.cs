@@ -17,6 +17,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Collections;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SiaqodbManager
 {
@@ -171,16 +172,16 @@ namespace SiaqodbManager
             
             EncryptionSettings.SetEncryptionSettings();//set back settings
 
-            string ifEncrypted = "";
+            string ifEncrypted = @" Sqo.SiaqodbConfigurator.SetLicense(@"" qU3TtvA4T4L30VSlCCGUTbooYKG1XXCnjJ+jaPPrPLaD7PdPw9HujjxmkZ467OqZ"");";
             if (EncryptionSettings.IsEncryptedChecked)
             {
-                ifEncrypted = @" SiaqodbConfigurator.EncryptedDatabase=true;
-                                 SiaqodbConfigurator.SetEncryptor(BuildInAlgorithm."+EncryptionSettings.Algorithm+@"); 
+                ifEncrypted += @" Sqo.SiaqodbConfigurator.EncryptedDatabase=true;
+                                 Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm." + EncryptionSettings.Algorithm + @"); 
 
                                 ";
                 if (!string.IsNullOrEmpty(EncryptionSettings.Pwd))
                 {
-                    ifEncrypted += @"SiaqodbConfigurator.SetEncryptionPassword(""" + EncryptionSettings.Pwd + @""");";
+                    ifEncrypted += @" SiaqodbConfigurator.SetEncryptionPassword(""" + EncryptionSettings.Pwd + @""");";
 
                 }
             }
@@ -218,7 +219,8 @@ namespace SiaqodbManager
               c.Class("RunQuery")
                 .AddMethod(c.Method("object", "FilterByLINQ", "", metBody)));
 
-            Assembly assembly = c.Compile(WriteErrors);
+            Assembly assembly = c.Compile( WriteErrors);
+          
             if (assembly != null)
             {
                 Type t = assembly.GetType("LINQQuery.RunQuery");
@@ -227,14 +229,9 @@ namespace SiaqodbManager
                 try
                 {
                     var retVal = method.Invoke(null, null);
-                    //Type[] tt = retVal.GetType().GetGenericArguments();
+                   
                     IList w = ((IList)retVal);
-                    //ArrayList ar = new ArrayList();
-                    //while (w.MoveNext())
-                    //{
-                    //    ar.Add(w.Current);
 
-                    //}
                     this.dataGridView1.DataSource = w;
                     this.dataGridView1.AutoGenerateColumns = true;
                     this.tabControl1.SelectedIndex = 0;
