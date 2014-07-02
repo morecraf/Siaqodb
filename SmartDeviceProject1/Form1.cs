@@ -29,6 +29,10 @@ namespace SmartDeviceProject1
             instance.StoreObject(a);
             IList<A> ssss = instance.LoadAll<A>();
             string s = "";
+
+            PropertyInfo pi=typeof(A).GetProperty("AString");
+            string backingField = Sqo.Utilities.ExternalMetaHelper.GetBackingField(pi);
+            instance.DeleteObjectBy(backingField, ssss[1]);
         }
     }
     public class A
