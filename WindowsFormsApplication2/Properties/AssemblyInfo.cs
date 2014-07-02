@@ -5,23 +5,29 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("WindowsFormsApplication2")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("siaqodb")]
+[assembly: AssemblyDescription("NoSQL embedded database for .NET")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("WindowsFormsApplication2")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2014")]
+[assembly: AssemblyCompany("Dotissi")]
+[assembly: AssemblyProduct("siaqodb")]
+[assembly: AssemblyCopyright("Copyright © Dotissi 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
+#if UNITY3D || CF 
+#else
+//[assembly:AssemblyKeyFile("siaqodb.pfx")]
+#endif
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("151f209c-3c5d-4da8-bbbb-51eeca05707a")]
 
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("6499f830-6a14-4472-9eb7-dabbf0470ceb")]
+
+//[assembly:InternalsVisibleTo("SiaqodbManager")]
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
@@ -31,6 +37,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("4.0.1.0")]
+
