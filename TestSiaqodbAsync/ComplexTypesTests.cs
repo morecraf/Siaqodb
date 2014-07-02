@@ -17,7 +17,7 @@ namespace SiaqodbUnitTests
         public ComplexTypesTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = false;
-              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
+              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
         }
         [TestMethod]
         public async Task TestStore()
@@ -419,6 +419,36 @@ namespace SiaqodbUnitTests
             await s_db.FlushAsync();
             IList<A> lsA1 = await s_db.LoadAllAsync<A>();
             Assert.IsNull(lsA1[0].BVar.Ci);
+        }
+        [TestMethod]
+        public async Task TestStorePartialOnIndexed()
+        {
+            SiaqodbConfigurator.AddIndex("cId", typeof(C));
+
+            Siaqodb s_db = new Siaqodb(); await s_db.OpenAsync(dbFolder);
+            await s_db.DropTypeAsync<A>();
+            await s_db.DropTypeAsync<B>();
+            await s_db.DropTypeAsync<C>();
+            for (int i = 0; i < 10; i++)
+            {
+                A a = new A();
+                a.aId = i;
+                a.BVar = new B();
+                a.BVar.bId = 11;
+                a.BVar.Ci = new C();
+                a.BVar.Ci.ACircular = a;
+                a.BVar.Ci.cId = i%2;
+                await s_db.StoreObjectAsync(a);
+            }
+            await s_db.FlushAsync();
+            IList<A> lsA = await s_db.LoadAllAsync<A>();
+            lsA[0].BVar.Ci.cId = 3;
+            await s_db.StoreObjectPartiallyAsync(lsA[0].BVar, "Ci");
+            var q = await (from C c in s_db
+                     where c.cId == 3
+                     select c).ToListAsync();
+            Assert.AreEqual(1, q.Count);
+
         }
     }
     public class A

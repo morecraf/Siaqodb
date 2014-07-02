@@ -780,7 +780,154 @@ namespace Sqo.Indexes
 
        }
 #endif
+       public object GetValueForFutureUpdateIndex(int oid, string fieldName, SqoTypeInfo ti)
+       {
+          
+           if (cacheIndexes != null)
+           {
+               if (cacheIndexes.ContainsType(ti))
+               {
+                   if (oid > 0 && oid <= ti.Header.numberOfRecords)
+                   {
+                       IBTree index = cacheIndexes.GetIndex(ti, fieldName);
+                       if (index != null)
+                       {
+                           return siaqodb.LoadValue(oid, fieldName, ti.Type);
+                       }
 
+                   }
+               }
+           }
+
+           return null;
+       }
+#if ASYNC
+       public async Task<object> GetValueForFutureUpdateIndexAsync(int oid, string fieldName, SqoTypeInfo ti)
+       {
+
+           if (cacheIndexes != null)
+           {
+               if (cacheIndexes.ContainsType(ti))
+               {
+                   if (oid > 0 && oid <= ti.Header.numberOfRecords)
+                   {
+                       IBTree index = cacheIndexes.GetIndex(ti, fieldName);
+                       if (index != null)
+                       {
+                           return await siaqodb.LoadValueAsync(oid, fieldName, ti.Type);
+                       }
+
+                   }
+               }
+           }
+
+           return null;
+       }
+#endif
+       public void UpdateIndexes(int oid, string fieldName, SqoTypeInfo ti, object oldValue, object newValue)
+       {
+
+           if (cacheIndexes != null)
+           {
+               if (cacheIndexes.ContainsType(ti))
+               {
+                   IBTree index = cacheIndexes.GetIndex(ti, fieldName);
+                   if (index != null)
+                   {
+
+                       int c = 0;
+                       if (newValue == null || oldValue == null)
+                       {
+                           if (newValue == oldValue)
+                               c = 0;
+                           else if (newValue == null)
+                               c = -1;
+                           else if (oldValue == null)
+                               c = 1;
+                       }
+                       else
+                       {
+                           Type fieldType = newValue.GetType();
+                           object currentFieldVal = newValue;
+                           if (fieldType.IsEnum())
+                           {
+                               Type enumType = Enum.GetUnderlyingType(fieldType);
+
+                               currentFieldVal = Convertor.ChangeType(newValue, enumType);
+                           }
+                           c = ((IComparable)currentFieldVal).CompareTo(oldValue);
+                       }
+                       if (c == 0)//do nothing because values are equal
+                       {
+
+                       }
+                       else
+                       {
+                           //first remove oid=> a node can remain with ZERO oids but is np
+                           index.RemoveOid(oldValue, oid);
+                           //add new value(updated)
+                           index.AddItem(newValue, new int[] { oid });
+                           index.Persist();
+                       }
+                   }
+
+               }
+           }
+
+       }
+#if ASYNC
+       public async Task UpdateIndexesAsync(int oid, string fieldName, SqoTypeInfo ti, object oldValue, object newValue)
+       {
+
+           if (cacheIndexes != null)
+           {
+               if (cacheIndexes.ContainsType(ti))
+               {
+                   IBTree index = cacheIndexes.GetIndex(ti, fieldName);
+                   if (index != null)
+                   {
+
+                       int c = 0;
+                       if (newValue == null || oldValue == null)
+                       {
+                           if (newValue == oldValue)
+                               c = 0;
+                           else if (newValue == null)
+                               c = -1;
+                           else if (oldValue == null)
+                               c = 1;
+                       }
+                       else
+                       {
+                           Type fieldType = newValue.GetType();
+                           object currentFieldVal = newValue;
+                           if (fieldType.IsEnum())
+                           {
+                               Type enumType = Enum.GetUnderlyingType(fieldType);
+
+                               currentFieldVal = Convertor.ChangeType(newValue, enumType);
+                           }
+                           c = ((IComparable)currentFieldVal).CompareTo(oldValue);
+                       }
+                       if (c == 0)//do nothing because values are equal
+                       {
+
+                       }
+                       else
+                       {
+                           //first remove oid=> a node can remain with ZERO oids but is np
+                           await index.RemoveOidAsync(oldValue, oid);
+                           //add new value(updated)
+                           await index.AddItemAsync(newValue, new int[] { oid });
+                           await index.PersistAsync();
+                       }
+                   }
+
+               }
+           }
+
+       }
+#endif
        internal void Close()
        {
            this.cacheIndexes = null;

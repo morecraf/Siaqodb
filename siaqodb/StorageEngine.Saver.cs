@@ -160,7 +160,10 @@ namespace Sqo
                     type = property.PropertyType;
 
                 }
+                object oldPropVal = indexManager.GetValueForFutureUpdateIndex(oid, backingField, tiOfProp);
                 this.SaveValue(oid, backingField, tiOfProp, objOfProp);
+                indexManager.UpdateIndexes(oid, backingField, tiOfProp, oldPropVal, objOfProp);
+
 
             }
         }
@@ -199,7 +202,9 @@ namespace Sqo
                     type = property.PropertyType;
 
                 }
+                object oldPropVal = await indexManager.GetValueForFutureUpdateIndexAsync(oid, backingField, tiOfProp);
                 await this.SaveValueAsync(oid, backingField, tiOfProp, objOfProp).ConfigureAwait(false);
+                await indexManager.UpdateIndexesAsync(oid, backingField, tiOfProp, oldPropVal, objOfProp);
 
             }
         }

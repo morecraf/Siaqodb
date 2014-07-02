@@ -12,8 +12,8 @@ namespace SiaqodbManager
     {
         private List<CodeCompileUnit> listCompileUnits = new List<CodeCompileUnit>();
         private List<CodeNamespace> listNamespaces = new List<CodeNamespace>();
-        private System.Collections.Specialized.StringCollection listReferencedAssemblies = 
-            new System.Collections.Specialized.StringCollection() { "System.dll" };
+        private System.Collections.Specialized.StringCollection listReferencedAssemblies =
+            new System.Collections.Specialized.StringCollection();
 
         public CodeDom()
            

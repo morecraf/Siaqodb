@@ -180,6 +180,7 @@ namespace SiaqodbManager
             btnSave.IsEnabled = false;
             menuSave.IsEnabled = false;
             menuSaveAs.IsEnabled = false;
+            btnDBInfo.IsEnabled = false;
             
         }
 
@@ -470,6 +471,7 @@ namespace SiaqodbManager
                     }
 
                 }
+                btnDBInfo.IsEnabled = true;
             }
             else
             {
@@ -560,7 +562,23 @@ namespace SiaqodbManager
             }
         }
 
-     
+        private void btnDBInfo_Click(object sender, RoutedEventArgs e)
+        {
+            if (siaqodbList != null)
+            {
+                foreach (Sqo.MetaType mt in siaqodbList)
+                {
+
+                }
+                DatabaseInfo dbinfo = new DatabaseInfo();
+
+                dbinfo.Title ="Database info";
+                SetDefaultSettings(dbinfo);
+                dbinfo.Initialize(siaqodb,siaqodbList);
+                dbinfo.Show(this.dockingManager1);
+                dbinfo.Activate();
+            }
+        }
 
     }
 }

@@ -103,6 +103,7 @@ namespace SiaqodbManager
             this.dataGridView1.Size = new System.Drawing.Size(648, 516);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.VirtualMode = true;
+            
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             this.dataGridView1.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView1_CellValueNeeded);
             this.dataGridView1.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView1_CellValuePushed);
@@ -111,6 +112,7 @@ namespace SiaqodbManager
             this.dataGridView1.UserAddedRow += new System.Windows.Forms.DataGridViewRowEventHandler(dataGridView1_UserAddedRow);
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellContentClick);
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellDoubleClick);
+            this.dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
             myhost.Child = dataGridView1;
             this.typesList = typesList;
             this.metaType = metaType;
@@ -129,6 +131,7 @@ namespace SiaqodbManager
             }
             dataGridView1.Columns.Clear();
             dataGridView1.Columns.Add("OID", "OID");
+            //dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.SystemColors.ControlDark;
             foreach (MetaField f in metaType.Fields)
             {
 
@@ -162,6 +165,80 @@ namespace SiaqodbManager
             {
                 //this.lblNrRows.Text = oids.Count + " rows";
             }
+        }
+        int currentSortedColumn = -1;
+        System.Windows.Forms.SortOrder currentSortOrder;
+        void dataGridView1_ColumnHeaderMouseClick(object sender, System.Windows.Forms.DataGridViewCellMouseEventArgs e)
+        {
+            if (e.ColumnIndex > 0)
+            {
+                MetaField fi = metaType.Fields[e.ColumnIndex - 1];
+                if (fi.FieldType == null || typeof(IList).IsAssignableFrom(fi.FieldType))//complex type
+                {
+                    return;
+                }
+            }
+            if (currentSortedColumn != -1)
+            {
+                dataGridView1.Columns[currentSortedColumn].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.None;
+                dataGridView1.Columns[currentSortedColumn].HeaderCell.Style.BackColor = System.Drawing.SystemColors.Control;
+            }
+            if (e.ColumnIndex == currentSortedColumn)
+            {
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Descending;
+                    currentSortOrder = System.Windows.Forms.SortOrder.Descending;
+                }
+                else
+                {
+                    dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                    currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
+            }
+            dataGridView1.Columns[e.ColumnIndex].HeaderCell.Style.BackColor = System.Drawing.SystemColors.ControlDark;
+            currentSortedColumn = e.ColumnIndex;
+            this.SortByColumn();
+        }
+
+        private void SortByColumn()
+        {
+            if (currentSortedColumn == 0)
+            {
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    oids = oids.OrderBy(a => a).Select(a => a).ToList();
+                }
+                else
+                {
+                    oids = oids.OrderByDescending(a => a).Select(a => a).ToList();
+                }
+               
+            }
+            else
+            {
+                List<SortableEntity> seList = new List<SortableEntity>();
+                foreach (int oid in oids)
+                {
+                    object val = siaqodb.LoadValue(oid, metaType.Fields[currentSortedColumn - 1].Name, metaType);
+                    SortableEntity se = new SortableEntity() { OID = oid, SortableValue = val };
+                    seList.Add(se);
+                }
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    oids = seList.OrderBy(a => a.SortableValue).Select(a => a.OID).ToList();
+                }
+                else
+                {
+                    oids = seList.OrderByDescending(a => a.SortableValue).Select(a => a.OID).ToList();
+                }
+            }
+            dataGridView1.Refresh();
         }
         protected void OnOpenObjects(MetaEventArgs args)
         {
@@ -442,6 +519,11 @@ namespace SiaqodbManager
             this.mType = mType;
             this.oids = oids;
         }
+    }
+    public class SortableEntity
+    {
+        public int OID { get; set; }
+        public object SortableValue { get; set; }
     }
     
 }

@@ -9,6 +9,7 @@ using Sqo.Attributes;
 using Sqo.Exceptions;
 using Sqo.Transactions;
 using Windows.Storage;
+using System.Reflection;
 
 namespace SiaqodbUnitTests
 {
@@ -18,8 +19,8 @@ namespace SiaqodbUnitTests
         StorageFolder dbFolder = ApplicationData.Current.LocalFolder;
         public BasicTests()
         {
-              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
-          
+              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
+           
         }
         [TestMethod]
         public async Task TestInsert()
@@ -27,6 +28,7 @@ namespace SiaqodbUnitTests
             Siaqodb nop = new Siaqodb();
             try
             {
+                
                 await nop.OpenAsync(ApplicationData.Current.LocalFolder);
                 await nop.DropTypeAsync<Customer>();
                 for (int i = 10; i < 20; i++)

@@ -3,26 +3,27 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C1BA127F-10B1-5E62-ABD0-7DB1112139A7}</ProjectGuid>
     <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>SiaqodbSyncProviderMT</RootNamespace>
+    <RootNamespace>SiaqodbSyncProvider</RootNamespace>
     <MtouchSdkVersion>4.2</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\iPhoneSimulator\Licensed\</OutputPath>
+    <OutputPath>bin\xamarin.ios</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
     <ConsolePause>False</ConsolePause>
     <MtouchLink>None</MtouchLink>
-    <AssemblyName>SiaqodbSyncProvideriOS</AssemblyName>
+    <AssemblyName>SiaqodbSyncProvider</AssemblyName>
+    <DocumentationFile>bin\xamarin.ios\SiaqodbSyncProvider.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -64,9 +65,6 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="ExpressionCompilerMT">
-      <HintPath>..\..\libs\ExpressionCompilerMT.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -84,6 +82,14 @@
     <ProjectReference Include="..\SyncCacheController\SyncCacheController %28Xamarin.iOS%29.csproj">
       <Project>{6EC0573E-CAAB-4B83-8474-99A42B6B16A8}</Project>
       <Name>SyncCacheController (Xamarin.iOS)</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28Xamarin.iOS%29.csproj">
+      <Project>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE104}</Project>
+      <Name>Siaqodb (Xamarin.iOS)</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28Xamarin%29.csproj">
+      <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
+      <Name>SiaqodbPortable (Xamarin)</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

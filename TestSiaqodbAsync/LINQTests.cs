@@ -16,7 +16,7 @@ namespace SiaqodbUnitTests
         string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
         public LINQTests()
         {
-              SiaqodbConfigurator.SetLicense("Q3ALvFX78oSAX5bF/uJhboptXN5g2EZLsyiBLHIsWbuIPn+HGtqvTaSZUortZcEV");
+              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
         }	
         [TestMethod]
         public async Task TestBasicQuery()
@@ -153,8 +153,8 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task TestBasicWhereStringComparison()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
-            await nop.DropTypeAsync<Customer>();
+            Siaqodb siaqodb = new Siaqodb(); await siaqodb.OpenAsync(dbFolder);
+            await siaqodb.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
             {
@@ -169,35 +169,38 @@ namespace SiaqodbUnitTests
                     c.Name = "ADH" + i.ToString();
                 }
                 listInitial.Add(c);
-                await nop.StoreObjectAsync(c);
+                await siaqodb.StoreObjectAsync(c);
             }
-            await nop.FlushAsync();
-            var query = await (from Customer c in nop
+            await siaqodb.FlushAsync();
+
+
+            var query = await (from Customer c in siaqodb
                         where c.Name.Contains("ADH")
                         select c).ToListAsync();
 
+
             Assert.AreEqual(query.Count, 5);
-            query = await (from Customer c in nop
+            query = await (from Customer c in siaqodb
                     where c.Name.Contains("2T")
                     select c).ToListAsync();
 
             Assert.AreEqual(query.Count, 1);
 
-            query = await (from Customer c in nop
+            query = await (from Customer c in siaqodb
                     where c.Name.StartsWith("A")
                     select c).ToListAsync();
             Assert.AreEqual(query.Count, 5);
-            query = await (from Customer c in nop
+            query = await (from Customer c in siaqodb
                     where c.Name.StartsWith("ake")
                     select c).ToListAsync();
 
 
             Assert.AreEqual(query.Count, 0);
-            query = await (from Customer c in nop
+            query = await (from Customer c in siaqodb
                     where c.Name.EndsWith("ADH")
                     select c).ToListAsync();
             Assert.AreEqual(0, query.Count);
-            query = await (from Customer c in nop
+            query = await (from Customer c in siaqodb
                     where c.Name.EndsWith("TEST")
                     select c).ToListAsync();
             Assert.AreEqual(5, query.Count);

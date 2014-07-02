@@ -3,75 +3,68 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE107}</ProjectGuid>
+    <ProjectGuid>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE104}</ProjectGuid>
     <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Siaqodb</RootNamespace>
+    <RootNamespace>Sqo</RootNamespace>
     <MtouchSdkVersion>4.2</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\iPhoneSimulator\Licensed</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;XIOS;</DefineConstants>
+    <OutputPath>bin\xamarin.ios</OutputPath>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
     <ConsolePause>False</ConsolePause>
     <MtouchLink>None</MtouchLink>
     <GenerateDocumentation>True</GenerateDocumentation>
-    <AssemblyName>SiaqodbiOS</AssemblyName>
+    <AssemblyName>Siaqodb</AssemblyName>
+    <DocumentationFile>bin\xamarin.ios\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <OutputPath>bin\iPhoneSimulator\DebugLicensed\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
     <MtouchLink>None</MtouchLink>
-    <AssemblyName>Siaqodb.Xam.iOS</AssemblyName>
+    <AssemblyName>SiaqodbAsync.Xamarin.iOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\iPhone\DebugLicensed\</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;</DefineConstants>
+    <OutputPath>bin\iPhone\DebugLicensed</OutputPath>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
     <ConsolePause>False</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AssemblyName>SiaqodbXiOS</AssemblyName>
+    <AssemblyName>SiaqodbAsyncXiOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\iPhone\Release</OutputPath>
+    <OutputPath>bin\iPhone\DebugLicensed</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AssemblyName>SiaqodbMT</AssemblyName>
+    <AssemblyName>SiaqodbAsync.Xamarin.iOS</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="ExpressionCompilerMT">
-      <HintPath>..\libs\ExpressionCompilerMT.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Attributes\IgnoreAttribute.cs" />
-    <Compile Include="Attributes\Index.cs" />
-    <Compile Include="Attributes\MaxLengthAttribute.cs" />
-    <Compile Include="Attributes\UniqueConstraint.cs" />
-    <Compile Include="Attributes\UseVariable.cs" />
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
     <Compile Include="Cache\CacheForIndexes.cs" />
@@ -87,7 +80,6 @@
     <Compile Include="Core\SqoISFile2.cs" />
     <Compile Include="Core\SqoMDFile.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
-    <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
@@ -99,7 +91,6 @@
     <Compile Include="Internal\_bs.cs" />
     <Compile Include="Linq\Evaluator.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
-    <Compile Include="Linq\ISqoQuery.cs" />
     <Compile Include="Linq\JoinTranslator.cs" />
     <Compile Include="Linq\LazyEnumerator.cs" />
     <Compile Include="Linq\LazySqoQuery.cs" />
@@ -109,7 +100,6 @@
     <Compile Include="Linq\SelectQuery.cs" />
     <Compile Include="Linq\SqoColumn.cs" />
     <Compile Include="Linq\SqoQuery.cs" />
-    <Compile Include="Linq\SqoQueryExtensions.cs" />
     <Compile Include="Meta\FieldSqoInfo.cs" />
     <Compile Include="Meta\MetaExtractor.cs" />
     <Compile Include="Meta\ObjectInfo.cs" />
@@ -134,13 +124,8 @@
     <Compile Include="Utilities\ObjectRow.cs" />
     <Compile Include="Utilities\ObjectTable.cs" />
     <Compile Include="Utilities\ObjectTableHelper.cs" />
-    <Compile Include="Utilities\SqoUnity3DLic.cs" />
-    <Compile Include="Events.cs" />
-    <Compile Include="IObjectList.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="LazyObjectList.cs" />
-    <Compile Include="MetaField.cs" />
-    <Compile Include="MetaType.cs" />
     <Compile Include="ObjectList.cs" />
     <Compile Include="Siaqodb.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
@@ -148,7 +133,6 @@
     <Compile Include="StorageEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\RawdataSerializer.cs" />
-    <Compile Include="Attributes\TextAttribute.cs" />
     <Compile Include="Indexes\IndexInfo.cs" />
     <Compile Include="Utilities\Convertor.cs" />
     <Compile Include="MetaObjects\RawdataInfo.cs" />
@@ -156,7 +140,6 @@
     <Compile Include="Cache\CircularRefCache.cs" />
     <Compile Include="Linq\IncludeSqoQuery.cs" />
     <Compile Include="Utilities\ATuple.cs" />
-    <Compile Include="Utilities\SqoTrialLicense.cs" />
     <Compile Include="Linq\SqoOrderedQuery.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
     <Compile Include="Core\ObjectSerializer.Reader.cs" />
@@ -180,5 +163,19 @@
     <Compile Include="Cache\CacheOIDs.cs" />
     <Compile Include="Cache\ConditionalWeakTable.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
+    <Compile Include="AsyncLocker\AsyncLock.cs" />
+    <Compile Include="MetaObjects\DocumentInfo.cs" />
+    <Compile Include="Utilities\SqoLicense.cs" />
+    <Compile Include="Cache\CacheDocuments.cs" />
+    <Compile Include="Linq\SqoQueryExtensionsImpl.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AsyncLocker\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28Xamarin%29.csproj">
+      <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
+      <Name>SiaqodbPortable (Xamarin)</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

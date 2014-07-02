@@ -55,12 +55,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Siaqodb, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Siaqodb, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\net45\Siaqodb.dll</HintPath>
-    </Reference>
-    <Reference Include="SiaqodbPortable">
-      <HintPath>..\packages\Siaqodb.4.0.0.8\lib\net45\SiaqodbPortable.dll</HintPath>
+      <HintPath>D:\temp\SFA_DLL\aaa\Siaqodb.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -72,6 +69,7 @@
     <Compile Include="ComplexTypesTest.cs" />
     <Compile Include="JaggedTests.cs" />
     <Compile Include="JoinTest.cs" />
+    <Compile Include="LicensesTests.cs" />
     <Compile Include="LINQTest.cs" />
     <Compile Include="ObjectTableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
