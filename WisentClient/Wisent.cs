@@ -17,10 +17,10 @@ namespace WisentClient
             DotissiObject result;
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri("http://localhost:9000/");
+                httpClient.BaseAddress = new Uri("http://localhost:53411/");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/"+bucket+"/"+key);
+                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/excelsior/"+bucket+"/"+key);
                 httpResponseMessage.EnsureSuccessStatusCode();
                 List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
                 formatters.Add(
@@ -35,11 +35,11 @@ namespace WisentClient
         {
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri("http://localhost:9000/");
+                httpClient.BaseAddress = new Uri("http://localhost:53411/");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync("/"+bucket, obj, formatter);
+                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync("excelsior/"+bucket, obj, formatter);
                 if (!httpResponseMessage.IsSuccessStatusCode)
                 {
                     string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;

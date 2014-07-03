@@ -54,8 +54,8 @@ namespace WindowsFormsApplication2
             WisentClient.Wisent client = new WisentClient.Wisent();
             DotissiObject doObj = new DotissiObject();
             User book=new User();
-            book.UserName="2022";
-            book.author="Cristi Ursachi";
+            book.UserName="2023";
+            book.author="Cristi Ursachi45";
             book.body="An amazing book...";
             book.title="How tos";
             book.copies_owned=7;
@@ -64,13 +64,13 @@ namespace WindowsFormsApplication2
             doObj.Key = book.UserName;
             try
             {
-                await client.Put("books", doObj);
+                await client.Put("crypto_users", doObj);
             }
             catch(Exception ex)
             {
                 
             }
-            DotissiObject obj = await client.Get("books", book.UserName);
+            DotissiObject obj = await client.Get("crypto_users", book.UserName);
             string a = "";
 
         }
