@@ -39,7 +39,7 @@ namespace App1
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+            Sqo.SiaqodbConfigurator.SetLicense(@" i/AOVHf64RgOFsQ3tQbLyAGTDrmVBvpAlNI0/h9kTaUNa5SvqcNzDOo8UuCzKt2Qyti8OEi74oGCetVUakukAw==");
             Siaqodb nop = new Siaqodb();
             
             await nop.OpenAsync(ApplicationData.Current.LocalFolder);

@@ -19,6 +19,7 @@ namespace Sqo
         TagsIndexManager indexManager;
         private readonly object _locker = new object();
         private readonly AsyncLock _lockerAsync = new AsyncLock();
+#if !WinRT
         public DotissiDB(string bucketPath)
         {
             SiaqodbConfigurator.EncryptedDatabase = true;
@@ -27,6 +28,9 @@ namespace Sqo
             siaqodb.SetTagsIndexManager(indexManager);
            
         }
+
+       
+#endif
         private void CreateDirtyEntity(object obj, DirtyOperation dop)
         {
             this.CreateDirtyEntity(obj, dop, null);
@@ -113,7 +117,7 @@ namespace Sqo
             object o = tags;
             Type tagsType = o.GetType();
 
-            PropertyInfo[] pi = tagsType.GetProperties();
+            /*PropertyInfo[] pi = tagsType.GetProperties();
             foreach (PropertyInfo p in pi)
             {
                 if (p.PropertyType == typeof(string) )
@@ -122,7 +126,7 @@ namespace Sqo
                     intTags.Add(p.Name,Convert.ToInt32( p.GetValue(o)));
             }
            
-            this.Store(key, obj, strTags, intTags);
+            this.Store(key, obj, strTags, intTags);*/
         }
 
         public void Store(string key, object obj, Dictionary<string, string> strTags, Dictionary<string, int> intTags)

@@ -138,6 +138,9 @@
     <Compile Include="Core\RawdataSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
     <Compile Include="Core\SqoWinRTFile.cs" />
+    <Compile Include="DoDB.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
@@ -152,6 +155,7 @@
     <Compile Include="Indexes\BTree\BTreeNode.cs" />
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
+    <Compile Include="Indexes\BTree\TagsIndexManager.cs" />
     <Compile Include="Indexes\IndexInfo.cs" />
     <Compile Include="Internal\_bs.cs" />
     <Compile Include="ISqoDataObject.cs" />
