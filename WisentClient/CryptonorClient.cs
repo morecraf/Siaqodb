@@ -8,9 +8,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WisentClient
+namespace Cryptonor
 {
-    public class Wisent
+    public class CryptonorClient
     {
         public async Task<DotissiObject> Get(string bucket,string key)
         {
@@ -28,6 +28,25 @@ namespace WisentClient
 		        
                 var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(DotissiObject), formatters);
                 result = (DotissiObject)obj;
+            }
+            return result;
+        }
+        public async Task<IEnumerable<DotissiObject>> GetByTag(string bucket,string tagName,string op,object value)
+        {
+            IEnumerable<DotissiObject> result;
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new Uri("http://localhost:53411/");
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/excelsior/" + bucket + "/Tags/" + tagName+"/"+op+"/"+value);
+                httpResponseMessage.EnsureSuccessStatusCode();
+                List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
+                formatters.Add(
+                    new JsonMediaTypeFormatter());
+
+                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(IEnumerable<DotissiObject>), formatters);
+                result = (IEnumerable<DotissiObject>)obj;
             }
             return result;
         }

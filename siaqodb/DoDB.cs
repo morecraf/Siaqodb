@@ -274,6 +274,8 @@ namespace Sqo
             this.Document = SiaqodbConfigurator.DocumentSerializer.Serialize(obj);
             this.IsDirty = true;
         }
+        [Ignore]
+        public Dictionary<string, object> Tags { get; set; }
     }
     internal enum DirtyOperation
     {

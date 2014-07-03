@@ -84,7 +84,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb (UniversalApp)", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiaqodbSyncMobile (WPA 8.1)", "SyncFramework\SiaqodbSyncMobile (WPA 8.1)\SiaqodbSyncMobile (WPA 8.1).csproj", "{F4AB87DE-C442-456E-A013-3288D780F2D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WisentClient", "WisentClient\WisentClient.csproj", "{7888AB5E-B9F1-40C0-8132-D0B5E47BFC6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorClient", "WisentClient\CryptonorClient.csproj", "{7888AB5E-B9F1-40C0-8132-D0B5E47BFC6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication2", "WindowsFormsApplication2\WindowsFormsApplication2.csproj", "{8C3C5DF6-2D48-41CB-B625-1676607A769B}"
 EndProject
