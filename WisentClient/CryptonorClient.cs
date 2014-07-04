@@ -7,6 +7,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Cryptonor
 {
@@ -39,7 +40,8 @@ namespace Cryptonor
                 httpClient.BaseAddress = new Uri("http://localhost:53411/");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/excelsior/" + bucket + "/Tags/" + tagName+"/"+op+"/"+value);
+                string uri = "/excelsior/" + bucket + "/" + Mapper.GetTagByType(value.GetType()) + "/" + tagName + "/" + op + "/" + Mapper.URLEncode(value);
+                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(uri);
                 httpResponseMessage.EnsureSuccessStatusCode();
                 List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
                 formatters.Add(

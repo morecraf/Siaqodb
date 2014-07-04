@@ -54,7 +54,7 @@ namespace WindowsFormsApplication2
             Cryptonor.CryptonorClient client = new Cryptonor.CryptonorClient();
             DotissiObject doObj = new DotissiObject();
             User book=new User();
-            book.UserName="2026";
+            book.UserName="2029";
             book.author="Cristi Ursachi45";
             book.body="An amazing book...";
             book.title="How tos";
@@ -64,17 +64,17 @@ namespace WindowsFormsApplication2
             doObj.Key = book.UserName;
             doObj.Tags = new Dictionary<string, object>();
             doObj.Tags["country"] = "RO";
-            doObj.Tags["district"] = "IS";
+            doObj.Tags["mydecimal"] = new decimal(20.2);
 
             try
             {
-                await client.Put("crypto_users", doObj);
+                //await client.Put("crypto_users", doObj);
             }
             catch(Exception ex)
             {
                 
             }
-            IEnumerable<DotissiObject> obj = await client.GetByTag("crypto_users","country","eq","RO");
+            IEnumerable<DotissiObject> obj = await client.GetByTag("crypto_users", "mydecimal", "eq", (double)20);
             string a = "";
 
         }
