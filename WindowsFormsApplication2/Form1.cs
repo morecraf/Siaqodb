@@ -50,27 +50,31 @@ namespace WindowsFormsApplication2
         private async void button2_Click(object sender, EventArgs e)
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
-           
-            WisentClient.Wisent client = new WisentClient.Wisent();
+
+            Cryptonor.CryptonorClient client = new Cryptonor.CryptonorClient();
             DotissiObject doObj = new DotissiObject();
             User book=new User();
-            book.UserName="2022";
-            book.author="Cristi Ursachi";
+            book.UserName="2029";
+            book.author="Cristi Ursachi45";
             book.body="An amazing book...";
             book.title="How tos";
             book.copies_owned=7;
             
             doObj.SetValue<User>(book);
             doObj.Key = book.UserName;
+            doObj.Tags = new Dictionary<string, object>();
+            doObj.Tags["country"] = "RO";
+            doObj.Tags["mydecimal"] = new decimal(20.2);
+
             try
             {
-                await client.Put("books", doObj);
+                //await client.Put("crypto_users", doObj);
             }
             catch(Exception ex)
             {
                 
             }
-            DotissiObject obj = await client.Get("books", book.UserName);
+            IEnumerable<DotissiObject> obj = await client.GetByTag("crypto_users", "mydecimal", "eq", (double)20);
             string a = "";
 
         }
