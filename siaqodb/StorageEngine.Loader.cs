@@ -426,7 +426,14 @@ namespace Sqo
             bool isOIDField = where.AttributeName[0] == "OID";
             if (!indexManager.LoadOidsByIndex(ti, where.AttributeName[0], where, oids))
             {
-                if (tagsIndexManager != null && ti.Type == typeof(DotissiObject) && (where.AttributeName[0] == "intTags" || where.AttributeName[0] == "strTags") && tagsIndexManager.ExistsIndex(where.Value2.ToString()))
+                if (tagsIndexManager != null && ti.Type == typeof(DotissiObject) &&
+                    (where.AttributeName[0] == "tags_Int"
+                    || where.AttributeName[0] == "tags_String"
+                     || where.AttributeName[0] == "tags_DateTime"
+                      || where.AttributeName[0] == "tags_Double"
+                       || where.AttributeName[0] == "tags_Bool"
+                    ) 
+                    && tagsIndexManager.ExistsIndex(where.Value2.ToString()))
                 {
                     tagsIndexManager.LoadOidsByIndex(where, oids);
                 }

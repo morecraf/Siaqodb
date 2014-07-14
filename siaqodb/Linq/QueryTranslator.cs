@@ -328,7 +328,11 @@ namespace Sqo
                 }
                 Visit(mExpression);
                 ConstantExpression c2 = m.Arguments[0] as ConstantExpression;
-                if (c2.Value != null && c2.Value.GetType() == typeof(string) && (mExpression.Member.Name == "StrTags" || mExpression.Member.Name == "IntTags"))
+                if (c2.Value != null && c2.Value.GetType() == typeof(string) && 
+                    (mExpression.Member.Name == "Tags_Int" || mExpression.Member.Name == "Tags_DateTime"
+                    || mExpression.Member.Name == "Tags_String" || mExpression.Member.Name == "Tags_Double"
+                    || mExpression.Member.Name == "Tags_Bool")
+                    )
                 {
                     currentWhere.Value2 = c2.Value;//KEY of dictionary
                 }

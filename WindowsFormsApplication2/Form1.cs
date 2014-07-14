@@ -23,28 +23,29 @@ namespace WindowsFormsApplication2
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //SiaqodbConfigurator.SetDocumentSerializer(new BSONSerializer());
-            SiaqodbConfigurator.SetLicense("ZWsshw4VXZbmQa8beHWlOAde6w4EqCYCOqUjgSS0Qi0=");
-            Siaqodb db = new Siaqodb(@"e:\temp\_clouddb\");
+            SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
+            SiaqodbConfigurator.SetLicense("anqHBdiAJzXSpNdJRy+BkMMNlL1+jZBe4wyzvnZpba8=");
+            DotissiDB db = new DotissiDB(@"c:\work\temp\clouddb\");
             for (int i = 0; i < 10; i++)
             {
 
-                //Invoice inv=new Invoice() { InvoiceNumber = i, Customer = "MyCust" + i, Total = i * 10 };
-                //db.Store
-                //    (
-                //    key: i.ToString(), 
-                //    obj: inv,
-                //    tags: new { Email = "mycust" + i % 2 + "@hope.ro" }
-                //    );
-                User b = new User() { UserName = "qq" + i.ToString() };
-                db.StoreObject(b);
+                Invoice inv=new Invoice() { InvoiceNumber = i, Customer = "MyCust" + i, Total = i * 10 };
+                db.Store
+                    (
+                    key: i.ToString(), 
+                    obj: inv,
+                    tags: new { Email = "mycust" + i % 2 + "@hope.ro" }
+                    );
+                //User b = new User() { UserName = "qq" + i.ToString() };
+                //db.StoreObject(b);
             }
-            db.Flush();
-            User result = db.Cast<User>().First(user => user.UserName.Contains( "name",StringComparison.OrdinalIgnoreCase)
-                &&  user.UserName.StartsWith( "name",StringComparison.OrdinalIgnoreCase)
-                && user.UserName.EndsWith("name", StringComparison.OrdinalIgnoreCase));
+            //db.Flush();
+            //User result = db.Cast<User>().First(user => user.UserName.Contains( "name",StringComparison.OrdinalIgnoreCase)
+             //   &&  user.UserName.StartsWith( "name",StringComparison.OrdinalIgnoreCase)
+              //  && user.UserName.EndsWith("name", StringComparison.OrdinalIgnoreCase));
+           
+            var q = db.Query<DotissiObject>().Where(a => a.Tags_String["Email"] == "mycust0@hope.ro").ToList();
             string s = "";
-           // var q = db.Query<DotissiObject>().Where(a => a.StrTags["Email"] == "mycust0@hope.ro").ToList();
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -54,7 +55,7 @@ namespace WindowsFormsApplication2
             Cryptonor.CryptonorClient client = new Cryptonor.CryptonorClient();
             DotissiObject doObj = new DotissiObject();
             User book=new User();
-            book.UserName="2029";
+            book.UserName="2030";
             book.author="Cristi Ursachi45";
             book.body="An amazing book...";
             book.title="How tos";
@@ -62,19 +63,22 @@ namespace WindowsFormsApplication2
             
             doObj.SetValue<User>(book);
             doObj.Key = book.UserName;
-            doObj.Tags = new Dictionary<string, object>();
-            doObj.Tags["country"] = "RO";
-            doObj.Tags["mydecimal"] = new decimal(20.2);
+           // doObj.Tags = new Dictionary<string, object>();
+            //doObj.Tags["country"] = "RO";
+           // doObj.Tags["mydecimal"] = new decimal(20.2);
+            doObj.SetTag("myguid3", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
+            //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
 
             try
             {
-                //await client.Put("crypto_users", doObj);
+               await client.Put("crypto_users", doObj);
             }
             catch(Exception ex)
             {
                 
             }
-            IEnumerable<DotissiObject> obj = await client.GetByTag("crypto_users", "mydecimal", "eq", (double)20);
+            IEnumerable<DotissiObject> obj = await client.GetByTag("crypto_users", "myguid3", "eq", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
+            //var ra = await client.Get("crypto_users");
             string a = "";
 
         }

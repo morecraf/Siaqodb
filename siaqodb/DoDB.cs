@@ -9,6 +9,7 @@ using Sqo.Attributes;
 using Sqo.Exceptions;
 using Sqo.Indexes;
 using Sqo.Transactions;
+using System.Collections;
 
 
 namespace Sqo
@@ -105,43 +106,42 @@ namespace Sqo
         }
         public void Store(string key, object obj)
         {
-            this.Store(key, obj, null,null);
+            this.Store(key, obj, null);
         }
 
 
         public void Store(string key, object obj, object tags = null)
         {
-            
-            Dictionary<string, int> intTags = new Dictionary<string, int>();
-            Dictionary<string, string> strTags = new Dictionary<string, string>();
-            object o = tags;
-            Type tagsType = o.GetType();
 
-            /*PropertyInfo[] pi = tagsType.GetProperties();
-            foreach (PropertyInfo p in pi)
-            {
-                if (p.PropertyType == typeof(string) )
-                    strTags.Add(p.Name, p.GetValue(o).ToString());
-                else if (p.PropertyType == typeof(int))
-                    intTags.Add(p.Name,Convert.ToInt32( p.GetValue(o)));
-            }
-           
-            this.Store(key, obj, strTags, intTags);*/
+            Dictionary<string, object> tags_Dict = null ;
+           if (tags != null)
+           {
+               tags_Dict = new Dictionary<string, object>();
+               object o = tags;
+               Type tagsType = o.GetType();
+
+               PropertyInfo[] pi = tagsType.GetProperties();
+               foreach (PropertyInfo p in pi)
+               {
+                   tags_Dict.Add(p.Name, p.GetValue(o));
+               }
+           }
+
+            this.Store(key, obj, tags_Dict);
         }
 
-        public void Store(string key, object obj, Dictionary<string, string> strTags, Dictionary<string, int> intTags)
+        public void Store(string key, object obj, Dictionary<string,object> tags)
         {
             DotissiObject dotissiObject = new DotissiObject();
             dotissiObject.Key = key;
             dotissiObject.IsDirty = true;
             dotissiObject.SetValue(obj);
-            if (strTags != null)
+            if (tags != null)
             {
-                dotissiObject.StrTags = strTags;
-            }
-            if (intTags != null)
-            {
-                dotissiObject.IntTags = intTags;
+                foreach (string tagName in tags.Keys)
+                {
+                    dotissiObject.SetTag(tagName, tags[tagName]);
+                }
             }
             this.Store(dotissiObject);
         }
@@ -158,17 +158,15 @@ namespace Sqo
                     }
                     oID = this.siaqodb.GetOID(obj);
                     DirtyOperation dop = (oID == 0) ? DirtyOperation.Inserted : DirtyOperation.Updated;
-                    Dictionary<string, int> oldInts=null;
-                    Dictionary<string, string> oldStrs = null;
+                    Dictionary<string, object> oldTags=null;
                     if (dop == DirtyOperation.Updated)
                     {
-                        oldInts = indexManager.PrepareUpdateIntIndexes(oID);
-                        oldStrs = indexManager.PrepareUpdateStrIndexes(oID);
+                        oldTags = indexManager.PrepareUpdateIndexes(oID);
                     }
                     this.siaqodb.StoreObject(obj);
                     this.CreateDirtyEntity(obj, dop);
-                    indexManager.UpdateIndexes(obj.OID, oldInts, obj.IntTags);
-                    indexManager.UpdateIndexes(obj.OID, oldStrs, obj.StrTags);
+                    indexManager.UpdateIndexes(obj.OID, oldTags, obj.GetAllTags());
+                    
                 }
                 else
                 {
@@ -234,11 +232,7 @@ namespace Sqo
         }
         public byte[] Document { get; set; }
         public byte[] Version { get; set; }
-        private Dictionary<string, int> intTags;
-        public Dictionary<string, int> IntTags { get { return intTags; } set { intTags = value; } }
-        private Dictionary<string, string> strTags;
-        public Dictionary<string, string> StrTags { get { return strTags; } set { strTags = value; } }
-
+       
         public bool IsDirty { get; set; }
         
         internal DotissiObject(string key, byte[] document)
@@ -274,8 +268,85 @@ namespace Sqo
             this.Document = SiaqodbConfigurator.DocumentSerializer.Serialize(obj);
             this.IsDirty = true;
         }
-        [Ignore]
-        public Dictionary<string, object> Tags { get; set; }
+        private Dictionary<string, long> tags_Int;
+        public Dictionary<string, long> Tags_Int{get { return tags_Int; } set { tags_Int = value; }}
+
+        private Dictionary<string, DateTime> tags_DateTime;
+        public Dictionary<string, DateTime> Tags_DateTime { get { return tags_DateTime; } set { tags_DateTime = value; } }
+
+        private Dictionary<string, string> tags_String;
+        public Dictionary<string, string> Tags_String { get { return tags_String; } set { tags_String = value; } }
+
+        private Dictionary<string, double> tags_Double;
+        public Dictionary<string, double> Tags_Double { get { return tags_Double; } set { tags_Double = value; } }
+
+        private Dictionary<string, bool> tags_Bool;
+        public Dictionary<string, bool> Tags_Bool { get { return tags_Bool; } set { tags_Bool = value; } }
+
+        public void SetTag(string tagName, object value)
+        {
+            Type type = value.GetType();
+            if (type == typeof(int) || type == typeof(long))
+            {
+                if (Tags_Int == null)
+                    Tags_Int = new Dictionary<string, long>();
+                Tags_Int.Add(tagName, (long)value);
+            }
+            else if (type == typeof(DateTime))
+            {
+                if (Tags_DateTime == null)
+                    Tags_DateTime = new Dictionary<string, DateTime>();
+                Tags_DateTime.Add(tagName, (DateTime)value);
+            }
+
+            else if (type == typeof(double) || type == typeof(float))
+            {
+                if (Tags_Double == null)
+                    Tags_Double = new Dictionary<string, double>();
+                Tags_Double.Add(tagName, (double)value);
+            }
+            else if (type == typeof(string))
+            {
+                if (Tags_String == null)
+                    Tags_String = new Dictionary<string, string>();
+                Tags_String.Add(tagName, (string)value);
+            }
+          
+            else if (type == typeof(bool))
+            {
+                if (Tags_Bool == null)
+                    Tags_Bool = new Dictionary<string, bool>();
+                Tags_Bool.Add(tagName, (bool)value);
+            }
+            else
+            {
+                throw new SiaqodbException("Tag type:" + type.ToString() + " not supported.");
+            }
+           
+        }
+        internal Dictionary<string, object> GetAllTags()
+        {
+            Dictionary<string, object> tags = new Dictionary<string, object>();
+            CopyDictionary(tags, this.Tags_Int);
+            CopyDictionary(tags, this.Tags_String);
+            CopyDictionary(tags, this.Tags_DateTime);
+            CopyDictionary(tags, this.Tags_Double);
+            CopyDictionary(tags, this.Tags_Bool);
+            return tags;
+        }
+        private void CopyDictionary(Dictionary<string, object> tags, IDictionary dict_to_copy)
+        {
+            if (dict_to_copy != null)
+            {
+
+                foreach (string key in dict_to_copy.Keys)
+                {
+                    tags.Add(key, dict_to_copy[key]);
+                }
+
+            }
+        }
+        
     }
     internal enum DirtyOperation
     {

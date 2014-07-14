@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Sqo.Queries;
+using System.Collections;
 
 namespace Sqo.Indexes
 {
@@ -89,41 +90,50 @@ namespace Sqo.Indexes
                 return storedIndexes;
             }
         }
-        public Dictionary<string, int> PrepareUpdateIntIndexes(int oid)
+        public Dictionary<string, object> PrepareUpdateIndexes(int oid)
         {
             Sqo.Meta.SqoTypeInfo ti = siaqodb.CheckDBAndGetSqoTypeInfo<DotissiObject>();
+            Dictionary<string, object> tags = new Dictionary<string, object>();
             if (oid > 0 && oid <= ti.Header.numberOfRecords)
             {
 
-                object intTagsObj = siaqodb.LoadValue(oid, "intTags", ti.Type);
-                if (intTagsObj != null)
-                {
-                    return (Dictionary<string, int>)intTagsObj;
-                }
+                object intTagsObj = siaqodb.LoadValue(oid, "tags_Int", ti.Type);
+                this.CopyDictionary(tags, intTagsObj as IDictionary);
+
+                object dtTagsObj = siaqodb.LoadValue(oid, "tags_DateTime", ti.Type);
+                this.CopyDictionary(tags, dtTagsObj as IDictionary);
+
+                object strTagsObj = siaqodb.LoadValue(oid, "tags_String", ti.Type);
+                this.CopyDictionary(tags, strTagsObj as IDictionary);
+
+                object dblTagsObj = siaqodb.LoadValue(oid, "tags_Double", ti.Type);
+                this.CopyDictionary(tags, dblTagsObj as IDictionary);
+
+                object boolTagsObj = siaqodb.LoadValue(oid, "tags_Bool", ti.Type);
+                this.CopyDictionary(tags, boolTagsObj as IDictionary);
+                
+
+
 
             }
 
-            return null;
+            return tags;
 
         }
-        public Dictionary<string, string> PrepareUpdateStrIndexes(int oid)
+        private void CopyDictionary(Dictionary<string, object> tags, IDictionary dict_to_copy)
         {
-            Sqo.Meta.SqoTypeInfo ti = siaqodb.CheckDBAndGetSqoTypeInfo<DotissiObject>();
-            if (oid > 0 && oid <= ti.Header.numberOfRecords)
+            if (dict_to_copy != null )
             {
 
-                object strTagsObj = siaqodb.LoadValue(oid, "strTags", ti.Type);
-                if (strTagsObj != null)
+                foreach (string key in dict_to_copy.Keys)
                 {
-                    return (Dictionary<string, string>)strTagsObj;
+                    tags.Add(key, dict_to_copy[key]);
                 }
 
             }
-
-            return null;
-
         }
-        public void UpdateIndexes(int oid, Dictionary<string, int> oldTags, Dictionary<string, int> newTags)
+       
+        public void UpdateIndexes(int oid, Dictionary<string, object> oldTags, Dictionary<string, object> newTags)
         {
            
             if (oldTags != null && oldTags.Count > 0)
@@ -178,62 +188,7 @@ namespace Sqo.Indexes
             }
             
         }
-        public void UpdateIndexes(int oid, Dictionary<string, string> oldTags, Dictionary<string, string> newTags)
-        {
-            if (oldTags != null && oldTags.Count > 0)
-            {
-                foreach (string key in oldTags.Keys)
-                {
-
-                    if (newTags != null && newTags.ContainsKey(key))
-                    {
-
-                        int c = ((IComparable)newTags[key]).CompareTo(oldTags[key]);
-                        if (c != 0)
-                        {
-                            IBTree index = this.GetIndex(key, newTags[key].GetType());
-                            index.RemoveOid(oldTags[key], oid);
-                            //add new value(updated)
-                            index.AddItem(newTags[key], new int[] { oid });
-                            index.Persist();
-                        }
-                    }
-                    else//tag is removed
-                    {
-                        IBTree index = this.GetIndex(key, oldTags[key].GetType());
-                        index.RemoveOid(oldTags[key], oid);
-
-                    }
-                }
-                if (newTags != null)
-                {
-                    foreach (string key in newTags.Keys)
-                    {
-                        if (!oldTags.ContainsKey(key))
-                        {
-                            IBTree index = this.GetIndex(key, newTags[key].GetType());
-                            index.AddItem(newTags[key], new int[] { oid });
-                            index.Persist();
-                        }
-                    }
-                }
-
-            }
-            else//add
-            {
-                if (newTags != null)
-                {
-                    foreach (string key in newTags.Keys)
-                    {
-                        IBTree index = this.GetIndex(key, newTags[key].GetType());
-                        index.AddItem(newTags[key], new int[] { oid });
-                        index.Persist();
-                    }
-                    
-                }
-            }
-            
-        }
+        
         public bool ExistsIndex(string indexName)
         {
             indexName = "Tag|" + indexName;
