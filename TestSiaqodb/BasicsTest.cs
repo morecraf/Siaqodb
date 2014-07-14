@@ -2698,6 +2698,29 @@ namespace TestSiaqodb
 
             Assert.AreEqual(5, q19.ToList().Count);
         }
+
+        [TestMethod]
+        public void TestInsertBufferChunk()
+        {
+            SiaqodbConfigurator.BufferingChunkPercent = 2;
+            Siaqodb nop = new Siaqodb(objPath);
+            nop.DropType<Customer>();
+
+            for (int i = 0; i < 10000; i++)
+            {
+                Customer c = new Customer();
+                c.ID = i;
+                c.Name = "NOR" + i.ToString();
+               
+                nop.StoreObject(c);
+            }
+            nop.Flush();
+            IObjectList<Customer> listC = nop.LoadAll<Customer>();
+            Assert.AreEqual(listC.Count, 10000);
+
+
+
+        }
 	}
     public class RealPOCO
     {
