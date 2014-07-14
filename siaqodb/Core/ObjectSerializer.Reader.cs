@@ -836,9 +836,9 @@ namespace Sqo.Core
             long positionEnd = MetaHelper.GetSeekPosition(ti, oidEnd);
 
             int recordLength = ti.Header.lengthOfRecord;
-            if (preloadedBytes == null || preloadedBytes.Length != (recordLength + positionEnd))
+            if (preloadedBytes == null || preloadedBytes.Length != (recordLength + (positionEnd - positionStart)))
             {
-                preloadedBytes = new byte[recordLength + positionEnd];
+                preloadedBytes = new byte[recordLength + (positionEnd - positionStart)];
             }
             file.Read(positionStart, preloadedBytes);
 
@@ -854,9 +854,9 @@ namespace Sqo.Core
             long positionEnd = MetaHelper.GetSeekPosition(ti, oidEnd);
 
             int recordLength = ti.Header.lengthOfRecord;
-            if (preloadedBytes == null || preloadedBytes.Length != (recordLength + positionEnd))
+            if (preloadedBytes == null || preloadedBytes.Length != (recordLength + (positionEnd-positionStart)))
             {
-                preloadedBytes = new byte[recordLength + positionEnd];
+                preloadedBytes = new byte[recordLength + (positionEnd-positionStart)];
             }
             await file.ReadAsync(positionStart, preloadedBytes).ConfigureAwait(false);
 
