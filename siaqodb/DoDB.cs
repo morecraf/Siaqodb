@@ -10,18 +10,19 @@ using Sqo.Exceptions;
 using Sqo.Indexes;
 using Sqo.Transactions;
 using System.Collections;
+using System.Linq.Expressions;
 
 
 namespace Sqo
 {
-    public class DotissiDB
+    public class CryptonorLocalDB 
     {
         private Siaqodb siaqodb;
         TagsIndexManager indexManager;
         private readonly object _locker = new object();
         private readonly AsyncLock _lockerAsync = new AsyncLock();
 #if !WinRT
-        public DotissiDB(string bucketPath)
+        public CryptonorLocalDB(string bucketPath)
         {
             SiaqodbConfigurator.EncryptedDatabase = true;
             this.siaqodb = new Siaqodb(bucketPath);
@@ -104,48 +105,8 @@ namespace Sqo
                 await this.siaqodb.StoreObjectAsync(dirtyEntity);
             }
         }
-        public void Store(string key, object obj)
-        {
-            this.Store(key, obj, null);
-        }
-
-
-        public void Store(string key, object obj, object tags = null)
-        {
-
-            Dictionary<string, object> tags_Dict = null ;
-           if (tags != null)
-           {
-               tags_Dict = new Dictionary<string, object>();
-               object o = tags;
-               Type tagsType = o.GetType();
-
-               PropertyInfo[] pi = tagsType.GetProperties();
-               foreach (PropertyInfo p in pi)
-               {
-                   tags_Dict.Add(p.Name, p.GetValue(o));
-               }
-           }
-
-            this.Store(key, obj, tags_Dict);
-        }
-
-        public void Store(string key, object obj, Dictionary<string,object> tags)
-        {
-            DotissiObject dotissiObject = new DotissiObject();
-            dotissiObject.Key = key;
-            dotissiObject.IsDirty = true;
-            dotissiObject.SetValue(obj);
-            if (tags != null)
-            {
-                foreach (string tagName in tags.Keys)
-                {
-                    dotissiObject.SetTag(tagName, tags[tagName]);
-                }
-            }
-            this.Store(dotissiObject);
-        }
-        public void Store(DotissiObject obj)
+       
+        public void Store(CryptonorObject obj)
         {
             lock (this._locker)
             {
@@ -175,42 +136,40 @@ namespace Sqo
                 
             }
         }
-        public IList<T> LoadAll<T>()
+      
+        public IList<CryptonorObject> LoadAll()
         {
-            List<T> list = new List<T>();
-            IList<DotissiObject> list2 = this.siaqodb.LoadAll<DotissiObject>();
-            foreach (DotissiObject current in list2)
-            {
-                list.Add(current.GetValue<T>());
-            }
-            return list;
+            return this.siaqodb.LoadAll<CryptonorObject>();
         }
-        public IList<DotissiObject> LoadAll()
-        {
-            return this.siaqodb.LoadAll<DotissiObject>();
-        }
-        public T Load<T>(string key)
-        {
-            return default(T);
-        }
-        public DotissiObject Load(string key)
+       
+        public CryptonorObject Load(string key)
         {
             return null;
         }
         public ISqoQuery<T> Cast<T>()
         {
-            return this.Query<T>();
-        }
-        public ISqoQuery<T> Query<T>()
-        {
             return new SqoQuery<T>(this.siaqodb);
         }
+        public ISqoQuery<CryptonorObject> Query()
+        {
+            return new SqoQuery<CryptonorObject>(this.siaqodb);
+        }
+       
+        private DotissiConfigurator configurator=new DotissiConfigurator();
+        public DotissiConfigurator Configurator { get { return configurator; } }
+        public void Delete(string key)
+        { 
+            Dictionary<string,object> criteria=new Dictionary<string,object>();
+            criteria.Add("key",key);
+            this.siaqodb.DeleteObjectBy<CryptonorObject>(criteria);
+        }
     }
-    public class DotissiObject
+    public class CryptonorObject
     {
         [Index]
         private string key;
         public int OID { get; set; }
+       
         public bool ShouldSerializeOID()
         {
             return false;
@@ -230,44 +189,25 @@ namespace Sqo
                 this.key = value;
             }
         }
-        public byte[] Document { get; set; }
+        private byte[] document;
+        public byte[] Document
+        {
+            get { return document; }
+            set { document = value; }
+        }
         public byte[] Version { get; set; }
        
         public bool IsDirty { get; set; }
         
-        internal DotissiObject(string key, byte[] document)
+        internal CryptonorObject(string key, byte[] document)
         {
             this.Key = key;
             this.Document = document;
         }
-        public DotissiObject()
+        public CryptonorObject()
         {
         }
-        public T GetValue<T>()
-        {
-            return (T)((object)this.GetValue(typeof(T)));
-        }
-        public object GetValue(Type type)
-        {
-            if (SiaqodbConfigurator.DocumentSerializer == null)
-            {
-                throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
-            }
-            return SiaqodbConfigurator.DocumentSerializer.Deserialize(type, this.Document);
-        }
-        public void SetValue<T>(T obj)
-        {
-            this.SetValue((object)obj);
-        }
-        public void SetValue(object obj)
-        {
-            if (SiaqodbConfigurator.DocumentSerializer == null)
-            {
-                throw new SiaqodbException("Document serializer is not set, use SiaqodbConfigurator.SetDocumentSerializer method to set it");
-            }
-            this.Document = SiaqodbConfigurator.DocumentSerializer.Serialize(obj);
-            this.IsDirty = true;
-        }
+       
         private Dictionary<string, long> tags_Int;
         public Dictionary<string, long> Tags_Int{get { return tags_Int; } set { tags_Int = value; }}
 
@@ -370,6 +310,14 @@ namespace Sqo
         public void SetValue(FieldInfo field, object value)
         {
             field.SetValue(this, value);
+        }
+    }
+    public class DotissiConfigurator
+    {
+        internal Dictionary<Type, string> buckets = new Dictionary<Type, string>();
+        public void RegisterBucket(Type type, string bucketName)
+        {
+            buckets[type] = bucketName;
         }
     }
 }

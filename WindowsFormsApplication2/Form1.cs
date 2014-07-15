@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Sqo;
-
+using CryptonorClient;
 namespace WindowsFormsApplication2
 {
     public partial class Form1 : Form
@@ -25,7 +25,7 @@ namespace WindowsFormsApplication2
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
             SiaqodbConfigurator.SetLicense("anqHBdiAJzXSpNdJRy+BkMMNlL1+jZBe4wyzvnZpba8=");
-            DotissiDB db = new DotissiDB(@"c:\work\temp\clouddb\");
+            CryptonorLocalBucket db = new CryptonorLocalBucket(@"c:\work\temp\clouddb\");
             for (int i = 0; i < 10; i++)
             {
 
@@ -44,16 +44,17 @@ namespace WindowsFormsApplication2
              //   &&  user.UserName.StartsWith( "name",StringComparison.OrdinalIgnoreCase)
               //  && user.UserName.EndsWith("name", StringComparison.OrdinalIgnoreCase));
            
-            var q = db.Query<DotissiObject>().Where(a => a.Tags_String["Email"] == "mycust0@hope.ro").ToList();
+            var q = db.Query().Where(a => a.Tags_String["Email"] == "mycust0@hope.ro").ToList();
+            
             string s = "";
         }
 
         private async void button2_Click(object sender, EventArgs e)
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
-
-            Cryptonor.CryptonorClient client = new Cryptonor.CryptonorClient();
-            DotissiObject doObj = new DotissiObject();
+            CryptonorConfigurator.SetEncryptionKey("alfabetaalfabeta");
+            Cryptonor.CryptonorHttpClient client = new Cryptonor.CryptonorHttpClient();
+            CryptonorObject doObj = new CryptonorObject();
             User book=new User();
             book.UserName="2030";
             book.author="Cristi Ursachi45";
@@ -62,6 +63,7 @@ namespace WindowsFormsApplication2
             book.copies_owned=7;
             
             doObj.SetValue<User>(book);
+            var aa = doObj.GetValue<User>();
             doObj.Key = book.UserName;
            // doObj.Tags = new Dictionary<string, object>();
             //doObj.Tags["country"] = "RO";
@@ -77,7 +79,7 @@ namespace WindowsFormsApplication2
             {
                 
             }
-            IEnumerable<DotissiObject> obj = await client.GetByTag("crypto_users", "myguid3", "eq", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
+            IEnumerable<CryptonorObject> obj = await client.GetByTag("crypto_users", "myguid3", "eq", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
             //var ra = await client.Get("crypto_users");
             string a = "";
 

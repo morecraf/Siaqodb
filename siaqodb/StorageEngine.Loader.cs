@@ -426,7 +426,7 @@ namespace Sqo
             bool isOIDField = where.AttributeName[0] == "OID";
             if (!indexManager.LoadOidsByIndex(ti, where.AttributeName[0], where, oids))
             {
-                if (tagsIndexManager != null && ti.Type == typeof(DotissiObject) &&
+                if (tagsIndexManager != null && ti.Type == typeof(CryptonorObject) &&
                     (where.AttributeName[0] == "tags_Int"
                     || where.AttributeName[0] == "tags_String"
                      || where.AttributeName[0] == "tags_DateTime"

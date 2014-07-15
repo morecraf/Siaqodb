@@ -92,7 +92,7 @@ namespace Sqo.Indexes
         }
         public Dictionary<string, object> PrepareUpdateIndexes(int oid)
         {
-            Sqo.Meta.SqoTypeInfo ti = siaqodb.CheckDBAndGetSqoTypeInfo<DotissiObject>();
+            Sqo.Meta.SqoTypeInfo ti = siaqodb.CheckDBAndGetSqoTypeInfo<CryptonorObject>();
             Dictionary<string, object> tags = new Dictionary<string, object>();
             if (oid > 0 && oid <= ti.Header.numberOfRecords)
             {
@@ -158,6 +158,7 @@ namespace Sqo.Indexes
                     {
                         IBTree index = this.GetIndex(key, oldTags[key].GetType());
                         index.RemoveOid(oldTags[key], oid);
+                        index.Persist();
                        
                     }
                 }
@@ -183,6 +184,7 @@ namespace Sqo.Indexes
                     {
                         IBTree index = this.GetIndex(key, newTags[key].GetType());
                         index.AddItem(newTags[key], new int[] { oid });
+                        index.Persist();
                     }
                 }
             }
