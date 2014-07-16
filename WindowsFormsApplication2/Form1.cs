@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Sqo;
 using CryptonorClient;
+
 namespace WindowsFormsApplication2
 {
     public partial class Form1 : Form
@@ -53,7 +54,7 @@ namespace WindowsFormsApplication2
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
             CryptonorConfigurator.SetEncryptionKey("alfabetaalfabeta");
-            Cryptonor.CryptonorHttpClient client = new Cryptonor.CryptonorHttpClient();
+            CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior");
             CryptonorObject doObj = new CryptonorObject();
             User book=new User();
             book.UserName="2030";
@@ -68,18 +69,21 @@ namespace WindowsFormsApplication2
            // doObj.Tags = new Dictionary<string, object>();
             //doObj.Tags["country"] = "RO";
            // doObj.Tags["mydecimal"] = new decimal(20.2);
-            doObj.SetTag("myguid3", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
+            //doObj.SetTag("myguid3", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
             //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
-
+            CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
+            IBucket bucket= cl.GetBucket("crypto_users");
+            var q = await bucket.Query().Where(ar => ar.Tags_String["country"] == "RO").ToListAsync();
+            string aaas = "";
             try
             {
-               await client.Put("crypto_users", doObj);
+              // await client.Put("crypto_users", doObj);
             }
             catch(Exception ex)
             {
                 
             }
-            IEnumerable<CryptonorObject> obj = await client.GetByTag("crypto_users", "myguid3", "eq", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
+           // IEnumerable<CryptonorObject> obj = await client.GetByTag("crypto_users", "myguid3", "eq", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
             //var ra = await client.Get("crypto_users");
             string a = "";
 

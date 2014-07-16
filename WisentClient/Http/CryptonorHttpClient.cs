@@ -9,19 +9,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Cryptonor
+namespace CryptonorClient
 {
     public class CryptonorHttpClient
     {
+        string uri;
+        string dbName;
+        public CryptonorHttpClient(string uri,string dbName)
+        {
+            this.uri = uri;
+            this.dbName = dbName;
+        }
         public async Task<IEnumerable<CryptonorObject>> Get(string bucket)
         {
             IEnumerable<CryptonorObject> result;
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri("http://localhost:53411/");
+                httpClient.BaseAddress = new Uri(uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/excelsior/" + bucket );
+                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(dbName + "/" + bucket);
                 httpResponseMessage.EnsureSuccessStatusCode();
                 List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
                 formatters.Add(
@@ -37,10 +44,10 @@ namespace Cryptonor
             CryptonorObject result;
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri("http://localhost:53411/");
+                httpClient.BaseAddress = new Uri(uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/excelsior/"+bucket+"/"+key);
+                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(dbName + "/" + bucket + "/" + key);
                 httpResponseMessage.EnsureSuccessStatusCode();
                 List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
                 formatters.Add(
@@ -56,11 +63,11 @@ namespace Cryptonor
             IEnumerable<CryptonorObject> result;
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri("http://localhost:53411/");
+                httpClient.BaseAddress = new Uri(this.uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string uri = "/excelsior/" + bucket + "/" + Mapper.GetTagByType(value.GetType()) + "/" + tagName + "/" + op + "/" + Mapper.URLEncode(value);
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(uri);
+                string uriLocal = dbName + "/" + bucket + "/" + Mapper.GetTagByType(value.GetType()) + "/" + tagName + "/" + op + "/" + Mapper.URLEncode(value);
+                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(uriLocal);
                 httpResponseMessage.EnsureSuccessStatusCode();
                 List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
                 formatters.Add(
@@ -75,11 +82,11 @@ namespace Cryptonor
         {
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri("http://localhost:53411/");
+                httpClient.BaseAddress = new Uri(uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync("excelsior/"+bucket, obj, formatter);
+                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket, obj, formatter);
                 if (!httpResponseMessage.IsSuccessStatusCode)
                 {
                     string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;

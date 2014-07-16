@@ -11,9 +11,11 @@ namespace CryptonorClient
     public class CryptonorLocalBucket:IBucket
     {
         CryptonorLocalDB localDB;
+        public string BucketName { get; set; }
         public CryptonorLocalBucket(string bucketName)
         {
             localDB = new CryptonorLocalDB(bucketName);
+            this.BucketName = bucketName;
         }
         public Sqo.ISqoQuery<T> Cast<T>()
         {
@@ -30,7 +32,10 @@ namespace CryptonorClient
             CryptonorObject obj= localDB.Load(key);
             return obj.GetValue<T>();
         }
-
+        public IList<CryptonorObject> Get(System.Linq.Expressions.Expression expression)
+        {
+            return localDB.Load(expression);
+        }
         public IList<Sqo.CryptonorObject> GetAll()
         {
             return localDB.LoadAll();
@@ -112,6 +117,15 @@ namespace CryptonorClient
         public void Pull()
         { 
             
+        }
+
+
+
+
+
+        public Task<IList<CryptonorObject>> GetAsync(System.Linq.Expressions.Expression expression)
+        {
+            throw new NotImplementedException();
         }
     }
 }

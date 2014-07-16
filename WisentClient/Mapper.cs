@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Cryptonor
+namespace CryptonorClient
 {
     static class  Mapper
     {
@@ -41,6 +41,25 @@ namespace Cryptonor
                 return HttpUtility.UrlEncode(((DateTime)value).ToString("yyyy-MM-dd"));
             }
             return HttpUtility.UrlEncode(value.ToString());
+        }
+        public static string GetAPIOperator(OperationType operation)
+        {
+            switch (operation)
+            {
+                case OperationType.Equal:
+                    return "eq";
+                case OperationType.GreaterThan:
+                    return "gt";
+                case OperationType.GreaterThanOrEqual:
+                    return "ge";
+                case OperationType.LessThan:
+                    return "lt";
+                case OperationType.LessThanOrEqual:
+                    return "le";
+
+                default:
+                    throw new Exception("Operation :" + operation.ToString() + " not supported!");
+            }
         }
     }
 }

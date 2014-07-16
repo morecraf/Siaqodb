@@ -146,6 +146,10 @@ namespace Sqo
         {
             return null;
         }
+        public IList<CryptonorObject> Load(System.Linq.Expressions.Expression expression)
+        {
+            return this.siaqodb.Load<CryptonorObject>(expression);
+        }
         public ISqoQuery<T> Cast<T>()
         {
             return new SqoQuery<T>(this.siaqodb);

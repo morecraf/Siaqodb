@@ -8,6 +8,21 @@ namespace CryptonorClient
 {
     public class CryptonorClient
     {
+        string uri;
+        string dbName;
+        public CryptonorClient(string uri,string dbName)
+        {
+            this.uri = uri;
+            this.dbName = dbName;
+        }
+        public IBucket GetBucket(string bucketName)
+        {
+            return new CryptonorBucket(bucketName,this.uri,this.dbName);
+        }
+        public IBucket GetLocalBucket(string bucketName)
+        {
+            return new CryptonorLocalBucket(bucketName);
+        }
 
     }
 }

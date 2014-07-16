@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ASYNC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -60,6 +60,12 @@
     <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Entities\CryptonorObjectExtensions.cs" />
     <Compile Include="Http\CryptonorHttpClient.cs" />
+    <Compile Include="LINQ\Evaluator.cs" />
+    <Compile Include="LINQ\ExpressionVisitor.cs" />
+    <Compile Include="LINQ\CNQuery.cs" />
+    <Compile Include="LINQ\CNQueryExtensionsImpl.cs" />
+    <Compile Include="LINQ\QueryTranslator.cs" />
+    <Compile Include="LINQ\Where.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
