@@ -19,7 +19,12 @@ namespace CryptonorClient
             AESEncryptor encAes = DefaultEncryptor as AESEncryptor;
             if (encAes != null)
             {
-                encAes.SetKey(key);
+                byte[] aesKey = new byte[16];
+                int length = key.Length;
+                if (length > 16)
+                    length = 16;
+                Array.Copy(key, aesKey, length);
+                encAes.SetKey(aesKey);
             }
 
         }

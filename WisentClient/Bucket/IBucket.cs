@@ -16,8 +16,8 @@ namespace CryptonorClient
         System.Collections.Generic.IList<CryptonorObject> Get(System.Linq.Expressions.Expression expression);
         Task<System.Collections.Generic.IList<CryptonorObject>> GetAsync(System.Linq.Expressions.Expression expression);
      
-        System.Collections.Generic.IList<CryptonorObject> GetAll();
-        System.Collections.Generic.IList<T> GetAll<T>();
+        Task<System.Collections.Generic.IList<CryptonorObject>> GetAllAsync();
+        Task<System.Collections.Generic.IList<T>> GetAllAsync<T>();
         void Store(CryptonorObject obj);
         void Store(string key, object obj);
         void Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);

@@ -234,7 +234,7 @@ namespace Sqo
             {
                 if (Tags_Int == null)
                     Tags_Int = new Dictionary<string, long>();
-                Tags_Int.Add(tagName, (long)value);
+                Tags_Int.Add(tagName, Convert.ToInt64(value));
             }
             else if (type == typeof(DateTime))
             {
@@ -247,7 +247,7 @@ namespace Sqo
             {
                 if (Tags_Double == null)
                     Tags_Double = new Dictionary<string, double>();
-                Tags_Double.Add(tagName, (double)value);
+                Tags_Double.Add(tagName, Convert.ToDouble( value));
             }
             else if (type == typeof(string))
             {

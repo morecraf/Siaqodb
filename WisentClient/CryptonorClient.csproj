@@ -59,15 +59,17 @@
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Entities\CryptonorObjectExtensions.cs" />
+    <Compile Include="Entities\CryptonorResultSet.cs" />
     <Compile Include="Http\CryptonorHttpClient.cs" />
     <Compile Include="LINQ\Evaluator.cs" />
     <Compile Include="LINQ\ExpressionVisitor.cs" />
     <Compile Include="LINQ\CNQuery.cs" />
     <Compile Include="LINQ\CNQueryExtensionsImpl.cs" />
     <Compile Include="LINQ\QueryTranslator.cs" />
-    <Compile Include="LINQ\Where.cs" />
+    <Compile Include="Queries\QueryObject.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\Criteria.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

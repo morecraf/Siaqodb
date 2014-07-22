@@ -30,7 +30,7 @@ namespace CryptonorClient
             {
                 if (expression == null)
                 {
-                    //oList = await siaqodb.LoadAllAsync<T>();
+                    oList = await bucket.GetAllAsync<T>();
 
                 }
                 else
@@ -53,8 +53,8 @@ namespace CryptonorClient
                 {
                     if (expression == null)
                     {
-                        oList = (IList<T>)bucket.GetAll();
-                        
+                        //oList = (IList<T>)bucket.GetAll();
+                        throw new Exception("TODO");
                     }
                     else
                     {

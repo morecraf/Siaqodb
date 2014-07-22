@@ -53,11 +53,11 @@ namespace WindowsFormsApplication2
         private async void button2_Click(object sender, EventArgs e)
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
-            CryptonorConfigurator.SetEncryptionKey("alfabetaalfabeta");
+            CryptonorConfigurator.SetEncryptionKey("alfa");
             CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior");
             CryptonorObject doObj = new CryptonorObject();
             User book=new User();
-            book.UserName="2030";
+            book.UserName="2031";
             book.author="Cristi Ursachi45";
             book.body="An amazing book...";
             book.title="How tos";
@@ -66,23 +66,26 @@ namespace WindowsFormsApplication2
             doObj.SetValue<User>(book);
             var aa = doObj.GetValue<User>();
             doObj.Key = book.UserName;
-           // doObj.Tags = new Dictionary<string, object>();
-            //doObj.Tags["country"] = "RO";
+            //doObj.Tags = new Dictionary<string, object>();
+           // doObj.Tags["country"] = "RO";
            // doObj.Tags["mydecimal"] = new decimal(20.2);
-            //doObj.SetTag("myguid3", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
+            doObj.SetTag("birth_year", 1981);
+            doObj.SetTag("country", "RO");
             //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
-            CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
-            IBucket bucket= cl.GetBucket("crypto_users");
-            var q = await bucket.Query().Where(ar => ar.Tags_String["country"] == "RO").ToListAsync();
-            string aaas = "";
-            try
+              try
             {
-              // await client.Put("crypto_users", doObj);
+               //await client.Put("crypto_users", doObj);
             }
             catch(Exception ex)
             {
                 
             }
+              CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
+              IBucket bucket = cl.GetBucket("crypto_users");
+              var q = await bucket.Query().Where(ar => ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).ToListAsync();
+             // var all = await bucket.GetAllAsync();
+            string aaas = "";
+         
            // IEnumerable<CryptonorObject> obj = await client.GetByTag("crypto_users", "myguid3", "eq", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
             //var ra = await client.Get("crypto_users");
             string a = "";

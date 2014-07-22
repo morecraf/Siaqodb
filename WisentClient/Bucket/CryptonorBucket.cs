@@ -36,15 +36,16 @@ namespace CryptonorClient
             return obj.GetValue<T>();
         }
 
-        public IList<Sqo.CryptonorObject> GetAll()
+        public async Task<IList<Sqo.CryptonorObject>> GetAllAsync()
         {
-            return httpClient.Get(this.BucketName).Result.ToList();
+            var all=await httpClient.Get(this.BucketName);
+            return all.Objects;
         }
 
-        public IList<T> GetAll<T>()
+        public async Task<IList<T>> GetAllAsync<T>()
         {
             List<T> list = new List<T>();
-            IList<CryptonorObject> list2 = this.GetAll();
+            IList<CryptonorObject> list2 = await this.GetAllAsync();
             foreach (CryptonorObject current in list2)
             {
                 list.Add(current.GetValue<T>());
@@ -109,14 +110,16 @@ namespace CryptonorClient
         public IList<Sqo.CryptonorObject> Get(System.Linq.Expressions.Expression expression)
         {
             QueryTranslator t = new QueryTranslator();
-            Where where = t.Translate(expression);
-            return httpClient.GetByTag(this.BucketName, where.TagName, Mapper.GetAPIOperator(where.OperationType), where.TagValue).Result.ToList();
+            List<Criteria> where = t.Translate(expression);
+            if (where.Where(a => a.OperationType == Criteria.Equal).FirstOrDefault() == null)
+                throw new Exception("At least one EQUAL operation must be set");
+            return httpClient.GetByTag(this.BucketName, new QueryObject { Filter=where}).Result.Objects;
         }
         public async Task<IList<Sqo.CryptonorObject>> GetAsync(System.Linq.Expressions.Expression expression)
         {
             QueryTranslator t = new QueryTranslator();
-            Where where = t.Translate(expression);
-            return (await httpClient.GetByTag(this.BucketName, where.TagName, Mapper.GetAPIOperator(where.OperationType), where.TagValue)).ToList();
+            List<Criteria> where = t.Translate(expression);
+            return (await httpClient.GetByTag(this.BucketName, new QueryObject { Filter=where})).Objects;
         }
     }
 }

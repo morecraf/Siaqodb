@@ -16,8 +16,10 @@ namespace CryptonorClient
     internal class QueryTranslator : ExpressionVisitor
     {
 
-        Where currentWhere;
-          
+        Criteria currentWhere;
+        List<Criteria> criterias;
+        Dictionary<Expression, Criteria> criteriaValues = new Dictionary<Expression, Criteria>();
+      
         internal QueryTranslator()
         {
            
@@ -30,14 +32,13 @@ namespace CryptonorClient
 
 
 
-        internal Where Translate(Expression expression)
+        internal List<Criteria> Translate(Expression expression)
         {
-
             
             expression = Evaluator.PartialEval(expression);
             this.Visit(expression);
 
-            return this.currentWhere;
+            return this.criterias;
 
         }
 		internal void Validate(Expression expression)
@@ -138,23 +139,22 @@ namespace CryptonorClient
                 case ExpressionType.AndAlso:
 
                     HandleAnd(b);
-
                     break;
-
+               
                 case ExpressionType.Equal:
-                    HandleWhere(b,OperationType.Equal);
+                    HandleWhere(b,Criteria.Equal);
                     break;
                 case ExpressionType.LessThan:
-                    HandleWhere(b,OperationType.LessThan);
+                    HandleWhere(b, Criteria.LessThan);
                     break;
                 case ExpressionType.LessThanOrEqual:
-                    HandleWhere(b,OperationType.LessThanOrEqual);
+                    HandleWhere(b, Criteria.LessThanOrEqual);
                     break;
                 case ExpressionType.GreaterThan:
-                    HandleWhere(b,OperationType.GreaterThan);
+                    HandleWhere(b,Criteria.GreaterThan);
                     break;
                 case ExpressionType.GreaterThanOrEqual:
-                    HandleWhere(b,OperationType.GreaterThanOrEqual);
+                    HandleWhere(b, Criteria.GreaterThanOrEqual);
                     break;
                                 
                  
@@ -168,14 +168,21 @@ namespace CryptonorClient
 
         }
 
-        private  void HandleWhere(BinaryExpression b,OperationType opType)
+        private  void HandleWhere(BinaryExpression b,string opType)
         {
-            Where w = new Where();
+            Criteria w = new Criteria();
             w.OperationType = opType;
-            if (this.currentWhere == null)
-                this.currentWhere = w;
-			this.Visit(b.Left);
-			this.Visit(b.Right);
+            currentWhere = w;
+            criteriaValues[b] = w;
+          
+            if (criterias == null)
+            {
+                criterias = new List<Criteria>();
+               
+            }
+            criterias.Add(w);
+            this.Visit(b.Left);
+            this.Visit(b.Right);
 
 		}
 
@@ -239,40 +246,21 @@ namespace CryptonorClient
                 }
             }
             #endregion
-
-            if (currentWhere == null)
-            {
-                currentWhere = new Where();
-            }
             this.Visit(left);
             this.Visit(right);
-            InvocationExpression iExpreLeft = left as InvocationExpression;
-            if (iExpreLeft != null)
-                right = ((LambdaExpression)iExpreLeft.Expression).Body;
-
-            InvocationExpression iExpreRight = right as InvocationExpression;
-            if (iExpreRight != null)
-                right = ((LambdaExpression)iExpreRight.Expression).Body;
-
-
 
 
         }
-      
+       
         protected override Expression VisitConstant(ConstantExpression c)
         {
             if (currentWhere == null)
             {
                 throw new LINQUnoptimizeException("Unoptimized exception!");
             }
-            if (currentWhere.TagValue != null)
-            {
-                currentWhere.TagValue2 = c.Value;
-            }
-            else
-            {
-                currentWhere.TagValue = c.Value;
-            }
+
+            currentWhere.TagValue = c.Value;
+
             return c;
 
         }
@@ -282,7 +270,6 @@ namespace CryptonorClient
         protected override Expression VisitMemberAccess(MemberExpression m)
         {
             
-
             if (m.Expression != null && (m.Expression.NodeType == ExpressionType.Parameter || m.Expression.NodeType == ExpressionType.MemberAccess))
             {
 
@@ -304,7 +291,7 @@ namespace CryptonorClient
                    || m.Member.Name == "Tags_String" || m.Member.Name == "Tags_Double"
                    || m.Member.Name == "Tags_Bool")
                     {
-                        currentWhere.TagType = (TagType)Enum.Parse(typeof(TagType), m.Member.Name);
+                        currentWhere.TagType =  m.Member.Name;
                     }
 					
 				}

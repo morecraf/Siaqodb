@@ -20,22 +20,40 @@ namespace CryptonorClient
             this.uri = uri;
             this.dbName = dbName;
         }
-        public async Task<IEnumerable<CryptonorObject>> Get(string bucket)
+        public async Task<CryptonorResultSet> Get(string bucket)
         {
-            IEnumerable<CryptonorObject> result;
+            return await Get(bucket, 0, 0);
+        }
+        public async Task<CryptonorResultSet> Get(string bucket,int limit,long continuationToken)
+        {
+            CryptonorResultSet result;
             using (HttpClient httpClient = new HttpClient())
             {
                 httpClient.BaseAddress = new Uri(uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(dbName + "/" + bucket);
+                string finalURI = dbName + "/" + bucket;
+                if (limit > 0 || continuationToken>0)
+                {
+                    if (limit == 0)
+                    {
+                        limit = 100;
+                    }
+                    finalURI += "?limit=" + limit;
+                    if (continuationToken > 0)
+                    {
+                        finalURI += "&continuationToken="+continuationToken;
+                   
+                    }
+                }
+                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(finalURI);
                 httpResponseMessage.EnsureSuccessStatusCode();
                 List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
                 formatters.Add(
                     new JsonMediaTypeFormatter());
 
-                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(IEnumerable<CryptonorObject>), formatters);
-                result = (IEnumerable<CryptonorObject>)obj;
+                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), formatters);
+                result = (CryptonorResultSet)obj;
             }
             return result;
         }
@@ -58,9 +76,9 @@ namespace CryptonorClient
             }
             return result;
         }
-        public async Task<IEnumerable<CryptonorObject>> GetByTag(string bucket,string tagName,string op,object value)
+        public async Task<CryptonorResultSet> GetByTag(string bucket, string tagName, string op, object value)
         {
-            IEnumerable<CryptonorObject> result;
+            CryptonorResultSet result;
             using (HttpClient httpClient = new HttpClient())
             {
                 httpClient.BaseAddress = new Uri(this.uri);
@@ -73,8 +91,8 @@ namespace CryptonorClient
                 formatters.Add(
                     new JsonMediaTypeFormatter());
 
-                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(IEnumerable<CryptonorObject>), formatters);
-                result = (IEnumerable<CryptonorObject>)obj;
+                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), formatters);
+                result = (CryptonorResultSet)obj;
             }
             return result;
         }
@@ -94,6 +112,29 @@ namespace CryptonorClient
                 }
                 var aa=httpResponseMessage.EnsureSuccessStatusCode();
                 string h = ";;";
+            }
+        }
+        internal async Task<CryptonorResultSet> GetByTag(string bucket, QueryObject query)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                query.Limit=30;
+                httpClient.BaseAddress = new Uri(uri);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
+                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket+"/tags", query, formatter);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                    //throw new HttpException((int)response.StatusCode, responseBody);
+                }
+                var aa = httpResponseMessage.EnsureSuccessStatusCode();
+                List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
+                formatters.Add(
+                    new JsonMediaTypeFormatter());
+                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), formatters);
+                return (CryptonorResultSet)obj;
             }
         }
 

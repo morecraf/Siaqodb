@@ -36,12 +36,12 @@ namespace CryptonorClient
         {
             return localDB.Load(expression);
         }
-        public IList<Sqo.CryptonorObject> GetAll()
+        public async Task<IList<Sqo.CryptonorObject>> GetAllAsync()
         {
-            return localDB.LoadAll();
+            return  localDB.LoadAll();
         }
 
-        public IList<T> GetAll<T>()
+        public async Task<IList<T>> GetAllAsync<T>()
         {
 
             List<T> list = new List<T>();

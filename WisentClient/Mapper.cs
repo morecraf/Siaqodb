@@ -42,24 +42,6 @@ namespace CryptonorClient
             }
             return HttpUtility.UrlEncode(value.ToString());
         }
-        public static string GetAPIOperator(OperationType operation)
-        {
-            switch (operation)
-            {
-                case OperationType.Equal:
-                    return "eq";
-                case OperationType.GreaterThan:
-                    return "gt";
-                case OperationType.GreaterThanOrEqual:
-                    return "ge";
-                case OperationType.LessThan:
-                    return "lt";
-                case OperationType.LessThanOrEqual:
-                    return "le";
-
-                default:
-                    throw new Exception("Operation :" + operation.ToString() + " not supported!");
-            }
-        }
+       
     }
 }
