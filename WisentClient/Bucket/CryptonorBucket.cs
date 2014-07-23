@@ -25,47 +25,38 @@ namespace CryptonorClient
         {
             return new CNQuery<Sqo.CryptonorObject>(this);
         }
-        public Sqo.CryptonorObject Get(string key)
+        public Sqo.ISqoQuery<Sqo.CryptonorObject> Query(long continuationToken)
         {
-            return httpClient.Get(this.BucketName, key).Result;
+            return new CNQuery<Sqo.CryptonorObject>(this, continuationToken);
+        }
+        public async Task<Sqo.CryptonorObject> Get(string key)
+        {
+            return await httpClient.Get(this.BucketName, key);
         }
 
-        public T Get<T>(string key)
+        public async Task<T> Get<T>(string key)
         {
-            CryptonorObject obj = httpClient.Get(this.BucketName, key).Result;
+            CryptonorObject obj = await httpClient.Get(this.BucketName, key);
             return obj.GetValue<T>();
         }
 
-        public async Task<IList<Sqo.CryptonorObject>> GetAllAsync()
+        public async Task<CryptonorResultSet> GetAll()
         {
             var all=await httpClient.Get(this.BucketName);
-            return all.Objects;
+            return all;
         }
 
-        public async Task<IList<T>> GetAllAsync<T>()
+        public async Task Store(Sqo.CryptonorObject obj)
         {
-            List<T> list = new List<T>();
-            IList<CryptonorObject> list2 = await this.GetAllAsync();
-            foreach (CryptonorObject current in list2)
-            {
-                list.Add(current.GetValue<T>());
-            }
-            return list;
+            await httpClient.Put(this.BucketName, obj);
         }
 
-      
-
-        public void Store(Sqo.CryptonorObject obj)
+        public async Task Store(string key, object obj)
         {
-            httpClient.Put(this.BucketName, obj).Wait();
+            await this.Store(key, obj, null);
         }
 
-        public void Store(string key, object obj)
-        {
-            this.Store(key, obj, null);
-        }
-
-        public void Store(string key, object obj, Dictionary<string, object> tags)
+        public async Task Store(string key, object obj, Dictionary<string, object> tags)
         {
             CryptonorObject cryObject = new CryptonorObject();
             cryObject.Key = key;
@@ -79,10 +70,10 @@ namespace CryptonorClient
                 }
             }
 
-            this.Store(cryObject);
+            await this.Store(cryObject);
         }
 
-        public void Store(string key, object obj, object tags = null)
+        public async Task Store(string key, object obj, object tags = null)
         {
             Dictionary<string, object> tags_Dict = null;
             if (tags != null)
@@ -98,28 +89,27 @@ namespace CryptonorClient
                 }
             }
 
-            this.Store(key, obj, tags_Dict);
+           await this.Store(key, obj, tags_Dict);
         }
 
-        public void Delete(string key)
+        public async Task Delete(string key)
         {
             throw new NotImplementedException();
         }
 
-
-        public IList<Sqo.CryptonorObject> Get(System.Linq.Expressions.Expression expression)
+      
+        public async Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression)
+        {
+            return await this.Get(expression, 0);
+        }
+        public async Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression,long continuationToken)
         {
             QueryTranslator t = new QueryTranslator();
             List<Criteria> where = t.Translate(expression);
             if (where.Where(a => a.OperationType == Criteria.Equal).FirstOrDefault() == null)
                 throw new Exception("At least one EQUAL operation must be set");
-            return httpClient.GetByTag(this.BucketName, new QueryObject { Filter=where}).Result.Objects;
-        }
-        public async Task<IList<Sqo.CryptonorObject>> GetAsync(System.Linq.Expressions.Expression expression)
-        {
-            QueryTranslator t = new QueryTranslator();
-            List<Criteria> where = t.Translate(expression);
-            return (await httpClient.GetByTag(this.BucketName, new QueryObject { Filter=where})).Objects;
+          
+            return (await httpClient.GetByTag(this.BucketName, new QueryObject { Filter = where,ContinuationToken=continuationToken }));
         }
     }
 }

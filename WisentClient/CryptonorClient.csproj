@@ -65,6 +65,7 @@
     <Compile Include="LINQ\ExpressionVisitor.cs" />
     <Compile Include="LINQ\CNQuery.cs" />
     <Compile Include="LINQ\CNQueryExtensionsImpl.cs" />
+    <Compile Include="LINQ\ISqoQueryExtensions.cs" />
     <Compile Include="LINQ\QueryTranslator.cs" />
     <Compile Include="Queries\QueryObject.cs" />
     <Compile Include="Mapper.cs" />

@@ -12,5 +12,14 @@ namespace CryptonorClient
         public long ContinuationToken { get; set; }
         public int Count { get; set; }
         public IList<CryptonorObject> Objects { get; set; }
+        public IList<T> GetValues<T>()
+        { 
+            List<T> list = new List<T>();
+            foreach (CryptonorObject current in Objects)
+            {
+                list.Add(current.GetValue<T>());
+            }
+            return list;
+        }
     }
 }

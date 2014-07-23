@@ -76,7 +76,11 @@ namespace CryptonorClient
             }
             return result;
         }
-        public async Task<CryptonorResultSet> GetByTag(string bucket, string tagName, string op, object value)
+        public async Task<CryptonorResultSet> GetByTag(string bucket, string tagName, object value)
+        {
+            return await this.GetByTag(bucket, tagName, value, 0, 0);
+        }
+        public async Task<CryptonorResultSet> GetByTag(string bucket, string tagName, object value, int limit, long continuationToken)
         {
             CryptonorResultSet result;
             using (HttpClient httpClient = new HttpClient())
@@ -84,7 +88,20 @@ namespace CryptonorClient
                 httpClient.BaseAddress = new Uri(this.uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string uriLocal = dbName + "/" + bucket + "/" + Mapper.GetTagByType(value.GetType()) + "/" + tagName + "/" + op + "/" + Mapper.URLEncode(value);
+                string uriLocal = dbName + "/" + bucket + "/" + Mapper.GetTagByType(value.GetType()) + "/" + tagName + "/"  + Mapper.URLEncode(value);
+                 if (limit > 0 || continuationToken > 0)
+                {
+                    if (limit == 0)
+                    {
+                        limit = 100;
+                    }
+                    uriLocal += "?limit=" + limit;
+                    if (continuationToken > 0)
+                    {
+                        uriLocal += "&continuationToken=" + continuationToken;
+
+                    }
+                }
                 HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(uriLocal);
                 httpResponseMessage.EnsureSuccessStatusCode();
                 List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
@@ -118,7 +135,7 @@ namespace CryptonorClient
         {
             using (HttpClient httpClient = new HttpClient())
             {
-                query.Limit=30;
+               
                 httpClient.BaseAddress = new Uri(uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

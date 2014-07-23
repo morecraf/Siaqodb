@@ -33,27 +33,10 @@ namespace Sqo
 
        
 #endif
-        private void CreateDirtyEntity(object obj, DirtyOperation dop)
-        {
-            this.CreateDirtyEntity(obj, dop, null);
-        }
+       
         private async Task CreateDirtyEntityAsync(object obj, DirtyOperation dop)
         {
             await this.CreateDirtyEntityAsync(obj, dop, null);
-        }
-        private void CreateDirtyEntity(object obj, DirtyOperation dop, ITransaction transaction)
-        {
-            DirtyEntity dirtyEntity = new DirtyEntity();
-            dirtyEntity.EntityOID = this.siaqodb.GetOID(obj);
-            dirtyEntity.DirtyOp = dop;
-            if (transaction != null)
-            {
-                this.siaqodb.StoreObject(dirtyEntity, transaction);
-            }
-            else
-            {
-                this.siaqodb.StoreObject(dirtyEntity);
-            }
         }
         private async Task CreateDirtyEntityAsync(object obj, DirtyOperation dop, ITransaction transaction)
         {
@@ -69,27 +52,10 @@ namespace Sqo
                 await this.siaqodb.StoreObjectAsync(dirtyEntity);
             }
         }
-        private void CreateTombstoneDirtyEntity(object obj, int oid)
-        {
-            this.CreateTombstoneDirtyEntity(obj, oid, null);
-        }
+       
         private async Task CreateTombstoneDirtyEntityAsync(object obj, int oid)
         {
             await this.CreateTombstoneDirtyEntityAsync(obj, oid, null);
-        }
-        private void CreateTombstoneDirtyEntity(object obj, int oid, Transaction transaction)
-        {
-            DirtyEntity dirtyEntity = new DirtyEntity();
-            dirtyEntity.EntityOID = oid;
-            dirtyEntity.DirtyOp = DirtyOperation.Deleted;
-            if (transaction != null)
-            {
-                this.siaqodb.StoreObject(dirtyEntity, transaction);
-            }
-            else
-            {
-                this.siaqodb.StoreObject(dirtyEntity);
-            }
         }
         private async Task CreateTombstoneDirtyEntityAsync(object obj, int oid, Transaction transaction)
         {
@@ -105,50 +71,50 @@ namespace Sqo
                 await this.siaqodb.StoreObjectAsync(dirtyEntity);
             }
         }
-       
-        public void Store(CryptonorObject obj)
+
+        public async Task Store(CryptonorObject obj)
         {
-            lock (this._locker)
+
+            if (obj.IsDirty)
             {
-                if (obj.IsDirty)
+                int oID = this.siaqodb.GetOID(obj);
+                if (oID == 0)
                 {
-                    int oID = this.siaqodb.GetOID(obj);
-                    if (oID == 0)
-                    {
-                        this.siaqodb.GetOIDForAMSByField(obj, "key");
-                    }
-                    oID = this.siaqodb.GetOID(obj);
-                    DirtyOperation dop = (oID == 0) ? DirtyOperation.Inserted : DirtyOperation.Updated;
-                    Dictionary<string, object> oldTags=null;
-                    if (dop == DirtyOperation.Updated)
-                    {
-                        oldTags = indexManager.PrepareUpdateIndexes(oID);
-                    }
-                    this.siaqodb.StoreObject(obj);
-                    this.CreateDirtyEntity(obj, dop);
-                    indexManager.UpdateIndexes(obj.OID, oldTags, obj.GetAllTags());
-                    
+                    this.siaqodb.GetOIDForAMSByField(obj, "key");
                 }
-                else
+                oID = this.siaqodb.GetOID(obj);
+                DirtyOperation dop = (oID == 0) ? DirtyOperation.Inserted : DirtyOperation.Updated;
+                Dictionary<string, object> oldTags = null;
+                if (dop == DirtyOperation.Updated)
                 {
-                    this.siaqodb.StoreObject(obj);
+                    oldTags = indexManager.PrepareUpdateIndexes(oID);
                 }
-                
+                await this.siaqodb.StoreObjectAsync(obj);
+                await this.CreateDirtyEntityAsync(obj, dop);
+                indexManager.UpdateIndexes(obj.OID, oldTags, obj.GetAllTags());
+
             }
+            else
+            {
+                await this.siaqodb.StoreObjectAsync(obj);
+            }
+            this.siaqodb.Flush();
+
+
         }
       
-        public IList<CryptonorObject> LoadAll()
+        public async Task<IList<CryptonorObject>> LoadAll()
         {
-            return this.siaqodb.LoadAll<CryptonorObject>();
+            return await this.siaqodb.LoadAllAsync<CryptonorObject>();
         }
        
-        public CryptonorObject Load(string key)
+        public async Task<CryptonorObject> Load(string key)
         {
-            return null;
+            throw new NotImplementedException();
         }
-        public IList<CryptonorObject> Load(System.Linq.Expressions.Expression expression)
+        public async Task<IList<CryptonorObject>> Load(System.Linq.Expressions.Expression expression)
         {
-            return this.siaqodb.Load<CryptonorObject>(expression);
+            return await this.siaqodb.LoadAsync<CryptonorObject>(expression);
         }
         public ISqoQuery<T> Cast<T>()
         {
@@ -161,11 +127,11 @@ namespace Sqo
        
         private DotissiConfigurator configurator=new DotissiConfigurator();
         public DotissiConfigurator Configurator { get { return configurator; } }
-        public void Delete(string key)
+        public async Task Delete(string key)
         { 
             Dictionary<string,object> criteria=new Dictionary<string,object>();
             criteria.Add("key",key);
-            this.siaqodb.DeleteObjectBy<CryptonorObject>(criteria);
+            await this.siaqodb.DeleteObjectByAsync<CryptonorObject>(criteria);
         }
     }
     public class CryptonorObject

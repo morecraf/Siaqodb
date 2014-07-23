@@ -55,41 +55,76 @@ namespace WindowsFormsApplication2
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
             CryptonorConfigurator.SetEncryptionKey("alfa");
             CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior");
-            CryptonorObject doObj = new CryptonorObject();
-            User book=new User();
-            book.UserName="2031";
-            book.author="Cristi Ursachi45";
-            book.body="An amazing book...";
-            book.title="How tos";
-            book.copies_owned=7;
+            CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
+            //IBucket bucket = cl.GetLocalBucket(@"c:\work\temp\cloudb3\");
+            for (int i = 0; i < 50; i++)
+            {
+                CryptonorObject doObj = new CryptonorObject();
+                User book = new User();
+                book.UserName = "2031"+i.ToString();
+                book.author = "Cristi Ursachi45";
+                book.body = "An amazing book...";
+                book.title = "How tos";
+                book.copies_owned = 7;
+                doObj.IsDirty = true;
+                doObj.SetValue<User>(book);
+                var aa = doObj.GetValue<User>();
+                doObj.Key = book.UserName;
+                //doObj.Tags = new Dictionary<string, object>();
+                // doObj.Tags["country"] = "RO";
+                // doObj.Tags["mydecimal"] = new decimal(20.2);
+                doObj.SetTag("birth_year", 1981);
+                doObj.SetTag("country", "RO");
+                //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
+                try
+                {
+                    //await client.Put("crypto_users", doObj);
+                   // await bucket.Store(doObj);
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            var asteroid = await client.GetByTag("crypto_users", "country", "RO",10,0);
+            var asteroid2 = await client.GetByTag("crypto_users", "country", "RO",10,asteroid.ContinuationToken);
+            IBucket bucket = cl.GetBucket("crypto_users");
+              var q = await bucket.Query().Where(ar => ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).GetResultSetAsync();
+              var objects = q.GetValues<User>();
+              var usernames=objects.Select(a => a.UserName).OrderBy(a => a).ToList(); 
+              var q2 = await bucket.Query(q.ContinuationToken).Where(ar => ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).GetResultSetAsync();
+              var objects2 = q2.GetValues<User>();
+              var usernames2 = objects2.Select(a => a.UserName).OrderBy(a => a).ToList(); 
             
-            doObj.SetValue<User>(book);
-            var aa = doObj.GetValue<User>();
-            doObj.Key = book.UserName;
-            //doObj.Tags = new Dictionary<string, object>();
-           // doObj.Tags["country"] = "RO";
-           // doObj.Tags["mydecimal"] = new decimal(20.2);
-            doObj.SetTag("birth_year", 1981);
-            doObj.SetTag("country", "RO");
-            //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
-              try
-            {
-               //await client.Put("crypto_users", doObj);
-            }
-            catch(Exception ex)
-            {
-                
-            }
-              CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
-              IBucket bucket = cl.GetBucket("crypto_users");
-              var q = await bucket.Query().Where(ar => ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).ToListAsync();
-             // var all = await bucket.GetAllAsync();
+            // var all = await bucket.GetAllAsync();
             string aaas = "";
          
            // IEnumerable<CryptonorObject> obj = await client.GetByTag("crypto_users", "myguid3", "eq", new Guid("e8f3b6f8-e034-40d0-92ca-2b5994ce3e60"));
             //var ra = await client.Get("crypto_users");
-            string a = "";
+            string aasw = "";
+            List<User> users = new List<User>();
+            var filtered = users.Where(b => b.UserName == "myuser");
 
+            var linqSt = from User u in users
+                         orderby u.UserName
+                         select u;
+            A avar = new B();
+            avar.MetA();
+        }
+       
+    }
+    class A
+    {
+        public string MetA()
+        {
+            return "MetA";
+        }
+    }
+    class B:A
+    {
+        public string MetA()
+        {
+            return "MetB";
         }
     }
     public class User

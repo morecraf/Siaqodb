@@ -14,11 +14,17 @@ namespace CryptonorClient
    public class CNQuery<T>: Sqo.ISqoQuery<T> where T:Sqo.CryptonorObject
     {
         Expression expression;
+        long continuationToken;
         public Expression Expression { get { return expression; } set { expression = value; } }
         IBucket bucket;
         public CNQuery(IBucket bucket)
         {
             this.bucket = bucket;
+        }
+        public CNQuery(IBucket bucket,long continuationToken)
+        {
+            this.bucket = bucket;
+            this.continuationToken = continuationToken;
         }
         private IList<T> oList;
         
@@ -30,16 +36,36 @@ namespace CryptonorClient
             {
                 if (expression == null)
                 {
-                    oList = await bucket.GetAllAsync<T>();
+                    var result =await bucket.GetAll();
+                    oList = (IList<T>)result.Objects;
 
                 }
                 else
                 {
-                    oList = (IList<T>) (await bucket.GetAsync(this.expression));
+                    var result =await bucket.Get(this.expression,this.continuationToken);
+                    oList = (IList<T>)result.Objects ;
 
                 }
             }
             return oList;
+        }
+        public async Task<CryptonorResultSet> GetResultSetAsync<T>()
+        {
+
+            if (expression == null)
+            {
+                return await bucket.GetAll();
+
+            }
+            else
+            {
+
+                return await bucket.Get(this.expression,this.continuationToken);
+
+            }
+            
+            
+           
         }
 #endif
 
@@ -58,7 +84,7 @@ namespace CryptonorClient
                     }
                     else
                     {
-                        oList = (IList<T>)bucket.Get(this.expression);
+                        throw new Exception("TODO");
                     }
                 }
             
