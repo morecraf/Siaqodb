@@ -15,11 +15,12 @@ namespace CryptonorClient
         }
         public static void SetValue(this CryptonorObject cryObj, object objValue)
         {
+            if (CryptonorConfigurator.Cipher == null)
+                throw new Exception("Encryption algorithm should be set");
             byte[] serializedObj = CryptonorConfigurator.DocumentSerializer.Serialize(objValue);
-            int nrBytes = PaddingSize(serializedObj.Length);
-            byte[] encBytes = new byte[nrBytes];
-            Array.Copy(serializedObj, 0, encBytes, 0, serializedObj.Length);
-            CryptonorConfigurator.DefaultEncryptor.Encrypt(encBytes, 0, encBytes.Length);
+
+            CryptonorConfigurator.Cipher.EnsureLength(ref serializedObj);
+            byte[] encBytes= CryptonorConfigurator.Cipher.Encrypt(serializedObj);
             cryObj.Document = encBytes;
             cryObj.IsDirty = true;
         }
@@ -29,19 +30,14 @@ namespace CryptonorClient
         }
         public static object GetValue(this CryptonorObject cryObj, Type type)
         {
-            byte[] encryptedDoc = new byte[cryObj.Document.Length];
-            Array.Copy(cryObj.Document, 0, encryptedDoc, 0, encryptedDoc.Length);
-
-            CryptonorConfigurator.DefaultEncryptor.Decrypt(encryptedDoc, 0, encryptedDoc.Length);
-            return CryptonorConfigurator.DocumentSerializer.Deserialize(type, encryptedDoc);
+            byte[] decDoc=CryptonorConfigurator.Cipher.Decrypt(cryObj.Document);
+            return CryptonorConfigurator.DocumentSerializer.Deserialize(type, decDoc);
         }
-        private static int PaddingSize(int length)
+        public static T Tags<T>(this CryptonorObject cryObj, string tagName)
         {
-            int blockSize = CryptonorConfigurator.DefaultEncryptor.GetBlockSize() / 8;
-            if (length % blockSize == 0) 
-                return length;
-            else
-                return length + (blockSize - (length % blockSize));
+            
+            return default(T);
         }
+        
     }
 }

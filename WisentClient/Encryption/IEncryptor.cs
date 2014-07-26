@@ -8,8 +8,8 @@ namespace CryptonorClient.Encryption
 {
     public interface IEncryptor
     {
-        void Encrypt(byte[] bytes, int off, int len);
-        void Decrypt(byte[] bytes, int off, int len);
+        void Encrypt(byte[] bytesIn,int inOff, byte[] byteOut);
+        void Decrypt(byte[] bytesIn,int inOff, byte[] byteOut);
         int GetBlockSize();
 
     }

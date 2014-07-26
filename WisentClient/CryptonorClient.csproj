@@ -56,8 +56,12 @@
     <Compile Include="CryptonorConfigurator.cs" />
     <Compile Include="DocumentSerializer\CryptoJsonSerializer.cs" />
     <Compile Include="DocumentSerializer\IDocumentSerializer.cs" />
-    <Compile Include="Encryption\AESEncryptor.cs" />
+    <Compile Include="Encryption\AES128Encryptor.cs" />
+    <Compile Include="Encryption\AES256Encryptor.cs" />
+    <Compile Include="Encryption\Camellia.cs" />
+    <Compile Include="Encryption\CBCCipher.cs" />
     <Compile Include="Encryption\IEncryptor.cs" />
+    <Compile Include="Encryption\Pack.cs" />
     <Compile Include="Entities\CryptonorObjectExtensions.cs" />
     <Compile Include="Entities\CryptonorResultSet.cs" />
     <Compile Include="Http\CryptonorHttpClient.cs" />

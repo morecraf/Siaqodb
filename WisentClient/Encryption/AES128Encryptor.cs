@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CryptonorClient.Encryption
 {
-    class AESEncryptor : IEncryptor
+    class AES128Encryptor : IEncryptor
     {
 
 
@@ -25,7 +25,7 @@ namespace CryptonorClient.Encryption
         private int[] decKey = new int[44];
 
 
-        public AESEncryptor()
+        public AES128Encryptor()
         {
            
 
@@ -51,7 +51,7 @@ namespace CryptonorClient.Encryption
         }
 
 
-        static AESEncryptor()
+        static AES128Encryptor()
         {
             int[] pow = new int[256];
             int[] log = new int[256];
@@ -140,22 +140,18 @@ namespace CryptonorClient.Encryption
         }
 
 
-        public void Encrypt(byte[] bytes, int off, int len)
+        public void Encrypt(byte[] bytesIn, int offIn, byte[] bytesOut)
         {
 
-            for (int i = off; i < off + len; i += 16)
-            {
-                encryptBlock(bytes, bytes, i);
-            }
+            encryptBlock(bytesIn, bytesOut, offIn);
         }
 
 
-        public void Decrypt(byte[] bytes, int off, int len)
+        public void Decrypt(byte[] bytesIn, int offIn, byte[] bytesOut)
         {
-            for (int i = off; i < off + len; i += 16)
-            {
-                decryptBlock(bytes, bytes, i);
-            }
+
+            decryptBlock(bytesIn, bytesOut, offIn);
+
         }
 
 

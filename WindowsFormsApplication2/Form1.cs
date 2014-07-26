@@ -53,11 +53,12 @@ namespace WindowsFormsApplication2
         private async void button2_Click(object sender, EventArgs e)
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
-            CryptonorConfigurator.SetEncryptionKey("alfa");
+            CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia256,"aaaa");
             CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior");
             CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
             //IBucket bucket = cl.GetLocalBucket(@"c:\work\temp\cloudb3\");
-            for (int i = 0; i < 50; i++)
+            DateTime start = DateTime.Now;
+            for (int i = 0; i < 100000; i++)
             {
                 CryptonorObject doObj = new CryptonorObject();
                 User book = new User();
@@ -86,10 +87,12 @@ namespace WindowsFormsApplication2
 
                 }
             }
+            string elapsed = (DateTime.Now - start).ToString();
+
             var asteroid = await client.GetByTag("crypto_users", "country", "RO",10,0);
             var asteroid2 = await client.GetByTag("crypto_users", "country", "RO",10,asteroid.ContinuationToken);
             IBucket bucket = cl.GetBucket("crypto_users");
-              var q = await bucket.Query().Where(ar => ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).GetResultSetAsync();
+              var q = await bucket.Query().Where(ar =>ar.Tags<int>("Age")==20).GetResultSetAsync();// ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).GetResultSetAsync();
               var objects = q.GetValues<User>();
               var usernames=objects.Select(a => a.UserName).OrderBy(a => a).ToList(); 
               var q2 = await bucket.Query(q.ContinuationToken).Where(ar => ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).GetResultSetAsync();

@@ -10,23 +10,52 @@ namespace CryptonorClient
 {
     public class CryptonorConfigurator
     {
-        internal static IEncryptor DefaultEncryptor=new AESEncryptor();
+        internal static CBCCipher Cipher;
         internal static IDocumentSerializer DocumentSerializer=new CryptoJsonSerializer();
-      
-        public static void SetEncryptionKey(string encryptionKey)
+       
+        public static void SetEncryptor(EncryptionAlgorithm algorithm, string encryptionKey)
         {
-            byte[] key = Encoding.UTF8.GetBytes(encryptionKey);
-            AESEncryptor encAes = DefaultEncryptor as AESEncryptor;
-            if (encAes != null)
+            if (algorithm == EncryptionAlgorithm.AES128)
             {
-                byte[] aesKey = new byte[16];
-                int length = key.Length;
-                if (length > 16)
-                    length = 16;
-                Array.Copy(key, aesKey, length);
-                encAes.SetKey(aesKey);
+                AES128Encryptor encryptor = new AES128Encryptor();
+                Cipher = new CBCCipher(encryptor);
+                encryptor.SetKey(BuildKey(encryptionKey, 16));
+
+            }
+            if (algorithm == EncryptionAlgorithm.AES256)
+            {
+                AES256Encryptor encryptor = new AES256Encryptor();
+                Cipher = new CBCCipher(encryptor);
+                encryptor.SetKey(BuildKey(encryptionKey, 32));
+
+            }
+            if (algorithm == EncryptionAlgorithm.Camellia128)
+            {
+                CamelliaEngine encryptor = new CamelliaEngine();
+                Cipher = new CBCCipher(encryptor);
+                encryptor.SetKey(BuildKey(encryptionKey, 16));
+
+            }
+            if (algorithm == EncryptionAlgorithm.Camellia256)
+            {
+                CamelliaEngine encryptor = new CamelliaEngine();
+                Cipher = new CBCCipher(encryptor);
+              
+                encryptor.SetKey(BuildKey(encryptionKey,32));
+
             }
 
+        }
+        private static byte[] BuildKey(string encryptionKey, int keyLength)
+        {
+            byte[] key = Encoding.UTF8.GetBytes(encryptionKey);
+
+            byte[] aesKey = new byte[keyLength];
+            int length = key.Length;
+            if (length > keyLength)
+                length = keyLength;
+            Array.Copy(key, aesKey, length);
+            return aesKey;
         }
         public static void SetEncryptor(IEncryptor encryptor)
         {
@@ -34,7 +63,7 @@ namespace CryptonorClient
             {
                 throw new ArgumentNullException("encryptor");
             }
-            DefaultEncryptor = encryptor;
+            Cipher = new CBCCipher(encryptor);
         }
         public static void SetDocumentSerializer(IDocumentSerializer documentSerializer)
         {
@@ -46,4 +75,5 @@ namespace CryptonorClient
         }
        
     }
+    public enum EncryptionAlgorithm { AES128, AES256, Camellia128,Camellia256}
 }
