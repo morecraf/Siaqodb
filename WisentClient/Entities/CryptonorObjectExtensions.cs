@@ -30,7 +30,9 @@ namespace CryptonorClient
         }
         public static object GetValue(this CryptonorObject cryObj, Type type)
         {
-            byte[] decDoc=CryptonorConfigurator.Cipher.Decrypt(cryObj.Document);
+            byte[] documentVal = new byte[cryObj.Document.Length];
+            Array.Copy(cryObj.Document, documentVal, cryObj.Document.Length);
+            byte[] decDoc = CryptonorConfigurator.Cipher.Decrypt(documentVal);
             return CryptonorConfigurator.DocumentSerializer.Deserialize(type, decDoc);
         }
         public static T Tags<T>(this CryptonorObject cryObj, string tagName)

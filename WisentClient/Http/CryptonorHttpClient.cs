@@ -131,6 +131,24 @@ namespace CryptonorClient
                 string h = ";;";
             }
         }
+        public async Task Put(string bucket, IList<CryptonorObject> obj)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new Uri(uri);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
+                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket+"/batch", obj, formatter);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                    
+                }
+                var aa = httpResponseMessage.EnsureSuccessStatusCode();
+               
+            }
+        }
         internal async Task<CryptonorResultSet> GetByTag(string bucket, QueryObject query)
         {
             using (HttpClient httpClient = new HttpClient())
@@ -156,5 +174,24 @@ namespace CryptonorClient
         }
 
 
+
+        internal async Task Delete(string bucket, string key)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+
+                httpClient.BaseAddress = new Uri(uri);
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage httpResponseMessage = await httpClient.DeleteAsync(dbName + "/" + bucket + "/"+key);
+                if (!httpResponseMessage.IsSuccessStatusCode)
+                {
+                    string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                    //throw new HttpException((int)response.StatusCode, responseBody);
+                }
+                var aa = httpResponseMessage.EnsureSuccessStatusCode();
+              
+            }
+        }
     }
 }

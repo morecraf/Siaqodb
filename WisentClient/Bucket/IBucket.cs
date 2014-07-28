@@ -19,11 +19,14 @@ namespace CryptonorClient
         Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression,long continuationToken);
 
         Task<CryptonorResultSet> GetAll();
+        Task<CryptonorResultSet> GetAll(int limit, long continuationToken);
         Task Store(CryptonorObject obj);
         Task Store(string key, object obj);
         Task Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
         Task Store(string key, object obj, object tags = null);
+        Task StoreBatch(IList<CryptonorObject> obj);
         Task Delete(string key);
+        Task Delete(CryptonorObject obj);
         string BucketName { get; set; }
 
         

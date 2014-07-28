@@ -45,6 +45,11 @@ namespace CryptonorClient
             var all=await httpClient.Get(this.BucketName);
             return all;
         }
+        public async Task<CryptonorResultSet> GetAll(int limit, long continuationToken)
+        {
+            var all = await httpClient.Get(this.BucketName,limit,continuationToken);
+            return all;
+        }
 
         public async Task Store(Sqo.CryptonorObject obj)
         {
@@ -97,7 +102,10 @@ namespace CryptonorClient
             throw new NotImplementedException();
         }
 
-      
+        public async Task Delete(CryptonorObject obj)
+        {
+            throw new NotImplementedException();
+        }
         public async Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression)
         {
             return await this.Get(expression, 0);
@@ -110,6 +118,12 @@ namespace CryptonorClient
                 throw new Exception("At least one EQUAL operation must be set");
           
             return (await httpClient.GetByTag(this.BucketName, new QueryObject { Filter = where,ContinuationToken=continuationToken }));
+        }
+
+
+        public async Task StoreBatch(IList<CryptonorObject> objects)
+        {
+            await httpClient.Put(this.BucketName, objects);
         }
     }
 }

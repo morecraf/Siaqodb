@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Sqo;
 using CryptonorClient;
+using System.Linq.Expressions;
 
 namespace WindowsFormsApplication2
 {
@@ -26,7 +27,7 @@ namespace WindowsFormsApplication2
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
             SiaqodbConfigurator.SetLicense("anqHBdiAJzXSpNdJRy+BkMMNlL1+jZBe4wyzvnZpba8=");
-            CryptonorLocalBucket db = new CryptonorLocalBucket(@"c:\work\temp\clouddb\");
+            CryptonorLocalBucket db = new CryptonorLocalBucket("crypto_users",@"c:\work\temp\clouddb\","","");
             for (int i = 0; i < 10; i++)
             {
 
@@ -53,45 +54,50 @@ namespace WindowsFormsApplication2
         private async void button2_Click(object sender, EventArgs e)
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
-            CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia256,"aaaa");
+            CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128,"aaaa");
             CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior");
             CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
-            //IBucket bucket = cl.GetLocalBucket(@"c:\work\temp\cloudb3\");
+            IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
+           // IBucket bucket = cl.GetBucket("crypto_users");
             DateTime start = DateTime.Now;
-            for (int i = 0; i < 100000; i++)
+          
+            List<CryptonorObject> list = new List<CryptonorObject>();
+            for (int i = 0; i < 10; i++)
             {
                 CryptonorObject doObj = new CryptonorObject();
                 User book = new User();
-                book.UserName = "2031"+i.ToString();
-                book.author = "Cristi Ursachi45";
+                book.UserName = "2031" + i.ToString();
+                book.author = "Ursachi Alisia";
                 book.body = "An amazing book...";
                 book.title = "How tos";
                 book.copies_owned = 7;
-                doObj.IsDirty = true;
+                
                 doObj.SetValue<User>(book);
                 var aa = doObj.GetValue<User>();
                 doObj.Key = book.UserName;
                 //doObj.Tags = new Dictionary<string, object>();
                 // doObj.Tags["country"] = "RO";
                 // doObj.Tags["mydecimal"] = new decimal(20.2);
-                doObj.SetTag("birth_year", 1981);
+                doObj.SetTag("birth_year", 2008);
                 doObj.SetTag("country", "RO");
                 //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
-                try
-                {
-                    //await client.Put("crypto_users", doObj);
-                   // await bucket.Store(doObj);
-                }
-                catch (Exception ex)
-                {
 
-                }
+               // await bucket.Store(doObj);
+               // list.Add(doObj);
+
             }
+            Expression<Func<CryptonorObject, bool>> expr = a => (a.Tags_Int["birth_year"] > 2007 && a.Tags_String["country"] == "RO");
+          
+            //var qlos = (await bucket.Query().Where(expr).GetResultSetAsync()).GetValues<User>();
+          
+           // await ((CryptonorLocalBucket)bucket).Push();
+             await ((CryptonorLocalBucket)bucket).Pull(expr,3);
+            var qlos = (await bucket.Query().Where(expr).GetResultSetAsync()).GetValues<User>();
             string elapsed = (DateTime.Now - start).ToString();
 
             var asteroid = await client.GetByTag("crypto_users", "country", "RO",10,0);
             var asteroid2 = await client.GetByTag("crypto_users", "country", "RO",10,asteroid.ContinuationToken);
-            IBucket bucket = cl.GetBucket("crypto_users");
+           
               var q = await bucket.Query().Where(ar =>ar.Tags<int>("Age")==20).GetResultSetAsync();// ar.Tags_String["country"] == "RO" && (ar.Tags_Int["birth_year"] > 1900)).GetResultSetAsync();
               var objects = q.GetValues<User>();
               var usernames=objects.Select(a => a.UserName).OrderBy(a => a).ToList(); 

@@ -19,9 +19,9 @@ namespace CryptonorClient
         {
             return new CryptonorBucket(bucketName,this.uri,this.dbName);
         }
-        public IBucket GetLocalBucket(string bucketName)
+        public IBucket GetLocalBucket(string bucketName,string localFolder)
         {
-            return new CryptonorLocalBucket(bucketName);
+            return new CryptonorLocalBucket(bucketName,localFolder,uri,dbName);
         }
 
     }

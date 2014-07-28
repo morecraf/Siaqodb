@@ -100,7 +100,7 @@
     <Compile Include="Core\SqoFile.cs" />
     <Compile Include="Core\SqoISFile.cs" />
     <Compile Include="Core\SqoISFile2.cs" />
-    <Compile Include="DoDB.cs" />
+    <Compile Include="CryptonorLocalDB.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />

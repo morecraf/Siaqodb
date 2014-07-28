@@ -190,6 +190,18 @@ namespace Sqo.Indexes
             }
             
         }
+        public void UpdateIndexesAfterDelete(int oid, Dictionary<string, object> oldTags)
+        {
+            if (oldTags != null && oldTags.Count > 0)
+            {
+                foreach (string key in oldTags.Keys)
+                {
+                    IBTree index = this.GetIndex(key, oldTags[key].GetType());
+                    index.RemoveOid(oldTags[key], oid);
+                    index.Persist();
+                }
+            }
+        }
         
         public bool ExistsIndex(string indexName)
         {
