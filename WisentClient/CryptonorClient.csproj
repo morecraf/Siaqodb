@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ASYNC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -49,19 +49,47 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bucket\CryptonorBucket.cs" />
+    <Compile Include="Bucket\CryptonorLocalBucket.cs" />
+    <Compile Include="Bucket\IBucket.cs" />
     <Compile Include="CryptonorClient.cs" />
+    <Compile Include="CryptonorConfigurator.cs" />
+    <Compile Include="DocumentSerializer\CryptoJsonSerializer.cs" />
+    <Compile Include="DocumentSerializer\IDocumentSerializer.cs" />
+    <Compile Include="Encryption\AES128Encryptor.cs" />
+    <Compile Include="Encryption\AES256Encryptor.cs" />
+    <Compile Include="Encryption\Camellia.cs" />
+    <Compile Include="Encryption\CBCCipher.cs" />
+    <Compile Include="Encryption\IEncryptor.cs" />
+    <Compile Include="Encryption\Pack.cs" />
+    <Compile Include="Entities\CryptonorObjectExtensions.cs" />
+    <Compile Include="Entities\CryptonorResultSet.cs" />
+    <Compile Include="Http\CryptonorHttpClient.cs" />
+    <Compile Include="LINQ\Evaluator.cs" />
+    <Compile Include="LINQ\ExpressionVisitor.cs" />
+    <Compile Include="LINQ\CNQuery.cs" />
+    <Compile Include="LINQ\CNQueryExtensionsImpl.cs" />
+    <Compile Include="LINQ\ISqoQueryExtensions.cs" />
+    <Compile Include="LINQ\QueryTranslator.cs" />
+    <Compile Include="Queries\QueryObject.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\Criteria.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 4.5%29.csproj">
       <Project>{f5bd2e1f-dcdd-4a1c-8130-236c2d75ff93}</Project>
       <Name>Siaqodb %28.NET 4.5%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

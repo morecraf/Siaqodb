@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Cryptonor
+namespace CryptonorClient
 {
     static class  Mapper
     {
@@ -42,5 +42,6 @@ namespace Cryptonor
             }
             return HttpUtility.UrlEncode(value.ToString());
         }
+       
     }
 }

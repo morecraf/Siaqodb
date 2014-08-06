@@ -2,7 +2,8 @@
 
 namespace Sqo.Encryption
 {
-   
+  //converted from here
+  //https://code.google.com/p/h2database/source/browse/trunk/h2/src/main/org/h2/security/AES.java
  class AESEncryptor  :IEncryptor
 {
 

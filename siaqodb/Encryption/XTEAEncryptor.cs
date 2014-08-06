@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace Sqo.Encryption
-{
+{//converted from here:
+  //  https://code.google.com/p/h2database/source/browse/trunk/h2/src/main/org/h2/security/XTEA.java
     class XTEAEncryptor : IEncryptor
     {
         private static readonly int DELTA = unchecked((int)(0x9E3779B9));
