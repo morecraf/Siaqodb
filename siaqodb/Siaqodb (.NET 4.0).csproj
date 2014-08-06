@@ -59,7 +59,7 @@
     <DocumentationFile>bin\Licensed\Release\.NET4.0\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>

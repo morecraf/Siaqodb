@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -16,6 +16,10 @@
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>UnitTestsSiaqodbWinRT_TemporaryKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>C1D12A133CE2A515AD1DF84562725CB54CB9E36B</PackageCertificateThumbprint>
+    <TargetPlatformVersion>8.1</TargetPlatformVersion>
+    <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
+    <TargetFrameworkVersion />
+    <AppxBundle>Never</AppxBundle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -145,17 +149,17 @@
     <None Include="UnitTestsSiaqodbWinRT_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Siaqodb, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SiaqodbSetup\packages\Siaqodb4.0\bin\universal\Siaqodb.dll</HintPath>
-    </Reference>
-    <Reference Include="SiaqodbPortable, Version=4.0.0.9, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SiaqodbSetup\packages\Siaqodb4.0\bin\portable-net45+wp8+win8\SiaqodbPortable.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\siaqodb\Siaqodb %28UniversalApp%29.csproj">
+      <Project>{c2d71970-6fa2-4af5-8633-d1741bc28cb9}</Project>
+      <Name>Siaqodb %28UniversalApp%29</Name>
+    </ProjectReference>
   </ItemGroup>
-  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
-    <VisualStudioVersion>11.0</VisualStudioVersion>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
+    <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

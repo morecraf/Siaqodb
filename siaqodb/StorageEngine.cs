@@ -491,18 +491,21 @@ namespace Sqo
 
             }
 #elif WinRT
-            List<string> fileFilter = new List<string>();
-            fileFilter.Add("*");
-            QueryOptions qo = new QueryOptions(CommonFileQuery.DefaultQuery, fileFilter);
-            qo.UserSearchFilter = extension;
-            StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
-            IReadOnlyList<IStorageFile> files = resultQuery.GetFilesAsync().AsTask().Result;
+            //List<string> fileFilter = new List<string>();
+          //  fileFilter.Add("*");
+          //  QueryOptions qo = new QueryOptions();
+            //qo.se = fileFilter;
+           // qo.UserSearchFilter = extension;
+            //StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
+            IReadOnlyList<IStorageFile> files = storageFolder.GetFilesAsync().AsTask().Result;
 
             List<SqoTypeInfo> list = new List<SqoTypeInfo>();
 
 
             foreach (IStorageFile f in files)
             {
+                if (f.FileType != extension)
+                    continue;
                 string typeName = f.Name.Replace(extension, "");
                 if (typeName.StartsWith("Sqo.Indexes.IndexInfo2.") || typeName.StartsWith("Sqo.MetaObjects.RawdataInfo."))//engine types
                 {
@@ -624,18 +627,20 @@ namespace Sqo
 
             }
 #elif WinRT
-            List<string> fileFilter = new List<string>();
-            fileFilter.Add("*");
-            QueryOptions qo = new QueryOptions(CommonFileQuery.DefaultQuery, fileFilter);
-            qo.UserSearchFilter = extension;
-            StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
-            IReadOnlyList<IStorageFile> files = await resultQuery.GetFilesAsync();
+            //List<string> fileFilter = new List<string>();
+           // fileFilter.Add("*");
+            //QueryOptions qo = new QueryOptions();
+           // qo.UserSearchFilter = extension;
+            //StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
+            IReadOnlyList<IStorageFile> files = await storageFolder.GetFilesAsync();
 
             List<SqoTypeInfo> list = new List<SqoTypeInfo>();
 
 
             foreach (IStorageFile f in files)
             {
+                if (f.FileType != extension)
+                    continue;
                 string typeName = f.Name.Replace(extension, "");
                 if (typeName.StartsWith("Sqo.Indexes.IndexInfo2.") || typeName.StartsWith("Sqo.MetaObjects.RawdataInfo."))//engine types
                 {
@@ -776,22 +781,25 @@ namespace Sqo
 #elif WinRT
             this.LoadMetaDataTypes();
 
-            string extension = "*.sqo";
+            string extension = ".sqo";
             if (SiaqodbConfigurator.EncryptedDatabase)
             {
-                extension = "*.esqo";
+                extension = ".esqo";
             }
-            List<string> fileFilter = new List<string>();
-            fileFilter.Add("*");
-            QueryOptions qo = new QueryOptions(CommonFileQuery.DefaultQuery, fileFilter);
-            qo.UserSearchFilter = extension;
-            StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
-            IReadOnlyList<StorageFile> files = resultQuery.GetFilesAsync().AsTask().Result;
+            //List<string> fileFilter = new List<string>();
+            ////fileFilter.Add("*");
+            //QueryOptions qo = new QueryOptions();
+            //qo.UserSearchFilter = extension;
+            //StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
+            IReadOnlyList<StorageFile> files = storageFolder.GetFilesAsync().AsTask().Result;
 
             List<SqoTypeInfo> listToBuildIndexes = new List<SqoTypeInfo>();
             foreach (StorageFile f in files)
             {
-                string typeName = f.Name.Replace(extension.Replace("*", ""), "");
+                if (f.FileType != extension)
+                    continue;
+
+                string typeName = f.Name.Replace(extension, "");
 
                 //Type t=Type.GetType(typeName);
                 if (typeName.StartsWith("indexinfo2.") || typeName.StartsWith("rawdatainfo."))//engine types
@@ -972,22 +980,28 @@ namespace Sqo
             }
 #elif WinRT
             await this.LoadMetaDataTypesAsync().ConfigureAwait(false);
-            string extension = "*.sqo";
+            string extension = ".sqo";
             if (SiaqodbConfigurator.EncryptedDatabase)
             {
-                extension = "*.esqo";
+                extension = ".esqo";
             }
-            List<string> fileFilter = new List<string>();
-            fileFilter.Add("*");
-            QueryOptions qo = new QueryOptions(CommonFileQuery.DefaultQuery, fileFilter);
-            qo.UserSearchFilter = extension;
-            StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
-            IReadOnlyList<StorageFile> files = await resultQuery.GetFilesAsync();
+           
+           // List<string> fileFilter = new List<string>();
+            //fileFilter.Add("*");
+            //QueryOptions qo = new QueryOptions();
+            //qo.UserSearchFilter = extension;
+            //StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
+            IReadOnlyList<StorageFile> files = await storageFolder.GetFilesAsync();
 
             List<SqoTypeInfo> listToBuildIndexes = new List<SqoTypeInfo>();
             foreach (StorageFile f in files)
             {
-                string typeName = f.Name.Replace(extension.Replace("*", ""), "");
+                if (f.FileType != extension)
+                {
+                    continue;
+                }
+
+                string typeName = f.Name.Replace(extension, "");
 
                 //Type t=Type.GetType(typeName);
                 if (typeName.StartsWith("indexinfo2.") || typeName.StartsWith("rawdatainfo."))//engine types
