@@ -88,7 +88,7 @@ namespace Sqo
                 HandleIListMethods(m);
                 return m;
             }
-            else if (typeof(IDictionary).IsAssignableFrom(m.Method.DeclaringType))
+            else if (m.Method.DeclaringType == typeof(Sqo.CryptonorObject) && m.Method.Name == "GetTag")
             {
                 HandleDictionaryMethods(m);
                 return m;
@@ -319,28 +319,43 @@ namespace Sqo
         }
         private void HandleDictionaryMethods(MethodCallExpression m)
         {
-            if (m.Method.Name == "get_Item")
+            if (m.Method.Name == "GetTag" && m.Method.DeclaringType == typeof(Sqo.CryptonorObject))
             {
-                MemberExpression mExpression = m.Object as MemberExpression;
-                if (mExpression == null)
-                {
-                    throw new SiaqodbException("Must be a member that use IDictionary method:" + m.Method.Name);
-                }
-                Visit(mExpression);
                 ConstantExpression c2 = m.Arguments[0] as ConstantExpression;
-                if (c2.Value != null && c2.Value.GetType() == typeof(string) && 
-                    (mExpression.Member.Name == "Tags_Int" || mExpression.Member.Name == "Tags_DateTime"
-                    || mExpression.Member.Name == "Tags_String" || mExpression.Member.Name == "Tags_Double"
-                    || mExpression.Member.Name == "Tags_Bool")
+                if (c2.Value != null && c2.Value.GetType() == typeof(string) &&
+                    (m.Method.ReturnType == typeof(int) || m.Method.ReturnType == typeof(long) || m.Method.ReturnType == typeof(DateTime) || m.Method.ReturnType == typeof(bool)
+                || m.Method.ReturnType == typeof(string) || m.Method.ReturnType == typeof(double) || m.Method.ReturnType == typeof(float))
                     )
                 {
-                    currentWhere.Value2 = c2.Value;//KEY of dictionary
+                    currentWhere.Value2 = c2.Value.ToString();//KEY of dictionary
+                    string tagName="";
+                    if (m.Method.ReturnType == typeof(int) || m.Method.ReturnType == typeof(long))
+                    {
+                        tagName = "tags_Int";
+                    }
+                    else if (m.Method.ReturnType == typeof(float) || m.Method.ReturnType == typeof(double))
+                    {
+                        tagName = "tags_Double";
+                    }
+                    else if (m.Method.ReturnType == typeof(bool) )
+                    {
+                        tagName = "tags_Bool";
+                    }
+                    else if (m.Method.ReturnType == typeof(string))
+                    {
+                        tagName = "tags_String";
+                    }
+                    else if (m.Method.ReturnType == typeof(DateTime))
+                    {
+                        tagName = "tags_DateTime";
+                    }
+                    currentWhere.AttributeName.Add(tagName);
+                    currentWhere.ParentType.Add(typeof(CryptonorObject));
                 }
                 else
                 {
-                    throw new Exceptions.LINQUnoptimizeException("Unsupported string filtering query expression detected. ");
+                    throw new LINQUnoptimizeException("Unsupported string filtering query expression detected. ");
                 }
-
             }
             else
             {

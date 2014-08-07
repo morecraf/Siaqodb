@@ -42,7 +42,7 @@ namespace CryptonorClient
                 }
                 else
                 {
-                    var result =await bucket.Get(this.expression,this.continuationToken);
+                    var result =await bucket.Get(this.expression);
                     oList = (IList<T>)result.Objects ;
 
                 }
@@ -60,7 +60,7 @@ namespace CryptonorClient
             else
             {
 
-                return await bucket.Get(this.expression,this.continuationToken);
+                return await bucket.Get(this.expression);
 
             }
             

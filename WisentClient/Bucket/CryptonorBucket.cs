@@ -17,18 +17,7 @@ namespace CryptonorClient
             this.BucketName = bucketName;
             this.httpClient = new CryptonorHttpClient(uri,dbName);
         }
-        public Sqo.ISqoQuery<T> Cast<T>()
-        {
-            return (Sqo.ISqoQuery<T>)new CNQuery<CryptonorObject>(this);
-        }
-        public Sqo.ISqoQuery<Sqo.CryptonorObject> Query()
-        {
-            return new CNQuery<Sqo.CryptonorObject>(this);
-        }
-        public Sqo.ISqoQuery<Sqo.CryptonorObject> Query(long continuationToken)
-        {
-            return new CNQuery<Sqo.CryptonorObject>(this, continuationToken);
-        }
+       
         public async Task<Sqo.CryptonorObject> Get(string key)
         {
             return await httpClient.Get(this.BucketName, key);
@@ -45,12 +34,15 @@ namespace CryptonorClient
             var all=await httpClient.Get(this.BucketName);
             return all;
         }
-        public async Task<CryptonorResultSet> GetAll(int limit, long continuationToken)
+        public async Task<CryptonorResultSet> GetAll(int skip,int limit)
         {
-            var all = await httpClient.Get(this.BucketName,limit,continuationToken);
+            var all = await httpClient.Get(this.BucketName,skip,limit);
             return all;
         }
-
+        public async Task<CryptonorResultSet> Get(CryptonorQuery query)
+        {
+           return (await httpClient.GetByTag(this.BucketName, query));
+        }
         public async Task Store(Sqo.CryptonorObject obj)
         {
             await httpClient.Put(this.BucketName, obj);
@@ -106,19 +98,8 @@ namespace CryptonorClient
         {
             throw new NotImplementedException();
         }
-        public async Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression)
-        {
-            return await this.Get(expression, 0);
-        }
-        public async Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression,long continuationToken)
-        {
-            QueryTranslator t = new QueryTranslator();
-            List<Criteria> where = t.Translate(expression);
-            if (where.Where(a => a.OperationType == Criteria.Equal).FirstOrDefault() == null)
-                throw new Exception("At least one EQUAL operation must be set");
-          
-            return (await httpClient.GetByTag(this.BucketName, new QueryObject { Filter = where,ContinuationToken=continuationToken }));
-        }
+      
+      
 
 
         public async Task StoreBatch(IList<CryptonorObject> objects)

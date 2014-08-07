@@ -135,7 +135,7 @@ namespace Sqo
             await this.CreateTombstoneDirtyEntityAsync(cobj.OID);
             indexManager.UpdateIndexesAfterDelete(cobj.OID, oldTags);
         }
-        public async Task<ChangeSet> GetChangeSet()
+        public async Task<CryptonorChangeSet> GetChangeSet()
         {
             IList<DirtyEntity> all=await this.siaqodb.LoadAllAsync<DirtyEntity>();
            
@@ -200,7 +200,7 @@ namespace Sqo
             {
                 deleted.Add(new DeletedObject { DeletedTime = val.Item2.OperationTime, Key = val.Item1.Key });
             }
-            return new ChangeSet { ChangedObjects = changed,DeletedObjects=deleted };
+            return new CryptonorChangeSet { ChangedObjects = changed,DeletedObjects=deleted };
         }
 
         public async Task ClearSyncMetadata()
@@ -262,7 +262,7 @@ namespace Sqo
             get { return document; }
             set { document = value; }
         }
-        public byte[] Version { get; set; }
+        public string Version { get; set; }
        
         public bool IsDirty { get; set; }
         
@@ -276,54 +276,49 @@ namespace Sqo
         }
        
         private Dictionary<string, long> tags_Int;
-        public Dictionary<string, long> Tags_Int{get { return tags_Int; } set { tags_Int = value; }}
-
+      
         private Dictionary<string, DateTime> tags_DateTime;
-        public Dictionary<string, DateTime> Tags_DateTime { get { return tags_DateTime; } set { tags_DateTime = value; } }
-
+      
         private Dictionary<string, string> tags_String;
-        public Dictionary<string, string> Tags_String { get { return tags_String; } set { tags_String = value; } }
-
+       
         private Dictionary<string, double> tags_Double;
-        public Dictionary<string, double> Tags_Double { get { return tags_Double; } set { tags_Double = value; } }
-
+       
         private Dictionary<string, bool> tags_Bool;
-        public Dictionary<string, bool> Tags_Bool { get { return tags_Bool; } set { tags_Bool = value; } }
-
+      
         public void SetTag(string tagName, object value)
         {
             Type type = value.GetType();
             if (type == typeof(int) || type == typeof(long))
             {
-                if (Tags_Int == null)
-                    Tags_Int = new Dictionary<string, long>();
-                Tags_Int.Add(tagName, Convert.ToInt64(value));
+                if (tags_Int == null)
+                    tags_Int = new Dictionary<string, long>();
+                tags_Int.Add(tagName, Convert.ToInt64(value));
             }
             else if (type == typeof(DateTime))
             {
-                if (Tags_DateTime == null)
-                    Tags_DateTime = new Dictionary<string, DateTime>();
-                Tags_DateTime.Add(tagName, (DateTime)value);
+                if (tags_DateTime == null)
+                    tags_DateTime = new Dictionary<string, DateTime>();
+                tags_DateTime.Add(tagName, (DateTime)value);
             }
 
             else if (type == typeof(double) || type == typeof(float))
             {
-                if (Tags_Double == null)
-                    Tags_Double = new Dictionary<string, double>();
-                Tags_Double.Add(tagName, Convert.ToDouble( value));
+                if (tags_Double == null)
+                    tags_Double = new Dictionary<string, double>();
+                tags_Double.Add(tagName, Convert.ToDouble( value));
             }
             else if (type == typeof(string))
             {
-                if (Tags_String == null)
-                    Tags_String = new Dictionary<string, string>();
-                Tags_String.Add(tagName, (string)value);
+                if (tags_String == null)
+                    tags_String = new Dictionary<string, string>();
+                tags_String.Add(tagName, (string)value);
             }
           
             else if (type == typeof(bool))
             {
-                if (Tags_Bool == null)
-                    Tags_Bool = new Dictionary<string, bool>();
-                Tags_Bool.Add(tagName, (bool)value);
+                if (tags_Bool == null)
+                    tags_Bool = new Dictionary<string, bool>();
+                tags_Bool.Add(tagName, (bool)value);
             }
             else
             {
@@ -331,14 +326,66 @@ namespace Sqo
             }
            
         }
+    
+        public Dictionary<string, object> Tags
+        {
+            get { return this.GetAllTags(); }
+            internal set {
+                foreach (string key in value.Keys)
+                {
+                    this.SetTag(key, value[key]);
+                }
+            }
+        }
+        public T GetTag<T>( string tagName)
+        {
+            Type type = typeof(T);
+            return (T)this.GetTag(tagName, type);
+        }
+        public object GetTag(string tagName,Type expectedType)
+        {
+            Type type = expectedType;
+            if (type == typeof(int) || type == typeof(long))
+            {
+                if (tags_Int != null && tags_Int.ContainsKey(tagName))
+                    return Convert.ChangeType(tags_Int[tagName], type);
+            }
+            else if (type == typeof(DateTime))
+            {
+                if (tags_DateTime != null && tags_DateTime.ContainsKey(tagName))
+                    return Convert.ChangeType(tags_DateTime[tagName], type);
+            }
+
+            else if (type == typeof(double) || type == typeof(float))
+            {
+                if (tags_Double != null && tags_Double.ContainsKey(tagName))
+                    return Convert.ChangeType(tags_Double[tagName], type);
+            }
+            else if (type == typeof(string))
+            {
+                if (tags_String != null && tags_String.ContainsKey(tagName))
+                    return Convert.ChangeType(tags_String[tagName], type);
+            }
+
+            else if (type == typeof(bool))
+            {
+                if (tags_Bool != null && tags_Bool.ContainsKey(tagName))
+                    return Convert.ChangeType(tags_Bool[tagName], type);
+            }
+            else
+            {
+                throw new SiaqodbException("Tag type:" + type.ToString() + " not supported.");
+            }
+            return null;
+        }
         internal Dictionary<string, object> GetAllTags()
         {
             Dictionary<string, object> tags = new Dictionary<string, object>();
-            CopyDictionary(tags, this.Tags_Int);
-            CopyDictionary(tags, this.Tags_String);
-            CopyDictionary(tags, this.Tags_DateTime);
-            CopyDictionary(tags, this.Tags_Double);
-            CopyDictionary(tags, this.Tags_Bool);
+            CopyDictionary(tags, this.tags_Int);
+            CopyDictionary(tags, this.tags_String);
+            CopyDictionary(tags, this.tags_DateTime);
+            CopyDictionary(tags, this.tags_Double);
+            CopyDictionary(tags, this.tags_Bool);
             return tags;
         }
         private void CopyDictionary(Dictionary<string, object> tags, IDictionary dict_to_copy)
@@ -380,7 +427,7 @@ namespace Sqo
             field.SetValue(this, value);
         }
     }
-    public class ChangeSet
+    public class CryptonorChangeSet
     {
         public IList<CryptonorObject> ChangedObjects { get; internal set; }
         public IList<DeletedObject> DeletedObjects { get; internal set; }
@@ -399,4 +446,5 @@ namespace Sqo
             buckets[type] = bucketName;
         }
     }
+    
 }

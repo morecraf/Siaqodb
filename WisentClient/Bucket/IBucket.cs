@@ -9,17 +9,14 @@ namespace CryptonorClient
 {
     public interface IBucket
     {
-        ISqoQuery<T> Cast<T>();
-        Sqo.ISqoQuery<Sqo.CryptonorObject> Query();
-        Sqo.ISqoQuery<Sqo.CryptonorObject> Query(long continuationToken);
-      
+        
         Task<CryptonorObject> Get(string key);
         Task<T> Get<T>(string key);
-        Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression);
-        Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression,long continuationToken);
+        Task<CryptonorResultSet> Get(CryptonorQuery query);
+        //Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression,long continuationToken);
 
         Task<CryptonorResultSet> GetAll();
-        Task<CryptonorResultSet> GetAll(int limit, long continuationToken);
+        Task<CryptonorResultSet> GetAll(int skip,int limit);
         Task Store(CryptonorObject obj);
         Task Store(string key, object obj);
         Task Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);

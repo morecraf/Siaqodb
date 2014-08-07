@@ -35,11 +35,7 @@ namespace CryptonorClient
             byte[] decDoc = CryptonorConfigurator.Cipher.Decrypt(documentVal);
             return CryptonorConfigurator.DocumentSerializer.Deserialize(type, decDoc);
         }
-        public static T Tags<T>(this CryptonorObject cryObj, string tagName)
-        {
-            
-            return default(T);
-        }
+       
         
     }
 }

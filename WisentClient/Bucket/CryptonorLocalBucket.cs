@@ -27,23 +27,7 @@ namespace CryptonorClient
             this.uri = uri;
             this.dbName = dbName;
         }
-        public Sqo.ISqoQuery<T> Cast<T>()
-        {
-            return localDB.Cast<T>();
-        }
-        public Sqo.ISqoQuery<Sqo.CryptonorObject> Query()
-        {
-            return localDB.Query();
-        }
-        public ISqoQuery<CryptonorObject> Query(long continuationToken)
-        {
-            int lastOID=(int)continuationToken;
-            Expression<Func<CryptonorObject, bool>> predicate = cobj => cobj.OID > lastOID;
-            SqoQuery<CryptonorObject> query = localDB.Query() as SqoQuery<CryptonorObject>;
-            query.Expression = predicate;
-            return query;
-        }
-
+       
         public async Task<Sqo.CryptonorObject> Get(string key)
         {
             return await localDB.Load(key);
@@ -54,19 +38,183 @@ namespace CryptonorClient
             CryptonorObject obj= await localDB.Load(key);
             return obj.GetValue<T>();
         }
-        public async Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression)
+        public async Task<CryptonorResultSet> Get(CryptonorQuery query)
         {
-            var all= await localDB.Load(expression);
-            var lastOne = all.OrderBy(a=>a.OID).LastOrDefault();
-            long contiToken=0;
-            if(lastOne!=null)
-                 contiToken=lastOne.OID;
-            return new CryptonorResultSet { Objects = all, Count = all.Count, ContinuationToken = contiToken };
+            Expression<Func<CryptonorObject, bool>> expr = this.GetFilterExpression(query);
+            if (expr == null)
+            {
+                expr = a => a.OID > 0;
+            }
+            IList<CryptonorObject> objects = null;
+
+            if (query.Skip != null && query.Limit != null)
+            {
+                int skip = query.Skip.Value;
+                int limit = query.Limit.Value;
+                objects = await localDB.Query().Where(expr).Skip(skip).Take(limit).ToListAsync();
+            }
+            else if (query.Skip == null && query.Limit != null)
+            {
+
+                int limit = query.Limit.Value;
+                objects = await localDB.Query().Where(expr).Take(limit).ToListAsync();
+            }
+            else if (query.Skip != null && query.Limit == null)
+            {
+                int skip = query.Skip.Value;
+
+                objects = await localDB.Query().Where(expr).Skip(skip).ToListAsync();
+            }
+            else
+            {
+                objects = await localDB.Query().Where(expr).ToListAsync();
+            }
+            return new CryptonorResultSet
+            {
+                Objects = objects,
+                Count = objects.Count
+            };
+
         }
-        public async Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression, long continuationToken)
+
+        private Expression<Func<CryptonorObject, bool>> GetFilterExpression(CryptonorQuery query)
         {
-            return await Get(expression);
+            //TODO: this is ugly refactor me
+            Expression<Func<CryptonorObject, bool>> expr=null;
+            if (query.Value != null && string.Compare( query.TagName,"key",true)==0)
+            {
+                expr = a => a.Key == query.Value.ToString();
+            }
+            else if (query.Value != null)
+            {
+                if (query.Value.GetType() == typeof(int) )
+                {
+                    expr = a => a.GetTag<int>(query.TagName) == (int)query.Value;
+                }
+                else if (query.Value.GetType() == typeof(long))
+                {
+                    expr = a => a.GetTag<long>(query.TagName) == (long)query.Value;
+                }
+                else if (query.Value.GetType() == typeof(string))
+                {
+                    expr = a => a.GetTag<string>(query.TagName) == (string)query.Value;
+                }
+                else if (query.Value.GetType() == typeof(DateTime))
+                {
+                    expr = a => a.GetTag<DateTime>(query.TagName) == (DateTime)query.Value;
+                }
+                else if (query.Value.GetType() == typeof(double))
+                {
+                    expr = a => a.GetTag<double>(query.TagName) == (double)query.Value;
+                }
+                else if (query.Value.GetType() == typeof(float))
+                {
+                    expr = a => a.GetTag<float>(query.TagName) == (float)query.Value;
+                }
+            }
+            else if (query.Start != null && query.End != null && string.Compare(query.TagName, "key", true) == 0)
+            {
+                throw new NotSupportedException();
+            }
+            else if (query.Start != null && query.End != null )
+            {
+                if (query.Value.GetType() == typeof(int))
+                {
+                    expr = a => a.GetTag<int>(query.TagName) >= (int)query.Start && a.GetTag<int>(query.TagName) <= (int)query.End;
+                }
+                else if (query.Value.GetType() == typeof(long))
+                {
+                    expr = a => a.GetTag<long>(query.TagName) >= (long)query.Start && a.GetTag<long>(query.TagName) <= (long)query.End;
+       
+                }
+                else if (query.Value.GetType() == typeof(string))
+                {
+                    throw new NotSupportedException();
+                }
+                else if (query.Value.GetType() == typeof(DateTime))
+                {
+                    expr = a => a.GetTag<DateTime>(query.TagName) >= (DateTime)query.Start && a.GetTag<DateTime>(query.TagName) <= (DateTime)query.End;
+       
+                }
+                else if (query.Value.GetType() == typeof(double))
+                {
+                    expr = a => a.GetTag<double>(query.TagName) >= (double)query.Start && a.GetTag<double>(query.TagName) <= (double)query.End;
+       
+                }
+                else if (query.Value.GetType() == typeof(float))
+                {
+
+                    expr = a => a.GetTag<float>(query.TagName) >= (float)query.Start && a.GetTag<float>(query.TagName) <= (float)query.End;
+
+                }
+            }
+            else if (query.Start != null && query.End == null)
+            {
+                if (query.Value.GetType() == typeof(int))
+                {
+                    expr = a => a.GetTag<int>(query.TagName) >= (int)query.Start;
+                }
+                else if (query.Value.GetType() == typeof(long))
+                {
+                    expr = a => a.GetTag<long>(query.TagName) >= (long)query.Start;
+
+                }
+                else if (query.Value.GetType() == typeof(string))
+                {
+                    throw new NotSupportedException();
+                }
+                else if (query.Value.GetType() == typeof(DateTime))
+                {
+                    expr = a => a.GetTag<DateTime>(query.TagName) >= (DateTime)query.Start;
+
+                }
+                else if (query.Value.GetType() == typeof(double))
+                {
+                    expr = a => a.GetTag<double>(query.TagName) >= (double)query.Start;
+
+                }
+                else if (query.Value.GetType() == typeof(float))
+                {
+
+                    expr = a => a.GetTag<float>(query.TagName) >= (float)query.Start;
+
+                }
+            }
+            else if (query.Start == null && query.End !=null)
+            {
+                if (query.Value.GetType() == typeof(int))
+                {
+                    expr = a =>  a.GetTag<int>(query.TagName) <= (int)query.End;
+                }
+                else if (query.Value.GetType() == typeof(long))
+                {
+                    expr = a => a.GetTag<long>(query.TagName) <= (long)query.End;
+
+                }
+                else if (query.Value.GetType() == typeof(string))
+                {
+                    throw new NotSupportedException();
+                }
+                else if (query.Value.GetType() == typeof(DateTime))
+                {
+                    expr = a =>  a.GetTag<DateTime>(query.TagName) <= (DateTime)query.End;
+
+                }
+                else if (query.Value.GetType() == typeof(double))
+                {
+                    expr = a => a.GetTag<double>(query.TagName) <= (double)query.End;
+
+                }
+                else if (query.Value.GetType() == typeof(float))
+                {
+
+                    expr = a =>  a.GetTag<float>(query.TagName) <= (float)query.End;
+
+                }
+            }
+            return expr;
         }
+        
         public async Task<CryptonorResultSet> GetAll()
         {
 
@@ -75,15 +223,12 @@ namespace CryptonorClient
             return new CryptonorResultSet { Objects = all, Count = all.Count };
         }
 
-        public async Task<CryptonorResultSet> GetAll(int limit,long continuationToken)
+        public async Task<CryptonorResultSet> GetAll(int skip,int limit)
         {
-            int lastOID = (int)continuationToken;
-            var all=await localDB.Query().Where( cobj => cobj.OID > lastOID).Take(limit).ToListAsync();
-            var lastOne = all.OrderBy(a=>a.OID).LastOrDefault();
-            long contiToken=0;
-            if(lastOne!=null)
-                 contiToken=lastOne.OID;
-            return new CryptonorResultSet { Objects = all, Count = all.Count, ContinuationToken = contiToken };
+           
+            var all=await localDB.Query().Skip(skip).Take(limit).ToListAsync();
+           
+            return new CryptonorResultSet { Objects = all, Count = all.Count };
         }
 
       
@@ -158,7 +303,7 @@ namespace CryptonorClient
                 this.syncStatistics = new SyncStatistics();
                 this.syncStatistics.StartTime = DateTime.Now;
                 this.OnSyncProgress(new SyncProgressEventArgs("Synchronization started..."));
-                ChangeSet changeSet= await this.localDB.GetChangeSet();
+                CryptonorChangeSet changeSet= await this.localDB.GetChangeSet();
                 CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName);
                 await httpClient.Put(this.BucketName, changeSet.ChangedObjects);
                 syncStatistics.TotalChangesUploads = changeSet.ChangedObjects.Count;
@@ -208,20 +353,21 @@ namespace CryptonorClient
         {
             await this.Push();
             CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName);
-            var downloadedItems = await httpClient.Get(this.BucketName,limit,0);
+            var downloadedItems = await httpClient.Get(this.BucketName,0,limit);
             if (downloadedItems != null)
             {
                 await this.StoreBatch(downloadedItems.Objects);
-                long continuationToken = downloadedItems.ContinuationToken;
                 int remainLimit = limit - downloadedItems.Count;
+                int skip = downloadedItems.Count;
                 while (remainLimit > 0)
                 {
-                    downloadedItems = await httpClient.Get(this.BucketName, remainLimit, continuationToken);
+                    downloadedItems = await httpClient.Get(this.BucketName,skip, remainLimit);
                     if (downloadedItems != null)
                     {
                         await this.StoreBatch(downloadedItems.Objects);
-                        continuationToken = downloadedItems.ContinuationToken;
+                       
                         remainLimit -= downloadedItems.Count;
+                        skip += downloadedItems.Count;
                     }
                     else
                     {
@@ -232,37 +378,17 @@ namespace CryptonorClient
             }
 
         }
-        public async Task Pull(Expression expression, int limit)
+        public async Task Pull(CryptonorQuery query)
         {
-            QueryTranslator t = new QueryTranslator();
-            List<Criteria> where = t.Translate(expression);
-            if (where.Where(a => a.OperationType == Criteria.Equal).FirstOrDefault() == null)
-                throw new Exception("At least one EQUAL operation must be set");
-
+            
             await this.Push();
             CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName);
-            var downloadedItems =   (await httpClient.GetByTag(this.BucketName, new QueryObject { Filter = where,Limit=limit, ContinuationToken = 0 }));
+            var downloadedItems =   (await httpClient.GetByTag(this.BucketName, query));
        
             if (downloadedItems != null)
             {
                 await this.StoreBatch(downloadedItems.Objects);
-                long continuationToken = downloadedItems.ContinuationToken;
-                int remainLimit = limit - downloadedItems.Count;
-                while (remainLimit > 0)
-                {
-                    downloadedItems = (await httpClient.GetByTag(this.BucketName, new QueryObject { Filter = where, Limit = remainLimit, ContinuationToken = continuationToken }));
-                    if (downloadedItems != null)
-                    {
-                        await this.StoreBatch(downloadedItems.Objects);
-                        continuationToken = downloadedItems.ContinuationToken;
-                        remainLimit -= downloadedItems.Count;
-                    }
-                    else
-                    {
-                        remainLimit = 0;
-                    }
-
-                }
+               
             }
 
         }

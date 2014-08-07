@@ -80,7 +80,7 @@ namespace CryptonorClient
 
             }
            
-            else if (typeof(IDictionary).IsAssignableFrom(m.Method.DeclaringType))
+            else if (m.Method.DeclaringType==typeof(Sqo.CryptonorObject) && m.Method.Name=="Tags")
             {
                 HandleDictionaryMethods(m);
                 return m;
@@ -188,31 +188,43 @@ namespace CryptonorClient
 
         private void HandleDictionaryMethods(MethodCallExpression m)
         {
-            if (m.Method.Name == "get_Item")
-            {
-                MemberExpression mExpression = m.Object as MemberExpression;
-                if (mExpression == null)
-                {
-                    throw new SiaqodbException("Must be a member that use IDictionary method:" + m.Method.Name);
-                }
-                Visit(mExpression);
-                ConstantExpression c2 = m.Arguments[0] as ConstantExpression;
-                if (c2.Value != null && c2.Value.GetType() == typeof(string) &&
-                    (mExpression.Member.Name == "Tags_Int" || mExpression.Member.Name == "Tags_DateTime"
-                    || mExpression.Member.Name == "Tags_String" || mExpression.Member.Name == "Tags_Double"
-                    || mExpression.Member.Name == "Tags_Bool")
-                    )
-                {
-                    currentWhere.TagName = c2.Value.ToString();//KEY of dictionary
-                }
-                else
-                {
-                    throw new LINQUnoptimizeException("Unsupported string filtering query expression detected. ");
-                }
 
+            ConstantExpression c2 = m.Arguments[0] as ConstantExpression;
+            if (c2.Value != null && c2.Value.GetType() == typeof(string) &&
+                (m.Method.ReturnType == typeof(int) || m.Method.ReturnType == typeof(long) || m.Method.ReturnType == typeof(DateTime) || m.Method.ReturnType == typeof(bool)
+            || m.Method.ReturnType == typeof(string) || m.Method.ReturnType == typeof(double) || m.Method.ReturnType == typeof(float))
+                )
+            {
+                currentWhere.TagName = c2.Value.ToString();//KEY of dictionary
+                if (m.Method.ReturnType == typeof(int) || m.Method.ReturnType == typeof(long))
+                {
+                    currentWhere.TagType = "tags_int";
+                }
+                else if (m.Method.ReturnType == typeof(DateTime))
+                {
+                    currentWhere.TagType = "tags_datetime";
+                }
+                else if (m.Method.ReturnType == typeof(double) || m.Method.ReturnType == typeof(float))
+                {
+                    currentWhere.TagType = "tags_double";
+                }
+                else if (m.Method.ReturnType == typeof(string))
+                {
+                    currentWhere.TagType = "tags_string";
+                }
+                else if (m.Method.ReturnType == typeof(bool))
+                {
+                    currentWhere.TagType = "tags_bool";
+                }
+            }
+            else
+            {
+                throw new LINQUnoptimizeException("Unsupported string filtering query expression detected. ");
             }
 
-        
+
+
+
         }
 
         private void HandleAnd(BinaryExpression b)
@@ -281,20 +293,7 @@ namespace CryptonorClient
                         return this.VisitBinary(exp);
                     }
                 }
-#if WinRT
-                if (m.Member.GetMemberType() == MemberTypes.Property)
-#else
-                if (m.Member.MemberType == System.Reflection.MemberTypes.Property)
-#endif
-				{
-                    if (m.Member.Name == "Tags_Int" || m.Member.Name == "Tags_DateTime"
-                   || m.Member.Name == "Tags_String" || m.Member.Name == "Tags_Double"
-                   || m.Member.Name == "Tags_Bool")
-                    {
-                        currentWhere.TagType =  m.Member.Name;
-                    }
-					
-				}
+
 
 				else throw new NotSupportedException("Unsupported Member Type!");
 
