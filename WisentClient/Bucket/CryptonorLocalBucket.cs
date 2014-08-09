@@ -1,4 +1,5 @@
-﻿using Sqo;
+﻿
+using Sqo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-
+using Cryptonor.Queries;
+using Cryptonor;
 namespace CryptonorClient
 {
     public class CryptonorLocalBucket:IBucket
@@ -28,7 +30,7 @@ namespace CryptonorClient
             this.dbName = dbName;
         }
        
-        public async Task<Sqo.CryptonorObject> Get(string key)
+        public async Task<CryptonorObject> Get(string key)
         {
             return await localDB.Load(key);
         }
@@ -40,35 +42,7 @@ namespace CryptonorClient
         }
         public async Task<CryptonorResultSet> Get(CryptonorQuery query)
         {
-            Expression<Func<CryptonorObject, bool>> expr = this.GetFilterExpression(query);
-            if (expr == null)
-            {
-                expr = a => a.OID > 0;
-            }
-            IList<CryptonorObject> objects = null;
-
-            if (query.Skip != null && query.Limit != null)
-            {
-                int skip = query.Skip.Value;
-                int limit = query.Limit.Value;
-                objects = await localDB.Query().Where(expr).Skip(skip).Take(limit).ToListAsync();
-            }
-            else if (query.Skip == null && query.Limit != null)
-            {
-
-                int limit = query.Limit.Value;
-                objects = await localDB.Query().Where(expr).Take(limit).ToListAsync();
-            }
-            else if (query.Skip != null && query.Limit == null)
-            {
-                int skip = query.Skip.Value;
-
-                objects = await localDB.Query().Where(expr).Skip(skip).ToListAsync();
-            }
-            else
-            {
-                objects = await localDB.Query().Where(expr).ToListAsync();
-            }
+            var objects = await localDB.Load(query);
             return new CryptonorResultSet
             {
                 Objects = objects,
@@ -225,15 +199,12 @@ namespace CryptonorClient
 
         public async Task<CryptonorResultSet> GetAll(int skip,int limit)
         {
-           
-            var all=await localDB.Query().Skip(skip).Take(limit).ToListAsync();
+
+            var all = await localDB.LoadAll(skip, limit);
            
             return new CryptonorResultSet { Objects = all, Count = all.Count };
         }
-
-      
-
-        public async Task Store(Sqo.CryptonorObject obj)
+        public async Task Store(CryptonorObject obj)
         {
             await localDB.Store(obj);
         }
@@ -282,7 +253,7 @@ namespace CryptonorClient
 
         public async Task Delete(string key)
         {
-            CryptonorObject cobj = await localDB.Query().Where(a => a.Key == key).FirstOrDefaultAsync();
+            CryptonorObject cobj = await localDB.Load(key);
             await localDB.Delete(cobj);
         }
         public async Task Delete(CryptonorObject obj)

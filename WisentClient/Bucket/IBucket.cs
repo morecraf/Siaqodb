@@ -1,4 +1,6 @@
-﻿using Sqo;
+﻿using Cryptonor;
+using Cryptonor.Queries;
+using Sqo;
 using System;
 using System.Collections.Generic;
 using System.Linq;

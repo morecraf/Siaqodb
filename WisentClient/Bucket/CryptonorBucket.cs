@@ -1,4 +1,6 @@
-﻿using Sqo;
+﻿using Cryptonor;
+using Cryptonor.Queries;
+using Sqo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,7 @@ namespace CryptonorClient
             this.httpClient = new CryptonorHttpClient(uri,dbName);
         }
        
-        public async Task<Sqo.CryptonorObject> Get(string key)
+        public async Task<CryptonorObject> Get(string key)
         {
             return await httpClient.Get(this.BucketName, key);
         }
@@ -43,7 +45,7 @@ namespace CryptonorClient
         {
            return (await httpClient.GetByTag(this.BucketName, query));
         }
-        public async Task Store(Sqo.CryptonorObject obj)
+        public async Task Store(CryptonorObject obj)
         {
             await httpClient.Put(this.BucketName, obj);
         }

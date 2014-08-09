@@ -13,6 +13,8 @@ using Newtonsoft.Json.Bson;
 using Sqo;
 using CryptonorClient;
 using System.Linq.Expressions;
+using Cryptonor;
+using Cryptonor.Queries;
 
 namespace WindowsFormsApplication2
 {
@@ -56,17 +58,19 @@ namespace WindowsFormsApplication2
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
             CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128,"aaaa");
             CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior");
+            //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://ipv4.fiddler/CryptonorWebAPI/", "excelsior");
             CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
+         
             //IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
-           IBucket bucket = cl.GetBucket("crypto_users");
+          IBucket bucket = cl.GetBucket("crypto_users");
             DateTime start = DateTime.Now;
           
             List<CryptonorObject> list = new List<CryptonorObject>();
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 10; i++)
             {
                 CryptonorObject doObj = new CryptonorObject();
                 User book = new User();
-                book.UserName = "3111" + i.ToString();
+                book.UserName = "5111" + i.ToString();
                 book.author = "Ursachi Alisia";
                 book.body = "An amazing book...";
                 book.title = "How tos";
@@ -78,12 +82,12 @@ namespace WindowsFormsApplication2
                 //doObj.Tags = new Dictionary<string, object>();
                 // doObj.Tags["country"] = "RO";
                 // doObj.Tags["mydecimal"] = new decimal(20.2);
-                doObj.SetTag("birth_year", 2008);
+                doObj.SetTag("birth_year", 2010+i);
                 doObj.SetTag("age", 20);
                 doObj.SetTag("country", "RO");
                 //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
                 
-               await bucket.Store(doObj);
+              // await bucket.Store(doObj);
                // list.Add(doObj);
 
             }
@@ -97,9 +101,9 @@ namespace WindowsFormsApplication2
             // await ((CryptonorLocalBucket)bucket).Pull(expr,3);
             //var all = await bucket.Get("21110");
            // var qlos = (await bucket.Query().Where(expr).GetResultSetAsync()).GetValues<User>();
-            CryptonorQuery query67 = new CryptonorQuery("birth_year");
+            CryptonorQuery query67 = new CryptonorQuery("key");
             decimal d = 23.456M;
-            query67.Configure(a => a.In(2008,2009.98));
+            query67.Configure(a => a.In("41111", "41112"));
             var objw = await bucket.Get(query67);
             string elapsed = (DateTime.Now - start).ToString();
 

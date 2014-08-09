@@ -2943,10 +2943,7 @@ savedObject(this, e);
                 metaCache.SetOIDToObject(obj, oids[0], ti);
             }
         }
-        internal void SetTagsIndexManager(TagsIndexManager indexManager)
-        {
-            storageEngine.tagsIndexManager = indexManager;
-        }
+        
        
     }
    

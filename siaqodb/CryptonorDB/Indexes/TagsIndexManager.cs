@@ -6,8 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Sqo.Queries;
 using System.Collections;
+using Cryptonor;
+using Sqo.Indexes;
+using Sqo;
 
-namespace Sqo.Indexes
+namespace Cryptonor.Indexes
 {
     class TagsIndexManager
     {
@@ -214,77 +217,12 @@ namespace Sqo.Indexes
             return false;
         }
 
-        internal void LoadOidsByIndex(Queries.Where where, List<int> oids)
+        internal void LoadOidsByIndex(Cryptonor.Queries.CryptonorQuery query, List<int> oids)
         {
-            IBTree index = this.GetIndex(where.Value2.ToString(), where.Value.GetType());
-            if (where.OperationType == OperationType.Equal)
-            {
-                int[] oidsFound = index.FindItem(where.Value);
-                if (oidsFound != null)
-                {
-                    oids.AddRange(oidsFound);
-
-                }
-            }
-
-            else if (where.OperationType == OperationType.GreaterThan)
-            {
-                List<int> oidsFound = index.FindItemsBiggerThan(where.Value);
-                if (oidsFound != null)
-                {
-                    oidsFound.Reverse();
-                    oids.AddRange(oidsFound);
-
-                }
-
-            }
-            else if (where.OperationType == OperationType.GreaterThanOrEqual)
-            {
-                List<int> oidsFound = index.FindItemsBiggerThanOrEqual(where.Value);
-                if (oidsFound != null)
-                {
-                    oidsFound.Reverse();
-                    oids.AddRange(oidsFound);
-
-                }
-
-            }
-            else if (where.OperationType == OperationType.LessThan)
-            {
-                List<int> oidsFound = index.FindItemsLessThan(where.Value);
-                if (oidsFound != null)
-                {
-                    oids.AddRange(oidsFound);
-
-                }
-            }
-            else if (where.OperationType == OperationType.LessThanOrEqual)
-            {
-                List<int> oidsFound = index.FindItemsLessThanOrEqual(where.Value);
-                if (oidsFound != null)
-                {
-                    oids.AddRange(oidsFound);
-
-                }
-            }
-            else if (where.OperationType == OperationType.StartWith)
-            {
-                List<int> oidsFound = null;
-                if (where.Value2 != null && where.Value2 is StringComparison)
-                {
-                    oidsFound = index.FindItemsStartsWith(where.Value, false, (StringComparison)where.Value2);
-                }
-                else
-                {
-                    oidsFound = index.FindItemsStartsWith(where.Value, true, StringComparison.Ordinal);
-                }
-                if (oidsFound != null)
-                {
-                    oids.AddRange(oidsFound);
-
-                }
-
-            }
+            IBTree index = this.GetIndex(query.TagName, query.GetTagType());
+            IndexQueryFinder.FindOids(index, query, oids);
+           
         }
+       
     }
 }

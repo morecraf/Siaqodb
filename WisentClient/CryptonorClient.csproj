@@ -65,9 +65,8 @@
     <Compile Include="Entities\CryptonorObjectExtensions.cs" />
     <Compile Include="Entities\CryptonorResultSet.cs" />
     <Compile Include="Http\CryptonorHttpClient.cs" />
-    <Compile Include="Queries\CryptonorQuery.cs" />
+    <Compile Include="Queries\CryptonorQueryExtensions.cs" />
     <Compile Include="Queries\QueryConfigurator.cs" />
-    <Compile Include="Queries\ICryptonorQuery.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

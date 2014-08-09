@@ -12,9 +12,10 @@ using Sqo.Transactions;
 using System.Collections;
 using System.Linq.Expressions;
 using System.IO;
+using Sqo;
+using Cryptonor.Indexes;
 
-
-namespace Sqo
+namespace Cryptonor
 {
     public class CryptonorLocalDB 
     {
@@ -28,7 +29,7 @@ namespace Sqo
             //SiaqodbConfigurator.EncryptedDatabase = true;
             this.siaqodb = new Siaqodb(bucketPath);
             indexManager = new TagsIndexManager(this.siaqodb);
-            siaqodb.SetTagsIndexManager(indexManager);
+           
            
         }
 
@@ -104,23 +105,47 @@ namespace Sqo
         {
             return await this.siaqodb.LoadAllAsync<CryptonorObject>();
         }
+        public async Task<IList<CryptonorObject>> LoadAll(int skip, int limit)
+        {
+            return await this.siaqodb.Query<CryptonorObject>().Skip(skip).Take(limit).ToListAsync();
+        }
        
         public async Task<CryptonorObject> Load(string key)
         {
             throw new NotImplementedException();
         }
-        public async Task<IList<CryptonorObject>> Load(System.Linq.Expressions.Expression expression)
+        public async Task<IList<CryptonorObject>> Load(Cryptonor.Queries.CryptonorQuery query)
         {
-            return await this.siaqodb.LoadAsync<CryptonorObject>(expression);
+            List<int> oids = new List<int>();
+            if (string.Compare(query.TagName, "key", true) == 0)
+            {
+                this.LoadByKey(query, oids);
+            }
+            else //by tags
+            {   
+                this.indexManager.LoadOidsByIndex(query, oids);
+            }
+            List<CryptonorObject> allFiltered = new List<CryptonorObject>();
+            IEnumerable<int> oidsLoaded = oids;
+            if (query.Skip != null)
+                oidsLoaded = oidsLoaded.Skip(query.Skip.Value);
+            if (query.Limit != null)
+                oidsLoaded=oidsLoaded.Take(query.Limit.Value);
+            foreach (int oid in oidsLoaded)
+            {
+                var obj = await this.siaqodb.LoadObjectByOIDAsync<CryptonorObject>(oid);
+                allFiltered.Add(obj);
+            }
+            return allFiltered;
+           
         }
-        public ISqoQuery<T> Cast<T>()
+
+        private void LoadByKey(Queries.CryptonorQuery query, List<int> oids)
         {
-            return new SqoQuery<T>(this.siaqodb);
+            IBTree index = siaqodb.GetIndex("key", typeof(CryptonorObject));
+            IndexQueryFinder.FindOids(index, query, oids);
         }
-        public ISqoQuery<CryptonorObject> Query()
-        {
-            return new SqoQuery<CryptonorObject>(this.siaqodb);
-        }
+       
        
         private DotissiConfigurator configurator=new DotissiConfigurator();
         public DotissiConfigurator Configurator { get { return configurator; } }
@@ -231,177 +256,7 @@ namespace Sqo
             }
         }
     }
-    public class CryptonorObject
-    {
-        [Index]
-        private string key;
-        public int OID { get; set; }
-       
-        public bool ShouldSerializeOID()
-        {
-            return false;
-        }
-        public bool ShouldSerializeIsDirty()
-        {
-            return false;
-        }
-        public string Key
-        {
-            get
-            {
-                return this.key;
-            }
-            set
-            {
-                this.key = value;
-            }
-        }
-        private byte[] document;
-        public byte[] Document
-        {
-            get { return document; }
-            set { document = value; }
-        }
-        public string Version { get; set; }
-       
-        public bool IsDirty { get; set; }
-        
-        internal CryptonorObject(string key, byte[] document)
-        {
-            this.Key = key;
-            this.Document = document;
-        }
-        public CryptonorObject()
-        {
-        }
-       
-        private Dictionary<string, long> tags_Int;
-      
-        private Dictionary<string, DateTime> tags_DateTime;
-      
-        private Dictionary<string, string> tags_String;
-       
-        private Dictionary<string, double> tags_Double;
-       
-        private Dictionary<string, bool> tags_Bool;
-      
-        public void SetTag(string tagName, object value)
-        {
-            Type type = value.GetType();
-            if (type == typeof(int) || type == typeof(long))
-            {
-                if (tags_Int == null)
-                    tags_Int = new Dictionary<string, long>();
-                tags_Int.Add(tagName, Convert.ToInt64(value));
-            }
-            else if (type == typeof(DateTime))
-            {
-                if (tags_DateTime == null)
-                    tags_DateTime = new Dictionary<string, DateTime>();
-                tags_DateTime.Add(tagName, (DateTime)value);
-            }
-
-            else if (type == typeof(double) || type == typeof(float))
-            {
-                if (tags_Double == null)
-                    tags_Double = new Dictionary<string, double>();
-                tags_Double.Add(tagName, Convert.ToDouble( value));
-            }
-            else if (type == typeof(string))
-            {
-                if (tags_String == null)
-                    tags_String = new Dictionary<string, string>();
-                tags_String.Add(tagName, (string)value);
-            }
-          
-            else if (type == typeof(bool))
-            {
-                if (tags_Bool == null)
-                    tags_Bool = new Dictionary<string, bool>();
-                tags_Bool.Add(tagName, (bool)value);
-            }
-            else
-            {
-                throw new SiaqodbException("Tag type:" + type.ToString() + " not supported.");
-            }
-           
-        }
-    
-        public Dictionary<string, object> Tags
-        {
-            get { return this.GetAllTags(); }
-            internal set {
-                foreach (string key in value.Keys)
-                {
-                    this.SetTag(key, value[key]);
-                }
-            }
-        }
-        public T GetTag<T>( string tagName)
-        {
-            Type type = typeof(T);
-            return (T)this.GetTag(tagName, type);
-        }
-        public object GetTag(string tagName,Type expectedType)
-        {
-            Type type = expectedType;
-            if (type == typeof(int) || type == typeof(long))
-            {
-                if (tags_Int != null && tags_Int.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_Int[tagName], type);
-            }
-            else if (type == typeof(DateTime))
-            {
-                if (tags_DateTime != null && tags_DateTime.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_DateTime[tagName], type);
-            }
-
-            else if (type == typeof(double) || type == typeof(float))
-            {
-                if (tags_Double != null && tags_Double.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_Double[tagName], type);
-            }
-            else if (type == typeof(string))
-            {
-                if (tags_String != null && tags_String.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_String[tagName], type);
-            }
-
-            else if (type == typeof(bool))
-            {
-                if (tags_Bool != null && tags_Bool.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_Bool[tagName], type);
-            }
-            else
-            {
-                throw new SiaqodbException("Tag type:" + type.ToString() + " not supported.");
-            }
-            return null;
-        }
-        internal Dictionary<string, object> GetAllTags()
-        {
-            Dictionary<string, object> tags = new Dictionary<string, object>();
-            CopyDictionary(tags, this.tags_Int);
-            CopyDictionary(tags, this.tags_String);
-            CopyDictionary(tags, this.tags_DateTime);
-            CopyDictionary(tags, this.tags_Double);
-            CopyDictionary(tags, this.tags_Bool);
-            return tags;
-        }
-        private void CopyDictionary(Dictionary<string, object> tags, IDictionary dict_to_copy)
-        {
-            if (dict_to_copy != null)
-            {
-
-                foreach (string key in dict_to_copy.Keys)
-                {
-                    tags.Add(key, dict_to_copy[key]);
-                }
-
-            }
-        }
-        
-    }
+  
      enum DirtyOperation
     {
         Inserted = 1,

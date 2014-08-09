@@ -43,7 +43,7 @@ namespace Sqo
         
         RawdataSerializer rawSerializer;
         internal IndexManager indexManager;
-        internal TagsIndexManager tagsIndexManager;
+        
         CircularRefCache circularRefCache = new CircularRefCache();
         List<ATuple<Type, String>> includePropertiesCache;
         List<object> parentsComparison;

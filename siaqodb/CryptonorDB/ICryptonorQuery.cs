@@ -1,5 +1,5 @@
 ﻿using System;
-namespace CryptonorClient
+namespace Cryptonor.Queries
 {
     public interface ICryptonorQuery
     {
