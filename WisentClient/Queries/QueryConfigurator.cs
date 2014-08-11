@@ -60,7 +60,7 @@ namespace CryptonorClient
             this.Query.Skip = skip;
             return this;
         }
-        public QueryConfigurator Limit(int limit)
+        public QueryConfigurator Take(int limit)
         {
             this.Query.Limit = limit;
             return this;

@@ -51,144 +51,6 @@ namespace CryptonorClient
 
         }
 
-        private Expression<Func<CryptonorObject, bool>> GetFilterExpression(CryptonorQuery query)
-        {
-            //TODO: this is ugly refactor me
-            Expression<Func<CryptonorObject, bool>> expr=null;
-            if (query.Value != null && string.Compare( query.TagName,"key",true)==0)
-            {
-                expr = a => a.Key == query.Value.ToString();
-            }
-            else if (query.Value != null)
-            {
-                if (query.Value.GetType() == typeof(int) )
-                {
-                    expr = a => a.GetTag<int>(query.TagName) == (int)query.Value;
-                }
-                else if (query.Value.GetType() == typeof(long))
-                {
-                    expr = a => a.GetTag<long>(query.TagName) == (long)query.Value;
-                }
-                else if (query.Value.GetType() == typeof(string))
-                {
-                    expr = a => a.GetTag<string>(query.TagName) == (string)query.Value;
-                }
-                else if (query.Value.GetType() == typeof(DateTime))
-                {
-                    expr = a => a.GetTag<DateTime>(query.TagName) == (DateTime)query.Value;
-                }
-                else if (query.Value.GetType() == typeof(double))
-                {
-                    expr = a => a.GetTag<double>(query.TagName) == (double)query.Value;
-                }
-                else if (query.Value.GetType() == typeof(float))
-                {
-                    expr = a => a.GetTag<float>(query.TagName) == (float)query.Value;
-                }
-            }
-            else if (query.Start != null && query.End != null && string.Compare(query.TagName, "key", true) == 0)
-            {
-                throw new NotSupportedException();
-            }
-            else if (query.Start != null && query.End != null )
-            {
-                if (query.Value.GetType() == typeof(int))
-                {
-                    expr = a => a.GetTag<int>(query.TagName) >= (int)query.Start && a.GetTag<int>(query.TagName) <= (int)query.End;
-                }
-                else if (query.Value.GetType() == typeof(long))
-                {
-                    expr = a => a.GetTag<long>(query.TagName) >= (long)query.Start && a.GetTag<long>(query.TagName) <= (long)query.End;
-       
-                }
-                else if (query.Value.GetType() == typeof(string))
-                {
-                    throw new NotSupportedException();
-                }
-                else if (query.Value.GetType() == typeof(DateTime))
-                {
-                    expr = a => a.GetTag<DateTime>(query.TagName) >= (DateTime)query.Start && a.GetTag<DateTime>(query.TagName) <= (DateTime)query.End;
-       
-                }
-                else if (query.Value.GetType() == typeof(double))
-                {
-                    expr = a => a.GetTag<double>(query.TagName) >= (double)query.Start && a.GetTag<double>(query.TagName) <= (double)query.End;
-       
-                }
-                else if (query.Value.GetType() == typeof(float))
-                {
-
-                    expr = a => a.GetTag<float>(query.TagName) >= (float)query.Start && a.GetTag<float>(query.TagName) <= (float)query.End;
-
-                }
-            }
-            else if (query.Start != null && query.End == null)
-            {
-                if (query.Value.GetType() == typeof(int))
-                {
-                    expr = a => a.GetTag<int>(query.TagName) >= (int)query.Start;
-                }
-                else if (query.Value.GetType() == typeof(long))
-                {
-                    expr = a => a.GetTag<long>(query.TagName) >= (long)query.Start;
-
-                }
-                else if (query.Value.GetType() == typeof(string))
-                {
-                    throw new NotSupportedException();
-                }
-                else if (query.Value.GetType() == typeof(DateTime))
-                {
-                    expr = a => a.GetTag<DateTime>(query.TagName) >= (DateTime)query.Start;
-
-                }
-                else if (query.Value.GetType() == typeof(double))
-                {
-                    expr = a => a.GetTag<double>(query.TagName) >= (double)query.Start;
-
-                }
-                else if (query.Value.GetType() == typeof(float))
-                {
-
-                    expr = a => a.GetTag<float>(query.TagName) >= (float)query.Start;
-
-                }
-            }
-            else if (query.Start == null && query.End !=null)
-            {
-                if (query.Value.GetType() == typeof(int))
-                {
-                    expr = a =>  a.GetTag<int>(query.TagName) <= (int)query.End;
-                }
-                else if (query.Value.GetType() == typeof(long))
-                {
-                    expr = a => a.GetTag<long>(query.TagName) <= (long)query.End;
-
-                }
-                else if (query.Value.GetType() == typeof(string))
-                {
-                    throw new NotSupportedException();
-                }
-                else if (query.Value.GetType() == typeof(DateTime))
-                {
-                    expr = a =>  a.GetTag<DateTime>(query.TagName) <= (DateTime)query.End;
-
-                }
-                else if (query.Value.GetType() == typeof(double))
-                {
-                    expr = a => a.GetTag<double>(query.TagName) <= (double)query.End;
-
-                }
-                else if (query.Value.GetType() == typeof(float))
-                {
-
-                    expr = a =>  a.GetTag<float>(query.TagName) <= (float)query.End;
-
-                }
-            }
-            return expr;
-        }
-        
         public async Task<CryptonorResultSet> GetAll()
         {
 
@@ -276,13 +138,9 @@ namespace CryptonorClient
                 this.OnSyncProgress(new SyncProgressEventArgs("Synchronization started..."));
                 CryptonorChangeSet changeSet= await this.localDB.GetChangeSet();
                 CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName);
-                await httpClient.Put(this.BucketName, changeSet.ChangedObjects);
+                await httpClient.Put(this.BucketName, changeSet);
                 syncStatistics.TotalChangesUploads = changeSet.ChangedObjects.Count;
-                foreach (DeletedObject delObj in changeSet.DeletedObjects)
-                {
-                    await httpClient.Delete(this.BucketName, delObj.Key);
-                }
-                syncStatistics.TotalChangesUploads = changeSet.DeletedObjects.Count;
+               
                 await this.localDB.ClearSyncMetadata();
 
                 this.OnSyncProgress(new SyncProgressEventArgs("Synchronization finshed!"));

@@ -10,7 +10,9 @@ namespace CryptonorClient
 {
     public class CryptonorResultSet
     {
-        public long ContinuationToken { get; set; }
+        public int Total { get; set; }
+        public bool IsSuccess { get; set; }
+        public string Error { get; set; }
         public int Count { get; set; }
         public IList<CryptonorObject> Objects { get; set; }
         public IList<T> GetValues<T>()

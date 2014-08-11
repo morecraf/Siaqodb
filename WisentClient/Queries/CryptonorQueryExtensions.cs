@@ -11,7 +11,7 @@ namespace CryptonorClient
     {
       
 
-        public static ICryptonorQuery Configure(this ICryptonorQuery query, Action<QueryConfigurator> configurator)
+        public static ICryptonorQuery Setup(this ICryptonorQuery query, Action<QueryConfigurator> configurator)
         {
             configurator(new QueryConfigurator(query));
 

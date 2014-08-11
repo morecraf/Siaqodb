@@ -61,16 +61,16 @@ namespace WindowsFormsApplication2
             //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://ipv4.fiddler/CryptonorWebAPI/", "excelsior");
             CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
          
-            //IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
-          IBucket bucket = cl.GetBucket("crypto_users");
+          IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
+          //IBucket bucket = cl.GetBucket("crypto_users");
             DateTime start = DateTime.Now;
           
             List<CryptonorObject> list = new List<CryptonorObject>();
-            for (int i = 0; i < 10; i++)
+           /* for (int i = 90000; i < 1000000; i++)
             {
                 CryptonorObject doObj = new CryptonorObject();
                 User book = new User();
-                book.UserName = "5111" + i.ToString();
+                book.UserName = "6111" + i.ToString();
                 book.author = "Ursachi Alisia";
                 book.body = "An amazing book...";
                 book.title = "How tos";
@@ -82,29 +82,55 @@ namespace WindowsFormsApplication2
                 //doObj.Tags = new Dictionary<string, object>();
                 // doObj.Tags["country"] = "RO";
                 // doObj.Tags["mydecimal"] = new decimal(20.2);
-                doObj.SetTag("birth_year", 2010+i);
+                doObj.SetTag("birth_year", 3000+i);
                 doObj.SetTag("age", 20);
                 doObj.SetTag("country", "RO");
                 //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
                 
               // await bucket.Store(doObj);
-               // list.Add(doObj);
+                list.Add(doObj);
+                if (i % 10000 == 0 && i > 90000)
+                {
+                    await bucket.StoreBatch(list);
+                    list = new List<CryptonorObject>();
 
-            }
+                }
+            }*/
             //Expression<Func<CryptonorObject, bool>> expr = a => (a.Tags<int>("birth_year") >= 2007 && a.Tags<int>("birth_year") <=2009);
             //Expression<Func<CryptonorObject, bool>> expr = a => a.Key >= "21111" ;
           
            
             //var qlos = (await bucket.Query().Where(expr).GetResultSetAsync()).GetValues<User>();
           
-           // await ((CryptonorLocalBucket)bucket).Push();
-            // await ((CryptonorLocalBucket)bucket).Pull(expr,3);
+           
             //var all = await bucket.Get("21110");
            // var qlos = (await bucket.Query().Where(expr).GetResultSetAsync()).GetValues<User>();
-            CryptonorQuery query67 = new CryptonorQuery("key");
-            decimal d = 23.456M;
-            query67.Configure(a => a.In("41111", "41112"));
-            var objw = await bucket.Get(query67);
+            CryptonorQuery query67 = new CryptonorQuery("birth_year");
+            query67.Setup(a => a.Start(903012).Skip(10).Take(100));
+
+            //await ((CryptonorLocalBucket)bucket).Push();
+            //await ((CryptonorLocalBucket)bucket).Pull(query67);
+            var all = await bucket.GetAll();
+            int i = 0;
+            foreach (CryptonorObject cro in all.Objects)
+            {
+                User u=cro.GetValue<User>();
+                u.author = "Cristi";
+                cro.SetValue(u);
+                await bucket.Store(cro);
+                
+                if (i == 1)
+                {
+                    await bucket.Delete(cro);
+                    break;
+                }
+                i++;
+            }
+            await ((CryptonorLocalBucket)bucket).Push();
+            await ((CryptonorLocalBucket)bucket).Pull(query67);
+            var aall = await bucket.GetAll();
+            //var wsws= await bucket.Get(query67);
+            //objw.GetValues
             string elapsed = (DateTime.Now - start).ToString();
 
             //var asteroid = await client.GetByTag("crypto_users", "country", "RO",10,0);

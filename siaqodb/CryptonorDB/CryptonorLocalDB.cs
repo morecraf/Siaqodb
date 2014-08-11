@@ -26,7 +26,7 @@ namespace Cryptonor
 #if !WinRT
         public CryptonorLocalDB(string bucketPath)
         {
-            //SiaqodbConfigurator.EncryptedDatabase = true;
+            SiaqodbConfigurator.SetLicense(@"KBCz5WY1nJVZjOmOWFUJqJYumCAgTcxBUIN8DB1hGR0rX2kONgEs5MfHVHIXXhdm");
             this.siaqodb = new Siaqodb(bucketPath);
             indexManager = new TagsIndexManager(this.siaqodb);
            
@@ -112,7 +112,7 @@ namespace Cryptonor
        
         public async Task<CryptonorObject> Load(string key)
         {
-            throw new NotImplementedException();
+            return await this.siaqodb.Query<CryptonorObject>().Where(a => a.Key == key).FirstOrDefaultAsync();
         }
         public async Task<IList<CryptonorObject>> Load(Cryptonor.Queries.CryptonorQuery query)
         {
@@ -156,9 +156,10 @@ namespace Cryptonor
                 throw new Exception("Object not exists in local database");
             }
             var oldTags = indexManager.PrepareUpdateIndexes(cobj.OID);
+            int oid = cobj.OID;
             await this.siaqodb.DeleteAsync(cobj);
-            await this.CreateTombstoneDirtyEntityAsync(cobj.OID);
-            indexManager.UpdateIndexesAfterDelete(cobj.OID, oldTags);
+            await this.CreateTombstoneDirtyEntityAsync(oid);
+            indexManager.UpdateIndexesAfterDelete(oid, oldTags);
         }
         public async Task<CryptonorChangeSet> GetChangeSet()
         {
@@ -223,7 +224,7 @@ namespace Cryptonor
             }
             foreach (Tuple<CryptonorObject, DirtyEntity> val in deletes.Values)
             {
-                deleted.Add(new DeletedObject { DeletedTime = val.Item2.OperationTime, Key = val.Item1.Key });
+                deleted.Add(new DeletedObject { Version = val.Item1.Version, Key = val.Item1.Key });
             }
             return new CryptonorChangeSet { ChangedObjects = changed,DeletedObjects=deleted };
         }
@@ -284,14 +285,14 @@ namespace Cryptonor
     }
     public class CryptonorChangeSet
     {
-        public IList<CryptonorObject> ChangedObjects { get; internal set; }
-        public IList<DeletedObject> DeletedObjects { get; internal set; }
+        public IList<CryptonorObject> ChangedObjects { get; set; }
+        public IList<DeletedObject> DeletedObjects { get; set; }
        
     }
     public class DeletedObject
     {
         public string Key { get; set; }
-        public DateTime DeletedTime { get; set; }
+        public string Version { get; set; }
     }
     public class DotissiConfigurator
     {

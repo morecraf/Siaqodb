@@ -97,7 +97,7 @@ namespace CryptonorClient
                 string h = ";;";
             }
         }
-        public async Task Put(string bucket, IList<CryptonorObject> obj)
+        public async Task Put(string bucket, CryptonorChangeSet batch)
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -105,7 +105,7 @@ namespace CryptonorClient
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket+"/batch", obj, formatter);
+                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket + "/batch", batch, formatter);
                 if (!httpResponseMessage.IsSuccessStatusCode)
                 {
                     string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
@@ -141,7 +141,7 @@ namespace CryptonorClient
 
 
 
-        internal async Task Delete(string bucket, string key)
+        internal async Task Delete(string bucket, string key,string version)
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -149,7 +149,12 @@ namespace CryptonorClient
                 httpClient.BaseAddress = new Uri(uri);
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpResponseMessage = await httpClient.DeleteAsync(dbName + "/" + bucket + "/"+key);
+                string fullUri = dbName + "/" + bucket + "/" + key;
+                if (version != null)
+                {
+                    fullUri += "?version=" + version;
+                }
+                HttpResponseMessage httpResponseMessage = await httpClient.DeleteAsync(fullUri);
                 if (!httpResponseMessage.IsSuccessStatusCode)
                 {
                     string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;

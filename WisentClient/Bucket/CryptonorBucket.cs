@@ -93,12 +93,12 @@ namespace CryptonorClient
 
         public async Task Delete(string key)
         {
-            throw new NotImplementedException();
+            await httpClient.Delete(this.BucketName, key, null);
         }
 
         public async Task Delete(CryptonorObject obj)
         {
-            throw new NotImplementedException();
+            await httpClient.Delete(this.BucketName, obj.Key, obj.Version);
         }
       
       
@@ -106,7 +106,7 @@ namespace CryptonorClient
 
         public async Task StoreBatch(IList<CryptonorObject> objects)
         {
-            await httpClient.Put(this.BucketName, objects);
+            await httpClient.Put(this.BucketName, new CryptonorChangeSet { ChangedObjects = objects });
         }
     }
 }
