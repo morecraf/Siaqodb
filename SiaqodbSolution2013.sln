@@ -87,7 +87,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorClient", "WisentClient\CryptonorClient.csproj", "{7888AB5E-B9F1-40C0-8132-D0B5E47BFC6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication2", "WindowsFormsApplication2\WindowsFormsApplication2.csproj", "{8C3C5DF6-2D48-41CB-B625-1676607A769B}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App2", "App2\App2.csproj", "{31BD5382-620E-4554-A923-D7373A9F6A3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorTests", "CryptonorTests\CryptonorTests.csproj", "{242D3268-0826-4342-89A3-481129E49A72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -673,6 +676,20 @@ Global
 		{31BD5382-620E-4554-A923-D7373A9F6A3B}.Release|x86.ActiveCfg = Release|x86
 		{31BD5382-620E-4554-A923-D7373A9F6A3B}.Release|x86.Build.0 = Release|x86
 		{31BD5382-620E-4554-A923-D7373A9F6A3B}.Release|x86.Deploy.0 = Release|x86
+		{242D3268-0826-4342-89A3-481129E49A72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Release|ARM.ActiveCfg = Release|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Release|x64.ActiveCfg = Release|Any CPU
+		{242D3268-0826-4342-89A3-481129E49A72}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -711,5 +728,6 @@ Global
 		{7888AB5E-B9F1-40C0-8132-D0B5E47BFC6B} = {9C9C352C-2364-46E7-B910-7F92C69CB3CF}
 		{8C3C5DF6-2D48-41CB-B625-1676607A769B} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 		{31BD5382-620E-4554-A923-D7373A9F6A3B} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
+		{242D3268-0826-4342-89A3-481129E49A72} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 	EndGlobalSection
 EndGlobal

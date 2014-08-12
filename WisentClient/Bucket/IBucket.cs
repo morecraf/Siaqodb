@@ -15,8 +15,6 @@ namespace CryptonorClient
         Task<CryptonorObject> Get(string key);
         Task<T> Get<T>(string key);
         Task<CryptonorResultSet> Get(CryptonorQuery query);
-        //Task<CryptonorResultSet> Get(System.Linq.Expressions.Expression expression,long continuationToken);
-
         Task<CryptonorResultSet> GetAll();
         Task<CryptonorResultSet> GetAll(int skip,int limit);
         Task Store(CryptonorObject obj);

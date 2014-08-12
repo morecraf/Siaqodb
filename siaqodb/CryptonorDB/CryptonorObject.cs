@@ -65,6 +65,7 @@ namespace Cryptonor
 
         public void SetTag(string tagName, object value)
         {
+            tagName = tagName.ToLower();
             Type type = value.GetType();
             if (type == typeof(int) || type == typeof(long))
             {
@@ -116,9 +117,12 @@ namespace Cryptonor
             set
             {
                 tags = value;
-                foreach (string key in value.Keys)
+                if (value != null)
                 {
-                    this.SetTag(key, value[key]);
+                    foreach (string key in value.Keys)
+                    {
+                        this.SetTag(key, value[key]);
+                    }
                 }
 
             }
@@ -130,6 +134,7 @@ namespace Cryptonor
         }
         public object GetTag(string tagName, Type expectedType)
         {
+            tagName = tagName.ToLower();
             Type type = expectedType;
             if (type == typeof(int) || type == typeof(long))
             {
