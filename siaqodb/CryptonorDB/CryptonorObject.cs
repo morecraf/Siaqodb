@@ -71,33 +71,33 @@ namespace Cryptonor
             {
                 if (tags_Int == null)
                     tags_Int = new Dictionary<string, long>();
-                tags_Int.Add(tagName, Convert.ToInt64(value));
+                tags_Int[tagName]= Convert.ToInt64(value);
             }
             else if (type == typeof(DateTime))
             {
                 if (tags_DateTime == null)
                     tags_DateTime = new Dictionary<string, DateTime>();
-                tags_DateTime.Add(tagName, (DateTime)value);
+                tags_DateTime[tagName]= (DateTime)value;
             }
 
             else if (type == typeof(double) || type == typeof(float))
             {
                 if (tags_Double == null)
                     tags_Double = new Dictionary<string, double>();
-                tags_Double.Add(tagName, Convert.ToDouble(value));
+                tags_Double[tagName]= Convert.ToDouble(value);
             }
             else if (type == typeof(string))
             {
                 if (tags_String == null)
                     tags_String = new Dictionary<string, string>();
-                tags_String.Add(tagName, (string)value);
+                tags_String[tagName]= (string)value;
             }
 
             else if (type == typeof(bool))
             {
                 if (tags_Bool == null)
                     tags_Bool = new Dictionary<string, bool>();
-                tags_Bool.Add(tagName, (bool)value);
+                tags_Bool[tagName]= (bool)value;
             }
             else
             {

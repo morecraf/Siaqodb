@@ -144,6 +144,80 @@ namespace CryptonorTests
 
         }
         [TestMethod]
+        public async Task Update()
+        {
+            int rndNr = rnd.Next(100000);
+            string userName = "userName" + rndNr;
+            Person p = GetPerson(userName);
+            IBucket bucket = this.GetBucket();
+            await bucket.Store(p.UserName, p, new { Age = 33 });
+            
+            var fromDB = await bucket.Get(userName);
+            var value = fromDB.GetValue<Person>();
+            value.Age = 44;
+            fromDB.SetValue<Person>(value);
+            fromDB.SetTag("Age", 44);
+            await bucket.Store(fromDB);
+
+            fromDB = await bucket.Get(userName);
+            Assert.AreEqual(44, fromDB.GetTag<int>("Age"));
+            value = fromDB.GetValue<Person>();
+            Assert.AreEqual(userName, value.UserName);
+            Assert.AreEqual(44,value.Age);
+        }
+        [TestMethod]
+        public async Task UpdateWithConflict()
+        {
+            int rndNr = rnd.Next(100000);
+            string userName = "userName" + rndNr;
+            Person p = GetPerson(userName);
+            IBucket bucket = this.GetBucket();
+            await bucket.Store(p.UserName, p, new { Age = 33 });
+
+            var fromDB = await bucket.Get(userName);
+            var value = fromDB.GetValue<Person>();
+            value.Age = 44;
+
+                await bucket.Store(value.UserName, value, new { Age = 44 });
+            //treat conflict here because Version is not set
+
+            fromDB = await bucket.Get(userName);
+            Assert.AreEqual(44, fromDB.GetTag<int>("Age"));
+            value = fromDB.GetValue<Person>();
+            Assert.AreEqual(userName, value.UserName);
+            Assert.AreEqual(44, value.Age);
+        }
+        [TestMethod]
+        public async Task Delete()
+        {
+            int rndNr = rnd.Next(100000);
+            string userName = "userName" + rndNr;
+            Person p = GetPerson(userName);
+            IBucket bucket = this.GetBucket();
+            await bucket.Store(p.UserName, p, new { Age = 33 });
+
+            var fromDB = await bucket.Get(userName);
+            await bucket.Delete(fromDB);
+
+            fromDB = await bucket.Get(userName);
+            Assert.IsNull(fromDB);
+        }
+        [TestMethod]
+        public async Task DeleteByKey()
+        {
+            int rndNr = rnd.Next(100000);
+            string userName = "userName" + rndNr;
+            Person p = GetPerson(userName);
+            IBucket bucket = this.GetBucket();
+            await bucket.Store(p.UserName, p, new { Age = 33 });
+
+            var fromDB = await bucket.Get(userName);
+            await bucket.Delete(fromDB.Key);
+
+            fromDB = await bucket.Get(userName);
+            Assert.IsNull(fromDB);
+        }
+        [TestMethod]
         public async Task SearchByTags()
         {
              IBucket bucket = this.GetBucket();
@@ -807,6 +881,49 @@ namespace CryptonorTests
             Assert.AreEqual(list[0].Key, objFromDB2.Key);
 
           
+        }
+        [TestMethod]
+        public async Task SearchByKeyQuery()
+        {
+            IBucket bucket = this.GetBucket();
+            List<CryptonorObject> list = new List<CryptonorObject>();
+            string s = GetRandomString(10);
+
+            for (int i = 0; i < 3; i++)
+            {
+                string userName = "userName" + s+i;
+                Person p = GetPerson(userName);
+                Cryptonor.CryptonorObject obj = new Cryptonor.CryptonorObject();
+                obj.SetValue<Person>(p);
+             
+                obj.Key = userName;
+                list.Add(obj);
+            }
+            await bucket.StoreBatch(list);
+
+            CryptonorQuery query1 = new CryptonorQuery("key");
+            query1.Setup(a => a.Start("userName" + s).End("userName" + s + 2));
+            var result = await bucket.Get(query1);
+            Assert.AreEqual(result.Objects.Count, list.Count);
+
+            int j = 0;
+            foreach (CryptonorObject co in list)
+            {
+                CryptonorObject objFromDB = result.Objects[j];
+                Assert.AreEqual(co.Key, objFromDB.Key);
+                j++;
+            }
+            CryptonorQuery query2 = new CryptonorQuery("KEy");
+            query2.Setup(a => a.Start("userName" + s + 2).End("userName" + s).Descending());
+            var result2 = await bucket.Get(query2);
+            Assert.AreEqual(result2.Objects.Count, list.Count);
+            j = 2;
+            foreach (CryptonorObject co in list)
+            {
+                CryptonorObject objFromDB = result2.Objects[j];
+                Assert.AreEqual(co.Key, objFromDB.Key);
+                j--;
+            }
         }
         public string GetRandomString(int length)
         {
