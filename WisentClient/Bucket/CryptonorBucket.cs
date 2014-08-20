@@ -14,10 +14,10 @@ namespace CryptonorClient
     {
         public string BucketName { get; set; }
         CryptonorHttpClient httpClient;
-        public CryptonorBucket(string bucketName,string uri,string dbName)
+        public CryptonorBucket(string uri,string dbName,string bucketName,string appKey,string secretKey)
         {
             this.BucketName = bucketName;
-            this.httpClient = new CryptonorHttpClient(uri,dbName);
+            this.httpClient = new CryptonorHttpClient(uri,dbName,appKey,secretKey);
         }
        
         public async Task<CryptonorObject> Get(string key)

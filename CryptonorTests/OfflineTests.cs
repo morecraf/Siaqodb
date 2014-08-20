@@ -17,7 +17,7 @@ namespace CryptonorTests
         public override CryptonorClient.IBucket GetBucket()
         {
            
-            CryptonorClient.CryptonorClient client = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
+            CryptonorClient.CryptonorClient client = new CryptonorClient.CryptonorClient("http://localhost:53411", "excelsior","mykey","mypwd");
             IBucket bucket = client.GetLocalBucket("unit_tests", @"c:\work\temp\unitests\");
             return bucket;
         }

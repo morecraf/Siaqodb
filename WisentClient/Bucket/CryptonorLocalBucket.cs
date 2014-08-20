@@ -21,13 +21,17 @@ namespace CryptonorClient
         SyncStatistics syncStatistics;
         string uri;
         string dbName;
+        string appKey;
+        string secretKey;
         public string BucketName { get; set; }
-        public CryptonorLocalBucket(string bucketName,string localFolder,string uri,string dbName)
+        public CryptonorLocalBucket(string uri,string dbName,string bucketName,string localFolder,string appKey,string secretKey)
         {
             localDB = new CryptonorLocalDB(localFolder+Path.DirectorySeparatorChar+bucketName);
             this.BucketName = bucketName;
             this.uri = uri;
             this.dbName = dbName;
+            this.secretKey = secretKey;
+            this.appKey = appKey;
         }
        
         public async Task<CryptonorObject> Get(string key)
@@ -137,7 +141,7 @@ namespace CryptonorClient
                 this.syncStatistics.StartTime = DateTime.Now;
                 this.OnSyncProgress(new SyncProgressEventArgs("Synchronization started..."));
                 CryptonorChangeSet changeSet= await this.localDB.GetChangeSet();
-                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName);
+                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName,this.appKey,this.secretKey);
                 await httpClient.Put(this.BucketName, changeSet);
                 syncStatistics.TotalChangesUploads = changeSet.ChangedObjects.Count;
                
@@ -181,7 +185,7 @@ namespace CryptonorClient
         public async Task Pull(int limit)
         {
             await this.Push();
-            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName);
+            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName,this.appKey,this.secretKey);
             var downloadedItems = await httpClient.Get(this.BucketName,0,limit);
             if (downloadedItems != null)
             {
@@ -211,7 +215,7 @@ namespace CryptonorClient
         {
             
             await this.Push();
-            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName);
+            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName,this.appKey,this.secretKey);
             var downloadedItems =   (await httpClient.GetByTag(this.BucketName, query));
        
             if (downloadedItems != null)

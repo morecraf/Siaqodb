@@ -29,7 +29,7 @@ namespace WindowsFormsApplication2
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
             SiaqodbConfigurator.SetLicense("anqHBdiAJzXSpNdJRy+BkMMNlL1+jZBe4wyzvnZpba8=");
-            CryptonorLocalBucket db = new CryptonorLocalBucket("crypto_users",@"c:\work\temp\clouddb\","","");
+            CryptonorLocalBucket db = new CryptonorLocalBucket("crypto_users",@"c:\work\temp\clouddb\","","","","");
             for (int i = 0; i < 10; i++)
             {
 
@@ -57,12 +57,12 @@ namespace WindowsFormsApplication2
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
             CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128,"aaaa");
-            CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior");
+           // CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior","mykey","mypwd");
             //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://ipv4.fiddler/CryptonorWebAPI/", "excelsior");
-            CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior");
+            CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411", "excelsior","mykey","mypwd");
          
-          IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
-          //IBucket bucket = cl.GetBucket("crypto_users");
+          //IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
+          IBucket bucket = cl.GetBucket("crypto_users");
             DateTime start = DateTime.Now;
           
             List<CryptonorObject> list = new List<CryptonorObject>();
@@ -107,7 +107,7 @@ namespace WindowsFormsApplication2
            // var qlos = (await bucket.Query().Where(expr).GetResultSetAsync()).GetValues<User>();
             CryptonorQuery query67 = new CryptonorQuery("birth_year");
             query67.Setup(a => a.Start(903012).Skip(10).Take(100));
-
+            var filtered22=await bucket.Get(query67);
             //await ((CryptonorLocalBucket)bucket).Push();
             //await ((CryptonorLocalBucket)bucket).Pull(query67);
             var all = await bucket.GetAll();

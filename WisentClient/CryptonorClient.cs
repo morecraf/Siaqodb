@@ -10,18 +10,24 @@ namespace CryptonorClient
     {
         string uri;
         string dbName;
-        public CryptonorClient(string uri,string dbName)
+        string appKey;
+        string secretKey;
+
+        public CryptonorClient(string uri,string dbName,string appKey,string secretKey)
         {
             this.uri = uri;
             this.dbName = dbName;
+            this.appKey = appKey;
+            this.secretKey = secretKey;
         }
         public IBucket GetBucket(string bucketName)
         {
-            return new CryptonorBucket(bucketName,this.uri,this.dbName);
+            return new CryptonorBucket(this.uri,this.dbName,bucketName,this.appKey,this.secretKey);
+            
         }
         public IBucket GetLocalBucket(string bucketName,string localFolder)
         {
-            return new CryptonorLocalBucket(bucketName,localFolder,uri,dbName);
+            return new CryptonorLocalBucket(uri, dbName, bucketName, localFolder, this.appKey, this.secretKey);
         }
 
     }

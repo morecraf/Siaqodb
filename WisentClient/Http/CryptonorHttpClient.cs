@@ -1,8 +1,10 @@
 ﻿using Cryptonor;
 using Cryptonor.Queries;
+using CryptonorClient.Http;
 using Sqo;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -13,155 +15,145 @@ using System.Web;
 
 namespace CryptonorClient
 {
-    public class CryptonorHttpClient
+    public class CryptonorHttpClient : IDisposable
     {
         string uri;
         string dbName;
-        public CryptonorHttpClient(string uri,string dbName)
+        HttpClient httpClient;
+        RequestBuilder requestBuilder;
+        Signature signature;
+        public CryptonorHttpClient(string uri, string dbName,string appKey,string secretKey)
         {
-            this.uri = uri;
+            this.uri = uri.TrimEnd('/').TrimEnd('\\');
             this.dbName = dbName;
+            httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(this.uri);
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+          
+            this.requestBuilder = new RequestBuilder(this.uri, dbName);
+            this.signature = new Signature(appKey, secretKey);
         }
         public async Task<CryptonorResultSet> Get(string bucket)
         {
             return await Get(bucket, 0, 0);
         }
-        public async Task<CryptonorResultSet> Get(string bucket,int skip,int limit)
+        public async Task<CryptonorResultSet> Get(string bucket, int skip, int limit)
         {
-            CryptonorResultSet result;
-            using (HttpClient httpClient = new HttpClient())
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (limit > 0)
             {
-                httpClient.BaseAddress = new Uri(uri);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string finalURI = dbName + "/" + bucket;
-                if (limit > 0 || skip > 0)
-                {
-                    if (limit == 0)
-                    {
-                        limit = 100;
-                    }
-                    finalURI += "?limit=" + limit;
-                    if (skip > 0)
-                    {
-                        finalURI += "&skip="+skip;
-                   
-                    }
-                }
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(finalURI);
-                httpResponseMessage.EnsureSuccessStatusCode();
-                List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
-                formatters.Add(
-                    new JsonMediaTypeFormatter());
+                parameters.Add("limit", limit.ToString());
+            }
+            if (skip > 0)
+            {
+                parameters.Add("skip", skip.ToString());
+            }
+            HttpRequestMessage request = requestBuilder.BuildGetRequest(bucket, parameters);
 
-                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), formatters);
-                result = (CryptonorResultSet)obj;
-            }
-            return result;
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), GetDefaultFormatter());
+
+            return (CryptonorResultSet)obj;
         }
-        public async Task<CryptonorObject> Get(string bucket,string key)
+        public async Task<CryptonorObject> Get(string bucket, string key)
         {
-            CryptonorObject result;
-            using (HttpClient httpClient = new HttpClient())
-            {
-                httpClient.BaseAddress = new Uri(uri);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(dbName + "/" + bucket + "/" + key);
-                httpResponseMessage.EnsureSuccessStatusCode();
-                List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
-                formatters.Add(
-                    new JsonMediaTypeFormatter());
-		        
-                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorObject), formatters);
-                result = (CryptonorObject)obj;
-            }
-            return result;
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, key);
+
+            HttpRequestMessage request = requestBuilder.BuildGetRequest(uriFragment, null);
+           
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorObject), GetDefaultFormatter());
+
+            return (CryptonorObject)obj;
         }
-      
-        public async Task Put(string bucket,CryptonorObject obj)
+
+        public async Task Put(string bucket, CryptonorObject obj)
         {
-            using (HttpClient httpClient = new HttpClient())
-            {
-                httpClient.BaseAddress = new Uri(uri);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket, obj, formatter);
-                if (!httpResponseMessage.IsSuccessStatusCode)
-                {
-                    string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
-                    //throw new HttpException((int)response.StatusCode, responseBody);
-                }
-                var aa=httpResponseMessage.EnsureSuccessStatusCode();
-                string h = ";;";
-            }
+            string uriFragment = bucket;
+            HttpRequestMessage request = requestBuilder.BuildPostRequest(uriFragment, obj);
+
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+          
         }
         public async Task Put(string bucket, CryptonorChangeSet batch)
         {
-            using (HttpClient httpClient = new HttpClient())
-            {
-                httpClient.BaseAddress = new Uri(uri);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket + "/batch", batch, formatter);
-                if (!httpResponseMessage.IsSuccessStatusCode)
-                {
-                    string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
-                    
-                }
-                var aa = httpResponseMessage.EnsureSuccessStatusCode();
-               
-            }
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
+
+            HttpRequestMessage request = requestBuilder.BuildPostRequest(uriFragment, batch);
+
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            
         }
         internal async Task<CryptonorResultSet> GetByTag(string bucket, CryptonorQuery query)
         {
-            using (HttpClient httpClient = new HttpClient())
-            {
-               
-                httpClient.BaseAddress = new Uri(uri);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                HttpResponseMessage httpResponseMessage = await httpClient.PostAsync(dbName + "/" + bucket+"/search", query, formatter);
-                if (!httpResponseMessage.IsSuccessStatusCode)
-                {
-                    string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
-                    //throw new HttpException((int)response.StatusCode, responseBody);
-                }
-                var aa = httpResponseMessage.EnsureSuccessStatusCode();
-                List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
-                formatters.Add(
-                    new JsonMediaTypeFormatter());
-                var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), formatters);
-                return (CryptonorResultSet)obj;
-            }
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "search");
+
+            HttpRequestMessage request = requestBuilder.BuildPostRequest(uriFragment, query);
+
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), GetDefaultFormatter());
+
+            return (CryptonorResultSet)obj;
+          
         }
 
 
 
-        internal async Task Delete(string bucket, string key,string version)
+        internal async Task Delete(string bucket, string key, string version)
         {
-            using (HttpClient httpClient = new HttpClient())
-            {
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, key);
 
-                httpClient.BaseAddress = new Uri(uri);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string fullUri = dbName + "/" + bucket + "/" + key;
-                if (version != null)
-                {
-                    fullUri += "?version=" + version;
-                }
-                HttpResponseMessage httpResponseMessage = await httpClient.DeleteAsync(fullUri);
-                if (!httpResponseMessage.IsSuccessStatusCode)
-                {
-                    string responseBody = httpResponseMessage.Content.ReadAsStringAsync().Result;
-                    //throw new HttpException((int)response.StatusCode, responseBody);
-                }
-                var aa = httpResponseMessage.EnsureSuccessStatusCode();
-              
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (version !=null )
+            {
+                parameters.Add("version", version);
+            }
+            HttpRequestMessage request = requestBuilder.BuildDeleteRequest(uriFragment, parameters);
+
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+        }
+        private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
+        {
+            await signature.SignMessage(request);
+            return await httpClient.SendAsync(request);
+        }
+        public IEnumerable<MediaTypeFormatter> GetDefaultFormatter()
+        {
+            List<MediaTypeFormatter> formatters = new List<MediaTypeFormatter>();
+            formatters.Add(
+                new JsonMediaTypeFormatter());
+            return formatters;
+        }
+
+        /// <summary>
+        /// Implemenation of <see cref="IDisposable"/>
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Implemenation of <see cref="IDisposable"/> for
+        /// derived classes to use.
+        /// </summary>
+        /// <param name="disposing">
+        /// Indicates if being called from the Dispose() method
+        /// or the finalizer.
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // free managed resources
+                this.httpClient.Dispose();
             }
         }
     }
