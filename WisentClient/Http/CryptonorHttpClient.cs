@@ -69,16 +69,18 @@ namespace CryptonorClient
             return (CryptonorObject)obj;
         }
 
-        public async Task Put(string bucket, CryptonorObject obj)
+        public async Task<CryptonorWriteResponse> Put(string bucket, CryptonorObject obj)
         {
             string uriFragment = bucket;
             HttpRequestMessage request = requestBuilder.BuildPostRequest(uriFragment, obj);
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-          
+            var objResp = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorWriteResponse), GetDefaultFormatter());
+            return (CryptonorWriteResponse)objResp;
+            
         }
-        public async Task Put(string bucket, CryptonorChangeSet batch)
+        public async Task<CryptonorBatchResponse> Put(string bucket, CryptonorChangeSet batch)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
 
@@ -86,6 +88,8 @@ namespace CryptonorClient
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorBatchResponse), GetDefaultFormatter());
+            return (CryptonorBatchResponse)obj;
             
         }
         internal async Task<CryptonorResultSet> GetByTag(string bucket, CryptonorQuery query)

@@ -47,7 +47,14 @@ namespace CryptonorClient
         }
         public async Task Store(CryptonorObject obj)
         {
-            await httpClient.Put(this.BucketName, obj);
+            CryptonorWriteResponse response = await httpClient.Put(this.BucketName, obj);
+            if (response.IsSuccess)
+                obj.Version = response.Version;
+            else
+            {
+                throw new Exception("Write error->" + response.Error);
+            }
+
         }
 
         public async Task Store(string key, object obj)
@@ -104,9 +111,9 @@ namespace CryptonorClient
       
 
 
-        public async Task StoreBatch(IList<CryptonorObject> objects)
+        public async Task<CryptonorBatchResponse> StoreBatch(IList<CryptonorObject> objects)
         {
-            await httpClient.Put(this.BucketName, new CryptonorChangeSet { ChangedObjects = objects });
+            return await httpClient.Put(this.BucketName, new CryptonorChangeSet { ChangedObjects = objects });
         }
     }
 }

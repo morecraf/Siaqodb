@@ -25,4 +25,18 @@ namespace CryptonorClient
             return list;
         }
     }
+    public class CryptonorWriteResponse
+    {
+        public bool IsSuccess { get; set; }
+        public string Error { get; set; }
+        public string Version { get; set; }
+        public string Key { get; set; }
+
+    }
+    public class CryptonorBatchResponse
+    {
+
+        public List<CryptonorWriteResponse> WriteResponses { get; set; }
+        public bool IsSuccess { get; set; }
+    }
 }

@@ -21,7 +21,7 @@ namespace CryptonorClient
         Task Store(string key, object obj);
         Task Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
         Task Store(string key, object obj, object tags = null);
-        Task StoreBatch(IList<CryptonorObject> obj);
+        Task<CryptonorBatchResponse> StoreBatch(IList<CryptonorObject> obj);
         Task Delete(string key);
         Task Delete(CryptonorObject obj);
         string BucketName { get; set; }

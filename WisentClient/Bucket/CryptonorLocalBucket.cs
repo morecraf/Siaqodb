@@ -126,10 +126,12 @@ namespace CryptonorClient
         {
             await localDB.Delete(obj);
         }
-        public async Task StoreBatch(IList<CryptonorObject> objs)
+        public async Task<CryptonorBatchResponse> StoreBatch(IList<CryptonorObject> objs)
         {
             foreach (CryptonorObject cobj in objs)
                 await localDB.Store(cobj);
+            //TODO create better resposne
+            return new CryptonorBatchResponse() { IsSuccess = true };
         }
         public async Task Push()
         {
@@ -141,11 +143,15 @@ namespace CryptonorClient
                 this.syncStatistics.StartTime = DateTime.Now;
                 this.OnSyncProgress(new SyncProgressEventArgs("Synchronization started..."));
                 CryptonorChangeSet changeSet= await this.localDB.GetChangeSet();
-                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName,this.appKey,this.secretKey);
-                await httpClient.Put(this.BucketName, changeSet);
-                syncStatistics.TotalChangesUploads = changeSet.ChangedObjects.Count;
-               
-                await this.localDB.ClearSyncMetadata();
+                if ((changeSet.ChangedObjects != null && changeSet.ChangedObjects.Count > 0) ||
+                    (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
+                {
+                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
+                    var response= await httpClient.Put(this.BucketName, changeSet);
+                    syncStatistics.TotalChangesUploads = changeSet.ChangedObjects.Count;
+
+                    await this.localDB.ClearSyncMetadata();
+                }
 
                 this.OnSyncProgress(new SyncProgressEventArgs("Synchronization finshed!"));
                 this.syncStatistics.EndTime = DateTime.Now;
