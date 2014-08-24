@@ -32,7 +32,9 @@ namespace CryptonorClient
             this.dbName = dbName;
             this.secretKey = secretKey;
             this.appKey = appKey;
+            DownloadBatchSize = 1000;
         }
+        public int DownloadBatchSize { get; set; }
        
         public async Task<CryptonorObject> Get(string key)
         {
@@ -120,7 +122,10 @@ namespace CryptonorClient
         public async Task Delete(string key)
         {
             CryptonorObject cobj = await localDB.Load(key);
-            await localDB.Delete(cobj);
+            if (cobj != null)
+            {
+                await localDB.Delete(cobj);
+            }
         }
         public async Task Delete(CryptonorObject obj)
         {
@@ -128,8 +133,7 @@ namespace CryptonorClient
         }
         public async Task<CryptonorBatchResponse> StoreBatch(IList<CryptonorObject> objs)
         {
-            foreach (CryptonorObject cobj in objs)
-                await localDB.Store(cobj);
+            await localDB.StoreBatch(objs);
             //TODO create better resposne
             return new CryptonorBatchResponse() { IsSuccess = true };
         }
@@ -185,51 +189,60 @@ namespace CryptonorClient
 
         public async Task Pull()
         {
-            await this.Pull(0);//default
-
-        }
-        public async Task Pull(int limit)
-        {
-            await this.Push();
-            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName,this.appKey,this.secretKey);
-            var downloadedItems = await httpClient.Get(this.BucketName,0,limit);
-            if (downloadedItems != null)
-            {
-                await this.StoreBatch(downloadedItems.Objects);
-                int remainLimit = limit - downloadedItems.Count;
-                int skip = downloadedItems.Count;
-                while (remainLimit > 0)
-                {
-                    downloadedItems = await httpClient.Get(this.BucketName,skip, remainLimit);
-                    if (downloadedItems != null)
-                    {
-                        await this.StoreBatch(downloadedItems.Objects);
-                       
-                        remainLimit -= downloadedItems.Count;
-                        skip += downloadedItems.Count;
-                    }
-                    else
-                    {
-                        remainLimit = 0;
-                    }
-
-                }
-            }
+            await this.Pull(null);
 
         }
         public async Task Pull(CryptonorQuery query)
         {
-            
+
             await this.Push();
-            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName,this.appKey,this.secretKey);
-            var downloadedItems =   (await httpClient.GetByTag(this.BucketName, query));
-       
-            if (downloadedItems != null)
+            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
+            string anchor = await localDB.GetAnchor();
+
+            int remainLimit = 1;
+            CryptonorChangeSet downloadedItems = null;
+            while (remainLimit > 0)
             {
-                await this.StoreBatch(downloadedItems.Objects);
-               
+                remainLimit = 0;
+                downloadedItems = await DownloadChanges(httpClient, anchor, query);
+                if (downloadedItems != null)
+                {
+                    if (downloadedItems.ChangedObjects != null)
+                    {
+                        DateTime start = DateTime.Now;
+                        await this.StoreBatch(downloadedItems.ChangedObjects);
+                        string elapsed = (DateTime.Now - start).ToString();
+                        remainLimit += downloadedItems.ChangedObjects.Count;
+                    }
+                    if (downloadedItems.DeletedObjects != null)
+                    {
+                        foreach (DeletedObject delObj in downloadedItems.DeletedObjects)
+                        {
+                            await this.Delete(delObj.Key);
+                        }
+                        remainLimit += downloadedItems.DeletedObjects.Count;
+                    }
+                    anchor = downloadedItems.Anchor;
+                    if (!string.IsNullOrEmpty(anchor))
+                    {
+                        await localDB.StoreAnchor(anchor);
+                    }
+                }
             }
 
+        }
+        private async Task<CryptonorChangeSet> DownloadChanges(CryptonorHttpClient httpClient,string anchor,CryptonorQuery query)
+        {
+            CryptonorChangeSet changes = null;
+            if (query == null)
+            {
+                changes =await httpClient.GetChanges(this.BucketName, DownloadBatchSize, anchor);
+            }
+            else
+            {
+                changes = await httpClient.GetChanges(this.BucketName, query, DownloadBatchSize, anchor);
+            }
+            return changes;
         }
         public async Task Purge()
         {

@@ -32,14 +32,19 @@ namespace CryptonorClient.Http
         }
         public HttpRequestMessage BuildPostRequest(string endUriFragment,object content)
         {
+            return BuildPostRequest(endUriFragment, content, null);
+        }
+        public HttpRequestMessage BuildPostRequest(string endUriFragment, object content, Dictionary<string, string> parameters)
+        {
             HttpRequestMessage messageReq = new HttpRequestMessage();
             messageReq.Method = HttpMethod.Post;
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uriBase, endUriFragment);
-            string json =JsonConvert.SerializeObject(content);
-            StringContent contentReq = new StringContent(json,Encoding.UTF8, "application/json");
+            string json = JsonConvert.SerializeObject(content);
+            StringContent contentReq = new StringContent(json, Encoding.UTF8, "application/json");
             messageReq.Content = contentReq;
-            messageReq.RequestUri = new Uri(uriFragment);
-            
+            string queryString = GetQueryString(parameters);
+            messageReq.RequestUri = new Uri(CombinePathAndQuery(uriFragment, queryString));
+
             return messageReq;
         }
         public HttpRequestMessage BuildDeleteRequest(string endUriFragment, Dictionary<string, string> parameters)

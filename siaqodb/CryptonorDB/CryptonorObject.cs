@@ -52,15 +52,15 @@ namespace Cryptonor
         public CryptonorObject()
         {
         }
-
+        [Ignore]
         private Dictionary<string, long> tags_Int;
-
+        [Ignore]
         private Dictionary<string, DateTime> tags_DateTime;
-
+        [Ignore]
         private Dictionary<string, string> tags_String;
-
+        [Ignore]
         private Dictionary<string, double> tags_Double;
-
+        [Ignore]
         private Dictionary<string, bool> tags_Bool;
 
         public void SetTag(string tagName, object value)

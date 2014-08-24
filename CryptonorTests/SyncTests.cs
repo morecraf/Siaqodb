@@ -168,6 +168,48 @@ namespace CryptonorTests
               Assert.AreEqual(44, value.Age);
               Assert.AreEqual("Alisia", value.FirstName);
           }
+          [TestMethod]
+          public async Task TestConflictDeleteUpdate()
+          {//delete on C1 and update on C2->conflict
+              int rndNr = rnd.Next(100000);
+              string userName = "userName" + rndNr;
+              Person p = GetPerson(userName);
+              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              await bucket.Store(p.UserName, p, new { Age = 22 });
+              await bucket.Push();
+
+              CryptonorQuery query = new CryptonorQuery("key");
+              query.Setup(a => a.Value<string>(userName));
+              await bucket.Pull(query);
+
+              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
+
+              await bucket2.Pull(query);
+              //now both databases has same object with same version
+
+              var fromDB1 = await bucket.Get(userName);
+
+              await bucket.Delete(fromDB1);
+              await bucket.Pull(query);//also calls Push()
+
+              fromDB1 = await bucket.Get(userName);
+              Assert.IsNull(fromDB1);
+
+              fromDB1 = await bucket2.Get(userName);
+              var value = fromDB1.GetValue<Person>();
+              value.FirstName = "Alisia22";
+              value.Age = 6;
+              fromDB1.SetValue<Person>(value);
+              fromDB1.SetTag("Age", 6);
+              await bucket2.Store(fromDB1);
+
+             
+              await bucket2.Pull(query);//also calls Push()
+
+              fromDB1 = await bucket2.Get(userName);
+              Assert.IsNull(fromDB1);
+
+          }
           public string GetRandomString(int length)
           {
               const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";

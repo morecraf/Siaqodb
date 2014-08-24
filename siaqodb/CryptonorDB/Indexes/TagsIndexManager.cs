@@ -154,6 +154,7 @@ namespace Cryptonor.Indexes
                             index.RemoveOid(oldTags[key], oid);
                             //add new value(updated)
                             index.AddItem(newTags[key], new int[] { oid });
+                            index.AllowPersistance(this.allowPersistence);
                             index.Persist();
                         }
                     }
@@ -161,6 +162,7 @@ namespace Cryptonor.Indexes
                     {
                         IBTree index = this.GetIndex(key, oldTags[key].GetType());
                         index.RemoveOid(oldTags[key], oid);
+                        index.AllowPersistance(this.allowPersistence);
                         index.Persist();
                        
                     }
@@ -173,6 +175,7 @@ namespace Cryptonor.Indexes
                         {
                             IBTree index = this.GetIndex(key, newTags[key].GetType());
                             index.AddItem(newTags[key], new int[] { oid });
+                            index.AllowPersistance(this.allowPersistence);
                             index.Persist();
                         }
                     }
@@ -187,6 +190,7 @@ namespace Cryptonor.Indexes
                     {
                         IBTree index = this.GetIndex(key, newTags[key].GetType());
                         index.AddItem(newTags[key], new int[] { oid });
+                        index.AllowPersistance(this.allowPersistence);
                         index.Persist();
                     }
                 }
@@ -201,6 +205,7 @@ namespace Cryptonor.Indexes
                 {
                     IBTree index = this.GetIndex(key, oldTags[key].GetType());
                     index.RemoveOid(oldTags[key], oid);
+                    index.AllowPersistance(this.allowPersistence);
                     index.Persist();
                 }
             }
@@ -222,6 +227,27 @@ namespace Cryptonor.Indexes
             IBTree index = this.GetIndex(query.TagName, query.GetTagType());
             IndexQueryFinder.FindOids(index, query, oids);
            
+        }
+        internal void Persist()
+        {
+            if (cache != null)
+            {
+                foreach (string keyIndex in cache.Keys)
+                {
+                    IBTree index = cache[keyIndex];
+                    index.AllowPersistance(true);
+                    if (index != null)
+                    {
+                        index.Persist();
+                    }
+                }
+
+            }
+        }
+        private bool allowPersistence;
+        public void AllowPersistence(bool allow)
+        {
+            this.allowPersistence = allow;
         }
        
     }

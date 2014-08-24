@@ -97,8 +97,25 @@ namespace Cryptonor
                 await this.CreateDirtyEntityAsync(obj, dop);
             }
 
-            this.siaqodb.Flush();
+          
 
+        }
+        public async Task StoreBatch(IList<CryptonorObject> objects)
+        {
+            siaqodb.StartBulkInsert(typeof(CryptonorObject));
+            indexManager.AllowPersistence(false);
+            try {
+                foreach (CryptonorObject obj in objects)
+                    await this.Store(obj);
+            }
+            finally
+            {
+                siaqodb.EndBulkInsert(typeof(CryptonorObject));
+                indexManager.AllowPersistence(true);
+                indexManager.Persist();
+            }
+            this.siaqodb.Flush();
+            
         }
       
         public async Task<IList<CryptonorObject>> LoadAll()
@@ -246,6 +263,20 @@ namespace Cryptonor
             DeleteFileByExt(extension);
             DeleteFileByExt(extension2);
         }
+        public async Task<string> GetAnchor()
+        {
+
+            var all = await this.siaqodb.LoadAllAsync<Anchor>();
+            Anchor anc = all.FirstOrDefault();
+            if (anc != null)
+                return anc.AnchorValue;
+            return null;
+        }
+        public async Task StoreAnchor(string anchor)
+        {
+            Anchor anc = new Anchor() { OID = 1,AnchorValue=anchor };
+            await siaqodb.StoreObjectAsync(anc);
+        }
         private void DeleteFileByExt(string extension)
         {
             System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(siaqodb.GetDBPath());
@@ -256,6 +287,7 @@ namespace Cryptonor
                 File.Delete(f.FullName);
             }
         }
+       
     }
   
      enum DirtyOperation
@@ -287,7 +319,7 @@ namespace Cryptonor
     {
         public IList<CryptonorObject> ChangedObjects { get; set; }
         public IList<DeletedObject> DeletedObjects { get; set; }
-       
+        public string Anchor { get; set; }
     }
     public class DeletedObject
     {
@@ -301,6 +333,11 @@ namespace Cryptonor
         {
             buckets[type] = bucketName;
         }
+    }
+    internal class Anchor
+    {
+        public int OID { get; set; }
+        public string AnchorValue { get; set; }
     }
     
 }

@@ -12,7 +12,6 @@ namespace CryptonorClient
     {
         internal static CBCCipher Cipher;
         internal static IDocumentSerializer DocumentSerializer=new CryptoJsonSerializer();
-       
         public static void SetEncryptor(EncryptionAlgorithm algorithm, string encryptionKey)
         {
             if (algorithm == EncryptionAlgorithm.AES128)
@@ -73,6 +72,7 @@ namespace CryptonorClient
             }
             DocumentSerializer = documentSerializer;
         }
+       
        
     }
     public enum EncryptionAlgorithm { AES128, AES256, Camellia128,Camellia256}

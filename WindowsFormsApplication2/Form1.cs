@@ -62,10 +62,11 @@ namespace WindowsFormsApplication2
             //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://cryptonordb.cloudapp.net/cnor/", "excelsior", "mykey", "mypwd");
             CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
          
-          //IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
-          IBucket bucket = cl.GetBucket("crypto_users");
+          IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
+          //IBucket bucket = cl.GetBucket("crypto_users");
           DateTime start = DateTime.Now;
-          
+          await ((CryptonorLocalBucket)bucket).Pull();
+          string elapsed = (DateTime.Now - start).ToString();
             List<CryptonorObject> list = new List<CryptonorObject>();
             for (int i = 0; i < 100000; i++)
             {
@@ -112,7 +113,7 @@ namespace WindowsFormsApplication2
                 //Console.WriteLine(ya);
             }
            // var qlos = (await bucket.Query().Where(expr).GetResultSetAsync()).GetValues<User>();
-            string elapsed = (DateTime.Now - start).ToString();
+            elapsed = (DateTime.Now - start).ToString();
             start = DateTime.Now;
           
             CryptonorQuery query67 = new CryptonorQuery("birth_year");
@@ -120,7 +121,7 @@ namespace WindowsFormsApplication2
             var filtered22=await bucket.Get(query67);
             elapsed = (DateTime.Now - start).ToString();
             //await ((CryptonorLocalBucket)bucket).Push();
-            //await ((CryptonorLocalBucket)bucket).Pull(query67);
+           // await ((CryptonorLocalBucket)bucket).Pull(query67);
             var all = await bucket.GetAll();
             int j = 0;
             foreach (CryptonorObject cro in all.Objects)

@@ -105,8 +105,48 @@ namespace CryptonorClient
             return (CryptonorResultSet)obj;
           
         }
+        public async Task<CryptonorChangeSet> GetChanges(string bucket, CryptonorQuery query, int limit,string anchor)
+        {
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (limit > 0)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+            if (!string.IsNullOrEmpty(anchor))
+            {
+                parameters.Add("anchor", anchor);
+            }
+            HttpRequestMessage request = requestBuilder.BuildPostRequest(uriFragment, query,parameters);
 
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorChangeSet), GetDefaultFormatter());
 
+            return (CryptonorChangeSet)obj;
+
+        }
+        public async Task<CryptonorChangeSet> GetChanges(string bucket, int limit, string anchor)
+        {
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (limit > 0)
+            {
+                parameters.Add("limit", limit.ToString());
+            }
+            if (!string.IsNullOrEmpty(anchor))
+            {
+                parameters.Add("anchor", anchor);
+            }
+            HttpRequestMessage request = requestBuilder.BuildGetRequest(uriFragment, parameters);
+
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorChangeSet), GetDefaultFormatter());
+
+            return (CryptonorChangeSet)obj;
+
+        }
 
         internal async Task Delete(string bucket, string key, string version)
         {
