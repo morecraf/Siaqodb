@@ -106,6 +106,7 @@
     <Compile Include="CryptonorDB\Exceptions\CryptonorException.cs" />
     <Compile Include="CryptonorDB\ICryptonorQuery.cs" />
     <Compile Include="CryptonorDB\Indexes\IndexQueryFinder.cs" />
+    <Compile Include="CryptonorDB\TagsSerializer.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />

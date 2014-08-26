@@ -52,145 +52,90 @@ namespace Cryptonor
         public CryptonorObject()
         {
         }
-        [Ignore]
-        private Dictionary<string, long> tags_Int;
-        [Ignore]
-        private Dictionary<string, DateTime> tags_DateTime;
-        [Ignore]
-        private Dictionary<string, string> tags_String;
-        [Ignore]
-        private Dictionary<string, double> tags_Double;
-        [Ignore]
-        private Dictionary<string, bool> tags_Bool;
+       
 
+        public void SetTag<T>(string tagName, T value)
+        {
+            this.SetTag(tagName, (object)value);
+
+        }
         public void SetTag(string tagName, object value)
         {
             tagName = tagName.ToLower();
             Type type = value.GetType();
+            if (Tags == null)
+                Tags = new Dictionary<string, object>();
             if (type == typeof(int) || type == typeof(long))
             {
-                if (tags_Int == null)
-                    tags_Int = new Dictionary<string, long>();
-                tags_Int[tagName]= Convert.ToInt64(value);
+                Tags[tagName] = Convert.ToInt64(value);
             }
-            else if (type == typeof(DateTime))
-            {
-                if (tags_DateTime == null)
-                    tags_DateTime = new Dictionary<string, DateTime>();
-                tags_DateTime[tagName]= (DateTime)value;
-            }
-
             else if (type == typeof(double) || type == typeof(float))
             {
-                if (tags_Double == null)
-                    tags_Double = new Dictionary<string, double>();
-                tags_Double[tagName]= Convert.ToDouble(value);
+                Tags[tagName] = Convert.ToDouble(value);
             }
-            else if (type == typeof(string))
+            else if (type == typeof(DateTime) || type == typeof(string) || type == typeof(bool))
             {
-                if (tags_String == null)
-                    tags_String = new Dictionary<string, string>();
-                tags_String[tagName]= (string)value;
+
+                Tags[tagName] = value;
             }
 
-            else if (type == typeof(bool))
-            {
-                if (tags_Bool == null)
-                    tags_Bool = new Dictionary<string, bool>();
-                tags_Bool[tagName]= (bool)value;
-            }
             else
             {
                 throw new CryptonorException("Tag type:" + type.ToString() + " not supported.");
             }
-
         }
+        private byte[] tagsSerialized;
         [Ignore]
         Dictionary<string, object> tags;
         public Dictionary<string, object> Tags
         {
             get
             {
-                tags = this.GetAllTags();
+                if (tags == null && tagsSerialized != null)
+                {
+                    DeserializeTags();
+                }
                 return tags;
             }
             set
             {
                 tags = value;
-                if (value != null)
-                {
-                    foreach (string key in value.Keys)
-                    {
-                        this.SetTag(key, value[key]);
-                    }
-                }
 
             }
         }
+
         public T GetTag<T>(string tagName)
         {
-            Type type = typeof(T);
-            return (T)this.GetTag(tagName, type);
-        }
-        public object GetTag(string tagName, Type expectedType)
-        {
-            tagName = tagName.ToLower();
-            Type type = expectedType;
-            if (type == typeof(int) || type == typeof(long))
+            if (Tags != null)
             {
-                if (tags_Int != null && tags_Int.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_Int[tagName], type);
-            }
-            else if (type == typeof(DateTime))
-            {
-                if (tags_DateTime != null && tags_DateTime.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_DateTime[tagName], type);
-            }
-
-            else if (type == typeof(double) || type == typeof(float))
-            {
-                if (tags_Double != null && tags_Double.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_Double[tagName], type);
-            }
-            else if (type == typeof(string))
-            {
-                if (tags_String != null && tags_String.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_String[tagName], type);
-            }
-
-            else if (type == typeof(bool))
-            {
-                if (tags_Bool != null && tags_Bool.ContainsKey(tagName))
-                    return Convert.ChangeType(tags_Bool[tagName], type);
-            }
-            else
-            {
-                throw new CryptonorException("Tag type:" + type.ToString() + " not supported.");
-            }
-            return null;
-        }
-        internal Dictionary<string, object> GetAllTags()
-        {
-            Dictionary<string, object> tags = new Dictionary<string, object>();
-            CopyDictionary(tags, this.tags_Int);
-            CopyDictionary(tags, this.tags_String);
-            CopyDictionary(tags, this.tags_DateTime);
-            CopyDictionary(tags, this.tags_Double);
-            CopyDictionary(tags, this.tags_Bool);
-            if (tags.Count == 0)
-                return null;
-            return tags;
-        }
-        private void CopyDictionary(Dictionary<string, object> tags, IDictionary dict_to_copy)
-        {
-            if (dict_to_copy != null)
-            {
-
-                foreach (string key in dict_to_copy.Keys)
+                tagName = tagName.ToLower();
+                if (Tags.ContainsKey(tagName))
                 {
-                    tags.Add(key, dict_to_copy[key]);
+                    if (Tags[tagName].GetType() != typeof(T))
+                    {
+                        return (T)Sqo.Utilities.Convertor.ChangeType(Tags[tagName], typeof(T));
+                    }
+                    else
+                    {
+                        return (T)Tags[tagName];
+                    }
                 }
+            }
+           return default(T);
+        }
 
+        internal void SerializeTags()
+        {
+            if (tags != null)
+            {
+                tagsSerialized = TagsSerializer.GetBytes(tags);
+            }
+        }
+        internal void DeserializeTags()
+        {
+            if (tagsSerialized != null)
+            {
+                tags = TagsSerializer.GetDictionary(tagsSerialized);
             }
         }
 

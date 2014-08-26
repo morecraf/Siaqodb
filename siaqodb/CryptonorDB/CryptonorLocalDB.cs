@@ -85,13 +85,14 @@ namespace Cryptonor
             }
             oID = this.siaqodb.GetOID(obj);
             DirtyOperation dop = (oID == 0) ? DirtyOperation.Inserted : DirtyOperation.Updated;
+            obj.SerializeTags();
             Dictionary<string, object> oldTags = null;
             if (dop == DirtyOperation.Updated)
             {
                 oldTags = indexManager.PrepareUpdateIndexes(oID);
             }
             await this.siaqodb.StoreObjectAsync(obj);
-            indexManager.UpdateIndexes(obj.OID, oldTags, obj.GetAllTags());
+            indexManager.UpdateIndexes(obj.OID, oldTags, obj.Tags);
             if (obj.IsDirty)
             {
                 await this.CreateDirtyEntityAsync(obj, dop);
@@ -102,7 +103,7 @@ namespace Cryptonor
         }
         public async Task StoreBatch(IList<CryptonorObject> objects)
         {
-            siaqodb.StartBulkInsert(typeof(CryptonorObject));
+            await siaqodb.StartBulkInsertAsync(typeof(CryptonorObject));
             indexManager.AllowPersistence(false);
             try {
                 foreach (CryptonorObject obj in objects)
@@ -110,10 +111,11 @@ namespace Cryptonor
             }
             finally
             {
-                siaqodb.EndBulkInsert(typeof(CryptonorObject));
-                indexManager.AllowPersistence(true);
-                indexManager.Persist();
+              //TODO
             }
+            await siaqodb.EndBulkInsertAsync(typeof(CryptonorObject));
+            indexManager.AllowPersistence(true);
+            indexManager.Persist();
             this.siaqodb.Flush();
             
         }

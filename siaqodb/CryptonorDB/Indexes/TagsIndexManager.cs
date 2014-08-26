@@ -96,31 +96,15 @@ namespace Cryptonor.Indexes
         public Dictionary<string, object> PrepareUpdateIndexes(int oid)
         {
             Sqo.Meta.SqoTypeInfo ti = siaqodb.CheckDBAndGetSqoTypeInfo<CryptonorObject>();
-            Dictionary<string, object> tags = new Dictionary<string, object>();
             if (oid > 0 && oid <= ti.Header.numberOfRecords)
             {
 
-                object intTagsObj = siaqodb.LoadValue(oid, "tags_Int", ti.Type);
-                this.CopyDictionary(tags, intTagsObj as IDictionary);
-
-                object dtTagsObj = siaqodb.LoadValue(oid, "tags_DateTime", ti.Type);
-                this.CopyDictionary(tags, dtTagsObj as IDictionary);
-
-                object strTagsObj = siaqodb.LoadValue(oid, "tags_String", ti.Type);
-                this.CopyDictionary(tags, strTagsObj as IDictionary);
-
-                object dblTagsObj = siaqodb.LoadValue(oid, "tags_Double", ti.Type);
-                this.CopyDictionary(tags, dblTagsObj as IDictionary);
-
-                object boolTagsObj = siaqodb.LoadValue(oid, "tags_Bool", ti.Type);
-                this.CopyDictionary(tags, boolTagsObj as IDictionary);
-                
-
-
+                byte[] tagsBytes = (byte[])siaqodb.LoadValue(oid, "tagsSerialized", typeof(CryptonorObject));
+                return TagsSerializer.GetDictionary(tagsBytes);
 
             }
 
-            return tags;
+            return null;
 
         }
         private void CopyDictionary(Dictionary<string, object> tags, IDictionary dict_to_copy)
