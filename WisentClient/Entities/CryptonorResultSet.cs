@@ -29,6 +29,7 @@ namespace CryptonorClient
     {
         public bool IsSuccess { get; set; }
         public string Error { get; set; }
+        public string ErrorDesc { get; set; }
         public string Version { get; set; }
         public string Key { get; set; }
 

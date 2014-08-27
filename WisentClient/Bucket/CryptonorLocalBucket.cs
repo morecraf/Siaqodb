@@ -16,9 +16,10 @@ namespace CryptonorClient
     {
         CryptonorLocalDB localDB;
         private readonly AsyncLock _locker = new AsyncLock();
-        public event EventHandler<SyncCompletedEventArgs> SyncCompleted;
+        public event EventHandler<PushCompletedEventArgs> PushCompleted;
+        public event EventHandler<PullCompletedEventArgs> PullCompleted;
         public event EventHandler<SyncProgressEventArgs> SyncProgress;
-        SyncStatistics syncStatistics;
+      
         string uri;
         string dbName;
         string appKey;
@@ -141,51 +142,62 @@ namespace CryptonorClient
         {
 
             await this._locker.LockAsync();
+            var syncStatistics = new PushStatistics();
+            syncStatistics.StartTime = DateTime.Now;
+            Exception error = null;
+            List<Conflict> conflicts = null;
             try
             {
-                this.syncStatistics = new SyncStatistics();
-                this.syncStatistics.StartTime = DateTime.Now;
-                this.OnSyncProgress(new SyncProgressEventArgs("Synchronization started..."));
+                this.OnSyncProgress(new SyncProgressEventArgs("Push operation started..."));
+                this.OnSyncProgress(new SyncProgressEventArgs("Get local changes..."));
                 CryptonorChangeSet changeSet= await this.localDB.GetChangeSet();
                 if ((changeSet.ChangedObjects != null && changeSet.ChangedObjects.Count > 0) ||
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
+                    this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
                     CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
                     var response= await httpClient.Put(this.BucketName, changeSet);
-                    syncStatistics.TotalChangesUploads = changeSet.ChangedObjects.Count;
+                    this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
 
+                    var conflictResponses = response.WriteResponses.Where(a => string.Compare(a.Error, "conflict", true) == 0);
+                    foreach (var conflictR in conflictResponses)
+                    {
+                        if (conflicts == null)
+                            conflicts = new List<Conflict>();
+                        Conflict cf = new Conflict() { Key = conflictR.Key, Version = conflictR.Version, Description = conflictR.ErrorDesc };
+                        conflicts.Add(cf);
+                    }
+                    if (changeSet.ChangedObjects != null)
+                    {
+                        syncStatistics.TotalChangesUploads = changeSet.ChangedObjects.Count;
+                    }
+                    if (changeSet.DeletedObjects != null)
+                    {
+                        syncStatistics.TotalDeletedUploads = changeSet.DeletedObjects.Count;
+                    }
+                    if (conflicts != null)
+                    {
+                        syncStatistics.TotalConflicted = conflicts.Count;
+                    }
                     await this.localDB.ClearSyncMetadata();
                 }
 
-                this.OnSyncProgress(new SyncProgressEventArgs("Synchronization finshed!"));
-                this.syncStatistics.EndTime = DateTime.Now;
-                this.OnSyncCompleted(new SyncCompletedEventArgs(null, this.syncStatistics));
+                this.OnSyncProgress(new SyncProgressEventArgs("Push finshed!"));
+               
             }
-            catch (Exception error)
+            catch (Exception err)
             {
-                this.syncStatistics.EndTime = DateTime.Now;
-                this.OnSyncCompleted(new SyncCompletedEventArgs(error, this.syncStatistics));
+                error = err;
             }
             finally
             {
                 this._locker.Release();
             }
+            syncStatistics.EndTime = DateTime.Now;
+            OnPushCompleted(new PushCompletedEventArgs(error, syncStatistics, conflicts));
         }
         
-        internal void OnSyncCompleted(SyncCompletedEventArgs args)
-        {
-            if (this.SyncCompleted != null)
-            {
-                this.SyncCompleted(this, args);
-            }
-        }
-        internal void OnSyncProgress(SyncProgressEventArgs args)
-        {
-            if (this.SyncProgress != null)
-            {
-                this.SyncProgress(this, args);
-            }
-        }
+       
 
         public async Task Pull()
         {
@@ -196,40 +208,70 @@ namespace CryptonorClient
         {
 
             await this.Push();
-            CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
-            string anchor = await localDB.GetAnchor();
 
-            int remainLimit = 1;
-            CryptonorChangeSet downloadedItems = null;
-            while (remainLimit > 0)
+            await this._locker.LockAsync();
+            var syncStatistics = new PullStatistics();
+            syncStatistics.StartTime = DateTime.Now;
+            Exception error = null;
+            try
             {
-                remainLimit = 0;
-                downloadedItems = await DownloadChanges(httpClient, anchor, query);
-                if (downloadedItems != null)
-                {
-                    if (downloadedItems.ChangedObjects != null)
-                    {
-                        DateTime start = DateTime.Now;
-                        await this.StoreBatch(downloadedItems.ChangedObjects);
-                        string elapsed = (DateTime.Now - start).ToString();
-                        remainLimit += downloadedItems.ChangedObjects.Count;
-                    }
-                    if (downloadedItems.DeletedObjects != null)
-                    {
-                        foreach (DeletedObject delObj in downloadedItems.DeletedObjects)
-                        {
-                            await this.Delete(delObj.Key);
-                        }
-                        remainLimit += downloadedItems.DeletedObjects.Count;
-                    }
-                    anchor = downloadedItems.Anchor;
-                    if (!string.IsNullOrEmpty(anchor))
-                    {
-                        await localDB.StoreAnchor(anchor);
-                    }
-                }
-            }
+                this.OnSyncProgress(new SyncProgressEventArgs("Pull operation started..."));
 
+                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
+                string anchor = await localDB.GetAnchor();
+
+                int remainLimit = 1;
+                int nrBatch = 1;
+                CryptonorChangeSet downloadedItems = null;
+                while (remainLimit > 0)
+                {
+                    remainLimit = 0;
+                    this.OnSyncProgress(new SyncProgressEventArgs("Downloading batch #" + nrBatch + " ..."));
+                    downloadedItems = await DownloadChanges(httpClient, anchor, query);
+                    this.OnSyncProgress(new SyncProgressEventArgs("Batch #" + nrBatch + " downloaded, store items locally ..."));
+
+                    if (downloadedItems != null)
+                    {
+                        if (downloadedItems.ChangedObjects != null)
+                        {
+                            DateTime start = DateTime.Now;
+                            await this.StoreBatch(downloadedItems.ChangedObjects);
+                            string elapsed = (DateTime.Now - start).ToString();
+                            remainLimit += downloadedItems.ChangedObjects.Count;
+                            syncStatistics.TotalChangesDownloads += downloadedItems.ChangedObjects.Count;
+                        }
+                        if (downloadedItems.DeletedObjects != null)
+                        {
+                            foreach (DeletedObject delObj in downloadedItems.DeletedObjects)
+                            {
+                                await this.Delete(delObj.Key);
+                            }
+                            remainLimit += downloadedItems.DeletedObjects.Count;
+                            syncStatistics.TotalDeletedDownloads += downloadedItems.DeletedObjects.Count;
+                        }
+                        anchor = downloadedItems.Anchor;
+                        if (!string.IsNullOrEmpty(anchor))
+                        {
+                            await localDB.StoreAnchor(anchor);
+                        }
+                        this.OnSyncProgress(new SyncProgressEventArgs("Items of batch " + nrBatch + "stored locally ..."));
+
+                    }
+                    nrBatch++;
+                }
+                this.OnSyncProgress(new SyncProgressEventArgs("Push finshed!"));
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+            }
+            finally
+            {
+                this._locker.Release();
+            }
+            syncStatistics.EndTime = DateTime.Now;
+            OnPullCompleted(new PullCompletedEventArgs(error, syncStatistics));
+           
         }
         private async Task<CryptonorChangeSet> DownloadChanges(CryptonorHttpClient httpClient,string anchor,CryptonorQuery query)
         {
@@ -243,6 +285,27 @@ namespace CryptonorClient
                 changes = await httpClient.GetChanges(this.BucketName, query, DownloadBatchSize, anchor);
             }
             return changes;
+        }
+        internal void OnPullCompleted(PullCompletedEventArgs args)
+        {
+            if (this.PullCompleted != null)
+            {
+                this.PullCompleted(this, args);
+            }
+        }
+        internal void OnPushCompleted(PushCompletedEventArgs args)
+        {
+            if (this.PushCompleted != null)
+            {
+                this.PushCompleted(this, args);
+            }
+        }
+        internal void OnSyncProgress(SyncProgressEventArgs args)
+        {
+            if (this.SyncProgress != null)
+            {
+                this.SyncProgress(this, args);
+            }
         }
         public async Task Purge()
         {
@@ -261,70 +324,7 @@ namespace CryptonorClient
 
        
     }
-    public class SyncProgressEventArgs : EventArgs
-    {
-        public string Message
-        {
-            get;
-            private set;
-        }
-        public SyncProgressEventArgs(string message)
-        {
-            this.Message = message;
-        }
-    }
-    public class SyncCompletedEventArgs : EventArgs
-    {
-        public Exception Error
-        {
-            get;
-            private set;
-        }
-        public SyncStatistics Statistics
-        {
-            get;
-            private set;
-        }
-        public SyncCompletedEventArgs(Exception error, SyncStatistics statistics)
-        {
-            this.Error = error;
-            this.Statistics = statistics;
-        }
-    }
-    public class SyncStatistics
-    {
-        public DateTime StartTime
-        {
-            get;
-            internal set;
-        }
-        public DateTime EndTime
-        {
-            get;
-            internal set;
-        }
-        public int TotalUploads
-        {
-            get
-            {
-                return this.TotalChangesUploads + this.TotalDeletedUploads;
-            }
-        }
-        public int TotalDeletedUploads
-        {
-            get;
-            internal set;
-        }
-      
-        public int TotalChangesUploads
-        {
-            get;
-            internal set;
-        }
-        public int TotalDownloads
-        {
-            get;
-            internal set;
-        }
-    }
+   
+   
+   
 }

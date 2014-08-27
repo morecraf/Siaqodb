@@ -23,8 +23,18 @@ namespace WindowsFormsApplication2
         public Form1()
         {
             InitializeComponent();
+             cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
+
+           bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
+           ((CryptonorLocalBucket)bucket).PushCompleted += Form1_PushCompleted;
         }
 
+        async void Form1_PushCompleted(object sender, PushCompletedEventArgs e)
+        {
+            await bucket.Store(new CryptonorObject());
+        }
+        IBucket bucket;
+            CryptonorClient.CryptonorClient cl;
         private void button1_Click(object sender, EventArgs e)
         {
             SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
@@ -60,10 +70,7 @@ namespace WindowsFormsApplication2
            // CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior","mykey","mypwd");
             //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://ipv4.fiddler/CryptonorWebAPI/", "excelsior");
             //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://cryptonordb.cloudapp.net/cnor/", "excelsior", "mykey", "mypwd");
-            CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
-         
-          IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
-          //IBucket bucket = cl.GetBucket("crypto_users");
+            //IBucket bucket = cl.GetBucket("crypto_users");
           DateTime start = DateTime.Now;
           await ((CryptonorLocalBucket)bucket).Pull();
           string elapsed = (DateTime.Now - start).ToString();

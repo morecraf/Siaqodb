@@ -52,6 +52,7 @@
     <Compile Include="Bucket\CryptonorBucket.cs" />
     <Compile Include="Bucket\CryptonorLocalBucket.cs" />
     <Compile Include="Bucket\IBucket.cs" />
+    <Compile Include="Bucket\Events.cs" />
     <Compile Include="CryptonorClient.cs" />
     <Compile Include="CryptonorConfigurator.cs" />
     <Compile Include="DocumentSerializer\CryptoJsonSerializer.cs" />
