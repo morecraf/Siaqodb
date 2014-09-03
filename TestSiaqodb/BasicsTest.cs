@@ -20,14 +20,14 @@ namespace TestSiaqodb
 	[TestClass]
 	public class BasicsTest
 	{
-        string objPath = @"e:\sqoo\temp\tests_db\";
+        string objPath = @"c:\work\temp\unitTests_siaqodb\";
 		
 		public BasicsTest()
 		{
             SiaqodbConfigurator.EncryptedDatabase = true;
            // SiaqodbConfigurator.VerboseLevel = VerboseLevel.Info;
             SiaqodbConfigurator.LoggingMethod = this.LogWarns;
-              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
+            Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
 		}
         public void LogWarns(string log, VerboseLevel level)
         {

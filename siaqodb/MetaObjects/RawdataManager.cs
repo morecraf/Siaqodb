@@ -12,14 +12,18 @@ namespace Sqo.MetaObjects
     class RawdataManager
     {
         StorageEngine storageEngine;
+        Dictionary<int, RawdataInfo> cache;
         public RawdataManager(StorageEngine storageEngine)
         {
             this.storageEngine = storageEngine;
+           
         }
         public RawdataInfo GetRawdataInfo(int oid)
         {
-            RawdataInfo info = storageEngine.LoadObjectByOID<RawdataInfo>(this.GetSqoTypeInfo(), oid,false);
-            return info;
+            //RawdataInfo info = storageEngine.LoadObjectByOID<RawdataInfo>(this.GetSqoTypeInfo(), oid,false);
+           // return info;
+            FillCache();
+            return cache[oid];
         }
 #if ASYNC
         public async Task<RawdataInfo> GetRawdataInfoAsync(int oid)
@@ -75,7 +79,9 @@ namespace Sqo.MetaObjects
 #endif
         public void SaveRawdataInfo(RawdataInfo rawdataInfo)
         {
+            FillCache();
             storageEngine.SaveObject(rawdataInfo, GetSqoTypeInfo());
+            cache[rawdataInfo.OID] = rawdataInfo;
         }
 #if ASYNC
         public async Task SaveRawdataInfoAsync(RawdataInfo rawdataInfo)
@@ -116,5 +122,16 @@ namespace Sqo.MetaObjects
             await this.storageEngine.SaveValueAsync(oid, "IsFree", this.GetSqoTypeInfo(), true).ConfigureAwait(false);
         }
 #endif
+        private void FillCache()
+        {
+            if (cache == null)
+            {
+                cache = new Dictionary<int, RawdataInfo>();
+                var all = storageEngine.LoadAll<RawdataInfo>(this.GetSqoTypeInfo());
+                foreach (RawdataInfo ri in all)
+                    cache[ri.OID] = ri;
+
+            }
+        }
     }
 }

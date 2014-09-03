@@ -33,7 +33,7 @@ namespace CryptonorClient
             this.dbName = dbName;
             this.secretKey = secretKey;
             this.appKey = appKey;
-            DownloadBatchSize = 1000;
+            DownloadBatchSize = 10000;
         }
         public int DownloadBatchSize { get; set; }
        
@@ -162,6 +162,7 @@ namespace CryptonorClient
                     var conflictResponses = response.WriteResponses.Where(a => string.Compare(a.Error, "conflict", true) == 0);
                     foreach (var conflictR in conflictResponses)
                     {
+                       
                         if (conflicts == null)
                             conflicts = new List<Conflict>();
                         Conflict cf = new Conflict() { Key = conflictR.Key, Version = conflictR.Version, Description = conflictR.ErrorDesc };

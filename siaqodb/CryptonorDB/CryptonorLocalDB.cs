@@ -14,7 +14,10 @@ using System.Linq.Expressions;
 using System.IO;
 using Sqo;
 using Cryptonor.Indexes;
+#if WinRT
 
+using Windows.Storage;
+#endif
 namespace Cryptonor
 {
     public class CryptonorLocalDB 
@@ -32,10 +35,19 @@ namespace Cryptonor
            
            
         }
-
+#else
+        public CryptonorLocalDB(StorageFolder bucketPath)
+        {
+            SiaqodbConfigurator.SetLicense(@"KBCz5WY1nJVZjOmOWFUJqJYumCAgTcxBUIN8DB1hGR0rX2kONgEs5MfHVHIXXhdm");
+            this.siaqodb = new Siaqodb();
+            this.siaqodb.Open(bucketPath);
+            indexManager = new TagsIndexManager(this.siaqodb);
+           
+           
+        }
        
 #endif
-       
+
         private async Task CreateDirtyEntityAsync(object obj, DirtyOperation dop)
         {
             await this.CreateDirtyEntityAsync(obj, dop, null);
@@ -91,7 +103,7 @@ namespace Cryptonor
             {
                 oldTags = indexManager.PrepareUpdateIndexes(oID);
             }
-            await this.siaqodb.StoreObjectAsync(obj);
+            this.siaqodb.StoreObject(obj);
             indexManager.UpdateIndexes(obj.OID, oldTags, obj.Tags);
             if (obj.IsDirty)
             {
@@ -103,8 +115,9 @@ namespace Cryptonor
         }
         public async Task StoreBatch(IList<CryptonorObject> objects)
         {
-            await siaqodb.StartBulkInsertAsync(typeof(CryptonorObject));
+            siaqodb.StartBulkInsert(typeof(CryptonorObject));
             indexManager.AllowPersistence(false);
+            DateTime start = DateTime.Now;
             try {
                 foreach (CryptonorObject obj in objects)
                     await this.Store(obj);
@@ -113,7 +126,8 @@ namespace Cryptonor
             {
               //TODO
             }
-            await siaqodb.EndBulkInsertAsync(typeof(CryptonorObject));
+            string elaps = (DateTime.Now - start).ToString();
+            siaqodb.EndBulkInsert(typeof(CryptonorObject));
             indexManager.AllowPersistence(true);
             indexManager.Persist();
             this.siaqodb.Flush();
@@ -136,7 +150,7 @@ namespace Cryptonor
         public async Task<IList<CryptonorObject>> Load(Cryptonor.Queries.CryptonorQuery query)
         {
             List<int> oids = new List<int>();
-            if (string.Compare(query.TagName, "key", true) == 0)
+            if (string.Compare(query.TagName, "key", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 this.LoadByKey(query, oids);
             }
@@ -281,6 +295,22 @@ namespace Cryptonor
         }
         private void DeleteFileByExt(string extension)
         {
+#if WinRT
+            StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(this.siaqodb.GetDBPath()).AsTask().Result;
+            try
+            {
+                var files = storageFolder.GetFilesAsync().AsTask().Result;
+                foreach (var file in files)
+                {
+                    file.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask().Wait();
+                }
+            }
+            catch (FileNotFoundException ex)
+            {
+               //TODO handle it
+            }
+           
+#else
             System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(siaqodb.GetDBPath());
             FileInfo[] fi = di.GetFiles("*" + extension);
 
@@ -288,6 +318,7 @@ namespace Cryptonor
             {
                 File.Delete(f.FullName);
             }
+#endif
         }
        
     }
