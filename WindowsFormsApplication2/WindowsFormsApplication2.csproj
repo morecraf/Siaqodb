@@ -96,10 +96,6 @@
       <Project>{f5bd2e1f-dcdd-4a1c-8130-236c2d75ff93}</Project>
       <Name>Siaqodb %28.NET 4.5%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WisentClient\CryptonorClient.csproj">
-      <Project>{7888ab5e-b9f1-40c0-8132-d0b5e47bfc6b}</Project>
-      <Name>CryptonorClient</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

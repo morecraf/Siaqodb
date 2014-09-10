@@ -1,4 +1,6 @@
-﻿using Sqo;
+﻿using Cryptonor.Queries;
+using CryptonorClient;
+using Sqo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,11 +53,40 @@ namespace App2
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
            // QueryOptions qo=new QueryOptions(
-            Siaqodb siaqodb = new Siaqodb();
+            /*Siaqodb siaqodb = new Siaqodb();
             siaqodb.Open(ApplicationData.Current.LocalFolder);
             siaqodb.StoreObject(new A() { Name = "nnn" });
             var q = siaqodb.LoadAll<A>();
-            var a = "ass";
+            var a = "ass";*/
+            var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
+            StorageFolder folder = ApplicationData.Current.LocalFolder;
+            var subfolder = await folder.CreateFolderAsync("unit_tests", CreationCollisionOption.OpenIfExists);
+            IBucket bucket = cl.GetLocalBucket("unit_tests", folder.Path);
+
+            DateTime start = DateTime.Now;
+
+            //await this.Fill();
+
+            string elapsed = (DateTime.Now - start).ToString();
+
+            start = DateTime.Now;
+            try
+            {
+                ((CryptonorLocalBucket)bucket).PullCompleted += Form1_PullCompleted;
+                await ((CryptonorLocalBucket)bucket).Pull();
+            }
+            catch
+            {
+
+            }
+            elapsed = (DateTime.Now - start).ToString();
+            start = DateTime.Now;
+            var all =await bucket.GetAll();
+            string a = "";
+        }
+        void Form1_PullCompleted(object sender, PullCompletedEventArgs e)
+        {
+
         }
     }
     public class A

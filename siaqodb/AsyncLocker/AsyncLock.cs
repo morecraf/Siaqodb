@@ -1,6 +1,7 @@
 ﻿#if ASYNC
 using Sqo.MetaObjects;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -74,6 +75,17 @@ namespace Sqo
             return 0;
 #endif
         }
+    }
+}
+public static class TaskExtensions
+{
+    public static ConfiguredTaskAwaitable<T> LibAwait<T>(this Task<T> t)
+    {
+        return t.ConfigureAwait(false);
+    }
+    public static ConfiguredTaskAwaitable LibAwait(this Task t)
+    {
+        return t.ConfigureAwait(false);
     }
 }
 #endif

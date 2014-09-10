@@ -88,6 +88,10 @@
       <Project>{c2d71970-6fa2-4af5-8633-d1741bc28cb9}</Project>
       <Name>Siaqodb %28UniversalApp%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WisentClient\CryptonorClient%28UniversalApp%29\CryptonorClient%28UniversalApp%29.csproj">
+      <Project>{a6b451bb-ef04-42ff-81e6-2ff16a868920}</Project>
+      <Name>CryptonorClient%28UniversalApp%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">

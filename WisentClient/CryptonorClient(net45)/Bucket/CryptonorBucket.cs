@@ -108,8 +108,6 @@ namespace CryptonorClient
             await httpClient.Delete(this.BucketName, obj.Key, obj.Version);
         }
       
-      
-
 
         public async Task<CryptonorBatchResponse> StoreBatch(IList<CryptonorObject> objects)
         {

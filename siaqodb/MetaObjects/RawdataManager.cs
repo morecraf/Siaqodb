@@ -28,8 +28,10 @@ namespace Sqo.MetaObjects
 #if ASYNC
         public async Task<RawdataInfo> GetRawdataInfoAsync(int oid)
         {
-            RawdataInfo info = await storageEngine.LoadObjectByOIDAsync<RawdataInfo>(this.GetSqoTypeInfo(), oid, false).ConfigureAwait(false);
-            return info;
+            //RawdataInfo info = await storageEngine.LoadObjectByOIDAsync<RawdataInfo>(this.GetSqoTypeInfo(), oid, false).ConfigureAwait(false);
+           // return info;
+            await FillCacheAsync().ConfigureAwait(false);
+            return cache[oid];
         }
 #endif
         
@@ -86,7 +88,9 @@ namespace Sqo.MetaObjects
 #if ASYNC
         public async Task SaveRawdataInfoAsync(RawdataInfo rawdataInfo)
         {
+            await FillCacheAsync().ConfigureAwait(false);
             await storageEngine.SaveObjectAsync(rawdataInfo, GetSqoTypeInfo()).ConfigureAwait(false);
+            cache[rawdataInfo.OID] = rawdataInfo;
         }
 #endif
         public int GetNextOID()
@@ -128,6 +132,17 @@ namespace Sqo.MetaObjects
             {
                 cache = new Dictionary<int, RawdataInfo>();
                 var all = storageEngine.LoadAll<RawdataInfo>(this.GetSqoTypeInfo());
+                foreach (RawdataInfo ri in all)
+                    cache[ri.OID] = ri;
+
+            }
+        }
+        private async Task FillCacheAsync()
+        {
+            if (cache == null)
+            {
+                cache = new Dictionary<int, RawdataInfo>();
+                var all = await storageEngine.LoadAllAsync<RawdataInfo>(this.GetSqoTypeInfo()).ConfigureAwait(false);
                 foreach (RawdataInfo ri in all)
                     cache[ri.OID] = ri;
 

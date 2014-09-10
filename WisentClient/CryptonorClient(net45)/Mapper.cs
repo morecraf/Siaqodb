@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -34,14 +35,7 @@ namespace CryptonorClient
 
             throw new Exception("Type :" + type.ToString() + " not supported!");
         }
-        public static string URLEncode(object value)
-        {
-            if (value.GetType() == typeof(DateTime))
-            {
-                return HttpUtility.UrlEncode(((DateTime)value).ToString("yyyy-MM-dd"));
-            }
-            return HttpUtility.UrlEncode(value.ToString());
-        }
+        
        
     }
 }

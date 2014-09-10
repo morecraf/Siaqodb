@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A6B451BB-EF04-42FF-81E6-2FF16A868920}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CryptonorClient</RootNamespace>
+    <AssemblyName>CryptonorClient</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile32</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\universal\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE WinRT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\bin\universal\CryptonorClient.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28UniversalApp%29.csproj">
+      <Project>{c2d71970-6fa2-4af5-8633-d1741bc28cb9}</Project>
+      <Name>Siaqodb %28UniversalApp%29</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
+    <TargetPlatform Include="Windows, Version=8.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\CryptonorBucket.cs">
+      <Link>Bucket\CryptonorBucket.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\CryptonorLocalBucket.cs">
+      <Link>Bucket\CryptonorLocalBucket.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\Events.cs">
+      <Link>Bucket\Events.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\IBucket.cs">
+      <Link>Bucket\IBucket.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\CompatibilityHelper.cs">
+      <Link>CompatibilityHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\CryptonorClient.cs">
+      <Link>CryptonorClient.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\CryptonorConfigurator.cs">
+      <Link>CryptonorConfigurator.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\DocumentSerializer\CryptoJsonSerializer.cs">
+      <Link>DocumentSerializer\CryptoJsonSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\DocumentSerializer\IDocumentSerializer.cs">
+      <Link>DocumentSerializer\IDocumentSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\AES128Encryptor.cs">
+      <Link>Encryption\AES128Encryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\AES256Encryptor.cs">
+      <Link>Encryption\AES256Encryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\Camellia.cs">
+      <Link>Encryption\Camellia.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\CBCCipher.cs">
+      <Link>Encryption\CBCCipher.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\CryptonorRandom.cs">
+      <Link>Encryption\CryptonorRandom.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\IEncryptor.cs">
+      <Link>Encryption\IEncryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\Pack.cs">
+      <Link>Encryption\Pack.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Entities\CryptonorObjectExtensions.cs">
+      <Link>Entities\CryptonorObjectExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Entities\CryptonorResultSet.cs">
+      <Link>Entities\CryptonorResultSet.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Http\CryptonorHttpClient.cs">
+      <Link>Http\CryptonorHttpClient.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Http\RequestBuilder.cs">
+      <Link>Http\RequestBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Http\Signature.cs">
+      <Link>Http\Signature.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Mapper.cs">
+      <Link>Mapper.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Queries\CryptonorQueryExtensions.cs">
+      <Link>Queries\CryptonorQueryExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Queries\QueryConfigurator.cs">
+      <Link>Queries\QueryConfigurator.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\..\packages\Microsoft.Net.Http.2.2.22\lib\portable-net45+win8+wpa81\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\portable-wp8+netcore45+net45+wp81+wpa81\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\..\packages\Microsoft.Net.Http.2.2.22\lib\portable-net45+win8+wpa81\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

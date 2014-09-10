@@ -4,10 +4,16 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-
+#if WinRT
+using Windows.Security.Cryptography;
+using Windows.Storage.Streams;
+using Windows.Security.Cryptography.Core;
+using System.Runtime.InteropServices.WindowsRuntime;
+#else
+using System.Security.Cryptography;
+#endif
 namespace CryptonorClient.Http
 {
     class Signature
@@ -70,13 +76,22 @@ namespace CryptonorClient.Http
         {
             var key = Encoding.UTF8.GetBytes(hashedPassword.ToUpper());
             string hashString;
+#if WinRT
+            MacAlgorithmProvider macAlgorithmProvider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
+            var binaryMessage = CryptographicBuffer.ConvertStringToBinary(message, BinaryStringEncoding.Utf8);
+            var binaryKeyMaterial = key.AsBuffer();
+            var hmacKey = macAlgorithmProvider.CreateKey(binaryKeyMaterial);
+            var binarySignedMessage = CryptographicEngine.Sign(hmacKey, binaryMessage);
+            var signedMessage = CryptographicBuffer.EncodeToBase64String(binarySignedMessage);
+            return signedMessage;
+#else
 
             using (var hmac = new HMACSHA256(key))
             {
                 var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(message));
                 hashString = Convert.ToBase64String(hash);
             }
-
+#endif
             return hashString;
         }
         private static async Task<string> BuildParameterMessage(HttpRequestMessage reqMsg)
@@ -95,8 +110,9 @@ namespace CryptonorClient.Http
             // Use the list of keyvalue pair in order to allow the same key instead of dictionary
             var parameterCollection = new List<KeyValuePair<string, string>>();
 
-            var queryStringCollection = reqMsg.RequestUri.ParseQueryString();
-            AddNameValuesToCollection(parameterCollection, queryStringCollection);
+            var queryStringCollection = CompatibilityHelper.ParseQueryString(reqMsg.RequestUri);
+         
+            AddKeyValuesToCollection(parameterCollection,queryStringCollection);
 
             if (reqMsg.Content != null)
             {
@@ -107,19 +123,19 @@ namespace CryptonorClient.Http
 
             return parameterCollection.OrderBy(pair => pair.Key).ToList();
         }
-        private static void AddNameValuesToCollection(List<KeyValuePair<string, string>> parameterCollection,
-            NameValueCollection nameValueCollection)
+
+        private static void AddKeyValuesToCollection(List<KeyValuePair<string, string>> parameterCollection,
+           IEnumerable<KeyValuePair<string, string>> nameValueCollection)
         {
-            if (!nameValueCollection.AllKeys.Any())
+            if (!nameValueCollection.Any())
                 return;
 
-            foreach (var key in nameValueCollection.AllKeys)
+            foreach (var key in nameValueCollection)
             {
-                var value = nameValueCollection[key];
-                var pair = new KeyValuePair<string, string>(key, value);
-
-                parameterCollection.Add(pair);
+               
+                parameterCollection.Add(key);
             }
         }
+
     }
 }

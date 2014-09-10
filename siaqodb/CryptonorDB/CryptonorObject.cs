@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +24,7 @@ namespace Cryptonor
         {
             return false;
         }
+        [UseVariable("key")]
         public string Key
         {
             get
@@ -35,6 +37,8 @@ namespace Cryptonor
             }
         }
         private byte[] document;
+         [UseVariable("document")]
+      
         public byte[] Document
         {
             get { return document; }
@@ -138,6 +142,15 @@ namespace Cryptonor
                 tags = TagsSerializer.GetDictionary(tagsSerialized);
             }
         }
-
+#if SILVERLIGHT
+        public object GetValue(FieldInfo field)
+        {
+            return field.GetValue(this);
+        }
+        public void SetValue(FieldInfo field, object value)
+        {
+            field.SetValue(this, value);
+        }
+#endif
     }
 }

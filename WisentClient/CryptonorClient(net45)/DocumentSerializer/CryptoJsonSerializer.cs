@@ -13,7 +13,15 @@ namespace CryptonorClient.DocumentSerializer
         readonly JsonSerializer serializer = new JsonSerializer();
         public object Deserialize(Type type, byte[] objectBytes)
         {
+#if SILVERLIGHT || CF || WinRT
+
+            string jsonStr = Encoding.UTF8.GetString(objectBytes, 0, objectBytes.Length);
+
+#else
             string jsonStr = Encoding.UTF8.GetString(objectBytes);
+
+#endif
+
             return JsonConvert.DeserializeObject(jsonStr.TrimEnd('\0'), type);
         }
 

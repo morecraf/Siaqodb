@@ -177,15 +177,24 @@ namespace CryptonorTests
             var fromDB = await bucket.Get(userName);
             var value = fromDB.GetValue<Person>();
             value.Age = 44;
-
+            bool conflict = false;
+            try
+            {
                 await bucket.Store(value.UserName, value, new { Age = 44 });
-            //treat conflict here because Version is not set
+                //treat conflict here because Version is not set
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("conflict"))
+                    conflict = true;
+            }
 
+            Assert.IsTrue(conflict);
             fromDB = await bucket.Get(userName);
-            Assert.AreEqual(44, fromDB.GetTag<int>("Age"));
+            Assert.AreEqual(33, fromDB.GetTag<int>("Age"));
             value = fromDB.GetValue<Person>();
             Assert.AreEqual(userName, value.UserName);
-            Assert.AreEqual(44, value.Age);
+            Assert.AreEqual(33, value.Age);
         }
         [TestMethod]
         public async Task Delete()

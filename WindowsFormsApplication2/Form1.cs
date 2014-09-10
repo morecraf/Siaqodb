@@ -61,8 +61,8 @@ namespace WindowsFormsApplication2
                 CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "aaaa");
                 // CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior","mykey","mypwd");
                 //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://ipv4.fiddler/CryptonorWebAPI/", "excelsior");
-                // CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://cryptonordb.cloudapp.net/cnor/", "excelsior", "mykey", "mypwd");
-                var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
+                CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://cryptonordb.cloudapp.net/cnor/", "excelsior", "mykey", "mypwd");
+                //var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
                // IBucket bucket = cl.GetBucket("crypto_users");
 
                 IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
@@ -84,7 +84,7 @@ namespace WindowsFormsApplication2
 
                 }
                 elapsed = (DateTime.Now - start).ToString();
-
+                start = DateTime.Now;
                 CryptonorQuery query67 = new CryptonorQuery("birth_year");
                 query67.Setup(a => a.Start(1000).Skip(10).Take(100));
                 var filtered22 = await bucket.Get(query67);

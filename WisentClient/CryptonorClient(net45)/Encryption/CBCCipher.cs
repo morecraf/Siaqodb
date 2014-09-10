@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,8 +11,7 @@ namespace CryptonorClient.Encryption
     {
         IEncryptor encryptor;
         readonly int BLOCK_SIZE;
-        private RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
-  
+        CryptonorRandom random = new CryptonorRandom();
         public CBCCipher(IEncryptor encryptor)
         {
             this.encryptor = encryptor;
@@ -33,7 +31,7 @@ namespace CryptonorClient.Encryption
             if (bytesIn.Length % BLOCK_SIZE!=0)
                 throw new ArgumentException("bytesIn size invalid");
             byte[] IV = new byte[BLOCK_SIZE];
-            rngCsp.GetBytes(IV);
+            random.FillRandomBuffer(IV);
 
             byte[] bytesOut = new byte[bytesIn.Length + BLOCK_SIZE];//larger to keep IV
             Array.Copy(IV, 0, bytesOut, 0, IV.Length);//first block is IV
