@@ -48,17 +48,17 @@ namespace CryptonorClient
        
         public async Task<CryptonorObject> Get(string key)
         {
-            return await localDB.Load(key).LibAwait();
+            return await localDB.LoadAsync(key).LibAwait();
         }
 
         public async Task<T> Get<T>(string key)
         {
-            CryptonorObject obj = await localDB.Load(key).LibAwait();
+            CryptonorObject obj = await localDB.LoadAsync(key).LibAwait();
             return obj.GetValue<T>();
         }
         public async Task<CryptonorResultSet> Get(CryptonorQuery query)
         {
-            var objects = await localDB.Load(query).LibAwait();
+            var objects = await localDB.LoadAsync(query).LibAwait();
             return new CryptonorResultSet
             {
                 Objects = objects,
@@ -70,7 +70,7 @@ namespace CryptonorClient
         public async Task<CryptonorResultSet> GetAll()
         {
 
-            var all = await localDB.LoadAll().LibAwait();
+            var all = await localDB.LoadAllAsync().LibAwait();
 
             return new CryptonorResultSet { Objects = all, Count = all.Count };
         }
@@ -78,7 +78,7 @@ namespace CryptonorClient
         public async Task<CryptonorResultSet> GetAll(int skip,int limit)
         {
 
-            var all = await localDB.LoadAll(skip, limit).LibAwait();
+            var all = await localDB.LoadAllAsync(skip, limit).LibAwait();
            
             return new CryptonorResultSet { Objects = all, Count = all.Count };
         }
@@ -131,15 +131,15 @@ namespace CryptonorClient
 
         public async Task Delete(string key)
         {
-            CryptonorObject cobj = await localDB.Load(key).LibAwait();
+            CryptonorObject cobj = await localDB.LoadAsync(key).LibAwait();
             if (cobj != null)
             {
-                await localDB.Delete(cobj).LibAwait();
+                await localDB.DeleteAsync(cobj).LibAwait();
             }
         }
         public async Task Delete(CryptonorObject obj)
         {
-            await localDB.Delete(obj).LibAwait();
+            await localDB.DeleteAsync(obj).LibAwait();
         }
         public async Task<CryptonorBatchResponse> StoreBatch(IList<CryptonorObject> objs)
         {
@@ -165,7 +165,7 @@ namespace CryptonorClient
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Push operation started..."));
                 this.OnSyncProgress(new SyncProgressEventArgs("Get local changes..."));
-                CryptonorChangeSet changeSet = await this.localDB.GetChangeSet().LibAwait();
+                CryptonorChangeSet changeSet = await this.localDB.GetChangeSetAsync().LibAwait();
                 if ((changeSet.ChangedObjects != null && changeSet.ChangedObjects.Count > 0) ||
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
@@ -195,7 +195,7 @@ namespace CryptonorClient
                     {
                         syncStatistics.TotalConflicted = conflicts.Count;
                     }
-                    await this.localDB.ClearSyncMetadata();
+                    await this.localDB.ClearSyncMetadataAsync();
                 }
 
                 this.OnSyncProgress(new SyncProgressEventArgs("Push finshed!"));
@@ -234,7 +234,7 @@ namespace CryptonorClient
                 this.OnSyncProgress(new SyncProgressEventArgs("Pull operation started..."));
 
                 CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
-                string anchor = await localDB.GetAnchor().LibAwait();
+                string anchor = await localDB.GetAnchorAsync().LibAwait();
 
                 int remainLimit = 1;
                 int nrBatch = 1;
@@ -268,7 +268,7 @@ namespace CryptonorClient
                         anchor = downloadedItems.Anchor;
                         if (!string.IsNullOrEmpty(anchor))
                         {
-                            await localDB.StoreAnchor(anchor).LibAwait();
+                            await localDB.StoreAnchorAsync(anchor).LibAwait();
                         }
                         this.OnSyncProgress(new SyncProgressEventArgs("Items of batch " + nrBatch + "stored locally ..."));
 

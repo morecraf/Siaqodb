@@ -58,9 +58,12 @@ namespace App2
             siaqodb.StoreObject(new A() { Name = "nnn" });
             var q = siaqodb.LoadAll<A>();
             var a = "ass";*/
-            var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
+            var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "excelsior", "mykey", "mypwd");
             StorageFolder folder = ApplicationData.Current.LocalFolder;
+            
             var subfolder = await folder.CreateFolderAsync("unit_tests", CreationCollisionOption.OpenIfExists);
+            await subfolder.DeleteAsync();
+            subfolder = await folder.CreateFolderAsync("unit_tests", CreationCollisionOption.OpenIfExists);
             IBucket bucket = cl.GetLocalBucket("unit_tests", folder.Path);
 
             DateTime start = DateTime.Now;
