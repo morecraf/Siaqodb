@@ -19,7 +19,7 @@ namespace CryptonorTests
           public SyncTests()
           {
               CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "mysuper_secret");
-              client = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
+              client = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "excelsior", "mykey", "mypwd");
             
           }
           [TestMethod]

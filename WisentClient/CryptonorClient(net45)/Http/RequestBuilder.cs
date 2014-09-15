@@ -13,9 +13,9 @@ namespace CryptonorClient.Http
     class RequestBuilder
     {
         string uriBase;
-        public RequestBuilder(string uri, string dbName)
+        public RequestBuilder(string uri)
         {
-            this.uriBase = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uri, dbName);
+            this.uriBase = string.Format(CultureInfo.InvariantCulture, "{0}", uri);
            
         }
         public HttpRequestMessage BuildGetRequest(string endUriFragment, Dictionary<string, string> parameters)

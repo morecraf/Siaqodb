@@ -30,7 +30,7 @@ namespace CryptonorClient
             httpClient.BaseAddress = new Uri(this.uri);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
           
-            this.requestBuilder = new RequestBuilder(this.uri, dbName);
+            this.requestBuilder = new RequestBuilder(this.uri);
             this.signature = new Signature(appKey, secretKey);
         }
         public async Task<CryptonorResultSet> Get(string bucket)

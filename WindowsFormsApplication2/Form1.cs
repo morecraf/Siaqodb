@@ -58,14 +58,14 @@ namespace WindowsFormsApplication2
             private async void button2_Click(object sender, EventArgs e)
             {
                 SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
-                CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "aaaa");
+                CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "mysuper_secret");
                 // CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior","mykey","mypwd");
                 //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://ipv4.fiddler/CryptonorWebAPI/", "excelsior");
-                CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://cryptonordb.cloudapp.net/cnor/", "excelsior", "mykey", "mypwd");
-                //var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/", "excelsior", "mykey", "mypwd");
-               // IBucket bucket = cl.GetBucket("crypto_users");
+                //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://cryptonordb.cloudapp.net/cnor/", "excelsior", "mykey", "mypwd");
+                var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "excelsior", "b8d2f15848b12927d50d0037510013c8", "v8zQGiAjyl");
+                IBucket bucket = cl.GetBucket("iasi");
 
-                IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
+                //IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
 
                 DateTime start = DateTime.Now;
 
@@ -76,8 +76,11 @@ namespace WindowsFormsApplication2
                 start = DateTime.Now;
                 try
                 {
-                    ((CryptonorLocalBucket)bucket).PullCompleted += Form1_PullCompleted;
-                    await ((CryptonorLocalBucket)bucket).Pull();
+                    //((CryptonorLocalBucket)bucket).PullCompleted += Form1_PullCompleted;
+                    //await ((CryptonorLocalBucket)bucket).Pull();
+                    var all = await bucket.GetAll();
+                    await bucket.Delete(all.Objects[0].Key);
+
                 }
                 catch
                 {
@@ -85,17 +88,20 @@ namespace WindowsFormsApplication2
                 }
                 elapsed = (DateTime.Now - start).ToString();
                 start = DateTime.Now;
-                CryptonorQuery query67 = new CryptonorQuery("birth_year");
-                query67.Setup(a => a.Start(1000).Skip(10).Take(100));
+                CryptonorQuery query67 = new CryptonorQuery("mystr");
+                query67.Setup(a => a.Value("gk9Zlq321c0"));
                 var filtered22 = await bucket.Get(query67);
                 elapsed = (DateTime.Now - start).ToString();
+
+
+        
                 return;
 
             }
         private async Task Fill(IBucket bucket)
         {
             List<CryptonorObject> list = new List<CryptonorObject>();
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 100; i++)
             {
                 CryptonorObject doObj = new CryptonorObject();
                 User book = new User();
@@ -118,7 +124,7 @@ namespace WindowsFormsApplication2
 
                 // await bucket.Store(doObj);
                 list.Add(doObj);
-                if (i % 1000 == 0 && i > 1)
+                if (i % 10 == 0 && i > 1)
                 {
                     await bucket.StoreBatch(list);
                     list = new List<CryptonorObject>();
@@ -160,6 +166,20 @@ namespace WindowsFormsApplication2
         public int InvoiceNumber { get; set; }
         public string Customer { get; set; }
         public decimal Total { get; set; }
+    }
+    public class Person
+    {
+        public Person()
+        {
+
+        }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+        public DateTime BirthDate { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public Person Friend { get; set; }
     }
     public class JsonCRSerializer : IDocumentSerializer
     {
