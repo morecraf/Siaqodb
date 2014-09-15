@@ -608,6 +608,14 @@ namespace Sqo
         public int Old_OID;
         public int New_OID;
         public int TID;
+        public object GetValue(System.Reflection.FieldInfo field)
+        {
+            return field.GetValue(this);
+        }
+        public void SetValue(System.Reflection.FieldInfo field, object value)
+        {
+            field.SetValue(this, value);
+        }
     }
 
     public static class SqoStringExtensions
