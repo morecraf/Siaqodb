@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\net35\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET NON_ASYNC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\bin\net35\CryptonorClient.XML</DocumentationFile>

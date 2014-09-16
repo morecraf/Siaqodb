@@ -12,14 +12,14 @@ using Sqo;
 namespace CryptonorTests
 {
     [TestClass]
-    public class AuthenticationTests
+    public class AuthenticationTestsAsync
     {
         private IBucket bucketReadWrite;
         private IBucket bucketRead;
         private IBucket bucketNone;
         private const string documentKey="2a13e21abc054e046617f8613c0025b2";
 
-        public AuthenticationTests()
+        public AuthenticationTestsAsync()
         {
             CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "mysuper_secret");
             var cl1 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/","excelsior", "b8d2f15848b12927d50d0037510013c8", "v8zQGiAjyl");
@@ -420,7 +420,7 @@ namespace CryptonorTests
         {
             var start =  DateTime.Now;
 
-            for (int i = 0; i <1000; i++)
+            for (int i = 0; i <10; i++)
             {
                 await bucketReadWrite.GetAsync(documentKey);
             }
@@ -434,7 +434,7 @@ namespace CryptonorTests
         {
             var start = DateTime.Now;
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 10; i++)
             {
                 await bucketReadWrite.StoreAsync(new CryptonorObject{Key = i.ToString()});
             }
@@ -453,7 +453,7 @@ namespace CryptonorTests
 
             start = DateTime.Now;
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 10; i++)
             {
                 await bucketReadWrite.DeleteAsync( i.ToString() );
             }

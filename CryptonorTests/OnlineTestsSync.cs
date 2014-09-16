@@ -5,9 +5,9 @@ using CryptonorClient;
 namespace CryptonorTests
 {
     [TestClass]
-    public class OnlineTestsSync:BucketTestsSync
+    public class OnlineTests:BucketTestsSync
     {
-        public OnlineTestsSync():base()
+        public OnlineTests():base()
         {
            
            

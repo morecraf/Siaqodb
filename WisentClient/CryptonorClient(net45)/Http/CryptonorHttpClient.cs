@@ -16,7 +16,6 @@ using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.Serialization.Json;
 #endif
 using System.Web;
 
@@ -43,11 +42,12 @@ namespace CryptonorClient
             this.requestBuilder = new RequestBuilder(this.uri);
             this.signature = new Signature(appKey, secretKey);
         }
-
+#if NON_ASYNC
         public CryptonorResultSet Get(string bucket)
         {
             return Get(bucket, 0, 0);
         }
+#endif
 
 #if ASYNC
         public async Task<CryptonorResultSet> GetAsync(string bucket)
@@ -55,7 +55,7 @@ namespace CryptonorClient
             return await GetAsync(bucket, 0, 0);
         }
 #endif
-
+        #if NON_ASYNC
         public CryptonorResultSet Get(string bucket, int skip, int limit)
         {
             var parameters = new Dictionary<string, string>();
@@ -74,6 +74,7 @@ namespace CryptonorClient
 
             return DeserializeResponse<CryptonorResultSet>(resp);
         }
+#endif
 
 #if ASYNC
         public async Task<CryptonorResultSet> GetAsync(string bucket, int skip, int limit)
@@ -96,7 +97,7 @@ namespace CryptonorClient
             return (CryptonorResultSet)obj;
         }
 #endif
-
+        #if NON_ASYNC
         public CryptonorObject Get(string bucket, string key)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, key);
@@ -108,6 +109,7 @@ namespace CryptonorClient
 
             return DeserializeResponse<CryptonorObject>(resp);
         }
+#endif
 
 #if ASYNC
         public async Task<CryptonorObject> GetAsync(string bucket, string key)
@@ -123,7 +125,7 @@ namespace CryptonorClient
             return (CryptonorObject)obj;
         }
 #endif
-
+        #if NON_ASYNC
         public CryptonorWriteResponse Put(string bucket, CryptonorObject obj)
         {
             string uriFragment = bucket;
@@ -133,7 +135,7 @@ namespace CryptonorClient
 
             return DeserializeResponse<CryptonorWriteResponse>(resp);
         }
-
+#endif
 
 #if ASYNC
         public async Task<CryptonorWriteResponse> PutAsync(string bucket, CryptonorObject obj)
@@ -148,7 +150,7 @@ namespace CryptonorClient
             
         }
 #endif
-
+        #if NON_ASYNC
         public CryptonorBatchResponse Put(string bucket, CryptonorChangeSet batch)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
@@ -158,6 +160,7 @@ namespace CryptonorClient
 
             return DeserializeResponse<CryptonorBatchResponse>(resp);
         }
+#endif
 
 #if ASYNC
         public async Task<CryptonorBatchResponse> PutAsync(string bucket, CryptonorChangeSet batch)
@@ -173,7 +176,7 @@ namespace CryptonorClient
             
         }
 #endif
-
+#if NON_ASYNC
         internal CryptonorResultSet GetByTag(string bucket, CryptonorQuery query)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "search");
@@ -184,6 +187,7 @@ namespace CryptonorClient
 
             return DeserializeResponse<CryptonorResultSet>(resp);
         }
+#endif
 
 #if ASYNC
         internal async Task<CryptonorResultSet> GetByTagAsync(string bucket, CryptonorQuery query)
@@ -201,6 +205,7 @@ namespace CryptonorClient
         }
 #endif
 
+        #if NON_ASYNC
         /// <summary>
         /// 
         /// </summary>
@@ -237,6 +242,7 @@ namespace CryptonorClient
                 return serializer.Deserialize<T>(jsonTextReader);
             }
         }
+#endif
 
 #if ASYNC
         public async Task<CryptonorChangeSet> GetChangesAsync(string bucket, CryptonorQuery query, int limit,string anchor)
@@ -261,7 +267,7 @@ namespace CryptonorClient
 
         }
 #endif
-
+        #if NON_ASYNC
         public CryptonorChangeSet GetChanges(string bucket, int limit, string anchor)
         {
             var uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
@@ -282,7 +288,7 @@ namespace CryptonorClient
 
             return DeserializeResponse<CryptonorChangeSet>(resp);
         }
-
+#endif
 
 #if ASYNC
         public async Task<CryptonorChangeSet> GetChangesAsync(string bucket, int limit, string anchor)
@@ -308,7 +314,7 @@ namespace CryptonorClient
         }
 
 #endif
-
+        #if NON_ASYNC
         internal void Delete(string bucket, string key, string version)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, key);
@@ -346,6 +352,7 @@ namespace CryptonorClient
 
             return resp;
         }
+#endif
 
 #if ASYNC
         internal async Task DeleteAsync(string bucket, string key, string version)

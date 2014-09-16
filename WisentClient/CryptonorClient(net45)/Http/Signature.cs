@@ -34,7 +34,7 @@ namespace CryptonorClient.Http
             this.secretKey = secretKey;
             this.appKey = appKey;
         }
-
+ #if NON_ASYNC
         public void SignMessage(HttpWebRequest request, string jsonContent)
         {
             request.Headers.Add(ApplicationKeyHeaderName, appKey);
@@ -46,13 +46,9 @@ namespace CryptonorClient.Http
         }
         public void SignMessage(HttpWebRequest request)
         {
-            request.Headers.Add(ApplicationKeyHeaderName,appKey);
-            request.Headers[TimestampHeaderName]= DateTime.UtcNow.ToString("o");
-            request.Accept = "application/json";
-            request.ContentType = "application/json";
-            string signature = MakeSignature(request,"", secretKey);
-            request.Headers[SignatureHeaderName] = signature;
+            this.SignMessage(request, "");
         }
+#endif
 
 #if ASYNC
         public async Task SignMessageAsync(HttpRequestMessage message)
@@ -64,7 +60,7 @@ namespace CryptonorClient.Http
             message.Headers.Add(SignatureHeaderName, signature);
         }
 #endif
-
+#if NON_ASYNC
         private static string MakeSignature(HttpWebRequest request, string jsonContent, string secretKey)
         {
             var hashedPassword = secretKey;
@@ -73,6 +69,7 @@ namespace CryptonorClient.Http
             return ComputeHash(hashedPassword, baseString);
 
         }
+#endif
 
 #if ASYNC
         private async static Task<string> MakeSignatureAsync(HttpRequestMessage regMsg, string secretKey)
@@ -84,6 +81,7 @@ namespace CryptonorClient.Http
 
         }
 #endif
+        #if NON_ASYNC
         private static string GetHttpRequestHeader(WebHeaderCollection headers, string headerName)
         {
             if (!headers.AllKeys.Contains(headerName))
@@ -91,6 +89,8 @@ namespace CryptonorClient.Http
 
             return headers[headerName];
         }
+#endif
+
 
 #if ASYNC
         private static string GetHttpRequestHeader(HttpHeaders headers, string headerName)
@@ -102,11 +102,8 @@ namespace CryptonorClient.Http
                             .SingleOrDefault();
         }
 #endif
-        private string GetPrivateKey(string appKey)
-        {
-            return "mypwd";
-        }
 
+        #if NON_ASYNC
         private static string BuildBaseString(HttpWebRequest request, string jsonContent)
         {
             var headers = request.Headers;
@@ -123,6 +120,7 @@ namespace CryptonorClient.Http
             return message;
         }
 
+#endif
 
 #if ASYNC
         private static async Task<string> BuildBaseStringAsync(HttpRequestMessage request)
@@ -165,6 +163,7 @@ namespace CryptonorClient.Http
             return hashString;
         }
 
+        #if NON_ASYNC
         private static string BuildParameterMessage(HttpWebRequest request, string jsonContent)
         {
             var parameterCollection = BuildParameterCollection(request, jsonContent);
@@ -176,6 +175,8 @@ namespace CryptonorClient.Http
 
             return string.Join("&", keyValueStrings.ToArray());
         }
+#endif
+
 #if ASYNC
         private static async Task<string> BuildParameterMessageAsync(HttpRequestMessage request)
         {
@@ -191,6 +192,7 @@ namespace CryptonorClient.Http
 
 #endif
 
+        #if NON_ASYNC
         private static List<KeyValuePair<string, string>> BuildParameterCollection(HttpWebRequest request, string jsonContent)
         {
             // Use the list of keyvalue pair in order to allow the same key instead of dictionary
@@ -207,6 +209,7 @@ namespace CryptonorClient.Http
 
             return parameterCollection.OrderBy(pair => pair.Key).ToList();
         }
+#endif
 
 #if ASYNC
         private static async Task<List<KeyValuePair<string, string>>> BuildParameterCollectionAsync(HttpRequestMessage request)

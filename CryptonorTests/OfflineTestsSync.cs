@@ -8,9 +8,9 @@ using CryptonorClient;
 namespace CryptonorTests
 {
     [TestClass]
-    public class OfflineTestsAsync:BucketTestsSync
+    public class OfflineTests:BucketTestsSync
     {
-        public OfflineTestsAsync():base()
+        public OfflineTests():base()
         {
 
         }

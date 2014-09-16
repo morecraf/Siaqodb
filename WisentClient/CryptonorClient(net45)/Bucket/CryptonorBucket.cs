@@ -23,11 +23,12 @@ namespace CryptonorClient
             this.BucketName = bucketName;
             this.httpClient = new CryptonorHttpClient(uri, dbName, appKey, secretKey);
         }
-
+#if NON_ASYNC
         public CryptonorObject Get(string key)
         {
             return httpClient.Get(this.BucketName, key);
         }
+#endif
 
 #if ASYNC
     public async Task<CryptonorObject> GetAsync(string key)
@@ -35,26 +36,32 @@ namespace CryptonorClient
             return await httpClient.GetAsync(this.BucketName, key);
         }
 #endif
-
+        #if NON_ASYNC
         public T Get<T>(string key)
         {
             CryptonorObject obj = httpClient.Get(this.BucketName, key);
+            if (obj == null)
+                return default(T);
             return obj.GetValue<T>();
         }
+#endif
 
 #if ASYNC
  public async Task<T> GetAsync<T>(string key)
         {
             CryptonorObject obj = await httpClient.GetAsync(this.BucketName, key);
+         if (obj == null)
+                return default(T);
             return obj.GetValue<T>();
         }
 #endif
-
+#if NON_ASYNC
         public CryptonorResultSet GetAll()
         {
             var all = httpClient.Get(this.BucketName);
             return all;
         }
+#endif
 
 #if ASYNC
   public async Task<CryptonorResultSet> GetAllAsync()
@@ -63,12 +70,13 @@ namespace CryptonorClient
             return all;
         }
 #endif
-
+        #if NON_ASYNC
         public CryptonorResultSet GetAll(int skip, int limit)
         {
             var all = httpClient.Get(this.BucketName, skip, limit);
             return all;
         }
+#endif
 
 #if ASYNC
   public async Task<CryptonorResultSet> GetAllAsync(int skip,int limit)
@@ -77,11 +85,12 @@ namespace CryptonorClient
             return all;
         }
 #endif
-
+        #if NON_ASYNC
         public CryptonorResultSet Get(CryptonorQuery query)
         {
             return (httpClient.GetByTag(this.BucketName, query));
         }
+#endif
 
 #if ASYNC
  public async Task<CryptonorResultSet> GetAsync(CryptonorQuery query)
@@ -89,7 +98,7 @@ namespace CryptonorClient
            return (await httpClient.GetByTagAsync(this.BucketName, query));
         }
 #endif
-
+        #if NON_ASYNC
         public void Store(CryptonorObject obj)
         {
             CryptonorWriteResponse response = httpClient.Put(this.BucketName, obj);
@@ -101,6 +110,7 @@ namespace CryptonorClient
             }
 
         }
+#endif
 
 #if ASYNC
   public async Task StoreAsync(CryptonorObject obj)
@@ -115,11 +125,12 @@ namespace CryptonorClient
 
         }
 #endif
-
+        #if NON_ASYNC
         public void Store(string key, object obj)
         {
             this.Store(key, obj, null);
         }
+#endif
 
 #if ASYNC
  public async Task StoreAsync(string key, object obj)
@@ -127,7 +138,7 @@ namespace CryptonorClient
             await this.StoreAsync(key, obj, null);
         }
 #endif
-
+#if NON_ASYNC
         public void Store(string key, object obj, Dictionary<string, object> tags)
         {
             CryptonorObject cryObject = new CryptonorObject();
@@ -144,6 +155,7 @@ namespace CryptonorClient
 
             Store(cryObject);
         }
+#endif
 
 #if ASYNC
  public async Task StoreAsync(string key, object obj, Dictionary<string, object> tags)
@@ -163,7 +175,7 @@ namespace CryptonorClient
             await this.StoreAsync(cryObject);
         }
 #endif
-
+        #if NON_ASYNC
         public void Store(string key, object obj, object tags = null)
         {
             Dictionary<string, object> tags_Dict = null;
@@ -182,6 +194,7 @@ namespace CryptonorClient
 
             Store(key, obj, tags_Dict);
         }
+#endif
 
 #if ASYNC
    public async Task StoreAsync(string key, object obj, object tags = null)
@@ -203,11 +216,12 @@ namespace CryptonorClient
            await this.StoreAsync(key, obj, tags_Dict);
         }
 #endif
-
+        #if NON_ASYNC
         public void Delete(string key)
         {
             httpClient.Delete(this.BucketName, key, null);
         }
+#endif
 
 #if ASYNC
 public async Task DeleteAsync(string key)
@@ -216,22 +230,24 @@ public async Task DeleteAsync(string key)
         }
 #endif
 
+#if NON_ASYNC
          public void Delete(CryptonorObject obj)
         {
             httpClient.Delete(this.BucketName, obj.Key, obj.Version);
         }
-
+#endif
 #if ASYNC
  public async Task DeleteAsync(CryptonorObject obj)
         {
             await httpClient.DeleteAsync(this.BucketName, obj.Key, obj.Version);
         }
 #endif
-
+        #if NON_ASYNC
           public CryptonorBatchResponse StoreBatch(IList<CryptonorObject> objects)
         {
             return  httpClient.Put(this.BucketName, new CryptonorChangeSet { ChangedObjects = objects });
         }
+#endif
 
 #if ASYNC
 

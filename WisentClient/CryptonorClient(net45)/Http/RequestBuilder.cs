@@ -23,7 +23,7 @@ namespace CryptonorClient.Http
             this.uriBase = string.Format(CultureInfo.InvariantCulture, "{0}", uri);
            
         }
-
+         #if NON_ASYNC
         public HttpWebRequest BuildGetRequest(string endUriFragment, Dictionary<string, string> parameters)
         {
             HttpWebRequest messageReq=null;
@@ -34,8 +34,10 @@ namespace CryptonorClient.Http
             messageReq = (HttpWebRequest)WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
             messageReq.Method = "GET";
             messageReq.ContentType = "application/json";
+            messageReq.KeepAlive = false;
             return messageReq;
         }
+#endif
 
 #if ASYNC
         public HttpRequestMessage BuildGetRequestAsync(string endUriFragment, Dictionary<string, string> parameters)
@@ -51,11 +53,12 @@ namespace CryptonorClient.Http
             return messageReq;
         }
 #endif
-
+         #if NON_ASYNC
         public HttpWebRequest BuildPostRequest(string endUriFragment)
         {
             return BuildPostRequest(endUriFragment,null);
         }
+#endif
 
 #if ASYNC
         public HttpRequestMessage BuildPostRequestAsync(string endUriFragment,object content)
@@ -63,7 +66,7 @@ namespace CryptonorClient.Http
             return BuildPostRequestAsync(endUriFragment, content, null);
         }
 #endif
-
+         #if NON_ASYNC
         public HttpWebRequest BuildPostRequest(string endUriFragment, Dictionary<string, string> parameters)
         {
             HttpWebRequest request = null;
@@ -73,10 +76,11 @@ namespace CryptonorClient.Http
             request = (HttpWebRequest)WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
             request.Method = "POST";
             request.ContentType = "application/json";
-         
+            request.KeepAlive = false;
 
             return request;
         }
+#endif
 
 #if ASYNC
         public HttpRequestMessage BuildPostRequestAsync(string endUriFragment, object content, Dictionary<string, string> parameters)
@@ -93,7 +97,7 @@ namespace CryptonorClient.Http
             return messageReq;
         }
 #endif
-
+         #if NON_ASYNC
         public HttpWebRequest BuildDeleteRequest(string endUriFragment, Dictionary<string, string> parameters)
         {
             HttpWebRequest messageReq = null;
@@ -103,9 +107,10 @@ namespace CryptonorClient.Http
             messageReq =(HttpWebRequest) WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
             messageReq.Method = "DELETE";
             messageReq.ContentType = "application/json";
-
+            messageReq.KeepAlive = false;
             return messageReq;
         }
+#endif
 
 #if ASYNC
         public HttpRequestMessage BuildDeleteRequestAsync(string endUriFragment, Dictionary<string, string> parameters)

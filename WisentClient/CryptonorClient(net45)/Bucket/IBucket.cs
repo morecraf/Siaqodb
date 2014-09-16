@@ -28,7 +28,7 @@ namespace CryptonorClient
         Task DeleteAsync(string key);
         Task DeleteAsync(CryptonorObject obj);
 #endif
-
+#if NON_ASYNC
         CryptonorObject Get(string key);
         T Get<T>(string key);
         CryptonorResultSet Get(CryptonorQuery query);
@@ -46,6 +46,7 @@ namespace CryptonorClient
         CryptonorBatchResponse StoreBatch(IList<CryptonorObject> obj);
         void Delete(string key);
         void Delete(CryptonorObject obj);
+#endif
         string BucketName { get; set; }
 
         
