@@ -137,6 +137,7 @@ namespace Sqo.MetaObjects
 
             }
         }
+#if ASYNC
         private async Task FillCacheAsync()
         {
             if (cache == null)
@@ -148,5 +149,6 @@ namespace Sqo.MetaObjects
 
             }
         }
+#endif
     }
 }

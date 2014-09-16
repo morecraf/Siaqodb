@@ -5,25 +5,47 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if ASYNC
 using System.Threading.Tasks;
+#endif
 
 namespace CryptonorClient
 {
     public interface IBucket
     {
-        
-        Task<CryptonorObject> Get(string key);
-        Task<T> Get<T>(string key);
-        Task<CryptonorResultSet> Get(CryptonorQuery query);
-        Task<CryptonorResultSet> GetAll();
-        Task<CryptonorResultSet> GetAll(int skip,int limit);
-        Task Store(CryptonorObject obj);
-        Task Store(string key, object obj);
-        Task Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
-        Task Store(string key, object obj, object tags = null);
-        Task<CryptonorBatchResponse> StoreBatch(IList<CryptonorObject> obj);
-        Task Delete(string key);
-        Task Delete(CryptonorObject obj);
+#if ASYNC
+
+        Task<CryptonorObject> GetAsync(string key);
+        Task<T> GetAsync<T>(string key);
+         Task<CryptonorResultSet> GetAsync(CryptonorQuery query);
+         Task<CryptonorResultSet> GetAllAsync();
+         Task<CryptonorResultSet> GetAllAsync(int skip, int limit);
+        Task StoreAsync(CryptonorObject obj);
+        Task StoreAsync(string key, object obj);
+        Task StoreAsync(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
+        Task StoreAsync(string key, object obj, object tags = null);
+         Task<CryptonorBatchResponse> StoreBatchAsync(IList<CryptonorObject> obj);
+        Task DeleteAsync(string key);
+        Task DeleteAsync(CryptonorObject obj);
+#endif
+
+        CryptonorObject Get(string key);
+        T Get<T>(string key);
+        CryptonorResultSet Get(CryptonorQuery query);
+        CryptonorResultSet GetAll();
+        CryptonorResultSet GetAll(int skip, int limit);
+        void Store(CryptonorObject obj);
+        void Store(string key, object obj);
+        void Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
+        void Store(string key, object obj, object tags = null);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        CryptonorBatchResponse StoreBatch(IList<CryptonorObject> obj);
+        void Delete(string key);
+        void Delete(CryptonorObject obj);
         string BucketName { get; set; }
 
         

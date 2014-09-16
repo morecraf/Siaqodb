@@ -52,13 +52,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BucketTestsSync.cs" />
+    <Compile Include="OfflineTestsSync.cs" />
+    <Compile Include="OnlineTestsSync.cs" />
     <Compile Include="Person.cs" />
-    <Compile Include="BucketTests.cs" />
-    <Compile Include="OfflineTests.cs" />
-    <Compile Include="OnlineTests.cs" />
+    <Compile Include="BucketTestsAsync.cs" />
+    <Compile Include="OfflineTestsAsync.cs" />
+    <Compile Include="OnlineTestsAsync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyncTests.cs" />
     <Compile Include="AuthenticationTests.cs" />
+    <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 4.5%29.csproj">

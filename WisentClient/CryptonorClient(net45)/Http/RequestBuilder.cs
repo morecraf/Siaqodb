@@ -1,12 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿
+using System.IO;
+using System.Net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Linq;
+#if ASYNC
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Text;
 using System.Threading.Tasks;
+#endif
 
 namespace CryptonorClient.Http
 {
@@ -18,7 +23,22 @@ namespace CryptonorClient.Http
             this.uriBase = string.Format(CultureInfo.InvariantCulture, "{0}", uri);
            
         }
-        public HttpRequestMessage BuildGetRequest(string endUriFragment, Dictionary<string, string> parameters)
+
+        public HttpWebRequest BuildGetRequest(string endUriFragment, Dictionary<string, string> parameters)
+        {
+            HttpWebRequest messageReq=null;
+            var uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uriBase, endUriFragment);
+
+
+            var queryString = GetQueryString(parameters);
+            messageReq = (HttpWebRequest)WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
+            messageReq.Method = "GET";
+            messageReq.ContentType = "application/json";
+            return messageReq;
+        }
+
+#if ASYNC
+        public HttpRequestMessage BuildGetRequestAsync(string endUriFragment, Dictionary<string, string> parameters)
         {
             HttpRequestMessage messageReq = new HttpRequestMessage();
             messageReq.Method = HttpMethod.Get;
@@ -30,11 +50,36 @@ namespace CryptonorClient.Http
             messageReq.RequestUri=new Uri(CombinePathAndQuery(uriFragment, queryString));
             return messageReq;
         }
-        public HttpRequestMessage BuildPostRequest(string endUriFragment,object content)
+#endif
+
+        public HttpWebRequest BuildPostRequest(string endUriFragment)
         {
-            return BuildPostRequest(endUriFragment, content, null);
+            return BuildPostRequest(endUriFragment,null);
         }
-        public HttpRequestMessage BuildPostRequest(string endUriFragment, object content, Dictionary<string, string> parameters)
+
+#if ASYNC
+        public HttpRequestMessage BuildPostRequestAsync(string endUriFragment,object content)
+        {
+            return BuildPostRequestAsync(endUriFragment, content, null);
+        }
+#endif
+
+        public HttpWebRequest BuildPostRequest(string endUriFragment, Dictionary<string, string> parameters)
+        {
+            HttpWebRequest request = null;
+           
+            var queryString = GetQueryString(parameters);
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uriBase, endUriFragment);
+            request = (HttpWebRequest)WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
+            request.Method = "POST";
+            request.ContentType = "application/json";
+         
+
+            return request;
+        }
+
+#if ASYNC
+        public HttpRequestMessage BuildPostRequestAsync(string endUriFragment, object content, Dictionary<string, string> parameters)
         {
             HttpRequestMessage messageReq = new HttpRequestMessage();
             messageReq.Method = HttpMethod.Post;
@@ -47,7 +92,23 @@ namespace CryptonorClient.Http
 
             return messageReq;
         }
-        public HttpRequestMessage BuildDeleteRequest(string endUriFragment, Dictionary<string, string> parameters)
+#endif
+
+        public HttpWebRequest BuildDeleteRequest(string endUriFragment, Dictionary<string, string> parameters)
+        {
+            HttpWebRequest messageReq = null;
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uriBase, endUriFragment);
+
+            string queryString = GetQueryString(parameters);
+            messageReq =(HttpWebRequest) WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
+            messageReq.Method = "DELETE";
+            messageReq.ContentType = "application/json";
+
+            return messageReq;
+        }
+
+#if ASYNC
+        public HttpRequestMessage BuildDeleteRequestAsync(string endUriFragment, Dictionary<string, string> parameters)
         {
             HttpRequestMessage messageReq = new HttpRequestMessage();
             messageReq.Method = HttpMethod.Delete;
@@ -59,6 +120,7 @@ namespace CryptonorClient.Http
             messageReq.RequestUri = new Uri(CombinePathAndQuery(uriFragment, queryString));
             return messageReq;
         }
+#endif
         public static string GetQueryString(IDictionary<string, string> parameters)
         {
             string parametersString = null;

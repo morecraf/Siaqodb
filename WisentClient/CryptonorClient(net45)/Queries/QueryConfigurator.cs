@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if ASYNC
 using System.Threading.Tasks;
-
+#endif
 namespace CryptonorClient
 {
     public class QueryConfigurator

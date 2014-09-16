@@ -39,7 +39,7 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                await bucketNone.Get(documentKey);
+                await bucketNone.GetAsync(documentKey);
             }
             catch (HttpRequestException)
             {
@@ -54,9 +54,9 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                await bucketNone.Get(new CryptonorQuery("age"){Value = "22"});
+                await bucketNone.GetAsync(new CryptonorQuery("age"){Value = "22"});
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
                 unautorized = true;
             }
@@ -69,7 +69,7 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                await bucketNone.Get<Person>(documentKey);
+                await bucketNone.GetAsync<Person>(documentKey);
             }
             catch (HttpRequestException)
             {
@@ -84,7 +84,7 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                await bucketNone.GetAll();
+                await bucketNone.GetAllAsync();
             }
             catch (HttpRequestException)
             {
@@ -100,7 +100,7 @@ namespace CryptonorTests
            try
            {
                //store object(POST)
-               await bucketNone.Store(new CryptonorObject());
+               await bucketNone.StoreAsync(new CryptonorObject());
            }
            catch (HttpRequestException)
            {
@@ -116,7 +116,7 @@ namespace CryptonorTests
            try
            {
                //store object(POST)
-               await bucketNone.Store("dummy", new Person(), new { age = "22" });
+               await bucketNone.StoreAsync("dummy", new Person(), new { age = "22" });
            }
            catch (HttpRequestException)
            {
@@ -132,7 +132,7 @@ namespace CryptonorTests
            try
            {
                //store object(POST)
-               await bucketNone.Store("dummy", new Person());
+               await bucketNone.StoreAsync("dummy", new Person());
            }
            catch (HttpRequestException)
            {
@@ -148,7 +148,7 @@ namespace CryptonorTests
            try
            {
                //store object(POST)
-               await bucketNone.Store("dummy", new Person(), new Dictionary<string, object> { { "age", "22" } });
+               await bucketNone.StoreAsync("dummy", new Person(), new Dictionary<string, object> { { "age", "22" } });
            }
            catch (HttpRequestException)
            {
@@ -164,7 +164,7 @@ namespace CryptonorTests
            try
            {
                //store batch(POST)
-               await bucketNone.StoreBatch(new []{new CryptonorObject()});
+               await bucketNone.StoreBatchAsync(new []{new CryptonorObject()});
            }
            catch (HttpRequestException)
            {
@@ -179,8 +179,8 @@ namespace CryptonorTests
            var unautorized = false;
            try
            {
-               //delete by key(Delete)
-               await bucketNone.Delete("dummy");
+               //delete by key(DeleteAsync)
+               await bucketNone.DeleteAsync("dummy");
            }
            catch (HttpRequestException)
            {
@@ -196,7 +196,7 @@ namespace CryptonorTests
            try
            {
                //delete crypto object(DELETE)
-               await bucketNone.Delete(new CryptonorObject());
+               await bucketNone.DeleteAsync(new CryptonorObject());
            }
            catch (HttpRequestException)
            {
@@ -216,16 +216,16 @@ namespace CryptonorTests
             try
             {
                 //get all(GET)
-                await bucketRead.GetAll();
+                await bucketRead.GetAllAsync();
 
                 //get by querry(POST)
-                await bucketRead.Get(new CryptonorQuery("age"){Value = "22"});
+                await bucketRead.GetAsync(new CryptonorQuery("age"){Value = "22"});
 
                 //get document(GET)
-                await bucketRead.Get(documentKey);
+                await bucketRead.GetAsync(documentKey);
 
                 // get entity(GET)
-                await bucketRead.Get<Person>(documentKey);
+                await bucketRead.GetAsync<Person>(documentKey);
             }
             catch (HttpRequestException)
             {
@@ -243,7 +243,7 @@ namespace CryptonorTests
             try
             {
                 //store object(POST)
-                await bucketRead.Store(new CryptonorObject());
+                await bucketRead.StoreAsync(new CryptonorObject());
             }
             catch (HttpRequestException)
             {
@@ -259,7 +259,7 @@ namespace CryptonorTests
             try
             {
                 //store object(POST)
-                await bucketRead.Store("dummy", new Person(), new { age = "22" });
+                await bucketRead.StoreAsync("dummy", new Person(), new { age = "22" });
             }
             catch (HttpRequestException)
             {
@@ -275,7 +275,7 @@ namespace CryptonorTests
             try
             {
                 //store object(POST)
-                await bucketRead.Store("dummy", new Person());
+                await bucketRead.StoreAsync("dummy", new Person());
             }
             catch (HttpRequestException)
             {
@@ -291,7 +291,7 @@ namespace CryptonorTests
             try
             {
                 //store object(POST)
-                await bucketRead.Store("dummy", new Person(), new Dictionary<string, object> { { "age", "22" } });
+                await bucketRead.StoreAsync("dummy", new Person(), new Dictionary<string, object> { { "age", "22" } });
             }
             catch (HttpRequestException)
             {
@@ -307,7 +307,7 @@ namespace CryptonorTests
             try
             {
                 //store batch(POST)
-                await bucketRead.StoreBatch(new[] { new CryptonorObject() });
+                await bucketRead.StoreBatchAsync(new[] { new CryptonorObject() });
             }
             catch (HttpRequestException e)
             {
@@ -323,8 +323,8 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                //delete by key(Delete)
-                await bucketRead.Delete("dummy");
+                //delete by key(DeleteAsync)
+                await bucketRead.DeleteAsync("dummy");
             }
             catch (HttpRequestException)
             {
@@ -340,7 +340,7 @@ namespace CryptonorTests
             try
             {
                 //delete crypto object(DELETE)
-                await bucketRead.Delete(new CryptonorObject());
+                await bucketRead.DeleteAsync(new CryptonorObject());
             }
             catch (HttpRequestException)
             {
@@ -366,43 +366,43 @@ namespace CryptonorTests
             try
             {
                 //get all(GET)
-                await bucketReadWrite.GetAll();
+                await bucketReadWrite.GetAllAsync();
 
                 //get by querry(POST)
-                await bucketReadWrite.Get(new CryptonorQuery("age") { Value = "22" });
+                await bucketReadWrite.GetAsync(new CryptonorQuery("age") { Value = "22" });
 
                 //get document(GET)
-                await bucketReadWrite.Get(documentKey);
+                await bucketReadWrite.GetAsync(documentKey);
 
                 // get entity(GET)
-                await bucketReadWrite.Get<Person>(documentKey);
+                await bucketReadWrite.GetAsync<Person>(documentKey);
 
                 //store object(POST)
-                await bucketReadWrite.Store(cryptoObj);
+                await bucketReadWrite.StoreAsync(cryptoObj);
 
                 //store object(POST)
-                await bucketReadWrite.Store("key1",person,new {age="22"});
+                await bucketReadWrite.StoreAsync("key1",person,new {age="22"});
 
                 //store object(POST)
-                await bucketReadWrite.Store("key2",person);
+                await bucketReadWrite.StoreAsync("key2",person);
 
                 //store object(POST)
-                await bucketReadWrite.Store("key3", person,new Dictionary<string, object>{{"age","22"}});
+                await bucketReadWrite.StoreAsync("key3", person,new Dictionary<string, object>{{"age","22"}});
 
                 //store batch(POST)
-                await bucketReadWrite.StoreBatch(new []{new CryptonorObject{Key = "key4"},new CryptonorObject{ Key = "key5"}});
+                await bucketReadWrite.StoreBatchAsync(new []{new CryptonorObject{Key = "key4"},new CryptonorObject{ Key = "key5"}});
 
                 //delete by key(DELTE)
-                await bucketReadWrite.Delete("key1");
+                await bucketReadWrite.DeleteAsync("key1");
 
                 //delete other documents that were stored in this test
-                await bucketReadWrite.Delete("key2");
-                await bucketReadWrite.Delete("key3");
-                await bucketReadWrite.Delete("key4");
-                await bucketReadWrite.Delete("key5");
+                await bucketReadWrite.DeleteAsync("key2");
+                await bucketReadWrite.DeleteAsync("key3");
+                await bucketReadWrite.DeleteAsync("key4");
+                await bucketReadWrite.DeleteAsync("key5");
 
                 //delete obj(DELETE)
-                await bucketReadWrite.Delete(await bucketReadWrite.Get("key0"));
+                await bucketReadWrite.DeleteAsync(await bucketReadWrite.GetAsync("key0"));
             }
             catch (HttpRequestException)
             {
@@ -422,7 +422,7 @@ namespace CryptonorTests
 
             for (int i = 0; i <1000; i++)
             {
-                await bucketReadWrite.Get(documentKey);
+                await bucketReadWrite.GetAsync(documentKey);
             }
 
             var elapsed = DateTime.Now - start;
@@ -436,7 +436,7 @@ namespace CryptonorTests
 
             for (int i = 0; i < 1000; i++)
             {
-                await bucketReadWrite.Store(new CryptonorObject{Key = i.ToString()});
+                await bucketReadWrite.StoreAsync(new CryptonorObject{Key = i.ToString()});
             }
 
             var elapsed = DateTime.Now - start;
@@ -445,7 +445,7 @@ namespace CryptonorTests
             start = DateTime.Now;
 
         
-            await bucketReadWrite.GetAll();
+            await bucketReadWrite.GetAllAsync();
            
 
             elapsed = DateTime.Now - start;
@@ -455,7 +455,7 @@ namespace CryptonorTests
 
             for (int i = 0; i < 1000; i++)
             {
-                await bucketReadWrite.Delete( i.ToString() );
+                await bucketReadWrite.DeleteAsync( i.ToString() );
             }
 
             elapsed = DateTime.Now - start;

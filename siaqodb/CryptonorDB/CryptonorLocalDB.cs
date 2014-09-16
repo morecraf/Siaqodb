@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Sqo.Attributes;
 using Sqo.Exceptions;
 using Sqo.Indexes;
@@ -14,6 +12,11 @@ using System.Linq.Expressions;
 using System.IO;
 using Sqo;
 using Cryptonor.Indexes;
+using Sqo.Utilities;
+#if ASYNC
+using System.Threading.Tasks;
+#endif
+
 #if WinRT
 
 using Windows.Storage;
@@ -25,7 +28,9 @@ namespace Cryptonor
         private Siaqodb siaqodb;
         TagsIndexManager indexManager;
         private readonly object _locker = new object();
+#if ASYNC
         private readonly AsyncLock _lockerAsync = new AsyncLock();
+#endif
 #if !WinRT
         public CryptonorLocalDB(string bucketPath)
         {
@@ -261,9 +266,14 @@ namespace Cryptonor
             return await this.siaqodb.Query<CryptonorObject>().Skip(skip).Take(limit).ToListAsync().LibAwait();
         }
 #endif 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public CryptonorObject Load(string key)
         {
-            return this.siaqodb.Query<CryptonorObject>().Where(a => a.Key == key).FirstOrDefault();
+            return this.siaqodb.Query<CryptonorObject>().FirstOrDefault(a => a.Key == key);
         }
 #if ASYNC
         public async Task<CryptonorObject> LoadAsync(string key)
@@ -363,9 +373,9 @@ namespace Cryptonor
         {
             IList<DirtyEntity> all = this.siaqodb.LoadAll<DirtyEntity>();
 
-            Dictionary<int, Tuple<CryptonorObject, DirtyEntity>> inserts = new Dictionary<int, Tuple<CryptonorObject, DirtyEntity>>();
-            Dictionary<int, Tuple<CryptonorObject, DirtyEntity>> updates = new Dictionary<int, Tuple<CryptonorObject, DirtyEntity>>();
-            Dictionary<int, Tuple<CryptonorObject, DirtyEntity>> deletes = new Dictionary<int, Tuple<CryptonorObject, DirtyEntity>>();
+            Dictionary<int, ATuple<CryptonorObject, DirtyEntity>> inserts = new Dictionary<int, ATuple<CryptonorObject, DirtyEntity>>();
+            Dictionary<int, ATuple<CryptonorObject, DirtyEntity>> updates = new Dictionary<int, ATuple<CryptonorObject, DirtyEntity>>();
+            Dictionary<int, ATuple<CryptonorObject, DirtyEntity>> deletes = new Dictionary<int, ATuple<CryptonorObject, DirtyEntity>>();
 
             foreach (DirtyEntity en in all)
             {
@@ -374,14 +384,14 @@ namespace Cryptonor
                 {
                     if (inserts.ContainsKey(en.EntityOID))
                     {
-                        siaqodb.Delete(inserts[en.EntityOID].Item1);
+                        siaqodb.Delete(inserts[en.EntityOID].Name);
                         siaqodb.Delete(en);
                         inserts.Remove(en.EntityOID);
                         continue;
                     }
                     else if (updates.ContainsKey(en.EntityOID))
                     {
-                        siaqodb.Delete(updates[en.EntityOID].Item1);
+                        siaqodb.Delete(updates[en.EntityOID].Name);
                         updates.Remove(en.EntityOID);
                     }
                 }
@@ -398,31 +408,31 @@ namespace Cryptonor
                 CryptonorObject entityFromDB = (CryptonorObject)siaqodb.LoadObjectByOID(typeof(CryptonorObject), en.EntityOID);
                 if (en.DirtyOp == DirtyOperation.Inserted)
                 {
-                    inserts.Add(en.EntityOID, new Tuple<CryptonorObject, DirtyEntity>(entityFromDB, en));
+                    inserts.Add(en.EntityOID, new ATuple<CryptonorObject, DirtyEntity>(entityFromDB, en));
                 }
                 else if (en.DirtyOp == DirtyOperation.Updated)
                 {
-                    updates.Add(en.EntityOID, new Tuple<CryptonorObject, DirtyEntity>(entityFromDB, en));
+                    updates.Add(en.EntityOID, new ATuple<CryptonorObject, DirtyEntity>(entityFromDB, en));
                 }
                 else if (en.DirtyOp == DirtyOperation.Deleted)
                 {
-                    deletes.Add(en.EntityOID, new Tuple<CryptonorObject, DirtyEntity>(entityFromDB, en));
+                    deletes.Add(en.EntityOID, new ATuple<CryptonorObject, DirtyEntity>(entityFromDB, en));
                 }
 
             }
             IList<CryptonorObject> changed = new List<CryptonorObject>();
             IList<DeletedObject> deleted = new List<DeletedObject>();
-            foreach (Tuple<CryptonorObject, DirtyEntity> val in inserts.Values)
+            foreach (ATuple<CryptonorObject, DirtyEntity> val in inserts.Values)
             {
-                changed.Add(val.Item1);
+                changed.Add(val.Name);
             }
-            foreach (Tuple<CryptonorObject, DirtyEntity> val in updates.Values)
+            foreach (ATuple<CryptonorObject, DirtyEntity> val in updates.Values)
             {
-                changed.Add(val.Item1);
+                changed.Add(val.Name);
             }
-            foreach (Tuple<CryptonorObject, DirtyEntity> val in deletes.Values)
+            foreach (ATuple<CryptonorObject, DirtyEntity> val in deletes.Values)
             {
-                deleted.Add(new DeletedObject { Version = val.Item1.Version, Key = val.Item1.Key });
+                deleted.Add(new DeletedObject { Version = val.Name.Version, Key = val.Name.Key });
             }
             return new CryptonorChangeSet { ChangedObjects = changed, DeletedObjects = deleted };
         }

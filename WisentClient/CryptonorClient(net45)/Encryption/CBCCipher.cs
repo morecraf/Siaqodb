@@ -1,9 +1,7 @@
 ﻿using CryptonorClient.Encryption;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace CryptonorClient.Encryption
 {

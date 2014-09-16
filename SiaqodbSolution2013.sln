@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{91980E14-6FB0-4AE1-B381-5D00B9B9F7B3}"
 	ProjectSection(SolutionItems) = preProject
@@ -99,6 +99,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorClient(WP8.1)", "WisentClient\CryptonorClient(WP8.1)\CryptonorClient(WP8.1).csproj", "{264E3D2E-779F-4E06-AA4C-4A2D1C9B05C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorClient(UniversalApp)", "WisentClient\CryptonorClient(UniversalApp)\CryptonorClient(UniversalApp).csproj", "{A6B451BB-EF04-42FF-81E6-2FF16A868920}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorClient(net35)", "WisentClient\CryptonorClient(net35)\CryptonorClient(net35).csproj", "{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -744,6 +746,20 @@ Global
 		{A6B451BB-EF04-42FF-81E6-2FF16A868920}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A6B451BB-EF04-42FF-81E6-2FF16A868920}.Release|x64.ActiveCfg = Release|Any CPU
 		{A6B451BB-EF04-42FF-81E6-2FF16A868920}.Release|x86.ActiveCfg = Release|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Release|x64.ActiveCfg = Release|Any CPU
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -786,5 +802,6 @@ Global
 		{7888AB5E-B9F1-40C0-8132-D0B5E47BFC6B} = {FA794D82-8251-46B4-AC81-28102FF4C003}
 		{264E3D2E-779F-4E06-AA4C-4A2D1C9B05C4} = {FA794D82-8251-46B4-AC81-28102FF4C003}
 		{A6B451BB-EF04-42FF-81E6-2FF16A868920} = {FA794D82-8251-46B4-AC81-28102FF4C003}
+		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D} = {FA794D82-8251-46B4-AC81-28102FF4C003}
 	EndGlobalSection
 EndGlobal

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if ASYNC
 using System.Threading.Tasks;
 using System.Net.Http;
+#endif
 using System.Reflection;
 
 
@@ -13,11 +15,12 @@ namespace CryptonorClient
     {
         public static IEnumerable<KeyValuePair<string, string>> ParseQueryString(Uri uri)
         {
-            var value = uri.ParseQueryString();             
+                    
 #if NET
-           
+            var value = System.Web.HttpUtility.ParseQueryString(uri.Query);
             return NameValueToEnumerable(value);
 #else 
+            var value = uri.ParseQueryString(); 
             return value;
 #endif
         }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if WinRT
+﻿#if WinRT
 using Windows.Security.Cryptography;
 using Windows.Storage.Streams;
 using Windows.Security.Cryptography.Core;

@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace CryptonorTests
 {
     [TestClass]
-    public abstract class BucketTests
+    public abstract class BucketTestsAsync
     {
         public abstract IBucket GetBucket();
         Random rnd = new Random();
-        public BucketTests()
+        public BucketTestsAsync()
         {
             CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "mysuper_secret");
         }
@@ -26,8 +26,8 @@ namespace CryptonorTests
             string userName = "userName" + rndNr;
             Person p = GetPerson(userName); 
             IBucket bucket = this.GetBucket();
-            await bucket.Store(p.UserName, p, new { Age = 33 });
-            var fromDB=await bucket.Get(userName);
+            await bucket.StoreAsync(p.UserName, p, new { Age = 33 });
+            var fromDB=await bucket.GetAsync(userName);
             Assert.AreEqual(33, fromDB.GetTag<int>("Age"));
             var value = fromDB.GetValue<Person>();
             Assert.AreEqual(userName, value.UserName);
@@ -42,9 +42,9 @@ namespace CryptonorTests
             Dictionary<string,object> tags=new Dictionary<string,object>();
             tags.Add("birth_year",1981);
 
-            await bucket.Store(p.UserName, p, tags);
+            await bucket.StoreAsync(p.UserName, p, tags);
 
-            var fromDB = await bucket.Get(userName);
+            var fromDB = await bucket.GetAsync(userName);
             Assert.AreEqual(1981, fromDB.GetTag<int>("birth_year"));
             var value = fromDB.GetValue<Person>();
             Assert.AreEqual(userName, value.UserName);
@@ -57,9 +57,9 @@ namespace CryptonorTests
             Person p = GetPerson(userName);
             IBucket bucket = this.GetBucket();
          
-            await bucket.Store(p.UserName, p);
+            await bucket.StoreAsync(p.UserName, p);
 
-            var value = await bucket.Get<Person>(userName);
+            var value = await bucket.GetAsync<Person>(userName);
             Assert.AreEqual(userName, value.UserName);
         }
         [TestMethod]
@@ -74,9 +74,9 @@ namespace CryptonorTests
             obj.SetTag("birth_year", 1981);
             obj.Key = userName;
 
-            await bucket.Store(obj);
+            await bucket.StoreAsync(obj);
 
-            var objFromDB= await bucket.Get(userName);
+            var objFromDB= await bucket.GetAsync(userName);
             Assert.AreEqual(1981, objFromDB.GetTag<int>("birth_year"));
             Assert.AreEqual(userName, objFromDB.GetValue<Person>().UserName);
         }
@@ -99,10 +99,10 @@ namespace CryptonorTests
 
                 
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
             foreach (CryptonorObject co in list)
             {
-                var coDB = await bucket.Get(co.Key);
+                var coDB = await bucket.GetAsync(co.Key);
                 Person p=co.GetValue<Person>();
                 Person pDB=coDB.GetValue<Person>();
                 Assert.AreEqual(p.UserName, pDB.UserName);
@@ -132,9 +132,9 @@ namespace CryptonorTests
             obj.SetTag("mybool", true);
             obj.Key = userName;
 
-            await bucket.Store(obj);
+            await bucket.StoreAsync(obj);
 
-            var objFromDB = await bucket.Get(userName);
+            var objFromDB = await bucket.GetAsync(userName);
             
             Assert.AreEqual(34,objFromDB.GetTag<int>("myint"));
             Assert.AreEqual(34.45, objFromDB.GetTag<double>("mydouble"));
@@ -150,16 +150,16 @@ namespace CryptonorTests
             string userName = "userName" + rndNr;
             Person p = GetPerson(userName);
             IBucket bucket = this.GetBucket();
-            await bucket.Store(p.UserName, p, new { Age = 33 });
+            await bucket.StoreAsync(p.UserName, p, new { Age = 33 });
             
-            var fromDB = await bucket.Get(userName);
+            var fromDB = await bucket.GetAsync(userName);
             var value = fromDB.GetValue<Person>();
             value.Age = 44;
             fromDB.SetValue<Person>(value);
             fromDB.SetTag("Age", 44);
-            await bucket.Store(fromDB);
+            await bucket.StoreAsync(fromDB);
 
-            fromDB = await bucket.Get(userName);
+            fromDB = await bucket.GetAsync(userName);
             Assert.AreEqual(44, fromDB.GetTag<int>("Age"));
             value = fromDB.GetValue<Person>();
             Assert.AreEqual(userName, value.UserName);
@@ -172,15 +172,15 @@ namespace CryptonorTests
             string userName = "userName" + rndNr;
             Person p = GetPerson(userName);
             IBucket bucket = this.GetBucket();
-            await bucket.Store(p.UserName, p, new { Age = 33 });
+            await bucket.StoreAsync(p.UserName, p, new { Age = 33 });
 
-            var fromDB = await bucket.Get(userName);
+            var fromDB = await bucket.GetAsync(userName);
             var value = fromDB.GetValue<Person>();
             value.Age = 44;
             bool conflict = false;
             try
             {
-                await bucket.Store(value.UserName, value, new { Age = 44 });
+                await bucket.StoreAsync(value.UserName, value, new { Age = 44 });
                 //treat conflict here because Version is not set
             }
             catch (Exception ex)
@@ -190,25 +190,25 @@ namespace CryptonorTests
             }
 
             Assert.IsTrue(conflict);
-            fromDB = await bucket.Get(userName);
+            fromDB = await bucket.GetAsync(userName);
             Assert.AreEqual(33, fromDB.GetTag<int>("Age"));
             value = fromDB.GetValue<Person>();
             Assert.AreEqual(userName, value.UserName);
             Assert.AreEqual(33, value.Age);
         }
         [TestMethod]
-        public async Task Delete()
+        public async Task DeleteAsync()
         {
             int rndNr = rnd.Next(100000);
             string userName = "userName" + rndNr;
             Person p = GetPerson(userName);
             IBucket bucket = this.GetBucket();
-            await bucket.Store(p.UserName, p, new { Age = 33 });
+            await bucket.StoreAsync(p.UserName, p, new { Age = 33 });
 
-            var fromDB = await bucket.Get(userName);
-            await bucket.Delete(fromDB);
+            var fromDB = await bucket.GetAsync(userName);
+            await bucket.DeleteAsync(fromDB);
 
-            fromDB = await bucket.Get(userName);
+            fromDB = await bucket.GetAsync(userName);
             Assert.IsNull(fromDB);
         }
         [TestMethod]
@@ -218,12 +218,12 @@ namespace CryptonorTests
             string userName = "userName" + rndNr;
             Person p = GetPerson(userName);
             IBucket bucket = this.GetBucket();
-            await bucket.Store(p.UserName, p, new { Age = 33 });
+            await bucket.StoreAsync(p.UserName, p, new { Age = 33 });
 
-            var fromDB = await bucket.Get(userName);
-            await bucket.Delete(fromDB.Key);
+            var fromDB = await bucket.GetAsync(userName);
+            await bucket.DeleteAsync(fromDB.Key);
 
-            fromDB = await bucket.Get(userName);
+            fromDB = await bucket.GetAsync(userName);
             Assert.IsNull(fromDB);
         }
         [TestMethod]
@@ -251,11 +251,11 @@ namespace CryptonorTests
                  obj.Key = userName;
                  list.Add(obj);
              }
-             await bucket.StoreBatch(list);
+             await bucket.StoreBatchAsync(list);
 
              CryptonorQuery query1 = new CryptonorQuery("myint");
              query1.Setup(a => a.Value(myint));
-             var result = await bucket.Get(query1);
+             var result = await bucket.GetAsync(query1);
              Assert.AreEqual(3, result.Objects.Count);
              foreach (CryptonorObject co in list)
              {
@@ -264,7 +264,7 @@ namespace CryptonorTests
              }
              CryptonorQuery query2 = new CryptonorQuery("mydouble");
              query2.Setup(a => a.Value(mydouble));
-             var result2 = await bucket.Get(query2);
+             var result2 = await bucket.GetAsync(query2);
              Assert.AreEqual(3, result2.Objects.Count);
              foreach (CryptonorObject co in list)
              {
@@ -273,7 +273,7 @@ namespace CryptonorTests
              }
              CryptonorQuery query3 = new CryptonorQuery("mydatetime");
              query3.Setup(a => a.Value(mydate));
-             var result3 = await bucket.Get(query3);
+             var result3 = await bucket.GetAsync(query3);
              Assert.AreEqual(3, result3.Objects.Count);
              foreach (CryptonorObject co in list)
              {
@@ -282,7 +282,7 @@ namespace CryptonorTests
              }
              CryptonorQuery query4 = new CryptonorQuery("mystring");
              query4.Setup(a => a.Value(mystr));
-             var result4 = await bucket.Get(query4);
+             var result4 = await bucket.GetAsync(query4);
              Assert.AreEqual(3, result4.Objects.Count);
              foreach (CryptonorObject co in list)
              {
@@ -291,7 +291,7 @@ namespace CryptonorTests
              }
              CryptonorQuery query5 = new CryptonorQuery("mybool");
              query5.Setup(a => a.Value(mybool));
-             var result5 = await bucket.Get(query5);
+             var result5 = await bucket.GetAsync(query5);
              foreach (CryptonorObject co in list)
              {
                  CryptonorObject objFromDB = result5.Objects.FirstOrDefault(a => a.Key == co.Key);
@@ -318,11 +318,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("myint");
             query1.Setup(a => a.Start(myint));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j=0;
             foreach (CryptonorObject co in list)
             {
@@ -333,7 +333,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("myint");
             query2.Setup(a => a.Start(myint+2).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 2;
             foreach (CryptonorObject co in list)
             {
@@ -363,11 +363,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mystr");
             query1.Setup(a => a.Start(s+"0"));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j = 0;
             foreach (CryptonorObject co in list)
             {
@@ -378,7 +378,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mystr");
             query2.Setup(a => a.Start(s + "2").Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 2;
             foreach (CryptonorObject co in list)
             {
@@ -407,11 +407,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mydouble");
             query1.Setup(a => a.Start(mydouble));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j = 0;
             foreach (CryptonorObject co in list)
             {
@@ -422,7 +422,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mydouble");
             query2.Setup(a => a.Start(mydouble + 2).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 2;
             foreach (CryptonorObject co in list)
             {
@@ -452,11 +452,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mydate");
             query1.Setup(a => a.Start(mydate));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j = 0;
             foreach (CryptonorObject co in list)
             {
@@ -467,7 +467,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mydate");
             query2.Setup(a => a.Start(mydate.AddDays(2)).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 2;
             foreach (CryptonorObject co in list)
             {
@@ -496,11 +496,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("myint");
             query1.Setup(a => a.End(myint+2));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -512,7 +512,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("myint");
             query2.Setup(a => a.End(myint).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -542,11 +542,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mystr");
             query1.Setup(a => a.End(s + 2));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -558,7 +558,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mystr");
             query2.Setup(a => a.End(s).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -589,11 +589,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mydate");
             query1.Setup(a =>a.End(  mydate.AddDays( 2)));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -605,7 +605,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mydate");
             query2.Setup(a => a.End(mydate).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -636,11 +636,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mydouble");
             query1.Setup(a => a.End(mydouble+2));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             int j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -652,7 +652,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mydouble");
             query2.Setup(a => a.End(mydouble).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             j = 0;
             list.Reverse();
             foreach (CryptonorObject co in list)
@@ -682,11 +682,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("myint");
             query1.Setup(a => a.Start(myint).End(myint+2));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
 
             int j = 0;
@@ -699,7 +699,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("myint");
             query2.Setup(a => a.Start(myint + 2).End(myint).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
             j = 2;
             foreach (CryptonorObject co in list)
@@ -729,11 +729,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mystr");
             query1.Setup(a => a.Start(s).End(s + 2));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
 
             int j = 0;
@@ -746,7 +746,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mystr");
             query2.Setup(a => a.Start(s + 2).End(s).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
             j = 2;
             foreach (CryptonorObject co in list)
@@ -777,11 +777,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mydate");
             query1.Setup(a => a.Start(mydate).End(mydate.AddDays( 2)));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
 
             int j = 0;
@@ -794,7 +794,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mydate");
             query2.Setup(a => a.Start(mydate.AddDays(2)).End(mydate).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
             j = 2;
             foreach (CryptonorObject co in list)
@@ -824,11 +824,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("mydouble");
             query1.Setup(a => a.Start(mydouble).End(mydouble + 2));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
 
             int j = 0;
@@ -841,7 +841,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("mydouble");
             query2.Setup(a => a.Start(mydouble + 2).End(mydouble).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
             j = 2;
             foreach (CryptonorObject co in list)
@@ -871,11 +871,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("myint");
             query1.Setup(a => a.Start(myint).End(myint + 2).Skip(1).Take(1));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             Assert.AreEqual(1, result.Objects.Count);
             CryptonorObject objFromDB = result.Objects[0];
             Assert.AreEqual(myint + 1, objFromDB.GetTag<int>("myint"));
@@ -883,7 +883,7 @@ namespace CryptonorTests
            
             CryptonorQuery query2 = new CryptonorQuery("myint");
             query2.Setup(a => a.Start(myint + 2).End(myint).Skip(2).Take(1).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             Assert.AreEqual(1,result2.Objects.Count);
             CryptonorObject objFromDB2 = result2.Objects[0];
             Assert.AreEqual(myint  , objFromDB2.GetTag<int>("myint"));
@@ -908,11 +908,11 @@ namespace CryptonorTests
                 obj.Key = userName;
                 list.Add(obj);
             }
-            await bucket.StoreBatch(list);
+            await bucket.StoreBatchAsync(list);
 
             CryptonorQuery query1 = new CryptonorQuery("key");
             query1.Setup(a => a.Start("userName" + s).End("userName" + s + 2));
-            var result = await bucket.Get(query1);
+            var result = await bucket.GetAsync(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
 
             int j = 0;
@@ -924,7 +924,7 @@ namespace CryptonorTests
             }
             CryptonorQuery query2 = new CryptonorQuery("KEy");
             query2.Setup(a => a.Start("userName" + s + 2).End("userName" + s).Descending());
-            var result2 = await bucket.Get(query2);
+            var result2 = await bucket.GetAsync(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
             j = 2;
             foreach (CryptonorObject co in list)

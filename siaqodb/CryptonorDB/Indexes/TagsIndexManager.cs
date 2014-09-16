@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Sqo.Queries;
 using System.Collections;
 using Cryptonor;
 using Sqo.Indexes;
 using Sqo;
+#if ASYNC
+using System.Threading.Tasks;
+#endif
 
 namespace Cryptonor.Indexes
 {
