@@ -237,9 +237,11 @@ namespace CryptonorClient
         {
             var serializer = new Newtonsoft.Json.JsonSerializer();
             using (var sr = new StreamReader(resp.GetResponseStream()))
-            using (var jsonTextReader = new JsonTextReader(sr))
             {
-                return serializer.Deserialize<T>(jsonTextReader);
+                using (var jsonTextReader = new JsonTextReader(sr))
+                {
+                    return serializer.Deserialize<T>(jsonTextReader);
+                }
             }
         }
 #endif

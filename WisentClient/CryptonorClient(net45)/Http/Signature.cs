@@ -41,6 +41,7 @@ namespace CryptonorClient.Http
             request.Headers[TimestampHeaderName] = DateTime.UtcNow.ToString("o");
             request.Accept = "application/json";
             request.ContentType = "application/json";
+            request.KeepAlive = false;
             string signature = MakeSignature(request, jsonContent, secretKey);
             request.Headers[SignatureHeaderName] = signature;
         }

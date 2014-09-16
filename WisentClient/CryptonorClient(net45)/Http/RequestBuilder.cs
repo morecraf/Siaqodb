@@ -29,12 +29,9 @@ namespace CryptonorClient.Http
             HttpWebRequest messageReq=null;
             var uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uriBase, endUriFragment);
 
-
             var queryString = GetQueryString(parameters);
             messageReq = (HttpWebRequest)WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
             messageReq.Method = "GET";
-            messageReq.ContentType = "application/json";
-            messageReq.KeepAlive = false;
             return messageReq;
         }
 #endif
@@ -75,9 +72,6 @@ namespace CryptonorClient.Http
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uriBase, endUriFragment);
             request = (HttpWebRequest)WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
             request.Method = "POST";
-            request.ContentType = "application/json";
-            request.KeepAlive = false;
-
             return request;
         }
 #endif
@@ -106,8 +100,6 @@ namespace CryptonorClient.Http
             string queryString = GetQueryString(parameters);
             messageReq =(HttpWebRequest) WebRequest.Create(CombinePathAndQuery(uriFragment, queryString));
             messageReq.Method = "DELETE";
-            messageReq.ContentType = "application/json";
-            messageReq.KeepAlive = false;
             return messageReq;
         }
 #endif
