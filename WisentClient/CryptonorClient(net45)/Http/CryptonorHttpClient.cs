@@ -69,7 +69,7 @@ namespace CryptonorClient
             }
             var request = requestBuilder.BuildGetRequest(bucket, parameters);
 
-            var resp = SendSync(request);
+            var resp = Send(request);
 
 
             return DeserializeResponse<CryptonorResultSet>(resp);
@@ -104,7 +104,7 @@ namespace CryptonorClient
 
             HttpWebRequest request = requestBuilder.BuildGetRequest(uriFragment, null);
 
-            var resp = SendSync(request);
+            var resp = Send(request);
 
 
             return DeserializeResponse<CryptonorObject>(resp);
@@ -131,7 +131,7 @@ namespace CryptonorClient
             string uriFragment = bucket;
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
 
-            var resp = PostSync(request, JsonConvert.SerializeObject(obj));
+            var resp = Post(request, JsonConvert.SerializeObject(obj));
 
             return DeserializeResponse<CryptonorWriteResponse>(resp);
         }
@@ -156,7 +156,7 @@ namespace CryptonorClient
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
 
-            var resp = PostSync(request, JsonConvert.SerializeObject(batch));
+            var resp = Post(request, JsonConvert.SerializeObject(batch));
 
             return DeserializeResponse<CryptonorBatchResponse>(resp);
         }
@@ -183,7 +183,7 @@ namespace CryptonorClient
 
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
 
-            var resp = PostSync(request, JsonConvert.SerializeObject(query));
+            var resp = Post(request, JsonConvert.SerializeObject(query));
 
             return DeserializeResponse<CryptonorResultSet>(resp);
         }
@@ -228,7 +228,7 @@ namespace CryptonorClient
             }
 
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment, parameters);
-            var resp = PostSync(request, JsonConvert.SerializeObject(query));
+            var resp = Post(request, JsonConvert.SerializeObject(query));
 
             return DeserializeResponse<CryptonorChangeSet>(resp);
         }
@@ -284,7 +284,7 @@ namespace CryptonorClient
             }
             var request = requestBuilder.BuildGetRequest(uriFragment, parameters);
 
-            var resp = SendSync(request);
+            var resp = Send(request);
 
         
 
@@ -328,17 +328,17 @@ namespace CryptonorClient
             }
             HttpWebRequest request = requestBuilder.BuildDeleteRequest(uriFragment, parameters);
 
-            var resp = SendSync(request);
+            var resp = Send(request);
 
         }
 
-        private HttpWebResponse SendSync(HttpWebRequest request)
+        private HttpWebResponse Send(HttpWebRequest request)
         {
             signature.SignMessage(request);
             var resp = (HttpWebResponse) request.GetResponse();
             return resp;
         }
-        private HttpWebResponse PostSync(HttpWebRequest request, string jsonContent)
+        private HttpWebResponse Post(HttpWebRequest request, string jsonContent)
         {
             signature.SignMessage(request,jsonContent);
 
