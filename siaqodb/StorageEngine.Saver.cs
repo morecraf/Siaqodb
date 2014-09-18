@@ -1226,5 +1226,11 @@ namespace Sqo
             }
         }
 #endif
+        internal void AdjustArrayFieldsAfterShrink(SqoTypeInfo ti, FieldSqoInfo fi, int objectOID, int newOID)
+        {
+            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
+            serializer.SaveArrayOIDFieldContent(ti, fi, objectOID, newOID);
+
+        }
     }
 }

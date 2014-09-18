@@ -110,9 +110,13 @@ namespace Sqo
                 ShrinkTotal(siaqodb);
                 ClaimSpace(siaqodb);
                 ShrinkNormal(siaqodb);
-                
+                ShrinkRawInfo(siaqodb);
             }
             siaqodb.Close();
+        }
+        private static void ShrinkRawInfo(Siaqodb siaqodb)
+        {
+            siaqodb.ShrinkRawInfo();
         }
 #if ASYNC
         private static async Task ShrinkAsync(Siaqodb siaqodb, ShrinkType shrinkType)
@@ -135,6 +139,7 @@ namespace Sqo
             }
             await siaqodb.CloseAsync();
         }
+       
 #endif
         private static void ShrinkTotal(Siaqodb siaqodb)
         {
