@@ -30,11 +30,10 @@ namespace CryptonorClient
         public event EventHandler<SyncProgressEventArgs> SyncProgress;
       
         string uri;
-        string dbName;
         string appKey;
         string secretKey;
         public string BucketName { get; set; }
-        public CryptonorLocalBucket(string uri,string dbName,string bucketName,string localFolder,string appKey,string secretKey)
+        public CryptonorLocalBucket(string uri,string bucketName,string localFolder,string appKey,string secretKey)
         {
             string fullPath = localFolder + Path.DirectorySeparatorChar + bucketName;
 #if WinRT
@@ -45,7 +44,6 @@ namespace CryptonorClient
 #endif
             this.BucketName = bucketName;
             this.uri = uri;
-            this.dbName = dbName;
             this.secretKey = secretKey;
             this.appKey = appKey;
             DownloadBatchSize = 10000;
@@ -326,7 +324,7 @@ namespace CryptonorClient
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
                     this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
-                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
+                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
                     var response =  httpClient.Put(BucketName, changeSet);
                     this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
 
@@ -384,7 +382,7 @@ namespace CryptonorClient
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
                     this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
-                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
+                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
                     var response = await httpClient.PutAsync(this.BucketName, changeSet).LibAwait();
                     this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
 
@@ -457,7 +455,7 @@ namespace CryptonorClient
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Pull operation started..."));
 
-                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
+                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
                 string anchor = localDB.GetAnchor();
 
                 int remainLimit = 1;
@@ -526,7 +524,7 @@ namespace CryptonorClient
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Pull operation started..."));
 
-                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.dbName, this.appKey, this.secretKey);
+                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
                 string anchor = await localDB.GetAnchorAsync().LibAwait();
 
                 int remainLimit = 1;

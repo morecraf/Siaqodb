@@ -11,8 +11,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+
 #if ASYNC
 using System.Net.Http.Formatting;
+
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -30,10 +32,9 @@ namespace CryptonorClient
 #endif
         RequestBuilder requestBuilder;
         Signature signature;
-        public CryptonorHttpClient(string uri, string dbName,string appKey,string secretKey)
+        public CryptonorHttpClient(string uri,string appKey,string secretKey)
         {
             this.uri = uri.TrimEnd('/').TrimEnd('\\');
-            this.dbName = dbName;
 #if ASYNC
             httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri(this.uri);
@@ -420,5 +421,19 @@ namespace CryptonorClient
 #endif
             }
         }
+#if ASYNC
+        public async Task<List<string>> GetAllAsync()
+        {
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}","allBuckets" );
+
+            HttpRequestMessage request = requestBuilder.BuildGetRequestAsync(uriFragment, null);
+           
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(List<string>), GetDefaultFormatter());
+
+            return (List<string>)obj;
+        }
+#endif
     }
 }

@@ -18,10 +18,10 @@ namespace CryptonorClient
     {
         public string BucketName { get; set; }
         CryptonorHttpClient httpClient;
-        public CryptonorBucket(string uri, string dbName, string bucketName, string appKey, string secretKey)
+        public CryptonorBucket(string uri,  string bucketName, string appKey, string secretKey)
         {
             this.BucketName = bucketName;
-            this.httpClient = new CryptonorHttpClient(uri, dbName, appKey, secretKey);
+            this.httpClient = new CryptonorHttpClient(uri,  appKey, secretKey);
         }
 #if NON_ASYNC
         public CryptonorObject Get(string key)
