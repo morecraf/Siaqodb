@@ -2975,9 +2975,7 @@ savedObject(this, e);
                 List<SqoTypeInfo> existingTypes = this.metaCache.DumpAllTypes();
                 foreach (SqoTypeInfo ti in existingTypes)
                 {
-                    if (ti.Type == typeof(Sqo.MetaObjects.RawdataInfo) ||
-                        ti.Type == typeof(Sqo.Indexes.IndexInfo2) ||
-                        (ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)))
+                    if (ti.Type == typeof(Sqo.MetaObjects.RawdataInfo))                     
                     {
                         continue;
                     }
