@@ -5,6 +5,7 @@ VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{91980E14-6FB0-4AE1-B381-5D00B9B9F7B3}"
 	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
 		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 		localtestrun222.testrunconfig = localtestrun222.testrunconfig
 		Performance1.psess = Performance1.psess
@@ -103,6 +104,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorClient(net35)", "WisentClient\CryptonorClient(net35)\CryptonorClient(net35).csproj", "{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptonorTestsAsync", "CryptonorTests\CryptonorTestsAsync.csproj", "{B44CE041-7A0C-4D32-9FCD-931A950B221C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAndLoadTestProject1", "WebAndLoadTestProject1\WebAndLoadTestProject1.csproj", "{8D552BB1-B411-468F-BB39-F5C7EC983239}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InitCouchNode", "InitCouchNode\InitCouchNode.csproj", "{8C0A9003-5345-4298-9256-25180955DA45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -776,6 +781,34 @@ Global
 		{B44CE041-7A0C-4D32-9FCD-931A950B221C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B44CE041-7A0C-4D32-9FCD-931A950B221C}.Release|x64.ActiveCfg = Release|Any CPU
 		{B44CE041-7A0C-4D32-9FCD-931A950B221C}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|ARM.ActiveCfg = Release|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|x64.ActiveCfg = Release|Any CPU
+		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|x86.ActiveCfg = Release|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Release|ARM.ActiveCfg = Release|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Release|x64.ActiveCfg = Release|Any CPU
+		{8C0A9003-5345-4298-9256-25180955DA45}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -820,5 +853,7 @@ Global
 		{A6B451BB-EF04-42FF-81E6-2FF16A868920} = {FA794D82-8251-46B4-AC81-28102FF4C003}
 		{3140D422-2136-4BB0-8A2C-2B6AA7DFA14D} = {FA794D82-8251-46B4-AC81-28102FF4C003}
 		{B44CE041-7A0C-4D32-9FCD-931A950B221C} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
+		{8D552BB1-B411-468F-BB39-F5C7EC983239} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
+		{8C0A9003-5345-4298-9256-25180955DA45} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 	EndGlobalSection
 EndGlobal
