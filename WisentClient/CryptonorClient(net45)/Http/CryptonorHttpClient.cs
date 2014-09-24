@@ -424,7 +424,7 @@ namespace CryptonorClient
 #if ASYNC
         public async Task<List<string>> GetAllAsync()
         {
-            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}","allBuckets" );
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}", "allBuckets");
 
             HttpRequestMessage request = requestBuilder.BuildGetRequestAsync(uriFragment, null);
            

@@ -28,7 +28,7 @@ namespace CryptonorClient.DocumentSerializer
         public byte[] Serialize(object obj)
         {
            
-            string jsonStr = JsonConvert.SerializeObject(obj);
+            string jsonStr = JsonConvert.SerializeObject(obj,Formatting.Indented);
             return Encoding.UTF8.GetBytes(jsonStr);
         }
 
