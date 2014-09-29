@@ -15,6 +15,7 @@ using CryptonorClient;
 using System.Linq.Expressions;
 using Cryptonor;
 using Cryptonor.Queries;
+using System.Net;
 
 namespace WindowsFormsApplication2
 {
@@ -33,34 +34,44 @@ namespace WindowsFormsApplication2
 
             private async void button2_Click(object sender, EventArgs e)
             {
+                ServicePointManager.ServerCertificateValidationCallback +=(sender1, cert, chain, sslPolicyErrors) => true;
+
                 SiaqodbConfigurator.SetDocumentSerializer(new JsonCRSerializer());
-                CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "mysuper_secret");
+                CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.AES256, "mysuper_secret");
                 // CryptonorHttpClient client = new CryptonorHttpClient("http://localhost:53411/", "excelsior","mykey","mypwd");
                 //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://ipv4.fiddler/CryptonorWebAPI/", "excelsior");
-                //CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://cryptonordb.cloudapp.net/cnor/", "excelsior", "mykey", "mypwd");
-                var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "excelsior", "9bbaae526db72073e5f23963d1008003", "FRswjDioAT");
+                CryptonorClient.CryptonorClient cl = new CryptonorClient.CryptonorClient("http://portal.cryptonordb.com/api/api/", "9bbaae526db72073e5f23963d1008003", "FRswjDioAT");
+                //var cl = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "9bbaae526db72073e5f23963d1008003", "FRswjDioAT");
                 IBucket bucket = cl.GetBucket("iasi");
 
                 //IBucket bucket = cl.GetLocalBucket("crypto_users", @"c:\work\temp\cloudb3");
 
                 DateTime start = DateTime.Now;
 
-               // await this.Fill(bucket);
+                await this.Fill(bucket);
 
                 string elapsed = (DateTime.Now - start).ToString();
+
+                start = DateTime.Now;
+                CryptonorQuery que = new CryptonorQuery("key");
+                que.Setup(a => a.Start("buni").End("buni" + "999"));
+                var filtered = await bucket.GetAsync(que);
+                //var values = filtered.GetValues<User>();
+
+                elapsed = (DateTime.Now - start).ToString();
 
                 start = DateTime.Now;
                 try
                 {
                     //((CryptonorLocalBucket)bucket).PullCompleted += Form1_PullCompleted;
                     //await ((CryptonorLocalBucket)bucket).Pull();
-                   // var all = await bucket.GetAllAsync();
-                   // await bucket.DeleteAsync(all.Objects[0].Key);
+                    // var all = await bucket.GetAllAsync();
+                    // await bucket.DeleteAsync(all.Objects[0].Key);
                     start = DateTime.Now;
 
                     for (int i = 0; i < 1000; i++)
                     {
-                        var a = await bucket.GetAsync("400" + i);
+                        var a = await bucket.GetAsync("100" + i);
                     }
                     elapsed = (DateTime.Now - start).ToString();
                 }
@@ -76,25 +87,33 @@ namespace WindowsFormsApplication2
                 elapsed = (DateTime.Now - start).ToString();
 
 
-        
+
                 return;
 
             }
         private async Task Fill(IBucket bucket)
         {
             List<CryptonorObject> list = new List<CryptonorObject>();
-            for (int i = 0; i < 1000; i++)
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 10; i++)
+            { 
+                sb.Append("aaaaaaaaaammmmmmmmmmpopopopopouuuuuuuuuuttttttttttaaaaaaaaaammmmmmmmmmpopopopopouuuuuuuuuutttttttttt");
+            }
+            string body = sb.ToString();
+
+            for (int i = 1; i < 100; i++)
             {
                 CryptonorObject doObj = new CryptonorObject();
                 User book = new User();
-                book.UserName = "600" + i.ToString();
+                book.UserName = textBox1.Text + (i).ToString();
                 book.author = "Ursachi Alisia";
-                book.body = "An amazing book...";
+
+                book.body = body;
                 book.title = "How tos";
                 book.copies_owned = 7;
 
                 doObj.SetValue<User>(book);
-                var aa = doObj.GetValue<User>();
+                //var aa = doObj.GetValue<User>();
                 doObj.Key = book.UserName;
                 //doObj.Tags = new Dictionary<string, object>();
                 // doObj.Tags["country"] = "RO";
@@ -104,14 +123,17 @@ namespace WindowsFormsApplication2
                 doObj.SetTag("country", "RO" + i.ToString());
                 //doObj.Tags_Guid["myguid3"] = Guid.NewGuid();
 
-                await bucket.StoreAsync(doObj);
-                /*list.Add(doObj);
-                if (i % 10 == 0 && i > 1)
+                 await bucket.StoreAsync(doObj);
+                //list.Add(doObj);
+                /*if (i % 10 == 0 && i > 1)
                 {
                     await bucket.StoreBatchAsync(list);
                     list = new List<CryptonorObject>();
 
                 }*/
+
+                //await bucket.StoreBatchAsync(list);
+
             }
         }
         void Form1_PullCompleted(object sender, PullCompletedEventArgs e)

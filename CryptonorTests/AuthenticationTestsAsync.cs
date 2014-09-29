@@ -22,11 +22,11 @@ namespace CryptonorTests
         public AuthenticationTestsAsync()
         {
             CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "mysuper_secret");
-            var cl1 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/","excelsior", "b8d2f15848b12927d50d0037510013c8", "v8zQGiAjyl");
+            var cl1 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/","b8d2f15848b12927d50d0037510013c8", "v8zQGiAjyl");
             bucketReadWrite = cl1.GetBucket("iasi");
-            var cl2 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "excelsior", "b8d2f15848b12927d50d003751001bf9", "lvcrHysPRw");
+            var cl2 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "b8d2f15848b12927d50d003751001bf9", "lvcrHysPRw");
             bucketRead= cl2.GetBucket("iasi");
-            var cl3 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "excelsior", "b8d2f15848b12927d50d00375100227a", "o5BPwKMv4u");
+            var cl3 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "b8d2f15848b12927d50d00375100227a", "o5BPwKMv4u");
             bucketNone= cl3.GetBucket("iasi");
         }
 

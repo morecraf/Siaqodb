@@ -12,6 +12,12 @@ namespace CryptonorClient
     {
         internal static CBCCipher Cipher;
         internal static IDocumentSerializer DocumentSerializer=new CryptoJsonSerializer();
+        internal static Dictionary<Type, Func<object, string>> KeyConventions = new Dictionary<Type, Func<object, string>>();
+        internal static Dictionary<Type, Func<object, string>> VersionSetConventions = new Dictionary<Type, Func<object, string>>();
+        internal static Dictionary<Type, Action<object,string>> VersionGetConventions = new Dictionary<Type, Action<object,string>>();
+        
+        //internal static Dictionary<Type, Func<object, Dictionary<string, object>>> TagsConventions = new Dictionary<Type, Func<object, Dictionary<string, object>>>();
+       
         public static void SetEncryptor(EncryptionAlgorithm algorithm, string encryptionKey)
         {
             if (algorithm == EncryptionAlgorithm.AES128)
@@ -72,8 +78,20 @@ namespace CryptonorClient
             }
             DocumentSerializer = documentSerializer;
         }
-       
-       
+        public static void RegisterKeyConvention<T>(Func<T, string> func)
+        {
+            KeyConventions[typeof(T)] = a => func((T)a);
+        }
+        public static void RegisterSetVersionConvention<T>(Func<T, string> func)
+        {
+            VersionSetConventions[typeof(T)] = a => func((T)a);
+        }
+
+        public static void RegisterGetVersionConvention<T>(Action<T,string> action)
+        {
+            VersionGetConventions[typeof(T)] = (a,b) => action((T)a,b);
+        }
+        
     }
     public enum EncryptionAlgorithm { AES128, AES256, Camellia128,Camellia256}
 }

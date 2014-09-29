@@ -18,10 +18,10 @@ namespace CryptonorClient
     {
         public string BucketName { get; set; }
         CryptonorHttpClient httpClient;
-        public CryptonorBucket(string uri,  string bucketName, string appKey, string secretKey)
+        public CryptonorBucket(string uri,  string bucketName, string username, string password)
         {
             this.BucketName = bucketName;
-            this.httpClient = new CryptonorHttpClient(uri,  appKey, secretKey);
+            this.httpClient = new CryptonorHttpClient(uri,  username, password);
         }
 #if NON_ASYNC
         public CryptonorObject Get(string key)
@@ -141,38 +141,48 @@ namespace CryptonorClient
 #if NON_ASYNC
         public void Store(string key, object obj, Dictionary<string, object> tags)
         {
-            CryptonorObject cryObject = new CryptonorObject();
-            cryObject.Key = key;
-            cryObject.SetValue(obj);
+            CryptonorObject crObject = new CryptonorObject();
+            crObject.Key = key;
+            crObject.SetValue(obj);
 
             if (tags != null)
             {
                 foreach (string tagName in tags.Keys)
                 {
-                    cryObject.SetTag(tagName, tags[tagName]);
+                    crObject.SetTag(tagName, tags[tagName]);
                 }
             }
 
-            Store(cryObject);
+            Store(crObject);
+            Type type = obj.GetType();
+            if (CryptonorConfigurator.VersionGetConventions.ContainsKey(type))
+            {
+                CryptonorConfigurator.VersionGetConventions[type](obj, crObject.Version);
+            }
         }
 #endif
 
 #if ASYNC
  public async Task StoreAsync(string key, object obj, Dictionary<string, object> tags)
         {
-            CryptonorObject cryObject = new CryptonorObject();
-            cryObject.Key = key;
-            cryObject.SetValue(obj);
+            CryptonorObject crObject = new CryptonorObject();
+            crObject.Key = key;
+            crObject.SetValue(obj);
 
             if (tags != null)
             {
                 foreach (string tagName in tags.Keys)
                 {
-                    cryObject.SetTag(tagName, tags[tagName]);
+                    crObject.SetTag(tagName, tags[tagName]);
                 }
             }
 
-            await this.StoreAsync(cryObject);
+            await this.StoreAsync(crObject);
+            Type type = obj.GetType();
+            if (CryptonorConfigurator.VersionGetConventions.ContainsKey(type))
+            {
+                CryptonorConfigurator.VersionGetConventions[type](obj, crObject.Version);
+            }
         }
 #endif
         #if NON_ASYNC
@@ -216,12 +226,26 @@ namespace CryptonorClient
            await this.StoreAsync(key, obj, tags_Dict);
         }
 #endif
-        #if NON_ASYNC
+#if ASYNC
+   public async Task StoreAsync(object obj, object tags = null)
+   {
+       await this.StoreAsync(null, obj, tags);
+   }
+#endif
+#if NON_ASYNC
+        public void Store(object obj, object tags = null)
+        {
+            this.Store(null, obj, tags);
+        }
+#endif
+
+#if NON_ASYNC
         public void Delete(string key)
         {
             httpClient.Delete(this.BucketName, key, null);
         }
 #endif
+
 
 #if ASYNC
 public async Task DeleteAsync(string key)

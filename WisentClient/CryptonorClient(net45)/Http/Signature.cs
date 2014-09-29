@@ -24,25 +24,25 @@ namespace CryptonorClient.Http
 {
     class Signature
     {
-        private const string ApplicationKeyHeaderName = "X-CNOR-Application";
+        private const string UsernameHeaderName = "X-CNOR-Username";
         private const string TimestampHeaderName = "X-CNOR-Date";
         private const string SignatureHeaderName = "X-CNOR-Signature";
-        string appKey;
-        string secretKey;
-        public Signature(string appKey, string secretKey)
+        string username;
+        string password;
+        public Signature(string username, string password)
         {
-            this.secretKey = secretKey;
-            this.appKey = appKey;
+            this.password = password;
+            this.username = username;
         }
  #if NON_ASYNC
         public void SignMessage(HttpWebRequest request, string jsonContent)
         {
-            request.Headers.Add(ApplicationKeyHeaderName, appKey);
+            request.Headers.Add(UsernameHeaderName, username);
             request.Headers[TimestampHeaderName] = DateTime.UtcNow.ToString("o");
             request.Accept = "application/json";
             request.ContentType = "application/json";
             request.KeepAlive = false;
-            string signature = MakeSignature(request, jsonContent, secretKey);
+            string signature = MakeSignature(request, jsonContent, password);
             request.Headers[SignatureHeaderName] = signature;
         }
         public void SignMessage(HttpWebRequest request)
@@ -54,17 +54,17 @@ namespace CryptonorClient.Http
 #if ASYNC
         public async Task SignMessageAsync(HttpRequestMessage message)
         {
-            message.Headers.Add(ApplicationKeyHeaderName, appKey);
+            message.Headers.Add(UsernameHeaderName, username);
             message.Headers.Add(TimestampHeaderName, DateTime.UtcNow.ToString("o"));
             message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            string signature = await MakeSignatureAsync(message, secretKey);
+            string signature = await MakeSignatureAsync(message, password);
             message.Headers.Add(SignatureHeaderName, signature);
         }
 #endif
 #if NON_ASYNC
-        private static string MakeSignature(HttpWebRequest request, string jsonContent, string secretKey)
+        private static string MakeSignature(HttpWebRequest request, string jsonContent, string password)
         {
-            var hashedPassword = secretKey;
+            var hashedPassword = password;
             var baseString = BuildBaseString(request, jsonContent);
 
             return ComputeHash(hashedPassword, baseString);
@@ -73,9 +73,9 @@ namespace CryptonorClient.Http
 #endif
 
 #if ASYNC
-        private async static Task<string> MakeSignatureAsync(HttpRequestMessage regMsg, string secretKey)
+        private async static Task<string> MakeSignatureAsync(HttpRequestMessage regMsg, string password)
         {
-            var hashedPassword = secretKey;
+            var hashedPassword = password;
             var baseString = await BuildBaseStringAsync(regMsg);
 
             return ComputeHash(hashedPassword, baseString);
@@ -143,7 +143,7 @@ namespace CryptonorClient.Http
 
         private static string ComputeHash(string hashedPassword, string message)
         {
-            var key = Encoding.UTF8.GetBytes(hashedPassword.ToUpper());
+            var key = Encoding.UTF8.GetBytes(hashedPassword);
             string hashString;
 #if WinRT
             MacAlgorithmProvider macAlgorithmProvider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);

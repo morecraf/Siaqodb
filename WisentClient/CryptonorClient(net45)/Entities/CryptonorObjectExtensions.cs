@@ -18,8 +18,18 @@ namespace CryptonorClient
         }
         public static void SetValue(this CryptonorObject cryObj, object objValue)
         {
+            
             if (CryptonorConfigurator.Cipher == null)
                 throw new Exception("Encryption algorithm should be set");
+
+            if (cryObj.Key == null && CryptonorConfigurator.KeyConventions.ContainsKey(objValue.GetType()))
+            {
+                cryObj.Key = CryptonorConfigurator.KeyConventions[objValue.GetType()](objValue);
+            }
+            if (cryObj.Version == null && CryptonorConfigurator.VersionSetConventions.ContainsKey(objValue.GetType()))
+            {
+                cryObj.Version = CryptonorConfigurator.VersionSetConventions[objValue.GetType()](objValue);
+            }
             byte[] serializedObj = CryptonorConfigurator.DocumentSerializer.Serialize(objValue);
 
             CryptonorConfigurator.Cipher.EnsureLength(ref serializedObj);
@@ -27,16 +37,21 @@ namespace CryptonorClient
             cryObj.Document = encBytes;
             cryObj.IsDirty = true;
         }
-        public static T GetValue<T>(this CryptonorObject cryObj)
+        public static T GetValue<T>(this CryptonorObject crObj)
         {
-            return (T)((object)cryObj.GetValue(typeof(T)));
+            return (T)((object)crObj.GetValue(typeof(T)));
         }
-        public static object GetValue(this CryptonorObject cryObj, Type type)
+        public static object GetValue(this CryptonorObject crObj, Type type)
         {
-            byte[] documentVal = new byte[cryObj.Document.Length];
-            Array.Copy(cryObj.Document, documentVal, cryObj.Document.Length);
+            byte[] documentVal = new byte[crObj.Document.Length];
+            Array.Copy(crObj.Document, documentVal, crObj.Document.Length);
             byte[] decDoc = CryptonorConfigurator.Cipher.Decrypt(documentVal);
-            return CryptonorConfigurator.DocumentSerializer.Deserialize(type, decDoc);
+            object obj= CryptonorConfigurator.DocumentSerializer.Deserialize(type, decDoc);
+            if (CryptonorConfigurator.VersionGetConventions.ContainsKey(type))
+            {
+                CryptonorConfigurator.VersionGetConventions[type](obj,crObj.Version);
+            }
+            return obj;
         }
         public static string GetValueAsJson(this CryptonorObject cryObj)
         {

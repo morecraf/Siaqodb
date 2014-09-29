@@ -30,10 +30,10 @@ namespace CryptonorClient
         public event EventHandler<SyncProgressEventArgs> SyncProgress;
       
         string uri;
-        string appKey;
-        string secretKey;
+        string username;
+        string password;
         public string BucketName { get; set; }
-        public CryptonorLocalBucket(string uri,string bucketName,string localFolder,string appKey,string secretKey)
+        public CryptonorLocalBucket(string uri,string bucketName,string localFolder,string username,string password)
         {
             string fullPath = localFolder + Path.DirectorySeparatorChar + bucketName;
 #if WinRT
@@ -44,8 +44,8 @@ namespace CryptonorClient
 #endif
             this.BucketName = bucketName;
             this.uri = uri;
-            this.secretKey = secretKey;
-            this.appKey = appKey;
+            this.password = password;
+            this.username = username;
             DownloadBatchSize = 10000;
         }
         public int DownloadBatchSize { get; set; }
@@ -254,6 +254,19 @@ namespace CryptonorClient
             await this.StoreAsync(key, obj, tags_Dict).LibAwait();
         }
 #endif
+#if ASYNC
+  public async Task StoreAsync( object obj, object tags = null)
+  {
+      await this.StoreAsync(null, obj, tags);
+  }
+#endif
+#if NON_ASYNC
+        public void Store( object obj, object tags = null)
+        {
+            this.Store(null, obj, tags);
+        }
+#endif
+
         #if NON_ASYNC
         public void Delete(string key)
         {
@@ -324,7 +337,7 @@ namespace CryptonorClient
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
                     this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
-                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
+                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.username, this.password);
                     var response =  httpClient.Put(BucketName, changeSet);
                     this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
 
@@ -382,7 +395,7 @@ namespace CryptonorClient
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
                     this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
-                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
+                    CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.username, this.password);
                     var response = await httpClient.PutAsync(this.BucketName, changeSet).LibAwait();
                     this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
 
@@ -455,7 +468,7 @@ namespace CryptonorClient
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Pull operation started..."));
 
-                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
+                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.username, this.password);
                 string anchor = localDB.GetAnchor();
 
                 int remainLimit = 1;
@@ -524,7 +537,7 @@ namespace CryptonorClient
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Pull operation started..."));
 
-                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.appKey, this.secretKey);
+                CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.username, this.password);
                 string anchor = await localDB.GetAnchorAsync().LibAwait();
 
                 int remainLimit = 1;

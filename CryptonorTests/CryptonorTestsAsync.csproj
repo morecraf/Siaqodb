@@ -52,6 +52,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Init.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="BucketTestsAsync.cs" />
     <Compile Include="OfflineTestsAsync.cs" />

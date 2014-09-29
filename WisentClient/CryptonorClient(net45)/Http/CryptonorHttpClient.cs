@@ -26,13 +26,13 @@ namespace CryptonorClient
     public class CryptonorHttpClient : IDisposable
     {
         string uri;
-        string dbName;
+       
 #if ASYNC
         HttpClient httpClient;
 #endif
         RequestBuilder requestBuilder;
         Signature signature;
-        public CryptonorHttpClient(string uri,string appKey,string secretKey)
+        public CryptonorHttpClient(string uri,string username,string password)
         {
             this.uri = uri.TrimEnd('/').TrimEnd('\\');
 #if ASYNC
@@ -41,7 +41,7 @@ namespace CryptonorClient
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 #endif
             this.requestBuilder = new RequestBuilder(this.uri);
-            this.signature = new Signature(appKey, secretKey);
+            this.signature = new Signature(username, password);
         }
 #if NON_ASYNC
         public CryptonorResultSet Get(string bucket)

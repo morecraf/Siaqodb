@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CryptonorClient;
+using System.Net;
 
 namespace CryptonorTests
 {
@@ -9,13 +10,14 @@ namespace CryptonorTests
     {
         public OnlineTests():base()
         {
-           
+            ServicePointManager.ServerCertificateValidationCallback += (sender1, cert, chain, sslPolicyErrors) => true;
+
            
         }
         public override CryptonorClient.IBucket GetBucket()
         {
-            CryptonorClient.CryptonorClient client = new CryptonorClient.CryptonorClient("http://localhost:53411/api/",  "b8d2f15848b12927d50d0037510013c8", "v8zQGiAjyl");
-            IBucket bucket = client.GetBucket("iasi");
+            CryptonorClient.CryptonorClient client = new CryptonorClient.CryptonorClient(Init.Api_URL, Init.Username, Init.Password);
+            IBucket bucket = client.GetBucket("unit_tests");
             return bucket;
         }
        

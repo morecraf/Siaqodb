@@ -24,6 +24,7 @@ namespace CryptonorClient
         Task StoreAsync(string key, object obj);
         Task StoreAsync(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
         Task StoreAsync(string key, object obj, object tags = null);
+        Task StoreAsync(object obj, object tags = null);
          Task<CryptonorBatchResponse> StoreBatchAsync(IList<CryptonorObject> obj);
         Task DeleteAsync(string key);
         Task DeleteAsync(CryptonorObject obj);
@@ -38,6 +39,7 @@ namespace CryptonorClient
         void Store(string key, object obj);
         void Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
         void Store(string key, object obj, object tags = null);
+        void Store( object obj, object tags = null);
         /// <summary>
         /// 
         /// </summary>

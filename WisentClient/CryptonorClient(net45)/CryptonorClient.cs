@@ -11,24 +11,24 @@ namespace CryptonorClient
     {
         private CryptonorHttpClient httpClient;
         string uri;
-        string appKey;
-        string secretKey;
+        string username;
+        string password;
 
-        public CryptonorClient(string uri,string appKey,string secretKey)
+        public CryptonorClient(string uri,string username,string password)
         {
-            httpClient = new CryptonorHttpClient(uri, appKey, secretKey);
+            httpClient = new CryptonorHttpClient(uri, username, password);
             this.uri = uri;
-            this.appKey = appKey;
-            this.secretKey = secretKey;
+            this.username = username;
+            this.password = password;
         }
         public IBucket GetBucket(string bucketName)
         {
-            return new CryptonorBucket(this.uri,bucketName,this.appKey,this.secretKey);
+            return new CryptonorBucket(this.uri, bucketName, this.username, this.password);
             
         }
         public IBucket GetLocalBucket(string bucketName,string localFolder)
         {
-            return new CryptonorLocalBucket(uri, bucketName, localFolder, this.appKey, this.secretKey);
+            return new CryptonorLocalBucket(uri, bucketName, localFolder, this.username, this.password);
         }
 #if ASYNC
         public async Task<List<string>> GetAllBucketsAsync()
@@ -36,5 +36,6 @@ namespace CryptonorClient
             return await httpClient.GetAllAsync();
         }
 #endif
+    
     }
 }
