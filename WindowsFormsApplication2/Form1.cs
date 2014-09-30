@@ -27,10 +27,26 @@ namespace WindowsFormsApplication2
              
         }
 
-       
-            private void button1_Click(object sender, EventArgs e)
+
+        private void button1_Click(object sender, EventArgs e)
         {
+            Siaqodb siaqodb = new Siaqodb(@"c:\work\support\John_Kattenhorn\");
+            for (int i = 0; i < 10; i++)
+            {
+                Node n = new Node() { Name = "sa" + i.ToString() };
+                siaqodb.StoreObject(n);
+            }
+            siaqodb.Flush();
+            siaqodb.GetOID(
+            var all = siaqodb.LoadAll<Node>();
+            string s = "";
         }
+            public class Node
+            {
+                private int oid;
+                public int Id { get { return oid; } set { oid = value; } }
+                public string Name { get; set; }
+            }
 
             private async void button2_Click(object sender, EventArgs e)
             {
