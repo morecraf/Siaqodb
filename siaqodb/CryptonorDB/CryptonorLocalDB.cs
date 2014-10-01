@@ -183,10 +183,10 @@ namespace Cryptonor
                 Dictionary<string, object> oldTags = null;
                 if (dop == DirtyOperation.Updated)
                 {
-                    oldTags = indexManager.PrepareUpdateIndexes(oID);
+                    oldTags =await indexManager.PrepareUpdateIndexesAsync(oID);
                 }
                 await this.siaqodb.StoreObjectAsync(obj).LibAwait();
-                indexManager.UpdateIndexes(obj.OID, oldTags, obj.Tags);
+                await indexManager.UpdateIndexesAsync(obj.OID, oldTags, obj.Tags);
                 if (obj.IsDirty)
                 {
                     await this.CreateDirtyEntityAsync(obj, dop).LibAwait();
@@ -240,7 +240,7 @@ namespace Cryptonor
             string elaps = (DateTime.Now - start).ToString();
             await siaqodb.EndBulkInsertAsync(typeof(CryptonorObject)).LibAwait();
             indexManager.AllowPersistence(true);
-            indexManager.Persist();
+            await indexManager.PersistAsync();
             await this.siaqodb.FlushAsync().LibAwait();
             
         }
@@ -312,11 +312,11 @@ namespace Cryptonor
             List<int> oids = new List<int>();
             if (string.Compare(query.TagName, "key", StringComparison.OrdinalIgnoreCase) == 0)
             {
-                this.LoadByKey(query, oids);
+                await this.LoadByKeyAsync(query, oids);
             }
             else //by tags
             {   
-                this.indexManager.LoadOidsByIndex(query, oids);
+                await this.indexManager.LoadOidsByIndexAsync(query, oids);
             }
             List<CryptonorObject> allFiltered = new List<CryptonorObject>();
             IEnumerable<int> oidsLoaded = oids;
@@ -338,7 +338,13 @@ namespace Cryptonor
             IBTree index = siaqodb.GetIndex("key", typeof(CryptonorObject));
             IndexQueryFinder.FindOids(index, query, oids);
         }
-       
+#if ASYNC
+        private async Task LoadByKeyAsync(Queries.CryptonorQuery query, List<int> oids)
+        {
+            IBTree index = siaqodb.GetIndex("key", typeof(CryptonorObject));
+            await IndexQueryFinder.FindOidsAsync(index, query, oids);
+        }
+#endif
        
         private DotissiConfigurator configurator=new DotissiConfigurator();
         public DotissiConfigurator Configurator { get { return configurator; } }
@@ -362,11 +368,11 @@ namespace Cryptonor
             {
                 throw new Exception("Object not exists in local database");
             }
-            var oldTags = indexManager.PrepareUpdateIndexes(cobj.OID);
+            var oldTags = await indexManager.PrepareUpdateIndexesAsync(cobj.OID);
             int oid = cobj.OID;
             await this.siaqodb.DeleteAsync(cobj).LibAwait();
             await this.CreateTombstoneDirtyEntityAsync(oid).LibAwait();
-            indexManager.UpdateIndexesAfterDelete(oid, oldTags);
+            await indexManager.UpdateIndexesAfterDeleteAsync(oid, oldTags);
         }
 #endif
         public CryptonorChangeSet GetChangeSet()
