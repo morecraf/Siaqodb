@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\net35\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET NON_ASYNC</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET NON_ASYNC UNITY3D</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\bin\net35\CryptonorClient.XML</DocumentationFile>
@@ -33,17 +33,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.5\lib\net35\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CryptonorClient%28net45%29\Bucket\CryptonorBucket.cs">
@@ -121,12 +119,17 @@
     <Compile Include="..\CryptonorClient%28net45%29\Queries\QueryConfigurator.cs">
       <Link>Queries\QueryConfigurator.cs</Link>
     </Compile>
+    <Compile Include="litjson\IJsonWrapper.cs" />
+    <Compile Include="litjson\JsonData.cs" />
+    <Compile Include="litjson\JsonException.cs" />
+    <Compile Include="litjson\JsonMapper.cs" />
+    <Compile Include="litjson\JsonReader.cs" />
+    <Compile Include="litjson\JsonWriter.cs" />
+    <Compile Include="litjson\Lexer.cs" />
+    <Compile Include="litjson\ParserToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\siaqodb\Siaqodb %28.NET 3.5%29.csproj">

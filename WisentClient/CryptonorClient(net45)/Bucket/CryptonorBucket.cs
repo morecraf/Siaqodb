@@ -269,7 +269,7 @@ public async Task DeleteAsync(string key)
         #if NON_ASYNC
           public CryptonorBatchResponse StoreBatch(IList<CryptonorObject> objects)
         {
-            return  httpClient.Put(this.BucketName, new CryptonorChangeSet { ChangedObjects = objects });
+            return  httpClient.Put(this.BucketName, new CryptonorChangeSet { ChangedObjects =new List<CryptonorObject>( objects) });
         }
 #endif
 

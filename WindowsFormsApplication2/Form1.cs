@@ -37,7 +37,7 @@ namespace WindowsFormsApplication2
                 siaqodb.StoreObject(n);
             }
             siaqodb.Flush();
-            siaqodb.GetOID(
+            //siaqodb.GetOID(
             var all = siaqodb.LoadAll<Node>();
             string s = "";
         }

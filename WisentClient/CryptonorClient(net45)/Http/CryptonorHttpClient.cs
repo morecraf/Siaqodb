@@ -3,7 +3,6 @@ using System.Net;
 
 using Cryptonor;
 using Cryptonor.Queries;
-using Newtonsoft.Json;
 using Sqo;
 using CryptonorClient.Http;
 using System;
@@ -132,7 +131,11 @@ namespace CryptonorClient
             string uriFragment = bucket;
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
 
-            var resp = Post(request, JsonConvert.SerializeObject(obj));
+#if !UNITY3D
+            var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(obj));
+#else
+            var resp = Post(request, LitJson.JsonMapper.ToJson(obj));
+#endif
 
             return DeserializeResponse<CryptonorWriteResponse>(resp);
         }
@@ -156,9 +159,11 @@ namespace CryptonorClient
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
-
-            var resp = Post(request, JsonConvert.SerializeObject(batch));
-
+            #if !UNITY3D
+            var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(batch));
+#else
+            var resp = Post(request, LitJson.JsonMapper.ToJson(batch));
+#endif
             return DeserializeResponse<CryptonorBatchResponse>(resp);
         }
 #endif
@@ -183,8 +188,11 @@ namespace CryptonorClient
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "search");
 
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
-
-            var resp = Post(request, JsonConvert.SerializeObject(query));
+#if !UNITY3D
+            var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(query));
+#else
+            var resp = Post(request, LitJson.JsonMapper.ToJson(query));
+#endif
 
             return DeserializeResponse<CryptonorResultSet>(resp);
         }
@@ -229,21 +237,33 @@ namespace CryptonorClient
             }
 
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment, parameters);
-            var resp = Post(request, JsonConvert.SerializeObject(query));
-
+#if !UNITY3D
+            var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(query));
+#else
+            var resp = Post(request, LitJson.JsonMapper.ToJson(query));
+#endif
             return DeserializeResponse<CryptonorChangeSet>(resp);
         }
 
         private static T DeserializeResponse<T>(HttpWebResponse resp)
         {
+           #if !UNITY3D
             var serializer = new Newtonsoft.Json.JsonSerializer();
             using (var sr = new StreamReader(resp.GetResponseStream()))
             {
-                using (var jsonTextReader = new JsonTextReader(sr))
+                using (var jsonTextReader = new Newtonsoft.Json.JsonTextReader(sr))
                 {
                     return serializer.Deserialize<T>(jsonTextReader);
                 }
             }
+#else
+            using (var sr = new StreamReader(resp.GetResponseStream()))
+            {
+                LitJson.JsonReader reader = new LitJson.JsonReader(sr);
+                return LitJson.JsonMapper.ToObject<T>(reader);
+            }
+#endif
+
         }
 #endif
 

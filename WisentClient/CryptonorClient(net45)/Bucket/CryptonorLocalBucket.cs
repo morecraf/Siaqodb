@@ -89,7 +89,7 @@ namespace CryptonorClient
             var objects =  localDB.Load(query);
             return new CryptonorResultSet
             {
-                Objects = objects,
+                Objects =new List<CryptonorObject>( objects),
                 Count = objects.Count
             };
 
@@ -114,7 +114,7 @@ namespace CryptonorClient
 
             var all =  localDB.LoadAll();
 
-            return new CryptonorResultSet { Objects = all, Count = all.Count };
+            return new CryptonorResultSet { Objects = new List<CryptonorObject>( all), Count = all.Count };
         }
 #endif
 
@@ -134,7 +134,7 @@ namespace CryptonorClient
 
             var all =  localDB.LoadAll(skip, limit);
 
-            return new CryptonorResultSet { Objects = all, Count = all.Count };
+            return new CryptonorResultSet { Objects = new List<CryptonorObject>( all), Count = all.Count };
         }
 #endif
 

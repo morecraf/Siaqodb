@@ -34,7 +34,7 @@ namespace Cryptonor
 #if !WinRT
         public CryptonorLocalDB(string bucketPath)
         {
-            SiaqodbConfigurator.SetLicense(@"6mQill2r3RSwk/Nl9ZOBOoHDBrsSTUN8ZYGqWmmbxwuOHcOPjeEzLiacv5kTxM3Z");
+            SiaqodbConfigurator.SetLicense(@"8+9xiEEUL3aP1P5F1pkpCZQq2RoRgE5czRvwXgQIHBE=");
             this.siaqodb = new Siaqodb(bucketPath);
             indexManager = new TagsIndexManager(this.siaqodb);
            
@@ -426,8 +426,8 @@ namespace Cryptonor
                 }
 
             }
-            IList<CryptonorObject> changed = new List<CryptonorObject>();
-            IList<DeletedObject> deleted = new List<DeletedObject>();
+            List<CryptonorObject> changed = new List<CryptonorObject>();
+            List<DeletedObject> deleted = new List<DeletedObject>();
             foreach (ATuple<CryptonorObject, DirtyEntity> val in inserts.Values)
             {
                 changed.Add(val.Name);
@@ -624,8 +624,8 @@ namespace Cryptonor
     }
     public class CryptonorChangeSet
     {
-        public IList<CryptonorObject> ChangedObjects { get; set; }
-        public IList<DeletedObject> DeletedObjects { get; set; }
+        public List<CryptonorObject> ChangedObjects { get; set; }
+        public List<DeletedObject> DeletedObjects { get; set; }
         public string Anchor { get; set; }
     }
     public class DeletedObject

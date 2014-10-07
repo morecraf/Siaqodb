@@ -13,8 +13,8 @@ namespace CryptonorClient
         public bool IsSuccess { get; set; }
         public string Error { get; set; }
         public int Count { get; set; }
-        public IList<CryptonorObject> Objects { get; set; }
-        public IList<T> GetValues<T>()
+        public List<CryptonorObject> Objects { get; set; }
+        public List<T> GetValues<T>()
         { 
             List<T> list = new List<T>();
             foreach (CryptonorObject current in Objects)

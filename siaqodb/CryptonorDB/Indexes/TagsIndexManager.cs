@@ -139,6 +139,7 @@ namespace Cryptonor.Indexes
             storedIndexes.Add(ii);
             return ii;
         }
+#if ASYNC
         private async Task<IndexInfo2> BuildIndexInfoAsync(string indexName, IBTree index)
         {
 
@@ -149,6 +150,7 @@ namespace Cryptonor.Indexes
             storedIndexes.Add(ii);
             return ii;
         }
+#endif
         private IList<IndexInfo2> storedIndexes;
         public IList<IndexInfo2> StoredIndexes
         {
@@ -214,8 +216,12 @@ namespace Cryptonor.Indexes
                     
                     if (newTags!=null && newTags.ContainsKey(key))
                     {
-
-                        int c = ((IComparable)newTags[key]).CompareTo(oldTags[key]);
+                        object oldVal=oldTags[key];
+                        if (newTags[key].GetType() != oldVal.GetType())
+                        {
+                            oldVal = Sqo.Utilities.Convertor.ChangeType(oldTags[key], newTags[key].GetType());
+                        }
+                        int c = ((IComparable)newTags[key]).CompareTo(oldVal);
                         if (c != 0)
                         {
                             IBTree index = this.GetIndex(key, newTags[key].GetType());
