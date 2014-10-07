@@ -494,8 +494,8 @@ namespace Cryptonor
                 }
 
             }
-            IList<CryptonorObject> changed = new List<CryptonorObject>();
-            IList<DeletedObject> deleted = new List<DeletedObject>();
+            List<CryptonorObject> changed = new List<CryptonorObject>();
+            List<DeletedObject> deleted = new List<DeletedObject>();
             foreach( Tuple<CryptonorObject,DirtyEntity> val in inserts.Values)
             {
                 changed.Add(val.Item1);

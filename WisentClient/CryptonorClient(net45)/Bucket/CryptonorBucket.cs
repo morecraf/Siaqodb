@@ -277,7 +277,7 @@ public async Task DeleteAsync(string key)
 
         public async Task<CryptonorBatchResponse> StoreBatchAsync(IList<CryptonorObject> objects)
         {
-            return await httpClient.PutAsync(this.BucketName, new CryptonorChangeSet { ChangedObjects = objects });
+            return await httpClient.PutAsync(this.BucketName, new CryptonorChangeSet { ChangedObjects =new List<CryptonorObject>( objects) });
         }
 #endif
 

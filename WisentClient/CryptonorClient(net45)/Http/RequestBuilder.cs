@@ -81,7 +81,7 @@ namespace CryptonorClient.Http
             HttpRequestMessage messageReq = new HttpRequestMessage();
             messageReq.Method = HttpMethod.Post;
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", uriBase, endUriFragment);
-            string json = JsonConvert.SerializeObject(content);
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(content);
             StringContent contentReq = new StringContent(json, Encoding.UTF8, "application/json");
             messageReq.Content = contentReq;
             string queryString = GetQueryString(parameters);

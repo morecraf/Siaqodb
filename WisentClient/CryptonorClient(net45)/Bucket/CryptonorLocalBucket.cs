@@ -102,7 +102,7 @@ namespace CryptonorClient
             var objects = await localDB.LoadAsync(query).LibAwait();
             return new CryptonorResultSet
             {
-                Objects = objects,
+                Objects =new List<CryptonorObject>( objects),
                 Count = objects.Count
             };
 
@@ -124,7 +124,7 @@ namespace CryptonorClient
 
             var all = await localDB.LoadAllAsync().LibAwait();
 
-            return new CryptonorResultSet { Objects = all, Count = all.Count };
+            return new CryptonorResultSet { Objects =new List<CryptonorObject>( all), Count = all.Count };
         }
 
 #endif
@@ -144,7 +144,7 @@ namespace CryptonorClient
 
             var all = await localDB.LoadAllAsync(skip, limit).LibAwait();
            
-            return new CryptonorResultSet { Objects = all, Count = all.Count };
+            return new CryptonorResultSet { Objects =new List<CryptonorObject>( all), Count = all.Count };
         }
 #endif
 
