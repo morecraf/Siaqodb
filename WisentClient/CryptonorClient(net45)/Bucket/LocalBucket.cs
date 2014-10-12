@@ -19,7 +19,7 @@ using Windows.Storage;
 #endif
 namespace CryptonorClient
 {
-    public class CryptonorLocalBucket:IBucket
+    public class LocalBucket : IBucket
     {
         CryptonorLocalDB localDB;
 #if ASYNC
@@ -28,19 +28,19 @@ namespace CryptonorClient
         public event EventHandler<PushCompletedEventArgs> PushCompleted;
         public event EventHandler<PullCompletedEventArgs> PullCompleted;
         public event EventHandler<SyncProgressEventArgs> SyncProgress;
-      
+
         string uri;
         string username;
         string password;
         public string BucketName { get; set; }
-        public CryptonorLocalBucket(string uri,string bucketName,string localFolder,string username,string password)
+        public LocalBucket(string uri, string bucketName, string localFolder, string username, string password)
         {
             string fullPath = localFolder + Path.DirectorySeparatorChar + bucketName;
 #if WinRT
             StorageFolder folder = StorageFolder.GetFolderFromPathAsync(fullPath).AsTask().Result;
             localDB = new CryptonorLocalDB(folder);
 #else
-             localDB = new CryptonorLocalDB(fullPath);
+            localDB = new CryptonorLocalDB(fullPath);
 #endif
             this.BucketName = bucketName;
             this.uri = uri;
@@ -50,7 +50,7 @@ namespace CryptonorClient
         }
         public int DownloadBatchSize { get; set; }
 
-        #if NON_ASYNC
+#if NON_ASYNC
         /// <summary>
         /// 
         /// </summary>
@@ -63,7 +63,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-    public async Task<CryptonorObject> GetAsync(string key)
+        public async Task<CryptonorObject> GetAsync(string key)
         {
             return await localDB.LoadAsync(key).LibAwait();
         }
@@ -77,19 +77,19 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-    public async Task<T> GetAsync<T>(string key)
+        public async Task<T> GetAsync<T>(string key)
         {
             CryptonorObject obj = await localDB.LoadAsync(key).LibAwait();
             return obj.GetValue<T>();
         }
 #endif
 #if NON_ASYNC
-        public  CryptonorResultSet Get(CryptonorQuery query)
+        public ResultSet Get(Query query)
         {
-            var objects =  localDB.Load(query);
-            return new CryptonorResultSet
+            var objects = localDB.Load(query);
+            return new ResultSet
             {
-                Objects =new List<CryptonorObject>( objects),
+                Objects = new List<CryptonorObject>(objects),
                 Count = objects.Count
             };
 
@@ -97,84 +97,92 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-      public async Task<CryptonorResultSet> GetAsync(CryptonorQuery query)
+        public async Task<ResultSet> GetAsync(Query query)
         {
             var objects = await localDB.LoadAsync(query).LibAwait();
-            return new CryptonorResultSet
+            return new ResultSet
             {
-                Objects =new List<CryptonorObject>( objects),
+                Objects = new List<CryptonorObject>(objects),
                 Count = objects.Count
             };
 
         }
 #endif
 #if NON_ASYNC
-        public CryptonorResultSet GetAll()
+        public ResultSet GetAll()
         {
 
-            var all =  localDB.LoadAll();
+            var all = localDB.LoadAll();
 
-            return new CryptonorResultSet { Objects = new List<CryptonorObject>( all), Count = all.Count };
+            return new ResultSet { Objects = new List<CryptonorObject>(all), Count = all.Count };
         }
 #endif
 
 #if ASYNC
-  public async Task<CryptonorResultSet> GetAllAsync()
+        public async Task<ResultSet> GetAllAsync()
         {
 
             var all = await localDB.LoadAllAsync().LibAwait();
 
-            return new CryptonorResultSet { Objects =new List<CryptonorObject>( all), Count = all.Count };
+            return new ResultSet { Objects = new List<CryptonorObject>(all), Count = all.Count };
         }
 
 #endif
 #if NON_ASYNC
-        public CryptonorResultSet GetAll(int skip, int limit)
+        public ResultSet GetAll(int skip, int limit)
         {
 
-            var all =  localDB.LoadAll(skip, limit);
+            var all = localDB.LoadAll(skip, limit);
 
-            return new CryptonorResultSet { Objects = new List<CryptonorObject>( all), Count = all.Count };
+            return new ResultSet { Objects = new List<CryptonorObject>(all), Count = all.Count };
         }
 #endif
 
 #if ASYNC
-   public async Task<CryptonorResultSet> GetAllAsync(int skip,int limit)
+        public async Task<ResultSet> GetAllAsync(int skip, int limit)
         {
 
             var all = await localDB.LoadAllAsync(skip, limit).LibAwait();
-           
-            return new CryptonorResultSet { Objects =new List<CryptonorObject>( all), Count = all.Count };
+
+            return new ResultSet { Objects = new List<CryptonorObject>(all), Count = all.Count };
         }
 #endif
 
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Store(CryptonorObject obj)
         {
-             localDB.Store(obj);
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+            if (string.IsNullOrEmpty(obj.Key))
+                throw new ArgumentNullException("Key of CryptonorObject cannot be NULL");
+            localDB.Store(obj);
         }
 #endif
 
 #if ASYNC
-   public async Task StoreAsync(CryptonorObject obj)
+        public async Task StoreAsync(CryptonorObject obj)
         {
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+            if (string.IsNullOrEmpty(obj.Key))
+                throw new ArgumentNullException("Key of CryptonorObject cannot be NULL");
             await localDB.StoreAsync(obj).LibAwait();
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Store(string key, object obj)
         {
-             this.Store(key, obj, null);
+            this.Store(key, obj, null);
         }
 #endif
 
 #if ASYNC
-   public async Task StoreAsync(string key, object obj)
+        public async Task StoreAsync(string key, object obj)
         {
             await this.StoreAsync(key, obj, null).LibAwait();
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Store(string key, object obj, Dictionary<string, object> tags)
         {
             CryptonorObject cryObject = new CryptonorObject();
@@ -190,12 +198,12 @@ namespace CryptonorClient
                 }
             }
 
-           Store(cryObject);
+            Store(cryObject);
         }
 #endif
 
 #if ASYNC
- public async Task StoreAsync(string key, object obj, Dictionary<string, object> tags)
+        public async Task StoreAsync(string key, object obj, Dictionary<string, object> tags)
         {
             CryptonorObject cryObject = new CryptonorObject();
             cryObject.Key = key;
@@ -213,7 +221,7 @@ namespace CryptonorClient
             await this.StoreAsync(cryObject).LibAwait();
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Store(string key, object obj, object tags = null)
         {
             Dictionary<string, object> tags_Dict = null;
@@ -226,7 +234,7 @@ namespace CryptonorClient
                 PropertyInfo[] pi = tagsType.GetProperties();
                 foreach (PropertyInfo p in pi)
                 {
-                    tags_Dict.Add(p.Name, p.GetValue(o,null));
+                    tags_Dict.Add(p.Name, p.GetValue(o, null));
                 }
             }
 
@@ -235,7 +243,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-  public async Task StoreAsync(string key, object obj, object tags = null)
+        public async Task StoreAsync(string key, object obj, object tags = null)
         {
             Dictionary<string, object> tags_Dict = null;
             if (tags != null)
@@ -255,22 +263,22 @@ namespace CryptonorClient
         }
 #endif
 #if ASYNC
-  public async Task StoreAsync( object obj, object tags = null)
-  {
-      await this.StoreAsync(null, obj, tags);
-  }
+        public async Task StoreAsync(object obj, object tags = null)
+        {
+            await this.StoreAsync(null, obj, tags);
+        }
 #endif
 #if NON_ASYNC
-        public void Store( object obj, object tags = null)
+        public void Store(object obj, object tags = null)
         {
             this.Store(null, obj, tags);
         }
 #endif
 
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Delete(string key)
         {
-            CryptonorObject cobj =  localDB.Load(key);
+            CryptonorObject cobj = localDB.Load(key);
             if (cobj != null)
             {
                 localDB.Delete(cobj);
@@ -279,7 +287,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-      public async Task DeleteAsync(string key)
+        public async Task DeleteAsync(string key)
         {
             CryptonorObject cobj = await localDB.LoadAsync(key).LibAwait();
             if (cobj != null)
@@ -301,27 +309,27 @@ namespace CryptonorClient
             await localDB.DeleteAsync(obj).LibAwait();
         }
 #endif
-        #if NON_ASYNC
-        public 
-#else 
+#if NON_ASYNC
+        public
+#else
         internal
 #endif
-        CryptonorBatchResponse StoreBatch(IList<CryptonorObject> objs)
+ BatchResponse StoreBatch(IList<CryptonorObject> objs)
         {
             localDB.StoreBatch(objs);
             //TODO create better resposne
-            return new CryptonorBatchResponse() { IsSuccess = true };
+            return new BatchResponse() { IsSuccess = true };
         }
 
 #if ASYNC
-      public async Task<CryptonorBatchResponse> StoreBatchAsync(IList<CryptonorObject> objs)
+        public async Task<BatchResponse> StoreBatchAsync(IList<CryptonorObject> objs)
         {
             await localDB.StoreBatchAsync(objs).LibAwait();
             //TODO create better resposne
-            return new CryptonorBatchResponse() { IsSuccess = true };
+            return new BatchResponse() { IsSuccess = true };
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Push()
         {
             var syncStatistics = new PushStatistics();
@@ -332,13 +340,13 @@ namespace CryptonorClient
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Push operation started..."));
                 this.OnSyncProgress(new SyncProgressEventArgs("Get local changes..."));
-                CryptonorChangeSet changeSet = localDB.GetChangeSet();
+                ChangeSet changeSet = localDB.GetChangeSet();
                 if ((changeSet.ChangedObjects != null && changeSet.ChangedObjects.Count > 0) ||
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
                     this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
                     CryptonorHttpClient httpClient = new CryptonorHttpClient(this.uri, this.username, this.password);
-                    var response =  httpClient.Put(BucketName, changeSet);
+                    var response = httpClient.Put(BucketName, changeSet);
                     this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
 
                     var conflictResponses = response.WriteResponses.Where(a => string.Compare(a.Error, "conflict", StringComparison.OrdinalIgnoreCase) == 0);
@@ -378,7 +386,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-    public async Task PushAsync()
+        public async Task PushAsync()
         {
 
             await this._locker.LockAsync();
@@ -390,7 +398,7 @@ namespace CryptonorClient
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Push operation started..."));
                 this.OnSyncProgress(new SyncProgressEventArgs("Get local changes..."));
-                CryptonorChangeSet changeSet = await this.localDB.GetChangeSetAsync().LibAwait();
+                ChangeSet changeSet = await this.localDB.GetChangeSetAsync().LibAwait();
                 if ((changeSet.ChangedObjects != null && changeSet.ChangedObjects.Count > 0) ||
                     (changeSet.DeletedObjects != null && changeSet.DeletedObjects.Count > 0))
                 {
@@ -402,7 +410,7 @@ namespace CryptonorClient
                     var conflictResponses = response.WriteResponses.Where(a => string.Compare(a.Error, "conflict", StringComparison.OrdinalIgnoreCase) == 0);
                     foreach (var conflictR in conflictResponses)
                     {
-                       
+
                         if (conflicts == null)
                             conflicts = new List<Conflict>();
                         Conflict cf = new Conflict() { Key = conflictR.Key, Version = conflictR.Version, Description = conflictR.ErrorDesc };
@@ -424,7 +432,7 @@ namespace CryptonorClient
                 }
 
                 this.OnSyncProgress(new SyncProgressEventArgs("Push finshed!"));
-               
+
             }
             catch (Exception err)
             {
@@ -437,9 +445,9 @@ namespace CryptonorClient
             syncStatistics.EndTime = DateTime.Now;
             OnPushCompleted(new PushCompletedEventArgs(error, syncStatistics, conflicts));
         }
-       
+
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Pull()
         {
             this.Pull(null);
@@ -455,8 +463,8 @@ namespace CryptonorClient
         }
 #endif
 
-        #if NON_ASYNC
-        public void Pull(CryptonorQuery query)
+#if NON_ASYNC
+        public void Pull(Query query)
         {
 
             Push();
@@ -473,7 +481,7 @@ namespace CryptonorClient
 
                 int remainLimit = 1;
                 int nrBatch = 1;
-                CryptonorChangeSet downloadedItems = null;
+                ChangeSet downloadedItems = null;
                 while (remainLimit > 0)
                 {
                     remainLimit = 0;
@@ -524,7 +532,7 @@ namespace CryptonorClient
 
 #if ASYNC
 
-        public async Task PullAsync(CryptonorQuery query)
+        public async Task PullAsync(Query query)
         {
 
             await this.PushAsync().LibAwait();
@@ -542,7 +550,7 @@ namespace CryptonorClient
 
                 int remainLimit = 1;
                 int nrBatch = 1;
-                CryptonorChangeSet downloadedItems = null;
+                ChangeSet downloadedItems = null;
                 while (remainLimit > 0)
                 {
                     remainLimit = 0;
@@ -591,13 +599,13 @@ namespace CryptonorClient
             }
             syncStatistics.EndTime = DateTime.Now;
             OnPullCompleted(new PullCompletedEventArgs(error, syncStatistics));
-           
+
         }
 #endif
-        #if NON_ASYNC
-        private CryptonorChangeSet DownloadChanges(CryptonorHttpClient httpClient, string anchor, CryptonorQuery query)
+#if NON_ASYNC
+        private ChangeSet DownloadChanges(CryptonorHttpClient httpClient, string anchor, Query query)
         {
-            CryptonorChangeSet changes = null;
+            ChangeSet changes = null;
             if (query == null)
             {
                 changes = httpClient.GetChanges(this.BucketName, DownloadBatchSize, anchor);
@@ -611,9 +619,9 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-  private async Task<CryptonorChangeSet> DownloadChangesAsync(CryptonorHttpClient httpClient,string anchor,CryptonorQuery query)
+        private async Task<ChangeSet> DownloadChangesAsync(CryptonorHttpClient httpClient, string anchor, Query query)
         {
-            CryptonorChangeSet changes = null;
+            ChangeSet changes = null;
             if (query == null)
             {
                 changes = await httpClient.GetChangesAsync(this.BucketName, DownloadBatchSize, anchor).LibAwait();
@@ -635,7 +643,7 @@ namespace CryptonorClient
             }
         }
 
-     internal void OnPushCompleted(PushCompletedEventArgs args)
+        internal void OnPushCompleted(PushCompletedEventArgs args)
         {
             if (this.PushCompleted != null)
             {
@@ -644,7 +652,7 @@ namespace CryptonorClient
         }
 
 
-       internal void OnSyncProgress(SyncProgressEventArgs args)
+        internal void OnSyncProgress(SyncProgressEventArgs args)
         {
             if (this.SyncProgress != null)
             {
@@ -652,29 +660,29 @@ namespace CryptonorClient
             }
         }
 
-        #if NON_ASYNC
-       public void Purge()
-       {
+#if NON_ASYNC
+        public void Purge()
+        {
             this.Purge(true);
-       }
+        }
 #endif
 
 #if ASYNC
-       public async Task PurgeAsync()
+        public async Task PurgeAsync()
         {
             await this.PurgeAsync(true).LibAwait();
         }
 #endif
-        #if NON_ASYNC
-       public void Purge(bool pushFirst)
-       {
-           if (pushFirst)
-           {
+#if NON_ASYNC
+        public void Purge(bool pushFirst)
+        {
+            if (pushFirst)
+            {
                 this.Push();
-               
-           }
-           this.localDB.Purge();
-       }
+
+            }
+            this.localDB.Purge();
+        }
 #endif
 
 #if ASYNC
@@ -683,9 +691,9 @@ namespace CryptonorClient
             if (pushFirst)
             {
                 await this.PushAsync().LibAwait();
-                
+
             }
-        this.localDB.Purge();
+            this.localDB.Purge();
         }
 
 
@@ -694,7 +702,7 @@ namespace CryptonorClient
 
 
     }
-   
-   
-   
+
+
+
 }

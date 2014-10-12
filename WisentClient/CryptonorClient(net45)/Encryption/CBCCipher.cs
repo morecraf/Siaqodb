@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace CryptonorClient.Encryption
 {
-    public class CBCCipher
+    internal class CBCCipher
     {
         IEncryptor encryptor;
         readonly int BLOCK_SIZE;

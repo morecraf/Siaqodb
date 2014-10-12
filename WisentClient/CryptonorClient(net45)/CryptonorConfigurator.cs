@@ -70,14 +70,6 @@ namespace CryptonorClient
             }
             Cipher = new CBCCipher(encryptor);
         }
-        public static void SetDocumentSerializer(IDocumentSerializer documentSerializer)
-        {
-            if (documentSerializer == null)
-            {
-                throw new ArgumentNullException("documentSerializer");
-            }
-            DocumentSerializer = documentSerializer;
-        }
         public static void RegisterKeyConvention<T>(Func<T, string> func)
         {
             KeyConventions[typeof(T)] = a => func((T)a);

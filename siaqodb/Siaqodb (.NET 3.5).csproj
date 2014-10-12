@@ -151,11 +151,11 @@
     <Compile Include="Core\SqoMemoryFile.cs" />
     <Compile Include="CryptonorDB\CryptonorLocalDB.cs" />
     <Compile Include="CryptonorDB\CryptonorObject.cs" />
-    <Compile Include="CryptonorDB\CryptonorQuery.cs" />
     <Compile Include="CryptonorDB\Exceptions\CryptonorException.cs" />
-    <Compile Include="CryptonorDB\ICryptonorQuery.cs" />
     <Compile Include="CryptonorDB\Indexes\IndexQueryFinder.cs" />
     <Compile Include="CryptonorDB\Indexes\TagsIndexManager.cs" />
+    <Compile Include="CryptonorDB\IQuery.cs" />
+    <Compile Include="CryptonorDB\Query.cs" />
     <Compile Include="CryptonorDB\TagsSerializer.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />

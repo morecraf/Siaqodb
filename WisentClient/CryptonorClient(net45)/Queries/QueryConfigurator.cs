@@ -10,8 +10,8 @@ namespace CryptonorClient
 {
     public class QueryConfigurator
     {
-        protected readonly ICryptonorQuery Query;
-        public QueryConfigurator(ICryptonorQuery query)
+        protected readonly IQuery Query;
+        public QueryConfigurator(IQuery query)
         {
             this.Query = query;
         }

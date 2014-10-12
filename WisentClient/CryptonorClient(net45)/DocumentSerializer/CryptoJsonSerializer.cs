@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace CryptonorClient.DocumentSerializer
 {
-    public class CryptoJsonSerializer : IDocumentSerializer
+    internal class CryptoJsonSerializer : IDocumentSerializer
     {
         #region IDocumentSerializer Members
 

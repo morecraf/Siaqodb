@@ -281,7 +281,7 @@ namespace Cryptonor
             return await this.siaqodb.Query<CryptonorObject>().Where(a => a.Key == key).FirstOrDefaultAsync().LibAwait();
         }
 #endif
-        public IList<CryptonorObject> Load(Cryptonor.Queries.CryptonorQuery query)
+        public IList<CryptonorObject> Load(Cryptonor.Queries.Query query)
         {
             List<int> oids = new List<int>();
             if (string.Compare(query.TagName, "key", StringComparison.OrdinalIgnoreCase) == 0)
@@ -307,7 +307,7 @@ namespace Cryptonor
 
         }
 #if ASYNC
-        public async Task<IList<CryptonorObject>> LoadAsync(Cryptonor.Queries.CryptonorQuery query)
+        public async Task<IList<CryptonorObject>> LoadAsync(Cryptonor.Queries.Query query)
         {
             List<int> oids = new List<int>();
             if (string.Compare(query.TagName, "key", StringComparison.OrdinalIgnoreCase) == 0)
@@ -333,21 +333,18 @@ namespace Cryptonor
            
         }
 #endif
-        private void LoadByKey(Queries.CryptonorQuery query, List<int> oids)
+        private void LoadByKey(Queries.Query query, List<int> oids)
         {
             IBTree index = siaqodb.GetIndex("key", typeof(CryptonorObject));
             IndexQueryFinder.FindOids(index, query, oids);
         }
 #if ASYNC
-        private async Task LoadByKeyAsync(Queries.CryptonorQuery query, List<int> oids)
+        private async Task LoadByKeyAsync(Queries.Query query, List<int> oids)
         {
             IBTree index = siaqodb.GetIndex("key", typeof(CryptonorObject));
             await IndexQueryFinder.FindOidsAsync(index, query, oids);
         }
 #endif
-       
-        private DotissiConfigurator configurator=new DotissiConfigurator();
-        public DotissiConfigurator Configurator { get { return configurator; } }
 
         public void Delete(CryptonorObject cobj)
         {
@@ -375,7 +372,7 @@ namespace Cryptonor
             await indexManager.UpdateIndexesAfterDeleteAsync(oid, oldTags);
         }
 #endif
-        public CryptonorChangeSet GetChangeSet()
+        public ChangeSet GetChangeSet()
         {
             IList<DirtyEntity> all = this.siaqodb.LoadAll<DirtyEntity>();
 
@@ -440,10 +437,10 @@ namespace Cryptonor
             {
                 deleted.Add(new DeletedObject { Version = val.Name.Version, Key = val.Name.Key });
             }
-            return new CryptonorChangeSet { ChangedObjects = changed, DeletedObjects = deleted };
+            return new ChangeSet { ChangedObjects = changed, DeletedObjects = deleted };
         }
 #if ASYNC
-        public async Task<CryptonorChangeSet> GetChangeSetAsync()
+        public async Task<ChangeSet> GetChangeSetAsync()
         {
             IList<DirtyEntity> all = await this.siaqodb.LoadAllAsync<DirtyEntity>().LibAwait();
            
@@ -508,7 +505,7 @@ namespace Cryptonor
             {
                 deleted.Add(new DeletedObject { Version = val.Item1.Version, Key = val.Item1.Key });
             }
-            return new CryptonorChangeSet { ChangedObjects = changed,DeletedObjects=deleted };
+            return new ChangeSet { ChangedObjects = changed,DeletedObjects=deleted };
         }
 #endif
         public void ClearSyncMetadata()
@@ -622,7 +619,7 @@ namespace Cryptonor
         }
 #endif
     }
-    public class CryptonorChangeSet
+    public class ChangeSet
     {
         public List<CryptonorObject> ChangedObjects { get; set; }
         public List<DeletedObject> DeletedObjects { get; set; }
@@ -632,14 +629,6 @@ namespace Cryptonor
     {
         public string Key { get; set; }
         public string Version { get; set; }
-    }
-    public class DotissiConfigurator
-    {
-        internal Dictionary<Type, string> buckets = new Dictionary<Type, string>();
-        public void RegisterBucket(Type type, string bucketName)
-        {
-            buckets[type] = bucketName;
-        }
     }
     internal class Anchor
     {

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Cryptonor.Queries
 {
-    public class CryptonorQuery :ICryptonorQuery
+    public class Query :IQuery
     {
-        public CryptonorQuery(string tagOrKey)
+        public Query(string tagOrKey)
         {
             this.TagName = tagOrKey;
 

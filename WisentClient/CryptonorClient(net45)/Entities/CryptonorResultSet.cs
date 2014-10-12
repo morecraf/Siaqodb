@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace CryptonorClient
 {
-    public class CryptonorResultSet
+    public class ResultSet
     {
         public int Total { get; set; }
         public bool IsSuccess { get; set; }
@@ -24,7 +24,7 @@ namespace CryptonorClient
             return list;
         }
     }
-    public class CryptonorWriteResponse
+    public class WriteResponse
     {
         public bool IsSuccess { get; set; }
         public string Error { get; set; }
@@ -33,10 +33,10 @@ namespace CryptonorClient
         public string Key { get; set; }
 
     }
-    public class CryptonorBatchResponse
+    public class BatchResponse
     {
 
-        public List<CryptonorWriteResponse> WriteResponses { get; set; }
+        public List<WriteResponse> WriteResponses { get; set; }
         public bool IsSuccess { get; set; }
     }
 }

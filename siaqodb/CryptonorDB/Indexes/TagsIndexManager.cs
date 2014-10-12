@@ -364,14 +364,14 @@ namespace Cryptonor.Indexes
 #endif
         
 
-        internal void LoadOidsByIndex(Cryptonor.Queries.CryptonorQuery query, List<int> oids)
+        internal void LoadOidsByIndex(Cryptonor.Queries.Query query, List<int> oids)
         {
             IBTree index = this.GetIndex(query.TagName, query.GetTagType());
             IndexQueryFinder.FindOids(index, query, oids);
            
         }
 #if ASYNC 
-        internal async Task LoadOidsByIndexAsync(Cryptonor.Queries.CryptonorQuery query, List<int> oids)
+        internal async Task LoadOidsByIndexAsync(Cryptonor.Queries.Query query, List<int> oids)
         {
             IBTree index = await this.GetIndexAsync(query.TagName, query.GetTagType()).LibAwait();
             await IndexQueryFinder.FindOidsAsync(index, query, oids).LibAwait();

@@ -54,7 +54,7 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                await bucketNone.GetAsync(new CryptonorQuery("age"){Value = "22"});
+                await bucketNone.GetAsync(new Query("age"){Value = "22"});
             }
             catch (HttpRequestException ex)
             {
@@ -219,7 +219,7 @@ namespace CryptonorTests
                 await bucketRead.GetAllAsync();
 
                 //get by querry(POST)
-                await bucketRead.GetAsync(new CryptonorQuery("age"){Value = "22"});
+                await bucketRead.GetAsync(new Query("age"){Value = "22"});
 
                 //get document(GET)
                 await bucketRead.GetAsync(documentKey);
@@ -369,7 +369,7 @@ namespace CryptonorTests
                 await bucketReadWrite.GetAllAsync();
 
                 //get by querry(POST)
-                await bucketReadWrite.GetAsync(new CryptonorQuery("age") { Value = "22" });
+                await bucketReadWrite.GetAsync(new Query("age") { Value = "22" });
 
                 //get document(GET)
                 await bucketReadWrite.GetAsync(documentKey);

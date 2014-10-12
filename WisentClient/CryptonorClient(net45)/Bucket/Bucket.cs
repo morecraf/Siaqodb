@@ -1,5 +1,6 @@
 ﻿using Cryptonor;
 using Cryptonor.Queries;
+using CryptonorClient.Exceptions;
 using Sqo;
 using System;
 using System.Collections.Generic;
@@ -14,14 +15,14 @@ using System.Threading.Tasks;
 
 namespace CryptonorClient
 {
-    public class CryptonorBucket : IBucket
+    public class Bucket : IBucket
     {
         public string BucketName { get; set; }
         CryptonorHttpClient httpClient;
-        public CryptonorBucket(string uri,  string bucketName, string username, string password)
+        public Bucket(string uri, string bucketName, string username, string password)
         {
             this.BucketName = bucketName;
-            this.httpClient = new CryptonorHttpClient(uri,  username, password);
+            this.httpClient = new CryptonorHttpClient(uri, username, password);
         }
 #if NON_ASYNC
         public CryptonorObject Get(string key)
@@ -31,12 +32,12 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-    public async Task<CryptonorObject> GetAsync(string key)
+        public async Task<CryptonorObject> GetAsync(string key)
         {
             return await httpClient.GetAsync(this.BucketName, key);
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public T Get<T>(string key)
         {
             CryptonorObject obj = httpClient.Get(this.BucketName, key);
@@ -47,16 +48,16 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
- public async Task<T> GetAsync<T>(string key)
+        public async Task<T> GetAsync<T>(string key)
         {
             CryptonorObject obj = await httpClient.GetAsync(this.BucketName, key);
-         if (obj == null)
+            if (obj == null)
                 return default(T);
             return obj.GetValue<T>();
         }
 #endif
 #if NON_ASYNC
-        public CryptonorResultSet GetAll()
+        public ResultSet GetAll()
         {
             var all = httpClient.Get(this.BucketName);
             return all;
@@ -64,14 +65,14 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-  public async Task<CryptonorResultSet> GetAllAsync()
+        public async Task<ResultSet> GetAllAsync()
         {
-            var all=await httpClient.GetAsync(this.BucketName);
+            var all = await httpClient.GetAsync(this.BucketName);
             return all;
         }
 #endif
-        #if NON_ASYNC
-        public CryptonorResultSet GetAll(int skip, int limit)
+#if NON_ASYNC
+        public ResultSet GetAll(int skip, int limit)
         {
             var all = httpClient.Get(this.BucketName, skip, limit);
             return all;
@@ -79,53 +80,62 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-  public async Task<CryptonorResultSet> GetAllAsync(int skip,int limit)
+        public async Task<ResultSet> GetAllAsync(int skip, int limit)
         {
-            var all = await httpClient.GetAsync(this.BucketName,skip,limit);
+            var all = await httpClient.GetAsync(this.BucketName, skip, limit);
             return all;
         }
 #endif
-        #if NON_ASYNC
-        public CryptonorResultSet Get(CryptonorQuery query)
+#if NON_ASYNC
+        public ResultSet Get(Query query)
         {
             return (httpClient.GetByTag(this.BucketName, query));
         }
 #endif
 
 #if ASYNC
- public async Task<CryptonorResultSet> GetAsync(CryptonorQuery query)
+        public async Task<ResultSet> GetAsync(Query query)
         {
-           return (await httpClient.GetByTagAsync(this.BucketName, query));
+            return (await httpClient.GetByTagAsync(this.BucketName, query));
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Store(CryptonorObject obj)
         {
-            CryptonorWriteResponse response = httpClient.Put(this.BucketName, obj);
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+            if (string.IsNullOrEmpty(obj.Key))
+                throw new ArgumentNullException("Key of CryptonorObject cannot be NULL");
+
+            WriteResponse response = httpClient.Put(this.BucketName, obj);
             if (response.IsSuccess)
                 obj.Version = response.Version;
             else
             {
-                throw new Exception("Write error->" + response.Error);
+                throw new WriteException(string.Format("Write error->{0}:{1}", response.Error, response.ErrorDesc));
             }
 
         }
 #endif
 
 #if ASYNC
-  public async Task StoreAsync(CryptonorObject obj)
+        public async Task StoreAsync(CryptonorObject obj)
         {
-            CryptonorWriteResponse response = await httpClient.PutAsync(this.BucketName, obj);
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+            if(string.IsNullOrEmpty(obj.Key))
+                throw new ArgumentNullException("Key of CryptonorObject cannot be NULL");
+            WriteResponse response = await httpClient.PutAsync(this.BucketName, obj);
             if (response.IsSuccess)
                 obj.Version = response.Version;
             else
             {
-                throw new Exception("Write error->" + response.Error);
+                throw new WriteException(string.Format("Write error->{0}:{1}", response.Error,response.ErrorDesc));
             }
 
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Store(string key, object obj)
         {
             this.Store(key, obj, null);
@@ -133,7 +143,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
- public async Task StoreAsync(string key, object obj)
+        public async Task StoreAsync(string key, object obj)
         {
             await this.StoreAsync(key, obj, null);
         }
@@ -163,7 +173,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
- public async Task StoreAsync(string key, object obj, Dictionary<string, object> tags)
+        public async Task StoreAsync(string key, object obj, Dictionary<string, object> tags)
         {
             CryptonorObject crObject = new CryptonorObject();
             crObject.Key = key;
@@ -185,7 +195,7 @@ namespace CryptonorClient
             }
         }
 #endif
-        #if NON_ASYNC
+#if NON_ASYNC
         public void Store(string key, object obj, object tags = null)
         {
             Dictionary<string, object> tags_Dict = null;
@@ -207,7 +217,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-   public async Task StoreAsync(string key, object obj, object tags = null)
+        public async Task StoreAsync(string key, object obj, object tags = null)
         {
             Dictionary<string, object> tags_Dict = null;
             if (tags != null)
@@ -223,14 +233,14 @@ namespace CryptonorClient
                 }
             }
 
-           await this.StoreAsync(key, obj, tags_Dict);
+            await this.StoreAsync(key, obj, tags_Dict);
         }
 #endif
 #if ASYNC
-   public async Task StoreAsync(object obj, object tags = null)
-   {
-       await this.StoreAsync(null, obj, tags);
-   }
+        public async Task StoreAsync(object obj, object tags = null)
+        {
+            await this.StoreAsync(null, obj, tags);
+        }
 #endif
 #if NON_ASYNC
         public void Store(object obj, object tags = null)
@@ -248,9 +258,9 @@ namespace CryptonorClient
 
 
 #if ASYNC
-public async Task DeleteAsync(string key)
+        public async Task DeleteAsync(string key)
         {
-             await httpClient.DeleteAsync(this.BucketName, key, null);
+            await httpClient.DeleteAsync(this.BucketName, key, null);
         }
 #endif
 
@@ -261,23 +271,23 @@ public async Task DeleteAsync(string key)
         }
 #endif
 #if ASYNC
- public async Task DeleteAsync(CryptonorObject obj)
+        public async Task DeleteAsync(CryptonorObject obj)
         {
             await httpClient.DeleteAsync(this.BucketName, obj.Key, obj.Version);
         }
 #endif
-        #if NON_ASYNC
-          public CryptonorBatchResponse StoreBatch(IList<CryptonorObject> objects)
+#if NON_ASYNC
+          public BatchResponse StoreBatch(IList<CryptonorObject> objects)
         {
-            return  httpClient.Put(this.BucketName, new CryptonorChangeSet { ChangedObjects =new List<CryptonorObject>( objects) });
+            return  httpClient.Put(this.BucketName, new ChangeSet { ChangedObjects =new List<CryptonorObject>( objects) });
         }
 #endif
 
 #if ASYNC
 
-        public async Task<CryptonorBatchResponse> StoreBatchAsync(IList<CryptonorObject> objects)
+        public async Task<BatchResponse> StoreBatchAsync(IList<CryptonorObject> objects)
         {
-            return await httpClient.PutAsync(this.BucketName, new CryptonorChangeSet { ChangedObjects =new List<CryptonorObject>( objects) });
+            return await httpClient.PutAsync(this.BucketName, new ChangeSet { ChangedObjects = new List<CryptonorObject>(objects) });
         }
 #endif
 

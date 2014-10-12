@@ -27,17 +27,18 @@ namespace CryptonorClient
         }
         public IBucket GetBucket(string bucketName)
         {
-            return new CryptonorBucket(this.uri, bucketName, this.username, this.password);
+            return new Bucket(this.uri, bucketName, this.username, this.password);
             
         }
         public IBucket GetLocalBucket(string bucketName,string localFolder)
         {
-            return new CryptonorLocalBucket(uri, bucketName, localFolder, this.username, this.password);
+            return new LocalBucket(uri, bucketName, localFolder, this.username, this.password);
         }
 #if ASYNC
         public async Task<List<string>> GetAllBucketsAsync()
         {
             return await httpClient.GetAllAsync();
+            
         }
 #endif
     

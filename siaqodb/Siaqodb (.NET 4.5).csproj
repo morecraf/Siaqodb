@@ -106,11 +106,11 @@
     <Compile Include="CryptonorDB\CryptonorObject.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CryptonorDB\CryptonorQuery.cs">
+    <Compile Include="CryptonorDB\Query.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CryptonorDB\Exceptions\CryptonorException.cs" />
-    <Compile Include="CryptonorDB\ICryptonorQuery.cs" />
+    <Compile Include="CryptonorDB\IQuery.cs" />
     <Compile Include="CryptonorDB\Indexes\IndexQueryFinder.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -69,7 +69,7 @@ namespace WindowsFormsApplication2
                 string elapsed = (DateTime.Now - start).ToString();
 
                 start = DateTime.Now;
-                CryptonorQuery que = new CryptonorQuery("key");
+                Query que = new Query("key");
                 que.Setup(a => a.Start("buni").End("buni" + "999"));
                 var filtered = await bucket.GetAsync(que);
                 //var values = filtered.GetValues<User>();
@@ -79,8 +79,8 @@ namespace WindowsFormsApplication2
                 start = DateTime.Now;
                 try
                 {
-                    //((CryptonorLocalBucket)bucket).PullCompleted += Form1_PullCompleted;
-                    //await ((CryptonorLocalBucket)bucket).Pull();
+                    //((LocalBucket)bucket).PullCompleted += Form1_PullCompleted;
+                    //await ((LocalBucket)bucket).Pull();
                     // var all = await bucket.GetAllAsync();
                     // await bucket.DeleteAsync(all.Objects[0].Key);
                     start = DateTime.Now;
@@ -97,7 +97,7 @@ namespace WindowsFormsApplication2
                 }
                 elapsed = (DateTime.Now - start).ToString();
                 start = DateTime.Now;
-                CryptonorQuery query67 = new CryptonorQuery("mystr");
+                Query query67 = new Query("mystr");
                 query67.Setup(a => a.Value("gk9Zlq321c0"));
                 var filtered22 = await bucket.GetAsync(query67);
                 elapsed = (DateTime.Now - start).ToString();

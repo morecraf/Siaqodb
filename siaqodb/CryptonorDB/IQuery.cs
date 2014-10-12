@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Cryptonor.Queries
 {
-    public interface ICryptonorQuery
+    public interface IQuery
     {
          string TagName { get; set; }
          object Value { get; set; }

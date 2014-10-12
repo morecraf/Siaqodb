@@ -253,7 +253,7 @@ namespace CryptonorTests
              }
               bucket.StoreBatch(list);
 
-             CryptonorQuery query1 = new CryptonorQuery("myint");
+             Query query1 = new Query("myint");
              query1.Setup(a => a.Value(myint));
              var result =  bucket.Get(query1);
              Assert.AreEqual(3, result.Objects.Count);
@@ -262,7 +262,7 @@ namespace CryptonorTests
                  CryptonorObject objFromDB=result.Objects.FirstOrDefault(a => a.Key == co.Key);
                  Assert.IsNotNull(objFromDB);
              }
-             CryptonorQuery query2 = new CryptonorQuery("mydouble");
+             Query query2 = new Query("mydouble");
              query2.Setup(a => a.Value(mydouble));
              var result2 =  bucket.Get(query2);
              Assert.AreEqual(3, result2.Objects.Count);
@@ -271,7 +271,7 @@ namespace CryptonorTests
                  CryptonorObject objFromDB = result2.Objects.FirstOrDefault(a => a.Key == co.Key);
                  Assert.IsNotNull(objFromDB);
              }
-             CryptonorQuery query3 = new CryptonorQuery("mydatetime");
+             Query query3 = new Query("mydatetime");
              query3.Setup(a => a.Value(mydate));
              var result3 =  bucket.Get(query3);
              Assert.AreEqual(3, result3.Objects.Count);
@@ -280,7 +280,7 @@ namespace CryptonorTests
                  CryptonorObject objFromDB = result3.Objects.FirstOrDefault(a => a.Key == co.Key);
                  Assert.IsNotNull(objFromDB);
              }
-             CryptonorQuery query4 = new CryptonorQuery("mystring");
+             Query query4 = new Query("mystring");
              query4.Setup(a => a.Value(mystr));
              var result4 =  bucket.Get(query4);
              Assert.AreEqual(3, result4.Objects.Count);
@@ -289,7 +289,7 @@ namespace CryptonorTests
                  CryptonorObject objFromDB = result4.Objects.FirstOrDefault(a => a.Key == co.Key);
                  Assert.IsNotNull(objFromDB);
              }
-             CryptonorQuery query5 = new CryptonorQuery("mybool");
+             Query query5 = new Query("mybool");
              query5.Setup(a => a.Value(mybool));
              var result5 =  bucket.Get(query5);
              foreach (CryptonorObject co in list)
@@ -320,7 +320,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("myint");
+            Query query1 = new Query("myint");
             query1.Setup(a => a.Start(myint));
             var result =  bucket.Get(query1);
             int j=0;
@@ -331,7 +331,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("myint");
+            Query query2 = new Query("myint");
             query2.Setup(a => a.Start(myint+2).Descending());
             var result2 =  bucket.Get(query2);
             j = 2;
@@ -365,7 +365,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mystr");
+            Query query1 = new Query("mystr");
             query1.Setup(a => a.Start(s+"0"));
             var result =  bucket.Get(query1);
             int j = 0;
@@ -376,7 +376,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mystr");
+            Query query2 = new Query("mystr");
             query2.Setup(a => a.Start(s + "2").Descending());
             var result2 =  bucket.Get(query2);
             j = 2;
@@ -409,7 +409,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mydouble");
+            Query query1 = new Query("mydouble");
             query1.Setup(a => a.Start(mydouble));
             var result =  bucket.Get(query1);
             int j = 0;
@@ -420,7 +420,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mydouble");
+            Query query2 = new Query("mydouble");
             query2.Setup(a => a.Start(mydouble + 2).Descending());
             var result2 =  bucket.Get(query2);
             j = 2;
@@ -454,7 +454,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mydate");
+            Query query1 = new Query("mydate");
             query1.Setup(a => a.Start(mydate));
             var result =  bucket.Get(query1);
             int j = 0;
@@ -465,7 +465,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mydate");
+            Query query2 = new Query("mydate");
             query2.Setup(a => a.Start(mydate.AddDays(2)).Descending());
             var result2 =  bucket.Get(query2);
             j = 2;
@@ -498,7 +498,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("myint");
+            Query query1 = new Query("myint");
             query1.Setup(a => a.End(myint+2));
             var result =  bucket.Get(query1);
             int j = 0;
@@ -510,7 +510,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("myint");
+            Query query2 = new Query("myint");
             query2.Setup(a => a.End(myint).Descending());
             var result2 =  bucket.Get(query2);
             j = 0;
@@ -544,7 +544,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mystr");
+            Query query1 = new Query("mystr");
             query1.Setup(a => a.End(s + 2));
             var result =  bucket.Get(query1);
             int j = 0;
@@ -556,7 +556,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mystr");
+            Query query2 = new Query("mystr");
             query2.Setup(a => a.End(s).Descending());
             var result2 =  bucket.Get(query2);
             j = 0;
@@ -591,7 +591,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mydate");
+            Query query1 = new Query("mydate");
             query1.Setup(a =>a.End(  mydate.AddDays( 2)));
             var result =  bucket.Get(query1);
             int j = 0;
@@ -603,7 +603,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mydate");
+            Query query2 = new Query("mydate");
             query2.Setup(a => a.End(mydate).Descending());
             var result2 =  bucket.Get(query2);
             j = 0;
@@ -638,7 +638,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mydouble");
+            Query query1 = new Query("mydouble");
             query1.Setup(a => a.End(mydouble+2));
             var result =  bucket.Get(query1);
             int j = 0;
@@ -650,7 +650,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mydouble");
+            Query query2 = new Query("mydouble");
             query2.Setup(a => a.End(mydouble).Descending());
             var result2 =  bucket.Get(query2);
             j = 0;
@@ -684,7 +684,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("myint");
+            Query query1 = new Query("myint");
             query1.Setup(a => a.Start(myint).End(myint+2));
             var result =  bucket.Get(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
@@ -697,7 +697,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("myint");
+            Query query2 = new Query("myint");
             query2.Setup(a => a.Start(myint + 2).End(myint).Descending());
             var result2 =  bucket.Get(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
@@ -731,7 +731,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mystr");
+            Query query1 = new Query("mystr");
             query1.Setup(a => a.Start(s).End(s + 2));
             var result =  bucket.Get(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
@@ -744,7 +744,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mystr");
+            Query query2 = new Query("mystr");
             query2.Setup(a => a.Start(s + 2).End(s).Descending());
             var result2 =  bucket.Get(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
@@ -779,7 +779,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mydate");
+            Query query1 = new Query("mydate");
             query1.Setup(a => a.Start(mydate).End(mydate.AddDays( 2)));
             var result =  bucket.Get(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
@@ -792,7 +792,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mydate");
+            Query query2 = new Query("mydate");
             query2.Setup(a => a.Start(mydate.AddDays(2)).End(mydate).Descending());
             var result2 =  bucket.Get(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
@@ -826,7 +826,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("mydouble");
+            Query query1 = new Query("mydouble");
             query1.Setup(a => a.Start(mydouble).End(mydouble + 2));
             var result =  bucket.Get(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
@@ -839,7 +839,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("mydouble");
+            Query query2 = new Query("mydouble");
             query2.Setup(a => a.Start(mydouble + 2).End(mydouble).Descending());
             var result2 =  bucket.Get(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
@@ -873,7 +873,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("myint");
+            Query query1 = new Query("myint");
             query1.Setup(a => a.Start(myint).End(myint + 2).Skip(1).Take(1));
             var result =  bucket.Get(query1);
             Assert.AreEqual(1, result.Objects.Count);
@@ -881,7 +881,7 @@ namespace CryptonorTests
             Assert.AreEqual(myint + 1, objFromDB.GetTag<int>("myint"));
             Assert.AreEqual(list[1].Key, objFromDB.Key);
            
-            CryptonorQuery query2 = new CryptonorQuery("myint");
+            Query query2 = new Query("myint");
             query2.Setup(a => a.Start(myint + 2).End(myint).Skip(2).Take(1).Descending());
             var result2 =  bucket.Get(query2);
             Assert.AreEqual(1,result2.Objects.Count);
@@ -910,7 +910,7 @@ namespace CryptonorTests
             }
              bucket.StoreBatch(list);
 
-            CryptonorQuery query1 = new CryptonorQuery("key");
+            Query query1 = new Query("key");
             query1.Setup(a => a.Start("username" + s).End("username" + s + 2));
             var result =  bucket.Get(query1);
             Assert.AreEqual(result.Objects.Count, list.Count);
@@ -922,7 +922,7 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j++;
             }
-            CryptonorQuery query2 = new CryptonorQuery("KEy");
+            Query query2 = new Query("KEy");
             query2.Setup(a => a.Start("username" + s + 2).End("username" + s).Descending());
             var result2 =  bucket.Get(query2);
             Assert.AreEqual(result2.Objects.Count, list.Count);
@@ -933,6 +933,39 @@ namespace CryptonorTests
                 Assert.AreEqual(co.Key, objFromDB.Key);
                 j--;
             }
+        }
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void StoreNullDoc()
+        {
+            int rndNr = rnd.Next(100000);
+            string username = "username" + rndNr;
+          
+            IBucket bucket = this.GetBucket();
+            bucket.Store(username, null, new { Age = 33 });
+        }
+        [TestMethod]
+        public void StoreEmptyDoc()
+        {
+            int rndNr = rnd.Next(100000);
+            string username = "username" + rndNr;
+          
+            IBucket bucket = this.GetBucket();
+            CryptonorObject crObj = new CryptonorObject();
+            crObj.Key = username;
+            bucket.Store(crObj);
+            var fromDB = bucket.Get(username);
+            var value = fromDB.GetValue<Person>();
+            Assert.AreEqual(null, value);
+        }
+        [TestMethod]
+        public void StoreNullOrEmptyKey()
+        {
+           
+            IBucket bucket = this.GetBucket();
+            CryptonorObject crObj = new CryptonorObject();
+            bucket.Store(crObj);
+           
         }
         public string GetRandomString(int length)
         {

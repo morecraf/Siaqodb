@@ -11,7 +11,7 @@ namespace Cryptonor.Indexes
 {
     class IndexQueryFinder
     {
-        public static void FindOids(IBTree index, Cryptonor.Queries.CryptonorQuery query,List<int> oids)
+        public static void FindOids(IBTree index, Cryptonor.Queries.Query query,List<int> oids)
         {
             IEnumerable<int> oidsFound = null;
             if (query.Value != null)
@@ -53,7 +53,7 @@ namespace Cryptonor.Indexes
             }
         }
 #if ASYNC
-        public static async Task FindOidsAsync(IBTree index, Cryptonor.Queries.CryptonorQuery query, List<int> oids)
+        public static async Task FindOidsAsync(IBTree index, Cryptonor.Queries.Query query, List<int> oids)
         {
             IEnumerable<int> oidsFound = null;
             if (query.Value != null)

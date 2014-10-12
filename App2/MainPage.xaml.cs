@@ -75,8 +75,8 @@ namespace App2
             start = DateTime.Now;
             try
             {
-                ((CryptonorLocalBucket)bucket).PullCompleted += Form1_PullCompleted;
-                await ((CryptonorLocalBucket)bucket).Pull();
+                ((LocalBucket)bucket).PullCompleted += Form1_PullCompleted;
+                await ((LocalBucket)bucket).Pull();
             }
             catch
             {

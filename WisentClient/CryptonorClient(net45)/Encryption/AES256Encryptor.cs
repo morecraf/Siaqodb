@@ -30,7 +30,7 @@ namespace CryptonorClient.Encryption
    * This file contains the fast version with 8Kbytes of static tables for round precomputation
    * </p>
    */
-    public class AES256Encryptor:IEncryptor
+    internal class AES256Encryptor:IEncryptor
     {
         // The S box
         private static readonly byte[] S =

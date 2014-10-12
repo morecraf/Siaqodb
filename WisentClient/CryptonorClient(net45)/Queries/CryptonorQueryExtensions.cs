@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace CryptonorClient
 {
-    public static class CryptonorQueryExtensions 
+    public static class QueryExtensions 
     {
       
 
-        public static ICryptonorQuery Setup(this ICryptonorQuery query, Action<QueryConfigurator> configurator)
+        public static IQuery Setup(this IQuery query, Action<QueryConfigurator> configurator)
         {
             configurator(new QueryConfigurator(query));
 

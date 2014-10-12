@@ -22,7 +22,7 @@ using System.Web;
 
 namespace CryptonorClient
 {
-    public class CryptonorHttpClient : IDisposable
+    internal class CryptonorHttpClient : IDisposable
     {
         string uri;
        
@@ -43,20 +43,20 @@ namespace CryptonorClient
             this.signature = new Signature(username, password);
         }
 #if NON_ASYNC
-        public CryptonorResultSet Get(string bucket)
+        public ResultSet Get(string bucket)
         {
             return Get(bucket, 0, 0);
         }
 #endif
 
 #if ASYNC
-        public async Task<CryptonorResultSet> GetAsync(string bucket)
+        public async Task<ResultSet> GetAsync(string bucket)
         {
             return await GetAsync(bucket, 0, 0);
         }
 #endif
         #if NON_ASYNC
-        public CryptonorResultSet Get(string bucket, int skip, int limit)
+        public ResultSet Get(string bucket, int skip, int limit)
         {
             var parameters = new Dictionary<string, string>();
             if (limit > 0)
@@ -72,12 +72,12 @@ namespace CryptonorClient
             var resp = Send(request);
 
 
-            return DeserializeResponse<CryptonorResultSet>(resp);
+            return DeserializeResponse<ResultSet>(resp);
         }
 #endif
 
 #if ASYNC
-        public async Task<CryptonorResultSet> GetAsync(string bucket, int skip, int limit)
+        public async Task<ResultSet> GetAsync(string bucket, int skip, int limit)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             if (limit > 0)
@@ -92,9 +92,9 @@ namespace CryptonorClient
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ResultSet), GetDefaultFormatter());
 
-            return (CryptonorResultSet)obj;
+            return (ResultSet)obj;
         }
 #endif
         #if NON_ASYNC
@@ -126,7 +126,7 @@ namespace CryptonorClient
         }
 #endif
         #if NON_ASYNC
-        public CryptonorWriteResponse Put(string bucket, CryptonorObject obj)
+        public WriteResponse Put(string bucket, CryptonorObject obj)
         {
             string uriFragment = bucket;
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
@@ -137,25 +137,25 @@ namespace CryptonorClient
             var resp = Post(request, LitJson.JsonMapper.ToJson(obj));
 #endif
 
-            return DeserializeResponse<CryptonorWriteResponse>(resp);
+            return DeserializeResponse<WriteResponse>(resp);
         }
 #endif
 
 #if ASYNC
-        public async Task<CryptonorWriteResponse> PutAsync(string bucket, CryptonorObject obj)
+        public async Task<WriteResponse> PutAsync(string bucket, CryptonorObject obj)
         {
             string uriFragment = bucket;
             HttpRequestMessage request = requestBuilder.BuildPostRequestAsync(uriFragment, obj);
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var objResp = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorWriteResponse), GetDefaultFormatter());
-            return (CryptonorWriteResponse)objResp;
+            var objResp = await httpResponseMessage.Content.ReadAsAsync(typeof(WriteResponse), GetDefaultFormatter());
+            return (WriteResponse)objResp;
             
         }
 #endif
         #if NON_ASYNC
-        public CryptonorBatchResponse Put(string bucket, CryptonorChangeSet batch)
+        public BatchResponse Put(string bucket, ChangeSet batch)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
@@ -164,12 +164,12 @@ namespace CryptonorClient
 #else
             var resp = Post(request, LitJson.JsonMapper.ToJson(batch));
 #endif
-            return DeserializeResponse<CryptonorBatchResponse>(resp);
+            return DeserializeResponse<BatchResponse>(resp);
         }
 #endif
 
 #if ASYNC
-        public async Task<CryptonorBatchResponse> PutAsync(string bucket, CryptonorChangeSet batch)
+        public async Task<BatchResponse> PutAsync(string bucket, ChangeSet batch)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
 
@@ -177,13 +177,13 @@ namespace CryptonorClient
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorBatchResponse), GetDefaultFormatter());
-            return (CryptonorBatchResponse)obj;
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(BatchResponse), GetDefaultFormatter());
+            return (BatchResponse)obj;
             
         }
 #endif
 #if NON_ASYNC
-        internal CryptonorResultSet GetByTag(string bucket, CryptonorQuery query)
+        internal ResultSet GetByTag(string bucket, Query query)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "search");
 
@@ -194,12 +194,12 @@ namespace CryptonorClient
             var resp = Post(request, LitJson.JsonMapper.ToJson(query));
 #endif
 
-            return DeserializeResponse<CryptonorResultSet>(resp);
+            return DeserializeResponse<ResultSet>(resp);
         }
 #endif
 
 #if ASYNC
-        internal async Task<CryptonorResultSet> GetByTagAsync(string bucket, CryptonorQuery query)
+        internal async Task<ResultSet> GetByTagAsync(string bucket, Query query)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "search");
 
@@ -207,9 +207,9 @@ namespace CryptonorClient
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorResultSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ResultSet), GetDefaultFormatter());
 
-            return (CryptonorResultSet)obj;
+            return (ResultSet)obj;
           
         }
 #endif
@@ -223,7 +223,7 @@ namespace CryptonorClient
         /// <param name="limit"></param>
         /// <param name="anchor"></param>
         /// <returns></returns>
-        public CryptonorChangeSet GetChanges(string bucket, CryptonorQuery query, int limit, string anchor)
+        public ChangeSet GetChanges(string bucket, Query query, int limit, string anchor)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             var parameters = new Dictionary<string, string>();
@@ -242,7 +242,7 @@ namespace CryptonorClient
 #else
             var resp = Post(request, LitJson.JsonMapper.ToJson(query));
 #endif
-            return DeserializeResponse<CryptonorChangeSet>(resp);
+            return DeserializeResponse<ChangeSet>(resp);
         }
 
         private static T DeserializeResponse<T>(HttpWebResponse resp)
@@ -268,7 +268,7 @@ namespace CryptonorClient
 #endif
 
 #if ASYNC
-        public async Task<CryptonorChangeSet> GetChangesAsync(string bucket, CryptonorQuery query, int limit,string anchor)
+        public async Task<ChangeSet> GetChangesAsync(string bucket, Query query, int limit,string anchor)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -284,14 +284,14 @@ namespace CryptonorClient
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorChangeSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ChangeSet), GetDefaultFormatter());
 
-            return (CryptonorChangeSet)obj;
+            return (ChangeSet)obj;
 
         }
 #endif
         #if NON_ASYNC
-        public CryptonorChangeSet GetChanges(string bucket, int limit, string anchor)
+        public ChangeSet GetChanges(string bucket, int limit, string anchor)
         {
             var uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             var parameters = new Dictionary<string, string>();
@@ -309,12 +309,12 @@ namespace CryptonorClient
 
         
 
-            return DeserializeResponse<CryptonorChangeSet>(resp);
+            return DeserializeResponse<ChangeSet>(resp);
         }
 #endif
 
 #if ASYNC
-        public async Task<CryptonorChangeSet> GetChangesAsync(string bucket, int limit, string anchor)
+        public async Task<ChangeSet> GetChangesAsync(string bucket, int limit, string anchor)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -330,9 +330,9 @@ namespace CryptonorClient
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(CryptonorChangeSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ChangeSet), GetDefaultFormatter());
 
-            return (CryptonorChangeSet)obj;
+            return (ChangeSet)obj;
 
         }
 

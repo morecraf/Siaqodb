@@ -51,8 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bucket\CryptonorBucket.cs" />
-    <Compile Include="Bucket\CryptonorLocalBucket.cs" />
+    <Compile Include="Bucket\Bucket.cs" />
+    <Compile Include="Bucket\LocalBucket.cs" />
     <Compile Include="Bucket\IBucket.cs" />
     <Compile Include="Bucket\Events.cs" />
     <Compile Include="CompatibilityHelper.cs" />
@@ -69,6 +69,7 @@
     <Compile Include="Encryption\Pack.cs" />
     <Compile Include="Entities\CryptonorObjectExtensions.cs" />
     <Compile Include="Entities\CryptonorResultSet.cs" />
+    <Compile Include="Exceptions\WriteException.cs" />
     <Compile Include="Http\CryptonorHttpClient.cs" />
     <Compile Include="Http\RequestBuilder.cs" />
     <Compile Include="Http\Signature.cs" />

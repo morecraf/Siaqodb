@@ -1,4 +1,5 @@
 ﻿using Cryptonor;
+using Cryptonor.Exceptions;
 using Sqo;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,9 @@ namespace CryptonorClient
         {
             
             if (CryptonorConfigurator.Cipher == null)
-                throw new Exception("Encryption algorithm should be set");
+                throw new CryptonorException("Encryption algorithm should be set,use CryptonorConfigurator.SetEncryptor(...) method");
+            if (objValue == null)
+                throw new ArgumentNullException("objValue");
 
             if (cryObj.Key == null && CryptonorConfigurator.KeyConventions.ContainsKey(objValue.GetType()))
             {
@@ -43,6 +46,11 @@ namespace CryptonorClient
         }
         public static object GetValue(this CryptonorObject crObj, Type type)
         {
+            if (crObj.Document == null)
+                return null;
+            if (CryptonorConfigurator.Cipher == null)
+                throw new CryptonorException("Encryption algorithm should be set,use CryptonorConfigurator.SetEncryptor(...) method");
+          
             byte[] documentVal = new byte[crObj.Document.Length];
             Array.Copy(crObj.Document, documentVal, crObj.Document.Length);
             byte[] decDoc = CryptonorConfigurator.Cipher.Decrypt(documentVal);
@@ -53,10 +61,15 @@ namespace CryptonorClient
             }
             return obj;
         }
-        public static string GetValueAsJson(this CryptonorObject cryObj)
+        public static string GetValueAsJson(this CryptonorObject crObj)
         {
-            byte[] documentVal = new byte[cryObj.Document.Length];
-            Array.Copy(cryObj.Document, documentVal, cryObj.Document.Length);
+            if (crObj.Document == null)
+                return null;
+            if (CryptonorConfigurator.Cipher == null)
+                throw new CryptonorException("Encryption algorithm should be set,use CryptonorConfigurator.SetEncryptor(...) method");
+          
+            byte[] documentVal = new byte[crObj.Document.Length];
+            Array.Copy(crObj.Document, documentVal, crObj.Document.Length);
             byte[] decDoc = CryptonorConfigurator.Cipher.Decrypt(documentVal);
 #if SILVERLIGHT || CF || WinRT
 
@@ -71,7 +84,10 @@ namespace CryptonorClient
         public static void SetValueAsJson(this CryptonorObject cryObj, string json)
         {
             if (CryptonorConfigurator.Cipher == null)
-                throw new Exception("Encryption algorithm should be set");
+                throw new CryptonorException("Encryption algorithm should be set,use CryptonorConfigurator.SetEncryptor(...) method");
+          
+            if (string.IsNullOrEmpty(json))
+                throw new ArgumentNullException("json");
             byte[] serializedObj = Encoding.UTF8.GetBytes(json);
 
             CryptonorConfigurator.Cipher.EnsureLength(ref serializedObj);

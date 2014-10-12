@@ -44,17 +44,17 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CryptonorClient%28net45%29\Bucket\CryptonorBucket.cs">
-      <Link>Bucket\CryptonorBucket.cs</Link>
-    </Compile>
-    <Compile Include="..\CryptonorClient%28net45%29\Bucket\CryptonorLocalBucket.cs">
-      <Link>Bucket\CryptonorLocalBucket.cs</Link>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\Bucket.cs">
+      <Link>Bucket\Bucket.cs</Link>
     </Compile>
     <Compile Include="..\CryptonorClient%28net45%29\Bucket\Events.cs">
       <Link>Bucket\Events.cs</Link>
     </Compile>
     <Compile Include="..\CryptonorClient%28net45%29\Bucket\IBucket.cs">
       <Link>Bucket\IBucket.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\LocalBucket.cs">
+      <Link>Bucket\LocalBucket.cs</Link>
     </Compile>
     <Compile Include="..\CryptonorClient%28net45%29\CompatibilityHelper.cs">
       <Link>CompatibilityHelper.cs</Link>
@@ -97,6 +97,9 @@
     </Compile>
     <Compile Include="..\CryptonorClient%28net45%29\Entities\CryptonorResultSet.cs">
       <Link>Entities\CryptonorResultSet.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Exceptions\WriteException.cs">
+      <Link>Exceptions\WriteException.cs</Link>
     </Compile>
     <Compile Include="..\CryptonorClient%28net45%29\Http\CryptonorHttpClient.cs">
       <Link>Http\CryptonorHttpClient.cs</Link>

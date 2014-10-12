@@ -58,7 +58,7 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                  bucketNone.Get(new CryptonorQuery("age") { Value = "22" });
+                  bucketNone.Get(new Query("age") { Value = "22" });
             }
             catch (WebException ex)
             {
@@ -223,7 +223,7 @@ namespace CryptonorTests
                   bucketRead.GetAll();
 
                 //get by querry(POST)
-                  bucketRead.Get(new CryptonorQuery("age") { Value = "22" });
+                  bucketRead.Get(new Query("age") { Value = "22" });
 
                 //get document(GET)
                   bucketRead.Get(documentKey);
@@ -373,7 +373,7 @@ namespace CryptonorTests
                   bucketReadWrite.GetAll();
 
                 //get by querry(POST)
-                  bucketReadWrite.Get(new CryptonorQuery("age") { Value = "22" });
+                  bucketReadWrite.Get(new Query("age") { Value = "22" });
 
                 //get document(GET)
                   bucketReadWrite.Get(documentKey);

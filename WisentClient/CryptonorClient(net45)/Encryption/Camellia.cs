@@ -4,7 +4,7 @@ using System;
 
 namespace CryptonorClient.Encryption
 {
-    public class CamelliaEngine: IEncryptor
+    internal class CamelliaEngine: IEncryptor
     {
         private bool initialised = false;
         private bool _keyIs128;

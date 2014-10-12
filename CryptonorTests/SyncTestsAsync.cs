@@ -28,11 +28,11 @@ namespace CryptonorTests
               int rndNr = rnd.Next(100000);
               string userName = "userName" + rndNr;
               Person p = GetPerson(userName);
-              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              LocalBucket bucket = (LocalBucket)client.GetLocalBucket("dbsync", localPath);
               await bucket.StoreAsync(p.UserName, p, new { Age = 22 });
               await bucket.PushAsync();
-              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
-              CryptonorQuery query = new CryptonorQuery("key");
+              LocalBucket bucket2 = (LocalBucket)client.GetLocalBucket("dbsync", localPath2);
+              Query query = new Query("key");
               query.Setup(a => a.Value<string>(userName));
 
               await bucket2.PullAsync(query);
@@ -48,11 +48,11 @@ namespace CryptonorTests
               int rndNr = rnd.Next(100000);
               string userName = "userName" + rndNr;
               Person p = GetPerson(userName);
-              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              LocalBucket bucket = (LocalBucket)client.GetLocalBucket("dbsync", localPath);
               await bucket.StoreAsync(p.UserName, p, new { Age = 22 });
               await bucket.PushAsync();
 
-              CryptonorQuery query = new CryptonorQuery("key");
+              Query query = new Query("key");
               query.Setup(a => a.Value<string>(userName));
               await bucket.PullAsync(query);
 
@@ -73,7 +73,7 @@ namespace CryptonorTests
               Assert.AreEqual(userName, value.UserName);
               Assert.AreEqual(44, value.Age);
               Assert.AreEqual("Alisia", value.FirstName);
-              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
+              LocalBucket bucket2 = (LocalBucket)client.GetLocalBucket("dbsync", localPath2);
             
               await bucket2.PullAsync(query);
 
@@ -90,11 +90,11 @@ namespace CryptonorTests
               int rndNr = rnd.Next(100000);
               string userName = "userName" + rndNr;
               Person p = GetPerson(userName);
-              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              LocalBucket bucket = (LocalBucket)client.GetLocalBucket("dbsync", localPath);
               await bucket.StoreAsync(p.UserName, p, new { Age = 22 });
               await bucket.PushAsync();
 
-              CryptonorQuery query = new CryptonorQuery("key");
+              Query query = new Query("key");
               query.Setup(a => a.Value<string>(userName));
               await bucket.PullAsync(query);
 
@@ -107,7 +107,7 @@ namespace CryptonorTests
               fromDB1 = await bucket.GetAsync(userName);
               Assert.IsNull(fromDB1);
 
-              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
+              LocalBucket bucket2 = (LocalBucket)client.GetLocalBucket("dbsync", localPath2);
 
               await bucket2.PullAsync(query);
 
@@ -121,15 +121,15 @@ namespace CryptonorTests
               int rndNr = rnd.Next(100000);
               string userName = "userName" + rndNr;
               Person p = GetPerson(userName);
-              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              LocalBucket bucket = (LocalBucket)client.GetLocalBucket("dbsync", localPath);
               await bucket.StoreAsync(p.UserName, p, new { Age = 22 });
               await bucket.PushAsync();
 
-              CryptonorQuery query = new CryptonorQuery("key");
+              Query query = new Query("key");
               query.Setup(a => a.Value<string>(userName));
               await bucket.PullAsync(query);
 
-              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
+              LocalBucket bucket2 = (LocalBucket)client.GetLocalBucket("dbsync", localPath2);
 
               await bucket2.PullAsync(query);
               //now both databases has same object with same version
@@ -181,15 +181,15 @@ namespace CryptonorTests
               int rndNr = rnd.Next(100000);
               string userName = "userName" + rndNr;
               Person p = GetPerson(userName);
-              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              LocalBucket bucket = (LocalBucket)client.GetLocalBucket("dbsync", localPath);
               await bucket.StoreAsync(p.UserName, p, new { Age = 22 });
               await bucket.PushAsync();
 
-              CryptonorQuery query = new CryptonorQuery("key");
+              Query query = new Query("key");
               query.Setup(a => a.Value<string>(userName));
               await bucket.PullAsync(query);
 
-              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
+              LocalBucket bucket2 = (LocalBucket)client.GetLocalBucket("dbsync", localPath2);
 
               await bucket2.PullAsync(query);
               //now both databases has same object with same version
@@ -230,15 +230,15 @@ namespace CryptonorTests
               int rndNr = rnd.Next(100000);
               string userName = "userName" + rndNr;
               Person p = GetPerson(userName);
-              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              LocalBucket bucket = (LocalBucket)client.GetLocalBucket("dbsync", localPath);
               await bucket.StoreAsync(p.UserName, p, new { Age = 22 });
               await bucket.PushAsync();
 
-              CryptonorQuery query = new CryptonorQuery("key");
+              Query query = new Query("key");
               query.Setup(a => a.Value<string>(userName));
               await bucket.PullAsync(query);
 
-              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
+              LocalBucket bucket2 = (LocalBucket)client.GetLocalBucket("dbsync", localPath2);
 
               await bucket2.PullAsync(query);
               //now both databases has same object with same version
@@ -276,15 +276,15 @@ namespace CryptonorTests
               int rndNr = rnd.Next(100000);
               string userName = "userName" + rndNr;
               Person p = GetPerson(userName);
-              CryptonorLocalBucket bucket = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath);
+              LocalBucket bucket = (LocalBucket)client.GetLocalBucket("dbsync", localPath);
               await bucket.StoreAsync(p.UserName, p, new { Age = 22 });
               await bucket.PushAsync();
 
-              CryptonorQuery query = new CryptonorQuery("key");
+              Query query = new Query("key");
               query.Setup(a => a.Value<string>(userName));
               await bucket.PullAsync(query);
 
-              CryptonorLocalBucket bucket2 = (CryptonorLocalBucket)client.GetLocalBucket("dbsync", localPath2);
+              LocalBucket bucket2 = (LocalBucket)client.GetLocalBucket("dbsync", localPath2);
 
               await bucket2.PullAsync(query);
               //now both databases has same object with same version
