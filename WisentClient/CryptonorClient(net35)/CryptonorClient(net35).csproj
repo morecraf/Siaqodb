@@ -95,8 +95,8 @@
     <Compile Include="..\CryptonorClient%28net45%29\Entities\CryptonorObjectExtensions.cs">
       <Link>Entities\CryptonorObjectExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\CryptonorClient%28net45%29\Entities\CryptonorResultSet.cs">
-      <Link>Entities\CryptonorResultSet.cs</Link>
+    <Compile Include="..\CryptonorClient%28net45%29\Entities\ResultSet.cs">
+      <Link>Entities\ResultSet.cs</Link>
     </Compile>
     <Compile Include="..\CryptonorClient%28net45%29\Exceptions\WriteException.cs">
       <Link>Exceptions\WriteException.cs</Link>

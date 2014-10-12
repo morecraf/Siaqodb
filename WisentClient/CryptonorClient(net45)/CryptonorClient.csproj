@@ -68,7 +68,7 @@
     <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Encryption\Pack.cs" />
     <Compile Include="Entities\CryptonorObjectExtensions.cs" />
-    <Compile Include="Entities\CryptonorResultSet.cs" />
+    <Compile Include="Entities\ResultSet.cs" />
     <Compile Include="Exceptions\WriteException.cs" />
     <Compile Include="Http\CryptonorHttpClient.cs" />
     <Compile Include="Http\RequestBuilder.cs" />
