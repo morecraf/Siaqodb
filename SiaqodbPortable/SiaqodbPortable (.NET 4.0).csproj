@@ -54,7 +54,7 @@
     <WarningLevel>1</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>
