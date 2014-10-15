@@ -196,7 +196,11 @@ namespace CryptonorClient
         }
 #endif
 #if NON_ASYNC
+#if CF 
+        public void Store(string key, object obj, object tags )
+#else
         public void Store(string key, object obj, object tags = null)
+#endif
         {
             Dictionary<string, object> tags_Dict = null;
             if (tags != null)
@@ -243,7 +247,12 @@ namespace CryptonorClient
         }
 #endif
 #if NON_ASYNC
+#if CF
+         public void Store(object obj, object tags)
+#else
         public void Store(object obj, object tags = null)
+#endif
+        
         {
             this.Store(null, obj, tags);
         }

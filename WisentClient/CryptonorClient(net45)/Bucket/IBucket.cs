@@ -38,8 +38,14 @@ namespace CryptonorClient
         void Store(CryptonorObject obj);
         void Store(string key, object obj);
         void Store(string key, object obj, System.Collections.Generic.Dictionary<string, object> tags);
+#if CF
+        void Store(string key, object obj, object tags );
+         void Store( object obj, object tags);
+#else
         void Store(string key, object obj, object tags = null);
         void Store( object obj, object tags = null);
+#endif
+
         /// <summary>
         /// 
         /// </summary>

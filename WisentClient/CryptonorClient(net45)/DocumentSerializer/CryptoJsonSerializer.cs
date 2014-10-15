@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if !UNITY3D
+#if !UNITY3D && !CF
 using Newtonsoft.Json;
 #endif
 
@@ -13,7 +13,7 @@ namespace CryptonorClient.DocumentSerializer
     {
         #region IDocumentSerializer Members
 
-        #if !UNITY3D
+        #if !UNITY3D && !CF
         readonly JsonSerializer serializer = new JsonSerializer();
 #endif
         public object Deserialize(Type type, byte[] objectBytes)
@@ -26,7 +26,7 @@ namespace CryptonorClient.DocumentSerializer
             string jsonStr = Encoding.UTF8.GetString(objectBytes);
 
 #endif
-            #if !UNITY3D
+            #if !UNITY3D && !CF
             return JsonConvert.DeserializeObject(jsonStr.TrimEnd('\0'), type);
 #else
             LitJson.JsonReader reader = new LitJson.JsonReader(jsonStr.TrimEnd('\0'));
@@ -38,7 +38,7 @@ namespace CryptonorClient.DocumentSerializer
 
         public byte[] Serialize(object obj)
         {
-#if !UNITY3D
+#if !UNITY3D && !CF
             string jsonStr = JsonConvert.SerializeObject(obj,Formatting.Indented);
            
 #else

@@ -131,7 +131,7 @@ namespace CryptonorClient
             string uriFragment = bucket;
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
 
-#if !UNITY3D
+#if !UNITY3D && !CF
             var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(obj));
 #else
             var resp = Post(request, LitJson.JsonMapper.ToJson(obj));
@@ -159,7 +159,7 @@ namespace CryptonorClient
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "batch");
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
-            #if !UNITY3D
+            #if !UNITY3D && !CF
             var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(batch));
 #else
             var resp = Post(request, LitJson.JsonMapper.ToJson(batch));
@@ -188,7 +188,7 @@ namespace CryptonorClient
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "search");
 
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment);
-#if !UNITY3D
+#if !UNITY3D && !CF
             var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(query));
 #else
             var resp = Post(request, LitJson.JsonMapper.ToJson(query));
@@ -237,7 +237,7 @@ namespace CryptonorClient
             }
 
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment, parameters);
-#if !UNITY3D
+#if !UNITY3D && !CF
             var resp = Post(request, Newtonsoft.Json.JsonConvert.SerializeObject(query));
 #else
             var resp = Post(request, LitJson.JsonMapper.ToJson(query));
@@ -247,7 +247,7 @@ namespace CryptonorClient
 
         private static T DeserializeResponse<T>(HttpWebResponse resp)
         {
-           #if !UNITY3D
+           #if !UNITY3D && !CF
             var serializer = new Newtonsoft.Json.JsonSerializer();
             using (var sr = new StreamReader(resp.GetResponseStream()))
             {

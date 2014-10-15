@@ -134,6 +134,14 @@
     <Compile Include="Core\SqoFile.cs" />
     <Compile Include="Core\SqoISFile.cs" />
     <Compile Include="Core\SqoISFile2.cs" />
+    <Compile Include="CryptonorDB\CryptonorLocalDB.cs" />
+    <Compile Include="CryptonorDB\CryptonorObject.cs" />
+    <Compile Include="CryptonorDB\Exceptions\CryptonorException.cs" />
+    <Compile Include="CryptonorDB\Indexes\IndexQueryFinder.cs" />
+    <Compile Include="CryptonorDB\Indexes\TagsIndexManager.cs" />
+    <Compile Include="CryptonorDB\IQuery.cs" />
+    <Compile Include="CryptonorDB\Query.cs" />
+    <Compile Include="CryptonorDB\TagsSerializer.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
@@ -212,7 +220,7 @@
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\System.Linq.Expressions\System.Linq.Expressions.csproj">
+    <ProjectReference Include="..\ThirdParty\System.Linq.Expressions\System.Linq.Expressions.csproj">
       <Project>{92FFA693-E97C-42AF-B479-E311BB4A7321}</Project>
       <Name>System.Linq.Expressions</Name>
     </ProjectReference>

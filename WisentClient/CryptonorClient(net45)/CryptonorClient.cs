@@ -20,7 +20,7 @@ namespace CryptonorClient
             this.uri = uri;
             this.username = username;
             this.password = password;
-#if UNITY3D
+#if UNITY3D || CF
           LitJson.JsonMapper.RegisterImporter<string, byte[]>(a => System.Convert.FromBase64String(a));
             LitJson.JsonMapper.RegisterExporter<byte[]>((a,b) => b.Write(System.Convert.ToBase64String(a)));
 #endif

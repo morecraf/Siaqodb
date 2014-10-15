@@ -70,7 +70,7 @@
       <Project>{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}</Project>
       <Name>Siaqodb %28CF%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\System.Linq.Expressions\System.Linq.Expressions.csproj">
+    <ProjectReference Include="..\..\ThirdParty\System.Linq.Expressions\System.Linq.Expressions.csproj">
       <Project>{92FFA693-E97C-42AF-B479-E311BB4A7321}</Project>
       <Name>System.Linq.Expressions</Name>
     </ProjectReference>

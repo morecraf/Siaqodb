@@ -20,6 +20,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 #else
 using System.Security.Cryptography;
 #endif
+#if CF
+using CryptonorClient.Encryption;
+#endif
+
 namespace CryptonorClient.Http
 {
     class Signature

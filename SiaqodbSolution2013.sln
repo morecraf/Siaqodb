@@ -83,6 +83,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestsSiaqodbWinRT", "Un
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAndLoadTestProject1", "UnitTests\WebAndLoadTestProject1\WebAndLoadTestProject1.csproj", "{8D552BB1-B411-468F-BB39-F5C7EC983239}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication2", "Toys\WindowsFormsApplication2\WindowsFormsApplication2.csproj", "{8C3C5DF6-2D48-41CB-B625-1676607A769B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -645,6 +647,20 @@ Global
 		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|x64.ActiveCfg = Release|Any CPU
 		{8D552BB1-B411-468F-BB39-F5C7EC983239}.Release|x86.ActiveCfg = Release|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Release|x64.ActiveCfg = Release|Any CPU
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -684,5 +700,6 @@ Global
 		{66F65EB0-FFEC-4C00-93BA-32BEFC3D8CED} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 		{B6F63D1C-1916-4B9D-8511-24B85E161E27} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 		{8D552BB1-B411-468F-BB39-F5C7EC983239} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
+		{8C3C5DF6-2D48-41CB-B625-1676607A769B} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 	EndGlobalSection
 EndGlobal

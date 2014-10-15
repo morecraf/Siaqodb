@@ -466,9 +466,9 @@ namespace  LitJson
                         {
                             IDictionary dict = ((IDictionary)instance);
                             if (dict[property].GetType() == typeof(int))
-                                dict[property] =  Convert.ChangeType(dict[property] , typeof(long));
+                                dict[property] =  Convertor.ChangeType(dict[property] , typeof(long));
                             if (dict[property].GetType() == typeof(float))
-                                dict[property] = Convert.ChangeType(dict[property], typeof(double));
+                                dict[property] = Convertor.ChangeType(dict[property], typeof(double));
                         }
                     }
 
@@ -924,6 +924,42 @@ namespace  LitJson
         public static void UnregisterImporters ()
         {
             custom_importers_table.Clear ();
+        }
+#if CF
+       
+#endif
+
+    }
+    static class TypeHelper
+    {
+
+        public static Type GetInterface(this Type type, string name)
+        {
+            Type[] subType = type.GetInterfaces();
+
+            for (int i = 0; i < subType.Length; i++)
+            {
+                if (subType[i].Name.CompareTo(name) == 0)
+                {
+                    return subType[i];
+                }
+            }
+
+            return null;
+        }
+
+    }
+    internal class Convertor
+    {
+        public static object ChangeType(object obj, Type t)
+        {
+            #if SILVERLIGHT
+                        return Convert.ChangeType(obj, t, System.Threading.Thread.CurrentThread.CurrentCulture);
+            #elif  CF
+                           return      Convert.ChangeType(obj, t,System.Globalization.CultureInfo.CurrentCulture);
+            #else
+                    return Convert.ChangeType(obj, t);
+            #endif
         }
     }
 }

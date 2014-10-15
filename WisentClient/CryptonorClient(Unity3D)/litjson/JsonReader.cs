@@ -132,7 +132,12 @@ namespace  LitJson
                 number.IndexOf ('E') != -1) {
 
                 double n_double;
+#if CF 
+                if (TryParseDouble(number, out n_double))
+#else
                 if (Double.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out n_double))
+#endif
+
                 {
                     token = JsonToken.Double;
                     token_value = n_double;
@@ -142,7 +147,12 @@ namespace  LitJson
             }
 
             int n_int32;
-            if (Int32.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out n_int32))
+#if CF 
+            if (TryParseInt32(number, out n_int32))
+#else
+                 if (Int32.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out n_int32))
+#endif
+
             {
                 token = JsonToken.Int;
                 token_value = n_int32;
@@ -151,7 +161,12 @@ namespace  LitJson
             }
 
             long n_int64;
-            if (Int64.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out n_int64))
+            #if CF 
+            if (TryParseInt64(number, out n_int64))
+#else
+                 if (Int64.TryParse(number, NumberStyles.Any, CultureInfo.InvariantCulture, out n_int64))
+#endif
+
             {
                 token = JsonToken.Long;
                 token_value = n_int64;
@@ -163,7 +178,49 @@ namespace  LitJson
             token = JsonToken.Int;
             token_value = 0;
         }
+#if CF
+        private bool TryParseInt64(string number, out long n_int64)
+        {
+            try
+            {
+                n_int64 = Int64.Parse(number, NumberStyles.Any, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch (Exception e)
+            {
+                n_int64 = -1;
+                return false;
+            }
+        }
 
+        private bool TryParseInt32(string number, out int n_int32)
+        {
+            try
+            {
+                n_int32 = Int32.Parse(number,NumberStyles.Any, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch (Exception e)
+            {
+                n_int32 = -1;
+                return false;
+            }
+        }
+
+        private bool TryParseDouble(string number, out double n_double)
+        {
+            try
+            {
+                n_double = Double.Parse(number, NumberStyles.Any, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch (Exception e)
+            {
+                n_double = -1;
+                return false;
+            }
+        }
+#endif
         private void ProcessSymbol ()
         {
             if (current_symbol == '[')  {

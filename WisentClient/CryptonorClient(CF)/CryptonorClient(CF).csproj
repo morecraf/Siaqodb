@@ -1,0 +1,192 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7F5BE730-17A7-4932-84DB-E1FDA4FA3DD1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CryptonorClient</RootNamespace>
+    <AssemblyName>CryptonorClient</AssemblyName>
+    <ProjectTypeGuids>{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PlatformFamilyName>Smartphone</PlatformFamilyName>
+    <PlatformID>f27da329-3269-4191-98e0-c87d3d7f1db9</PlatformID>
+    <OSVersion>5.2</OSVersion>
+    <DeployDirSuffix>CryptonorClient</DeployDirSuffix>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <NativePlatformName>Windows Mobile 6 Standard SDK</NativePlatformName>
+    <FormFactorID>
+    </FormFactorID>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\cf\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;Smartphone CF NON_ASYNC</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <FileAlignment>512</FileAlignment>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <DocumentationFile>..\bin\cf\CryptonorClient.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;$(PlatformFamilyName)</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <FileAlignment>512</FileAlignment>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\Bucket.cs">
+      <Link>Bucket\Bucket.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\Events.cs">
+      <Link>Bucket\Events.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\IBucket.cs">
+      <Link>Bucket\IBucket.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Bucket\LocalBucket.cs">
+      <Link>Bucket\LocalBucket.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\CompatibilityHelper.cs">
+      <Link>CompatibilityHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\CryptonorClient.cs">
+      <Link>CryptonorClient.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\CryptonorConfigurator.cs">
+      <Link>CryptonorConfigurator.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\DocumentSerializer\CryptoJsonSerializer.cs">
+      <Link>DocumentSerializer\CryptoJsonSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\DocumentSerializer\IDocumentSerializer.cs">
+      <Link>DocumentSerializer\IDocumentSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\AES128Encryptor.cs">
+      <Link>Encryption\AES128Encryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\AES256Encryptor.cs">
+      <Link>Encryption\AES256Encryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\Camellia.cs">
+      <Link>Encryption\Camellia.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\CBCCipher.cs">
+      <Link>Encryption\CBCCipher.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\CryptonorRandom.cs">
+      <Link>Encryption\CryptonorRandom.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\IEncryptor.cs">
+      <Link>Encryption\IEncryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Encryption\Pack.cs">
+      <Link>Encryption\Pack.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Entities\CryptonorObjectExtensions.cs">
+      <Link>Entities\CryptonorObjectExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Entities\ResultSet.cs">
+      <Link>Entities\ResultSet.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Exceptions\WriteException.cs">
+      <Link>Exceptions\WriteException.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Http\CryptonorHttpClient.cs">
+      <Link>Http\CryptonorHttpClient.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Http\RequestBuilder.cs">
+      <Link>Http\RequestBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Http\Signature.cs">
+      <Link>Http\Signature.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Queries\CryptonorQueryExtensions.cs">
+      <Link>Queries\CryptonorQueryExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28net45%29\Queries\QueryConfigurator.cs">
+      <Link>Queries\QueryConfigurator.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\IJsonWrapper.cs">
+      <Link>litjson\IJsonWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\JsonData.cs">
+      <Link>litjson\JsonData.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\JsonException.cs">
+      <Link>litjson\JsonException.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\JsonMapper.cs">
+      <Link>litjson\JsonMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\JsonReader.cs">
+      <Link>litjson\JsonReader.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\JsonWriter.cs">
+      <Link>litjson\JsonWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\Lexer.cs">
+      <Link>litjson\Lexer.cs</Link>
+    </Compile>
+    <Compile Include="..\CryptonorClient%28Unity3D%29\litjson\ParserToken.cs">
+      <Link>litjson\ParserToken.cs</Link>
+    </Compile>
+    <Compile Include="Encryption\HMAC\GeneralDigest.cs" />
+    <Compile Include="Encryption\HMAC\HMac.cs" />
+    <Compile Include="Encryption\HMAC\HMACSHA256.cs" />
+    <Compile Include="Encryption\HMAC\ICipherParameters.cs" />
+    <Compile Include="Encryption\HMAC\IDigest.cs" />
+    <Compile Include="Encryption\HMAC\IMac.cs" />
+    <Compile Include="Encryption\HMAC\KeyParameter.cs" />
+    <Compile Include="Encryption\HMAC\Sha256Digest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28CF%29.csproj">
+      <Project>{E41301EC-1AC6-471E-BFB0-5401A2EA0AF8}</Project>
+      <Name>Siaqodb %28CF%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ThirdParty\System.Linq.Expressions\System.Linq.Expressions.csproj">
+      <Project>{92FFA693-E97C-42AF-B479-E311BB4A7321}</Project>
+      <Name>System.Linq.Expressions</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}">
+        <HostingProcess disable="1" />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

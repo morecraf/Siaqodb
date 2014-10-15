@@ -61,4 +61,20 @@ namespace  LitJson
         string ToJson ();
         void   ToJson (JsonWriter writer);
     }
+#if CF
+    public interface IOrderedDictionary : IDictionary
+    {
+        object this[int idx]
+        {
+            get;
+            set;
+        }
+
+        IDictionaryEnumerator GetEnumerator();
+
+        void Insert(int idx, object key, object value);
+
+        void RemoveAt(int idx);
+    }
+#endif
 }
