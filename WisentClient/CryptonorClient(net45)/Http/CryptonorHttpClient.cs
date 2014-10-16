@@ -442,7 +442,7 @@ namespace CryptonorClient
             }
         }
 #if ASYNC
-        public async Task<List<string>> GetAllAsync()
+        public async Task<List<string>> GetBucketsAsync()
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}", "allBuckets");
 
@@ -453,6 +453,44 @@ namespace CryptonorClient
             var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(List<string>), GetDefaultFormatter());
 
             return (List<string>)obj;
+        }
+#endif
+ #if NON_ASYNC
+        public List<string> GetBuckets()
+        {
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}", "allBuckets");
+
+            HttpWebRequest request = requestBuilder.BuildGetRequest(uriFragment, null);
+
+            var resp = Send(request);
+
+            return DeserializeResponse<List<string>>(resp);
+        }
+#endif
+#if ASYNC
+        public async Task<string> Ping()
+        {
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}", "ping");
+
+            HttpRequestMessage request = requestBuilder.BuildGetRequestAsync(uriFragment, null);
+           
+            HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
+            httpResponseMessage.EnsureSuccessStatusCode();
+            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(string), GetDefaultFormatter());
+
+            return obj.ToString();
+        }
+#endif
+#if NON_ASYNC
+        public string Ping()
+        {
+            string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}", "ping");
+
+            HttpWebRequest request = requestBuilder.BuildGetRequest(uriFragment, null);
+
+            var resp = Send(request);
+
+            return DeserializeResponse<string>(resp);
         }
 #endif
     }

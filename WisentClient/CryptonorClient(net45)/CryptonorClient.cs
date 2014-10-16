@@ -35,10 +35,31 @@ namespace CryptonorClient
             return new LocalBucket(uri, bucketName, localFolder, this.username, this.password);
         }
 #if ASYNC
-        public async Task<List<string>> GetAllBucketsAsync()
+        public async Task<List<string>> GetBucketsAsync()
         {
-            return await httpClient.GetAllAsync();
+            return await httpClient.GetBucketsAsync();
             
+        }
+#endif
+#if NON_ASYNC
+        public List<string> GetBuckets()
+        {
+            return httpClient.GetBuckets();
+
+        }
+#endif
+#if ASYNC
+        public async Task<string> Ping()
+        {
+            return await httpClient.Ping();
+            
+        }
+#endif
+#if NON_ASYNC
+        public string Ping()
+        {
+            return httpClient.Ping();
+
         }
 #endif
     
