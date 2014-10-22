@@ -46,7 +46,7 @@ namespace CryptonorClient
         }
         public static object GetValue(this CryptonorObject crObj, Type type)
         {
-            if (crObj.Document == null)
+            if (crObj.Document == null || crObj.Document.Length==0)
                 return null;
             if (CryptonorConfigurator.Cipher == null)
                 throw new CryptonorException("Encryption algorithm should be set,use CryptonorConfigurator.SetEncryptor(...) method");
@@ -63,7 +63,7 @@ namespace CryptonorClient
         }
         public static string GetValueAsJson(this CryptonorObject crObj)
         {
-            if (crObj.Document == null)
+            if (crObj.Document == null || crObj.Document.Length == 0)
                 return null;
             if (CryptonorConfigurator.Cipher == null)
                 throw new CryptonorException("Encryption algorithm should be set,use CryptonorConfigurator.SetEncryptor(...) method");
