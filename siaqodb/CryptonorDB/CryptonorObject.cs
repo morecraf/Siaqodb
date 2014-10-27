@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Cryptonor
 {
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class CryptonorObject
     {
         [Index]

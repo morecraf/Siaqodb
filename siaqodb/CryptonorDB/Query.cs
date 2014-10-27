@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Cryptonor.Queries
 {
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class Query :IQuery
     {
         public Query(string tagOrKey)

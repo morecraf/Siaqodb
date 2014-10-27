@@ -34,7 +34,7 @@ namespace Cryptonor
 #if !WinRT
         public CryptonorLocalDB(string bucketPath)
         {
-            SiaqodbConfigurator.SetLicense(@"8+9xiEEUL3aP1P5F1pkpCZQq2RoRgE5czRvwXgQIHBE=");
+            Sqo.SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
             this.siaqodb = new Siaqodb(bucketPath);
             indexManager = new TagsIndexManager(this.siaqodb);
            
@@ -43,7 +43,7 @@ namespace Cryptonor
 #else
         public CryptonorLocalDB(StorageFolder bucketPath)
         {
-            SiaqodbConfigurator.SetLicense(@"6mQill2r3RSwk/Nl9ZOBOoHDBrsSTUN8ZYGqWmmbxwuOHcOPjeEzLiacv5kTxM3Z");
+           Sqo.SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
             this.siaqodb = new Siaqodb();
             this.siaqodb.Open(bucketPath);
             indexManager = new TagsIndexManager(this.siaqodb);
@@ -591,13 +591,14 @@ namespace Cryptonor
         }
        
     }
-  
+  [System.Reflection.Obfuscation(Exclude = true)]
      enum DirtyOperation
     {
         Inserted = 1,
         Updated,
         Deleted
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
      class DirtyEntity
     {
         public int EntityOID;
@@ -619,17 +620,20 @@ namespace Cryptonor
         }
 #endif
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class ChangeSet
     {
         public List<CryptonorObject> ChangedObjects { get; set; }
         public List<DeletedObject> DeletedObjects { get; set; }
         public string Anchor { get; set; }
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class DeletedObject
     {
         public string Key { get; set; }
         public string Version { get; set; }
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     internal class Anchor
     {
         public int OID { get; set; }
