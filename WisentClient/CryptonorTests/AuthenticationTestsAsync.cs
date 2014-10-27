@@ -22,11 +22,11 @@ namespace CryptonorTests
         public AuthenticationTestsAsync()
         {
             CryptonorConfigurator.SetEncryptor(EncryptionAlgorithm.Camellia128, "mysuper_secret");
-            var cl1 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/","b8d2f15848b12927d50d0037510013c8", "v8zQGiAjyl");
+            var cl1 = new CryptonorClient.CryptonorClient("http://api.cryptonordb.com/v0/", "4dc9e2422167019c7d51f51728000891", "JHpqovSSgkAFDyGjKIME");
             bucketReadWrite = cl1.GetBucket("iasi");
-            var cl2 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "b8d2f15848b12927d50d003751001bf9", "lvcrHysPRw");
+            var cl2 = new CryptonorClient.CryptonorClient("http://api.cryptonordb.com/v0/", "4dc9e2422167019c7d51f51728004dba", "XvCEAzzZtrx3nEyS0LDX");
             bucketRead= cl2.GetBucket("iasi");
-            var cl3 = new CryptonorClient.CryptonorClient("http://localhost:53411/api/", "b8d2f15848b12927d50d00375100227a", "o5BPwKMv4u");
+            var cl3 = new CryptonorClient.CryptonorClient("http://api.cryptonordb.com/v0/", "5ca1eef35a9621fbc81879299700085e", "yuJz6wlaW2ds68SK15Ju");
             bucketNone= cl3.GetBucket("iasi");
         }
 
@@ -41,9 +41,10 @@ namespace CryptonorTests
             {
                 await bucketNone.GetAsync(documentKey);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+                
+                if(ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -58,7 +59,8 @@ namespace CryptonorTests
             }
             catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -71,9 +73,10 @@ namespace CryptonorTests
             {
                 await bucketNone.GetAsync<Person>(documentKey);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -86,9 +89,10 @@ namespace CryptonorTests
             {
                 await bucketNone.GetAllAsync();
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -99,12 +103,15 @@ namespace CryptonorTests
            var unautorized = false;
            try
            {
-               //store object(POST)
-               await bucketNone.StoreAsync(new CryptonorObject());
+               var o = new CryptonorObject();
+               o.SetValue<Person>(new Person());
+               o.Key = Guid.NewGuid().ToString();
+               await bucketNone.StoreAsync(o);
            }
-           catch (HttpRequestException)
+           catch (HttpRequestException ex)
            {
-               unautorized = true;
+
+               if (ex.Message.Contains("Unauthorized")) unautorized = true;
            }
            Assert.IsTrue(unautorized);
        }
@@ -118,9 +125,10 @@ namespace CryptonorTests
                //store object(POST)
                await bucketNone.StoreAsync("dummy", new Person(), new { age = "22" });
            }
-           catch (HttpRequestException)
+           catch (HttpRequestException ex)
            {
-               unautorized = true;
+
+               if (ex.Message.Contains("Unauthorized")) unautorized = true;
            }
            Assert.IsTrue(unautorized);
        }
@@ -134,9 +142,10 @@ namespace CryptonorTests
                //store object(POST)
                await bucketNone.StoreAsync("dummy", new Person());
            }
-           catch (HttpRequestException)
+           catch (HttpRequestException ex)
            {
-               unautorized = true;
+
+               if (ex.Message.Contains("Unauthorized")) unautorized = true;
            }
            Assert.IsTrue(unautorized);
        }
@@ -150,9 +159,10 @@ namespace CryptonorTests
                //store object(POST)
                await bucketNone.StoreAsync("dummy", new Person(), new Dictionary<string, object> { { "age", "22" } });
            }
-           catch (HttpRequestException)
+           catch (HttpRequestException ex)
            {
-               unautorized = true;
+
+               if (ex.Message.Contains("Unauthorized")) unautorized = true;
            }
            Assert.IsTrue(unautorized);
        }
@@ -166,9 +176,10 @@ namespace CryptonorTests
                //store batch(POST)
                await bucketNone.StoreBatchAsync(new []{new CryptonorObject()});
            }
-           catch (HttpRequestException)
+           catch (HttpRequestException ex)
            {
-               unautorized = true;
+
+               if (ex.Message.Contains("Unauthorized")) unautorized = true;
            }
            Assert.IsTrue(unautorized);
        }
@@ -182,9 +193,10 @@ namespace CryptonorTests
                //delete by key(DeleteAsync)
                await bucketNone.DeleteAsync("dummy");
            }
-           catch (HttpRequestException)
+           catch (HttpRequestException ex)
            {
-               unautorized = true;
+
+               if (ex.Message.Contains("Unauthorized")) unautorized = true;
            }
            Assert.IsTrue(unautorized);
        }
@@ -195,12 +207,15 @@ namespace CryptonorTests
            var unautorized = false;
            try
            {
-               //delete crypto object(DELETE)
-               await bucketNone.DeleteAsync(new CryptonorObject());
+               var o = new CryptonorObject();
+               o.SetValue<Person>(new Person());
+               o.Key = Guid.NewGuid().ToString();
+               await bucketNone.DeleteAsync(o);
            }
-           catch (HttpRequestException)
+           catch (HttpRequestException ex)
            {
-               unautorized = true;
+
+               if (ex.Message.Contains("Unauthorized")) unautorized = true;
            }
            Assert.IsTrue(unautorized);
        }
@@ -227,9 +242,10 @@ namespace CryptonorTests
                 // get entity(GET)
                 await bucketRead.GetAsync<Person>(documentKey);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsFalse(unautorized);
         }
@@ -242,12 +258,15 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                //store object(POST)
-                await bucketRead.StoreAsync(new CryptonorObject());
+                var o= new CryptonorObject();
+                o.SetValue<Person>(new Person());
+                o.Key = Guid.NewGuid().ToString();
+                await bucketRead.StoreAsync(o);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -261,9 +280,10 @@ namespace CryptonorTests
                 //store object(POST)
                 await bucketRead.StoreAsync("dummy", new Person(), new { age = "22" });
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -277,9 +297,10 @@ namespace CryptonorTests
                 //store object(POST)
                 await bucketRead.StoreAsync("dummy", new Person());
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -293,9 +314,10 @@ namespace CryptonorTests
                 //store object(POST)
                 await bucketRead.StoreAsync("dummy", new Person(), new Dictionary<string, object> { { "age", "22" } });
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -309,10 +331,10 @@ namespace CryptonorTests
                 //store batch(POST)
                 await bucketRead.StoreBatchAsync(new[] { new CryptonorObject() });
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException ex)
             {
-                Console.WriteLine(e.Message);
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -326,9 +348,10 @@ namespace CryptonorTests
                 //delete by key(DeleteAsync)
                 await bucketRead.DeleteAsync("dummy");
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -339,12 +362,15 @@ namespace CryptonorTests
             var unautorized = false;
             try
             {
-                //delete crypto object(DELETE)
-                await bucketRead.DeleteAsync(new CryptonorObject());
+                var o = new CryptonorObject();
+                o.SetValue<Person>(new Person());
+                o.Key = Guid.NewGuid().ToString();
+                await bucketRead.DeleteAsync(o);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsTrue(unautorized);
         }
@@ -404,9 +430,10 @@ namespace CryptonorTests
                 //delete obj(DELETE)
                 await bucketReadWrite.DeleteAsync(await bucketReadWrite.GetAsync("key0"));
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException ex)
             {
-                unautorized = true;
+
+                if (ex.Message.Contains("Unauthorized")) unautorized = true;
             }
             Assert.IsFalse(unautorized);
         }

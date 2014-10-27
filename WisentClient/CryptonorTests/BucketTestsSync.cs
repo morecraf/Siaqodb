@@ -959,6 +959,7 @@ namespace CryptonorTests
             Assert.AreEqual(null, value);
         }
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void StoreNullOrEmptyKey()
         {
            
