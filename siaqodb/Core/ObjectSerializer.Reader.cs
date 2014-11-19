@@ -45,7 +45,19 @@ namespace Sqo.Core
                 byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
 
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
-                object fieldVal = byteTransformer.GetObject(field);
+
+                object fieldVal = null;
+                try
+                {
+                    fieldVal = byteTransformer.GetObject(field);
+                }
+                catch (Exception ex)
+                {
+                    if (ti.Type!=null && ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
+                        throw new IndexCorruptedException();
+                    SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded, will be set to default.", VerboseLevel.Info);
+                    fieldVal = MetaHelper.GetDefault(ai.AttributeType);
+                }
                 if (ai.AttributeTypeId == MetaExtractor.documentID)
                 { 
                     DocumentInfo dinfo=fieldVal as DocumentInfo;
@@ -115,8 +127,20 @@ namespace Sqo.Core
                 byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
 
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
-                object fieldVal = await byteTransformer.GetObjectAsync(field).ConfigureAwait(false);
-              
+                object fieldVal = null;
+                try
+                {
+                    fieldVal =  await byteTransformer.GetObjectAsync(field).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    if (ti.Type != null && ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
+                    {
+                        throw new IndexCorruptedException();
+                    }
+                    SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded, will be set to default.", VerboseLevel.Info);
+                    fieldVal = MetaHelper.GetDefault(ai.AttributeType);
+                }
                 if (ai.AttributeTypeId == MetaExtractor.documentID)
                 {
                     DocumentInfo dinfo = fieldVal as DocumentInfo;
@@ -244,7 +268,7 @@ namespace Sqo.Core
 #endif
         public object ReadFieldValue(SqoTypeInfo ti, int oid, FieldSqoInfo fi, RawdataSerializer rawSerializer)
         {
-            
+
             long position = MetaHelper.GetSeekPosition(ti, oid);
             int recordLength = ti.Header.lengthOfRecord;
             if (fi == null)
@@ -262,8 +286,19 @@ namespace Sqo.Core
                 Array.Copy(preloadedBytes, fieldPosition, b, 0, b.Length);
             }
             IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, fi, ti);
-
-            return byteTransformer.GetObject(b);
+            try
+            {
+                return byteTransformer.GetObject(b);
+            }
+            catch (Exception ex)
+            {
+                if (ti.Type != null && ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
+                {
+                    throw new IndexCorruptedException();
+                }
+                SiaqodbConfigurator.LogMessage("Field's" + fi.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                return MetaHelper.GetDefault(fi.AttributeType);
+            }
 
         }
 #if ASYNC
@@ -287,8 +322,19 @@ namespace Sqo.Core
                 Array.Copy(preloadedBytes, fieldPosition, b, 0, b.Length);
             }
             IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, fi, ti);
-
-            return await byteTransformer.GetObjectAsync(b).ConfigureAwait(false);
+            try
+            {
+                return await byteTransformer.GetObjectAsync(b).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (ti.Type != null && ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
+                {
+                    throw new IndexCorruptedException();
+                }
+                SiaqodbConfigurator.LogMessage("Field's" + fi.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                return MetaHelper.GetDefault(fi.AttributeType);
+            }
 
         }
 #endif
@@ -465,7 +511,16 @@ namespace Sqo.Core
                     }
                     else
                     {
-                        row[ai.Name] = ByteConverter.DeserializeValueType(ai.AttributeType, field, true, ti.Header.version);
+                        try
+                        {
+                            row[ai.Name] = ByteConverter.DeserializeValueType(ai.AttributeType, field, true, ti.Header.version);
+                        }
+                        catch (Exception ex)
+                        {
+
+                            SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                            row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                        }
                     }
 
                 }
@@ -503,7 +558,16 @@ namespace Sqo.Core
                 }
                 else
                 {
-                    row[ai.Name] = ByteConverter.DeserializeValueType(ai.AttributeType, field, true, ti.Header.version);
+                    try
+                    {
+                        row[ai.Name] = ByteConverter.DeserializeValueType(ai.AttributeType, field, true, ti.Header.version);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                        row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                    }
                 }
 
             }

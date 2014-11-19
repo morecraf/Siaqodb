@@ -187,14 +187,14 @@ namespace WindowsFormsApplication1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            SiaqodbConfigurator.SetLicense(@"G5Km9leSRHoYJ784J8ascwPg868xkD5kGQQHDbGcvC0=");
+            SiaqodbConfigurator.SetLicense(@"z/Cmq4ZDeCZvuUyx4dIZD1U/7GWIlE6kfCZzNmjvEhk=");
 
 
-            Siaqodb sqo = new Siaqodb(@"e:\sqoo\temp\db\");
+            Siaqodb sqo = new Siaqodb(@"c:\work\temp\_aaa\");
 
             DateTime start = DateTime.Now;
 
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 Tick t = new Tick();
                 t.mydate = DateTime.Now;
@@ -202,16 +202,19 @@ namespace WindowsFormsApplication1
                 t.mylong = i;
                 t.mystring = "asdasd" + i.ToString();
 
-                sqo.StoreObject(t);
+                //sqo.StoreObject(t);
             }
-            sqo.Flush();
+            //sqo.Flush();
 
             string elapsed = (DateTime.Now - start).ToString();
 
            // MessageBox.Show("Inserted:" + elapsed);
             start = DateTime.Now;
             // SiaqodbConfigurator.LoadRelatedObjects<PlayerHost>(false);
-            IList<Tick> players = sqo.LoadAll<Tick>();
+            //IList<Tick> players = sqo.LoadAll<Tick>();
+            var qu = (from Tick t in sqo
+                      where t.MyInt == 70
+                      select t).ToList();
             elapsed = (DateTime.Now - start).ToString();
             string g = "";
 
@@ -222,7 +225,7 @@ namespace WindowsFormsApplication1
 
         public int OID { get; set; }
 
-
+        [Index]
         public int MyInt;
         public string mystring;
         public DateTime mydate;

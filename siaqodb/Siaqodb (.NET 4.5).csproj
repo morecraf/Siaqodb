@@ -102,6 +102,7 @@
     <Compile Include="Core\SqoISFile2.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
+    <Compile Include="Exceptions\IndexCorruptedException.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\NotSupportedTypeException.cs" />

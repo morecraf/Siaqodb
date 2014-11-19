@@ -9,6 +9,7 @@ using Sqo.Utilities;
 using Sqo.MetaObjects;
 #if ASYNC
 using System.Threading.Tasks;
+using Sqo.Exceptions;
 #endif
 namespace Sqo.Indexes
 {
@@ -34,7 +35,16 @@ namespace Sqo.Indexes
                 IBTree index = cacheIndexes.GetIndex(ti, fieldName);
                 if (index != null && where.OperationType != OperationType.Contains && where.OperationType != OperationType.NotEqual && where.OperationType != OperationType.EndWith)
                 {
-                    this.LoadOidsByIndex(index, where, oids);
+                    try
+                    {
+                        this.LoadOidsByIndex(index, where, oids);
+                    }
+                    catch (IndexCorruptedException ex)
+                    {
+                        SiaqodbConfigurator.LogMessage("Index has corrupted, will be rebuild", VerboseLevel.Info);
+                        index=this.RenewIndex(ti, fieldName);
+                        this.LoadOidsByIndex(index, where, oids);
+                    }
                     return true;
                 }
             }
@@ -48,7 +58,21 @@ namespace Sqo.Indexes
                 IBTree index = cacheIndexes.GetIndex(ti, fieldName);
                 if (index != null && where.OperationType != OperationType.Contains && where.OperationType != OperationType.NotEqual && where.OperationType != OperationType.EndWith)
                 {
-                    await this.LoadOidsByIndexAsync(index, where, oids).ConfigureAwait(false);
+                    bool error = false;
+                    try
+                    {
+                        await this.LoadOidsByIndexAsync(index, where, oids).ConfigureAwait(false);
+                    }
+                    catch (IndexCorruptedException ex)
+                    {
+                        error = true;
+                    }
+                    if (error)
+                    {
+                        SiaqodbConfigurator.LogMessage("Index has corrupted, will be rebuild", VerboseLevel.Info);
+                        index = await this.RenewIndexAsync(ti, fieldName);
+                        await this.LoadOidsByIndexAsync(index, where, oids).ConfigureAwait(false);
+                    }
                     return true;
                 }
             }
@@ -337,13 +361,20 @@ namespace Sqo.Indexes
            IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
            IndexInfo2 indexInfo = null;
            string indexName = finfo.Name + tinfo.TypeName;
-           foreach (IndexInfo2 ii in StoredIndexes)
+           try
            {
-               if (indexName.StartsWith(ii.IndexName) || ii.IndexName.StartsWith(indexName))
+               foreach (IndexInfo2 ii in StoredIndexes)
                {
-                   indexInfo = ii;
-                   break;
+                   if (indexName.StartsWith(ii.IndexName) || ii.IndexName.StartsWith(indexName))
+                   {
+                       indexInfo = ii;
+                       break;
+                   }
                }
+           }
+           catch (Exception ex)
+           {
+               SiaqodbConfigurator.LogMessage("IndexInfo cannot be loaded, index will be rebuild", VerboseLevel.Info);
            }
            bool indexExists = false;
            if (indexInfo == null)
@@ -362,7 +393,22 @@ namespace Sqo.Indexes
            Type nodeType = typeof(BTreeNode<>).MakeGenericType(finfo.AttributeType);
            if (indexInfo.RootOID > 0 && indexExists)
            {
-               object rootP = siaqodb.LoadObjectByOID(nodeType, indexInfo.RootOID);
+               object rootP = null;
+               try
+               {
+                   rootP = siaqodb.LoadObjectByOID(nodeType, indexInfo.RootOID);
+               }
+               catch (IndexCorruptedException ex)
+               {
+                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
+                   {
+                       storedIndexes.Remove(indexInfo);
+                   }
+                   siaqodb.Delete(indexInfo);             
+                   indexInfo = this.BuildIndex(finfo, tinfo, index);
+                   index.SetIndexInfo(indexInfo);
+                   index.Persist();
+               }
                if (rootP != null)
                {
                    index.SetRoot(rootP);
@@ -379,14 +425,21 @@ namespace Sqo.Indexes
            IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
            IndexInfo2 indexInfo = null;
            string indexName = finfo.Name + tinfo.TypeName;
-           IList<IndexInfo2> stIndexes = await this.GetStoredIndexesAsync().ConfigureAwait(false);
-           foreach (IndexInfo2 ii in stIndexes)
+           try
            {
-               if (ii.IndexName == indexName)
+               IList<IndexInfo2> stIndexes = await this.GetStoredIndexesAsync().ConfigureAwait(false);
+               foreach (IndexInfo2 ii in stIndexes)
                {
-                   indexInfo = ii;
-                   break;
+                   if (ii.IndexName == indexName)
+                   {
+                       indexInfo = ii;
+                       break;
+                   }
                }
+           }
+           catch (Exception ex)
+           {
+               SiaqodbConfigurator.LogMessage("IndexInfo cannot be loaded, index will be rebuild", VerboseLevel.Info);
            }
            bool indexExists = false;
            if (indexInfo == null)
@@ -401,7 +454,27 @@ namespace Sqo.Indexes
            Type nodeType = typeof(BTreeNode<>).MakeGenericType(finfo.AttributeType);
            if (indexInfo.RootOID > 0 && indexExists)
            {
-               object rootP = await siaqodb.LoadObjectByOIDAsync(nodeType, indexInfo.RootOID).ConfigureAwait(false);
+               object rootP = null;
+               bool error = false;
+               try
+               {
+                   rootP = await siaqodb.LoadObjectByOIDAsync(nodeType, indexInfo.RootOID).ConfigureAwait(false);
+               }
+               catch (IndexCorruptedException ex)
+               {
+                   error = true;
+               }
+               if (error)
+               {
+                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
+                   {
+                       storedIndexes.Remove(indexInfo);
+                   }
+                   await siaqodb.DeleteAsync(indexInfo);
+                   indexInfo =await this.BuildIndexAsync(finfo, tinfo, index);
+                   index.SetIndexInfo(indexInfo);
+                   index.Persist();
+               }
                if (rootP != null)
                {
                    index.SetRoot(rootP);
@@ -996,5 +1069,88 @@ namespace Sqo.Indexes
            cacheIndexes = null;
            storedIndexes = null;
        }
+       private IBTree RenewIndex(SqoTypeInfo ti, string fieldName)
+       {
+           FieldSqoInfo finfo = MetaHelper.FindField(ti.Fields, fieldName);
+           IndexInfo2 indexInfo = null;
+           if (finfo != null)
+           {
+
+               string indexName = finfo.Name + ti.TypeName;
+
+               foreach (IndexInfo2 ii in StoredIndexes)
+               {
+                   if (indexName.StartsWith(ii.IndexName) || ii.IndexName.StartsWith(indexName))
+                   {
+                       indexInfo = ii;
+                       break;
+                   }
+               }
+
+               if (indexInfo != null)
+               {
+                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
+                   {
+                       storedIndexes.Remove(indexInfo);
+                   }
+                   siaqodb.Delete(indexInfo);
+                   
+               }
+               Type t = typeof(BTree<>).MakeGenericType(finfo.AttributeType);
+               ConstructorInfo ctor = t.GetConstructor(new Type[] { typeof(Siaqodb) });
+               IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
+
+               indexInfo = this.BuildIndex(finfo, ti, index);
+               index.SetIndexInfo(indexInfo);
+               index.Persist();
+               cacheIndexes.Set(ti, finfo, index);
+
+               return index;
+           }
+           return null;
+       }
+#if ASYNC
+       private async Task<IBTree> RenewIndexAsync(SqoTypeInfo ti, string fieldName)
+       {
+           FieldSqoInfo finfo = MetaHelper.FindField(ti.Fields, fieldName);
+           IndexInfo2 indexInfo = null;
+           if (finfo != null)
+           {
+
+               string indexName = finfo.Name + ti.TypeName;
+               IList<IndexInfo2> stIndexes = await this.GetStoredIndexesAsync().ConfigureAwait(false);
+
+               foreach (IndexInfo2 ii in stIndexes)
+               {
+                   if (indexName.StartsWith(ii.IndexName) || ii.IndexName.StartsWith(indexName))
+                   {
+                       indexInfo = ii;
+                       break;
+                   }
+               }
+
+               if (indexInfo != null)
+               {
+                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
+                   {
+                       storedIndexes.Remove(indexInfo);
+                   }
+                   await siaqodb.DeleteAsync(indexInfo);
+
+               }
+               Type t = typeof(BTree<>).MakeGenericType(finfo.AttributeType);
+               ConstructorInfo ctor = t.GetConstructor(new Type[] { typeof(Siaqodb) });
+               IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
+               indexInfo = await this.BuildIndexAsync(finfo, ti, index);
+               index.SetIndexInfo(indexInfo);
+               await index.PersistAsync();
+               cacheIndexes.Set(ti, finfo, index);
+
+               return index;
+           }
+           return null;
+       }
+#endif
+
     }
 }
