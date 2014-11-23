@@ -140,6 +140,7 @@
     <Compile Include="Core\SqoWinRTFile.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
+    <Compile Include="Exceptions\IndexCorruptedException.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\NotAsyncException.cs" />

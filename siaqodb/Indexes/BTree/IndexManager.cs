@@ -7,9 +7,10 @@ using Sqo.Meta;
 using System.Reflection;
 using Sqo.Utilities;
 using Sqo.MetaObjects;
+using Sqo.Exceptions;
 #if ASYNC
 using System.Threading.Tasks;
-using Sqo.Exceptions;
+
 #endif
 namespace Sqo.Indexes
 {

@@ -151,6 +151,7 @@
     <Compile Include="Core\SqoMemoryFile.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
+    <Compile Include="Exceptions\IndexCorruptedException.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\OptimisticConcurrencyException.cs" />
     <Compile Include="Exceptions\UniqueConstraintException.cs" />

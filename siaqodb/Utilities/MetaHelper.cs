@@ -295,7 +295,11 @@ namespace Sqo.Utilities
         }
         internal static object GetDefault(Type type)
         {
+#if WinRT
+            if (type.GetTypeInfo().IsValueType)
+#else
             if (type.IsValueType)
+#endif
             {
                 return Activator.CreateInstance(type);
             }
