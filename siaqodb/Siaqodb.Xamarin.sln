@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb.Xamarin.Android.Exa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPortable", "..\..\Examples\MyPortable\MyPortable.csproj", "{61D969B7-00EC-43DD-8DD4-2A88AED3F122}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cryptonor", "Cryptonor", "{16284191-1C69-4EB4-997C-FA92BAFF6FF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator

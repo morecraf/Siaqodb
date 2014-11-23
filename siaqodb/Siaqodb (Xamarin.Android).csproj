@@ -147,9 +147,18 @@
     <Compile Include="Linq\SqoQueryExtensionsImpl.cs" />
     <Compile Include="Cache\CacheDocuments.cs" />
     <Compile Include="Utilities\SqoLicense.cs" />
+    <Compile Include="CryptonorDB\CryptonorLocalDB.cs" />
+    <Compile Include="CryptonorDB\CryptonorObject.cs" />
+    <Compile Include="CryptonorDB\CryptonorQuery.cs" />
+    <Compile Include="CryptonorDB\ICryptonorQuery.cs" />
+    <Compile Include="CryptonorDB\TagsSerializer.cs" />
+    <Compile Include="CryptonorDB\Exceptions\CryptonorException.cs" />
+    <Compile Include="CryptonorDB\Indexes\IndexQueryFinder.cs" />
+    <Compile Include="CryptonorDB\Indexes\TagsIndexManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AsyncLocker\" />
+    <Folder Include="CryptonorDB\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
