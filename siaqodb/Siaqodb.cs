@@ -2943,8 +2943,55 @@ savedObject(this, e);
                 metaCache.SetOIDToObject(obj, oids[0], ti);
             }
         }
-        
        
+        internal void ShrinkRawInfo()
+        {
+            Expression<Func<Sqo.MetaObjects.RawdataInfo, bool>> predicate = ri => ri.IsFree == false;
+            List<int> existingOIDsOccupied = this.LoadOids<Sqo.MetaObjects.RawdataInfo>(predicate);
+            SqoTypeInfo tiRawInfo = this.GetSqoTypeInfo<Sqo.MetaObjects.RawdataInfo>();
+            //dump object bytes
+            Dictionary<int, byte[]> objectBytes = new Dictionary<int, byte[]>();
+            foreach (int oid in existingOIDsOccupied)
+            {
+                byte[] obj = storageEngine.GetObjectBytes(oid, tiRawInfo);
+                objectBytes.Add(oid, obj);
+            }
+            //store objects with new OIDs
+            storageEngine.SetFileLength(tiRawInfo.Header.headerSize, tiRawInfo);
+            tiRawInfo.Header.numberOfRecords = 0;
+            if (existingOIDsOccupied.Count == 0)
+            {
+                storageEngine.SaveType(tiRawInfo);//to save nrRecords
+            }
+            Dictionary<int, int> oldNewOIDs = new Dictionary<int, int>();
+            foreach (int oid in objectBytes.Keys)
+            {
+                int newOID = storageEngine.SaveObjectBytes(objectBytes[oid], tiRawInfo);
+                oldNewOIDs.Add(oid, newOID);
+            }
+
+            if (oldNewOIDs.Keys.Count > 0)
+            {
+                List<SqoTypeInfo> existingTypes = this.metaCache.DumpAllTypes();
+                foreach (SqoTypeInfo ti in existingTypes)
+                {
+                    if (ti.Type == typeof(Sqo.MetaObjects.RawdataInfo))                     
+                    {
+                        continue;
+                    }
+                    Dictionary<int, ATuple<int, FieldSqoInfo>> oldOIDs = storageEngine.GetUsedRawdataInfoOIDsAndFieldInfos(ti);
+                    foreach (int oldRawInfoOID in oldOIDs.Keys)
+                    {
+                        if (oldNewOIDs.ContainsKey(oldRawInfoOID))
+                        {
+                            int newOID = oldNewOIDs[oldRawInfoOID];
+                            storageEngine.AdjustArrayFieldsAfterShrink(ti, oldOIDs[oldRawInfoOID].Value, oldOIDs[oldRawInfoOID].Name, newOID);
+                        }
+                    }
+       
+    }
+            }
+        }
     }
    
 }
