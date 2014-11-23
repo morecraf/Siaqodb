@@ -759,6 +759,16 @@ namespace Sqo.Core
 
         }
 #endif
+        internal void SaveArrayOIDFieldContent(SqoTypeInfo ti, FieldSqoInfo fi, int objectOID, int newOID)
+        {
+            byte[] arrayOID = ByteConverter.IntToByteArray(newOID);
+            long position = MetaHelper.GetSeekPosition(ti, objectOID);
+             //an array field has size=9 (isNull(bool) + oid of array table(int)+ nrElements(int)
+              //so write oid after first byte which is null/not null
+            long writePosition=(long)(position + (long)fi.Header.PositionInRecord+1L);
+            file.Write(writePosition, arrayOID);
+        }
+
         [System.Reflection.Obfuscation(Exclude = true)]
         private EventHandler<ComplexObjectEventArgs> needSaveComplexObject;
         [System.Reflection.Obfuscation(Exclude = true)]

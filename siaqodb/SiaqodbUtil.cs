@@ -110,9 +110,13 @@ namespace Sqo
                 ShrinkTotal(siaqodb);
                 ClaimSpace(siaqodb);
                 ShrinkNormal(siaqodb);
-                
+                ShrinkRawInfo(siaqodb);
             }
             siaqodb.Close();
+        }
+        private static void ShrinkRawInfo(Siaqodb siaqodb)
+        {
+            siaqodb.ShrinkRawInfo();
         }
 #if ASYNC
         private static async Task ShrinkAsync(Siaqodb siaqodb, ShrinkType shrinkType)
@@ -135,6 +139,7 @@ namespace Sqo
             }
             await siaqodb.CloseAsync();
         }
+       
 #endif
         private static void ShrinkTotal(Siaqodb siaqodb)
         {
@@ -608,6 +613,14 @@ namespace Sqo
         public int Old_OID;
         public int New_OID;
         public int TID;
+        public object GetValue(System.Reflection.FieldInfo field)
+        {
+            return field.GetValue(this);
+        }
+        public void SetValue(System.Reflection.FieldInfo field, object value)
+        {
+            field.SetValue(this, value);
+        }
     }
 
     public static class SqoStringExtensions

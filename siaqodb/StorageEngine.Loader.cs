@@ -2143,5 +2143,41 @@ namespace Sqo
 
              return this.LoadFilteredOids(w, ti);
          }
+         internal Dictionary<int, ATuple<int, FieldSqoInfo>> GetUsedRawdataInfoOIDsAndFieldInfos(SqoTypeInfo ti)
+         {
+             Dictionary<int, ATuple<int, FieldSqoInfo>> existingRawdataInfoOIDs = new Dictionary<int, ATuple<int, FieldSqoInfo>>();
+             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
+             int nrRecords = ti.Header.numberOfRecords;
+             List<FieldSqoInfo> existingDynamicFields = new List<FieldSqoInfo>();
+             foreach (FieldSqoInfo ai in ti.Fields)
+             {
+                 IByteTransformer byteTrans = ByteTransformerFactory.GetByteTransformer(null, null, ai, ti);
+                 if (byteTrans is ArrayByteTranformer || byteTrans is DictionaryByteTransformer)
+                 {
+                     existingDynamicFields.Add(ai);
+                 }
+             }
+             if (existingDynamicFields.Count > 0)
+             {
+                 for (int i = 0; i < nrRecords; i++)
+                 {
+
+                     int oid = i + 1;
+                     if (serializer.IsObjectDeleted(oid, ti))
+                     {
+                         continue;
+                     }
+                     foreach (FieldSqoInfo ai in existingDynamicFields)
+                     {
+                         ATuple<int, int> arrayInfo = this.GetArrayMetaOfField(ti, oid, ai);
+                         if (arrayInfo.Name > 0)
+                         {
+                             existingRawdataInfoOIDs.Add(arrayInfo.Name, new ATuple<int, FieldSqoInfo>(oid, ai));
+                         }
+                     }
+                 }
+             }
+             return existingRawdataInfoOIDs;
+         }
     }
 }

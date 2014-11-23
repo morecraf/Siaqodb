@@ -80,7 +80,7 @@ namespace SiaqodbManager
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                 }
             }
-            Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTbooYKG1XXCnjJ+jaPPrPLaD7PdPw9HujjxmkZ467OqZ");
+            Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
 #if TRIAL
             string folder = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config";
             string trialFile = folder + System.IO.Path.DirectorySeparatorChar + "trial.lic";

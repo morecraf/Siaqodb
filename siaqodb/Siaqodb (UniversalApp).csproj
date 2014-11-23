@@ -31,7 +31,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NETFX_CORE WinRT ASYNC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -82,6 +82,7 @@
     <Compile Include="CryptonorDB\TagsSerializer.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
+    <Compile Include="Exceptions\IndexCorruptedException.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\NotAsyncException.cs" />

@@ -58,5 +58,9 @@ namespace Sqo.Cache
             }
             return null;
         }
+        public void Set(SqoTypeInfo ti, FieldSqoInfo fi,IBTree index)
+        {
+            cache[ti][fi]=index;
+        }
     }
 }
