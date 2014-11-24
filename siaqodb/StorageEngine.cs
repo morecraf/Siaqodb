@@ -2055,6 +2055,20 @@ namespace Sqo
         {
             return this.rawSerializer.File;
         }
+
+        internal string GetFileName(SqoTypeInfo ti)
+        {
+            string fileName = "";
+            if (SiaqodbConfigurator.EncryptedDatabase)
+            {
+                fileName = this.path + Path.DirectorySeparatorChar + GetFileByType(ti) + ".esqo";
+            }
+            else
+            {
+                fileName = this.path + Path.DirectorySeparatorChar + GetFileByType(ti) + ".sqo";
+            }
+            return fileName;
+        }
     }
         #endregion
 }
