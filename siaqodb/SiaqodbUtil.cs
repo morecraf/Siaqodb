@@ -398,7 +398,14 @@ namespace Sqo
             IsRepairMode = false;
         }
 #endif
-       
+        public static string GetPhysicalFileName<T>(Siaqodb siaqodb)
+        {
+            return siaqodb.GetFileName(typeof(T));
+        }
+        public static string GetPhysicalFileName(Siaqodb siaqodb, Type type)
+        {
+            return siaqodb.GetFileName(type);
+        }
        
 
         internal static bool IsRepairMode;

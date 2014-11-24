@@ -2992,6 +2992,12 @@ savedObject(this, e);
     }
             }
         }
+
+        internal string GetFileName(Type type)
+        {
+            SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(type);
+            return storageEngine.GetFileName(ti);
+        }
     }
    
 }
