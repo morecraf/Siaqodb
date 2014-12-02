@@ -5,6 +5,7 @@ using Sqo.Attributes;
 using Sqo;
 using System.Linq;
 using System.Diagnostics;
+using Sqo.Exceptions;
 #if ASYNC
 using System.Threading.Tasks;
 
@@ -63,6 +64,8 @@ namespace Sqo.Indexes
                     if (nodeOID > 0)
                     {
                         _children[i] = siaqodb.LoadObjectByOID<BTreeNode<T>>(nodeOID);
+						if (_children [i] == null)
+							throw new IndexCorruptedException ("Child OID not found");
                         _children[i].siaqodb = this.siaqodb;
                         _children[i].btree = this.btree;
                     }
@@ -82,6 +85,8 @@ namespace Sqo.Indexes
                     if (nodeOID > 0)
                     {
                         _children[i] = await siaqodb.LoadObjectByOIDAsync<BTreeNode<T>>(nodeOID).ConfigureAwait(false);
+						if (_children [i] == null)
+							throw new IndexCorruptedException ("Child OID not found");
                         _children[i].siaqodb = this.siaqodb;
                         _children[i].btree = this.btree;
                     }

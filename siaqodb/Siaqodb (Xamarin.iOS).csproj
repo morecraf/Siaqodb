@@ -176,6 +176,7 @@
     <Compile Include="CryptonorDB\Exceptions\CryptonorException.cs" />
     <Compile Include="CryptonorDB\Indexes\IndexQueryFinder.cs" />
     <Compile Include="CryptonorDB\Indexes\TagsIndexManager.cs" />
+    <Compile Include="Exceptions\IndexCorruptedException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AsyncLocker\" />
