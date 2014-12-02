@@ -61,6 +61,7 @@ namespace Sqo.Core
                 {
                     serializers[key].Close();
                 }
+                serializers.Clear();
             }
 
         }
