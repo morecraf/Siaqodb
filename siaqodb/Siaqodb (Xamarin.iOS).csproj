@@ -168,6 +168,7 @@
     <Compile Include="Utilities\SqoLicense.cs" />
     <Compile Include="Cache\CacheDocuments.cs" />
     <Compile Include="Linq\SqoQueryExtensionsImpl.cs" />
+    <Compile Include="Exceptions\IndexCorruptedException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AsyncLocker\" />

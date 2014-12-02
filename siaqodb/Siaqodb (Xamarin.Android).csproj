@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5244BC37-2892-43F5-BDC7-457D02B340A9}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
@@ -147,6 +145,7 @@
     <Compile Include="Linq\SqoQueryExtensionsImpl.cs" />
     <Compile Include="Cache\CacheDocuments.cs" />
     <Compile Include="Utilities\SqoLicense.cs" />
+    <Compile Include="Exceptions\IndexCorruptedException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AsyncLocker\" />
