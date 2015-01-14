@@ -20,7 +20,7 @@ namespace SiaqodbUnitTests
         public BasicTests()
         {
               Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
-           
+              Sqo.SiaqodbConfigurator.UseLargeBuffers = true;
         }
         [TestMethod]
         public async Task TestInsert()

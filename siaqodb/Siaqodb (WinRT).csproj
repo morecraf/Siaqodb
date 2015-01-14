@@ -138,6 +138,7 @@
     <Compile Include="Core\RawdataSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
     <Compile Include="Core\SqoWinRTFile.cs" />
+    <Compile Include="Core\SqoWinRTMemoryFile.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\IndexCorruptedException.cs" />

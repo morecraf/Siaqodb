@@ -28,7 +28,14 @@ namespace Sqo.Core
 #elif MONODROID
 				return new SqoFile(filePath, readOnly);
 #elif WinRT
-                return new SqoWinRTFile(filePath, readOnly);
+                if (SiaqodbConfigurator.UseLargeBuffers)
+                {
+                    return new SqoWinRTMemoryFile(filePath, readOnly);
+                }
+                else
+                {
+                    return new SqoWinRTFile(filePath, readOnly);
+                }
 #else
                 return new SqoFile(filePath,readOnly);
             
