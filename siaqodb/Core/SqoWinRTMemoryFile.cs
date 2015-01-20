@@ -21,26 +21,20 @@ namespace Sqo.Core
         //Stream streamWriter;
         FileRandomAccessStream fileStream;
         StorageFolder storageFolder;
+        bool isModified;
 
         public virtual async Task WriteAsync(long pos, byte[] buf)
         {
 
             stream.Seek(pos, SeekOrigin.Begin);
             await stream.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
-            /*fileStream.Seek((ulong)pos);
-            if (buf.Length > 0)
-            {
-                await fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf));
-            }*/
+            isModified = true;
         }
         public virtual async Task WriteAsync(byte[] buf)
         {
 
             await stream.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
-            /*if (buf.Length > 0)
-            {
-                await fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf));
-            }*/
+            isModified = true;
 
         }
         public virtual async Task<int> ReadAsync(long pos, byte[] buf)
@@ -64,21 +58,13 @@ namespace Sqo.Core
 
             stream.Seek(pos, SeekOrigin.Begin);
             stream.Write(buf, 0, buf.Length);
-            /*fileStream.Seek((ulong)pos);
-            if (buf.Length > 0)
-            {
-                fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf)).AsTask().Wait();
-            }*/
-
+            isModified = true;
         }
         public virtual void Write(byte[] buf)
         {
 
             stream.Write(buf, 0, buf.Length);
-            /*if (buf.Length > 0)
-            {
-                fileStream.WriteAsync(Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buf)).AsTask().Wait();
-            }*/
+            isModified = true;
 
         }
         public virtual int Read(long pos, byte[] buf)
@@ -102,7 +88,7 @@ namespace Sqo.Core
         {
             try
             {
-                if (fileStream != null && !this.IsClosed)
+                if (fileStream != null && !this.IsClosed && isModified)
                 {
                     stream.Flush();
                     byte[] bytes = stream.ToArray();
@@ -113,6 +99,7 @@ namespace Sqo.Core
                     streamTemp.Flush();
 
                     fileStream.FlushAsync().AsTask().Wait();
+                    isModified = false;
                 }
             }
             catch (FileNotFoundException ex)//did not found a better way to check if file exists
@@ -125,7 +112,7 @@ namespace Sqo.Core
             try
             {
 
-                if (fileStream != null && !this.IsClosed)
+                if (fileStream != null && !this.IsClosed && isModified)
                 {
                     await stream.FlushAsync().ConfigureAwait(false);
                     byte[] bytes = stream.ToArray();
@@ -136,6 +123,7 @@ namespace Sqo.Core
                     await streamTemp.FlushAsync().ConfigureAwait(false); ;
 
                     await fileStream.FlushAsync();
+                    isModified = false;
                 }
             }
             catch (FileNotFoundException ex)//did not found a better way to check if file exists
@@ -155,6 +143,7 @@ namespace Sqo.Core
                 stream = null;
                 fileStream.Dispose();
                 fileStream = null;
+                this.isModified = false;
             }
         }
 

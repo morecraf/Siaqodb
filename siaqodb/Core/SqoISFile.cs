@@ -19,16 +19,18 @@ namespace Sqo.Core
         private MemoryStream file;
         private IsolatedStorageFile isf;
         private string filePath;
-
+        bool isModified;
 
         public virtual void Write(long pos, byte[] buf)
         {
             file.Seek(pos, SeekOrigin.Begin);
             file.Write(buf, 0, buf.Length);
+            isModified = true;
         }
         public virtual void Write(byte[] buf)
         {
             file.Write(buf, 0, buf.Length);
+            isModified = true;
         }
         public virtual int Read(long pos, byte[] buf)
         {
@@ -41,7 +43,7 @@ namespace Sqo.Core
         }
         public virtual void Flush()
         {
-            if (!this.IsClosed)
+            if (!this.IsClosed && isModified)
             {
                 file.Flush();
                 byte[] bytes = file.GetBuffer();
@@ -50,6 +52,7 @@ namespace Sqo.Core
                 phisicalFile.Seek(0, SeekOrigin.Begin);
                 phisicalFile.Write(bytes, 0, bytes.Length);
                 phisicalFile.Close();
+                isModified = false;
             }
 
         }
@@ -58,10 +61,12 @@ namespace Sqo.Core
         {
             file.Seek(pos, SeekOrigin.Begin);
             await file.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
+            isModified = true;
         }
         public async Task WriteAsync(byte[] buf)
         {
             await file.WriteAsync(buf, 0, buf.Length).ConfigureAwait(false);
+            isModified = true;
         }
         public async Task<int> ReadAsync(long pos, byte[] buf)
         {
@@ -70,7 +75,7 @@ namespace Sqo.Core
         }
         public async Task FlushAsync()
         {
-            if (!this.IsClosed)
+            if (!this.IsClosed && isModified)
             {
                 await file.FlushAsync().ConfigureAwait(false);
                 byte[] bytes = file.GetBuffer();
@@ -79,6 +84,7 @@ namespace Sqo.Core
                 phisicalFile.Seek(0, SeekOrigin.Begin);
                 await phisicalFile.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
                 phisicalFile.Close();
+                isModified = false ;
             }
 
         }
@@ -92,6 +98,7 @@ namespace Sqo.Core
             
 
             phisicalFile.Close();
+            isModified = false;
         }
         public long Length
         {
