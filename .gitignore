@@ -194,4 +194,14 @@ WisentClient/CryptonorClient(Android)/.idea/workspace.xml
 WisentClient/CryptonorClient(Android)/.idea/libraries
 WisentClient/CryptonorClient(Android)/.DS_Store
 WisentClient/CryptonorClient(Android)/build
+WisentClient/CryptonorClient(Android)/app/build
+WisentClient/CryptonorClient(Android)/cryptonor/build
+
+WisentClient/CryptonorTests/CryptonorTests(Android)/.gradle
+WisentClient/CryptonorTests/CryptonorTests(Android)/local.properties
+WisentClient/CryptonorTests/CryptonorTests(Android)/.idea/workspace.xml
+WisentClient/CryptonorTests/CryptonorTests(Android)/.idea/libraries
+WisentClient/CryptonorTests/CryptonorTests(Android)/build
+WisentClient/CryptonorTests/CryptonorTests(Android)/app/build
+
 
