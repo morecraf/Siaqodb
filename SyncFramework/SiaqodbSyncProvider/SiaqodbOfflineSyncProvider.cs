@@ -22,7 +22,7 @@ namespace SiaqodbSyncProvider
         
         public  CacheController CacheController{get;set;}
         internal event EventHandler<SyncProgressEventArgs> SyncProgress;
-
+        private Dictionary<Guid, ICollection<IOfflineEntity>> currentChanges = new Dictionary<Guid, ICollection<IOfflineEntity>>(); 
         SiaqodbOffline siaqodb;
         System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static;
            
@@ -81,7 +81,7 @@ namespace SiaqodbSyncProvider
                 changeSet.Data = new List<IOfflineEntity>();
                 changeSet.IsLastBatch = true;
             }
-           
+            currentChanges[state] = changeSet.Data;
             return changeSet;
         }
         private List<SiaqodbOfflineEntity> GetChanges()
@@ -183,9 +183,10 @@ namespace SiaqodbSyncProvider
                     }
                 }
 
-                List<SiaqodbOfflineEntity> changesJustUploaded = this.GetChanges();
-                foreach (SiaqodbOfflineEntity en in changesJustUploaded)
+                ICollection<IOfflineEntity> changesJustUploaded = this.currentChanges[state];
+                foreach (IOfflineEntity enI in changesJustUploaded)
                 {
+                    SiaqodbOfflineEntity en = enI as SiaqodbOfflineEntity;
                     if (en.IsTombstone)
                     {
                         en.IsDirty = false;
@@ -212,7 +213,7 @@ namespace SiaqodbSyncProvider
             this.SaveAnchor(response.ServerBlob);
 
             this.OnSyncProgress(new SyncProgressEventArgs("Downloading changes from server..."));
-            
+            currentChanges.Remove(state);
         }
         
         public void SaveAnchor(byte[] anchor)

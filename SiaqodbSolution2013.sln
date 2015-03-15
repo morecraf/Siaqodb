@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{91980E14-6FB0-4AE1-B381-5D00B9B9F7B3}"
 	ProjectSection(SolutionItems) = preProject
@@ -87,6 +87,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App2", "App2\App2.csproj", "{31BD5382-620E-4554-A923-D7373A9F6A3B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb (WP 8-Unity3D)", "siaqodb\Siaqodb (WP 8-Unity3D).csproj", "{53FDE04F-C22A-4C96-A21C-8B92226AC273}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncCacheController (WP)", "SyncFramework\SyncCacheController\SyncCacheController (WP).csproj", "{C4D0C333-D6FA-46D5-A513-AC71E4805789}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -662,6 +664,24 @@ Global
 		{53FDE04F-C22A-4C96-A21C-8B92226AC273}.Release|x64.ActiveCfg = Release|Any CPU
 		{53FDE04F-C22A-4C96-A21C-8B92226AC273}.Release|x86.ActiveCfg = Release|x86
 		{53FDE04F-C22A-4C96-A21C-8B92226AC273}.Release|x86.Build.0 = Release|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|ARM.ActiveCfg = Debug|ARM
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|ARM.Build.0 = Debug|ARM
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|x86.ActiveCfg = Debug|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Debug|x86.Build.0 = Debug|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|ARM.ActiveCfg = Release|ARM
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|ARM.Build.0 = Release|ARM
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|Mixed Platforms.Build.0 = Release|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|x64.ActiveCfg = Release|Any CPU
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|x86.ActiveCfg = Release|x86
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -699,5 +719,6 @@ Global
 		{F4AB87DE-C442-456E-A013-3288D780F2D2} = {9C9C352C-2364-46E7-B910-7F92C69CB3CF}
 		{31BD5382-620E-4554-A923-D7373A9F6A3B} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 		{53FDE04F-C22A-4C96-A21C-8B92226AC273} = {C34B8B90-F727-43D5-AC70-BEFB5922FB66}
+		{C4D0C333-D6FA-46D5-A513-AC71E4805789} = {E064ACE9-0E16-4DF4-8835-4756E9B9D8E0}
 	EndGlobalSection
 EndGlobal

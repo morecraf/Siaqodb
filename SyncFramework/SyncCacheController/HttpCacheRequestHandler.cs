@@ -213,7 +213,7 @@ namespace Microsoft.Synchronization.ClientServices
                 // Create a SyncWriter to write the contents
                 this._syncWriter = (base.SerializationFormat == SerializationFormat.ODataAtom)
                     ? (SyncWriter)new ODataAtomWriter(base.BaseUri)
-                    : (SyncWriter)new ODataJsonWriter(base.BaseUri);
+                    : (SyncWriter)new ODataAtomWriter(base.BaseUri);
 
                 this._syncWriter.StartFeed(wrapper.CacheRequest.IsLastBatch, wrapper.CacheRequest.KnowledgeBlob ?? new byte[0]);
 
@@ -241,17 +241,17 @@ namespace Microsoft.Synchronization.ClientServices
                     this._syncWriter.AddItem(entity, tempId);
                 }
 
-                if (base.SerializationFormat == SerializationFormat.ODataAtom)
+                //if (base.SerializationFormat == SerializationFormat.ODataAtom)
                 {
                     XmlWriterSettings settings=new XmlWriterSettings();
                     settings.CheckCharacters=false;
                     XmlWriter writer = XmlWriter.Create(requestStream,settings);
                     this._syncWriter.WriteFeed(writer);
                 }
-                else
+                /*else
                 {
                     this._syncWriter.WriteFeed(JsonReaderWriterFactory.CreateJsonWriter(requestStream));
-                }
+                }*/
 
                 requestStream.Flush();
                 requestStream.Close();
@@ -291,21 +291,21 @@ namespace Microsoft.Synchronization.ClientServices
                 // Create a SyncWriter to write the contents
                 this._syncWriter = (base.SerializationFormat == SerializationFormat.ODataAtom)
                     ? (SyncWriter)new ODataAtomWriter(base.BaseUri)
-                    : (SyncWriter)new ODataJsonWriter(base.BaseUri);
+                    : (SyncWriter)new ODataAtomWriter(base.BaseUri);
 
                 this._syncWriter.StartFeed(wrapper.CacheRequest.IsLastBatch, wrapper.CacheRequest.KnowledgeBlob ?? new byte[0]);
 
-                if (base.SerializationFormat == SerializationFormat.ODataAtom)
+                //if (base.SerializationFormat == SerializationFormat.ODataAtom)
                 {
                     XmlWriterSettings settings = new XmlWriterSettings();
                     settings.CheckCharacters = false;
                     XmlWriter writer = XmlWriter.Create(requestStream, settings);
                     this._syncWriter.WriteFeed(writer);
                 }
-                else
-                {
-                    this._syncWriter.WriteFeed(JsonReaderWriterFactory.CreateJsonWriter(requestStream));
-                }
+               // else
+                //{
+                   // this._syncWriter.WriteFeed(JsonReaderWriterFactory.CreateJsonWriter(requestStream));
+                //}
 
                 requestStream.Flush();
                 requestStream.Close();
@@ -462,7 +462,7 @@ namespace Microsoft.Synchronization.ClientServices
                     // Create the SyncReader
                     this._syncReader = (base.SerializationFormat == ClientServices.SerializationFormat.ODataAtom)
                         ? (SyncReader)new ODataAtomReader(responseStream, this._knownTypes)
-                        : (SyncReader)new ODataJsonReader(responseStream, this._knownTypes);
+                        : (SyncReader)new ODataAtomReader(responseStream, this._knownTypes);
 
                     // Read the response
                     while (this._syncReader.Next())
@@ -637,7 +637,7 @@ namespace Microsoft.Synchronization.ClientServices
                     // Create the SyncReader
                     this._syncReader = (base.SerializationFormat == ClientServices.SerializationFormat.ODataAtom)
                         ? (SyncReader)new ODataAtomReader(responseStream, this._knownTypes)
-                        : (SyncReader)new ODataJsonReader(responseStream, this._knownTypes);
+                        : (SyncReader)new ODataAtomReader(responseStream, this._knownTypes);
 
                     // Read the response
                     while (this._syncReader.Next())

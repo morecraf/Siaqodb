@@ -90,11 +90,6 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Runtime.Serialization.Json">
-      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Silverlight\v3.0\Libraries\Client\System.Runtime.Serialization.Json.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="AsyncWorkerManager.cs" />
     <Compile Include="AsyncWorkManagerException.cs" />
     <Compile Include="AsyncWorkRequest.cs" />
@@ -125,8 +120,6 @@
     <Compile Include="Formatters\KeyAttribute.cs" />
     <Compile Include="Formatters\ODataAtomReader.cs" />
     <Compile Include="Formatters\ODataAtomWriter.cs" />
-    <Compile Include="Formatters\ODataJsonReader.cs" />
-    <Compile Include="Formatters\ODataJsonWriter.cs" />
     <Compile Include="Formatters\ReaderItemType.cs" />
     <Compile Include="Formatters\ReflectionUtility.cs" />
     <Compile Include="Formatters\SyncReader.cs" />
