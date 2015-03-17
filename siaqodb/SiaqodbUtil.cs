@@ -20,15 +20,8 @@ namespace Sqo
     /// </summary>
     public class SiaqodbUtil
     {
-        /// <summary>
-        /// Rebuild and defragment indexes
-        /// </summary>
-        /// <param name="siaqodb"></param>
-        public static void ReIndex(string databasePath)
-        {
-            Siaqodb siaqodb = new Siaqodb(databasePath);
-            ReIndex(siaqodb);
-        }
+       
+       
 #if ASYNC
         public static async Task ReIndexAsync(string databasePath)
         {
@@ -49,12 +42,7 @@ namespace Sqo
         }
         #endif
 
-        private static void ReIndex(Siaqodb siaqodb)
-        {
-            
-            siaqodb.ReIndexAll(true);
-            siaqodb.Close();
-        }
+        
 #if ASYNC
         private static async Task ReIndexAsync(Siaqodb siaqodb)
         {

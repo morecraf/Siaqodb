@@ -10,6 +10,7 @@ using Sqo.Exceptions;
 using Sqo.Utilities;
 using System.Collections;
 using System.Reflection;
+using LightningDB;
 #if ASYNC
 using System.Threading.Tasks;
 #endif
@@ -29,7 +30,7 @@ namespace Sqo.Core
             this.filePath = filePath;
             file = FileFactory.Create(filePath, false,useElevatedTrust);
         }
-        private byte[] SerializeTypeToBuffer(SqoTypeInfo ti)
+        private static byte[] SerializeTypeToBuffer(SqoTypeInfo ti)
         {
             byte[] headerSize = ByteConverter.IntToByteArray(ti.Header.headerSize);
             byte[] typeNameSize = ByteConverter.IntToByteArray(ti.Header.typeNameSize);
@@ -68,10 +69,10 @@ namespace Sqo.Core
             }
             return Combine(fullArray);
         }
-        public void SerializeType(SqoTypeInfo ti)
+        public static byte[] SerializeType(SqoTypeInfo ti)
         {
 
-            file.Write(0,SerializeTypeToBuffer(ti));
+          return SerializeTypeToBuffer(ti);
 
         }
 #if ASYNC
@@ -81,7 +82,7 @@ namespace Sqo.Core
 
         }
 #endif
-        private SqoTypeInfo DeserializeSqoTypeInfoFromBuffer(byte[] readFullSqoTypeInfo, bool loadRealType)
+        public static SqoTypeInfo DeserializeSqoTypeInfoFromBuffer(byte[] readFullSqoTypeInfo, bool loadRealType)
         {
             SqoTypeInfo tInfo = new SqoTypeInfo();
             tInfo.Header.headerSize = readFullSqoTypeInfo.Length;
@@ -300,22 +301,11 @@ namespace Sqo.Core
 
             catch (Exception ex)
             {
-                SiaqodbConfigurator.LogMessage("File:" + this.filePath + " is not a valid Siaqodb database file,skipped; error:"+ex.ToString(), VerboseLevel.Info);
+                SiaqodbConfigurator.LogMessage("The file is not a valid Siaqodb database file,skipped; error:"+ex.ToString(), VerboseLevel.Info);
             }
             return null;
         }
-        public SqoTypeInfo DeserializeSqoTypeInfo(bool loadRealType)
-        {
-
-            byte[] headerSizeB = new byte[4];
-            file.Read(0, headerSizeB);
-            int headerSize = ByteConverter.ByteArrayToInt(headerSizeB);
-            byte[] readFullSqoTypeInfo = new byte[headerSize];
-            file.Read(0, readFullSqoTypeInfo);
-            return DeserializeSqoTypeInfoFromBuffer(readFullSqoTypeInfo, loadRealType);
-
-
-        }
+       
         #if ASYNC
 
         public async Task<SqoTypeInfo> DeserializeSqoTypeInfoAsync(bool loadRealType)
@@ -374,7 +364,7 @@ namespace Sqo.Core
 
         }
 #endif
-        private byte[] GetBuffer(byte[] readFullSqoTypeInfo, int position, int size)
+        private static byte[] GetBuffer(byte[] readFullSqoTypeInfo, int position, int size)
         {
             byte[] b = new byte[size];
             Array.Copy(readFullSqoTypeInfo, position, b, 0, size);
@@ -416,11 +406,12 @@ namespace Sqo.Core
         public object ComplexObject { get; set; }
         public Type ParentType { get; set; }
         public string FieldName { get; set; }
-       
-        public ComplexObjectEventArgs(object obj,bool returnOnlyOid)
+        public LightningTransaction Transaction { get; set; }
+        public ComplexObjectEventArgs(object obj,bool returnOnlyOid,LightningTransaction transaction)
         {
             this.ComplexObject = obj;
             this.ReturnOnlyOid_TID = returnOnlyOid;
+            this.Transaction = transaction;
         }
         public ComplexObjectEventArgs(int OID,int TID)
         {

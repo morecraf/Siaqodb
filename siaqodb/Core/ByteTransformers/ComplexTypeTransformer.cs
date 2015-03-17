@@ -24,9 +24,9 @@ namespace Sqo.Core
 
         #region IByteTransformer Members
 
-        public byte[] GetBytes(object obj)
+        public byte[] GetBytes(object obj,LightningDB.LightningTransaction transaction)
         {
-            return this.serializer.GetComplexObjectBytes(obj);
+            return this.serializer.GetComplexObjectBytes(obj, transaction);
         }
 
         public object GetObject(byte[] bytes)

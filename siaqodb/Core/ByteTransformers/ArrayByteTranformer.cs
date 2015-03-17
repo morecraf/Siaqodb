@@ -28,7 +28,7 @@ namespace Sqo.Core
         }
         #region IByteTransformer Members
 
-        public byte[] GetBytes(object obj)
+        public byte[] GetBytes(object obj,LightningDB.LightningTransaction transaction)
         {
 
             ATuple<int, int> arrayMeta = null;
@@ -38,11 +38,11 @@ namespace Sqo.Core
             }
             if (fi.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.textID))
             {
-                return rawSerializer.SerializeArray(obj, fi.AttributeType, fi.Header.Length, fi.Header.RealLength, ti.Header.version, arrayMeta, this.serializer, true);
+                return rawSerializer.SerializeArray(obj, fi.AttributeType, fi.Header.Length, fi.Header.RealLength, ti.Header.version, arrayMeta, this.serializer, true,transaction);
             }
             else
             {
-                return rawSerializer.SerializeArray(obj, fi.AttributeType, fi.Header.Length, fi.Header.RealLength, ti.Header.version, arrayMeta, this.serializer, false);
+                return rawSerializer.SerializeArray(obj, fi.AttributeType, fi.Header.Length, fi.Header.RealLength, ti.Header.version, arrayMeta, this.serializer, false,transaction);
        
             }
             

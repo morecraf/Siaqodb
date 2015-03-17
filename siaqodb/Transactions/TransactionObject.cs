@@ -29,7 +29,8 @@ namespace Sqo.Transactions
 
         public TransactionObjectHeader PreCommit()
         {
-            if (objInfo.Oid > 0 && objInfo.Oid <= objInfo.SqoTypeInfo.Header.numberOfRecords && !serializer.IsObjectDeleted(objInfo.Oid, objInfo.SqoTypeInfo))
+            throw new NotImplementedException();
+            /* if (objInfo.Oid > 0 && objInfo.Oid <= objInfo.SqoTypeInfo.Header.numberOfRecords && !serializer.IsObjectDeleted(objInfo.Oid, objInfo.SqoTypeInfo))
             {
                 originalObject = engine.LoadObjectByOID(objInfo.SqoTypeInfo, objInfo.Oid);
                 TransactionObjectHeader header = new TransactionObjectHeader();
@@ -38,7 +39,7 @@ namespace Sqo.Transactions
                 return header;
 
             }
-            return null;            
+            return null;   */         
         }
 #if ASYNC
         public async Task<TransactionObjectHeader> PreCommitAsync()
@@ -60,11 +61,11 @@ namespace Sqo.Transactions
             
             if (this.Operation == OperationType.InsertOrUpdate)
             {
-                engine.SaveObject(currentObject, objInfo.SqoTypeInfo, objInfo);
+                //engine.SaveObject(currentObject, objInfo.SqoTypeInfo, objInfo);
             }
             else
             {
-                engine.DeleteObject(currentObject, objInfo.SqoTypeInfo);
+               // engine.DeleteObject(currentObject, objInfo.SqoTypeInfo);
             }
             
         }

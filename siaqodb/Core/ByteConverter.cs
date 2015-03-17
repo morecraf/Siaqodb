@@ -117,6 +117,23 @@ namespace Sqo.Core
 			
 			return BitConverter.ToDouble(bytes, 0);
 		}
+        public static string ByteArrayToString(byte[] bytes)
+        {
+
+#if SILVERLIGHT || CF || WinRT
+
+            string str = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+
+#else
+            string str = Encoding.UTF8.GetString(bytes);
+
+#endif
+            return str;
+        }
+        public static byte[] StringToByteArray(string str)
+        {
+            return Encoding.UTF8.GetBytes(str);
+        }
 		internal static byte[] GetBytes(object obj, Type objectType)
 		{
 			if (objectType == typeof(int)) return BitConverter.GetBytes((int)obj);

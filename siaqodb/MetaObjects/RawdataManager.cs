@@ -106,9 +106,9 @@ namespace Sqo.MetaObjects
             }
             return ti;
         }
-        internal void MarkRawInfoAsFree(int oid)
+        internal void MarkRawInfoAsFree(int oid,LightningDB.LightningTransaction transaction)
         {
-            this.storageEngine.SaveValue(oid, "IsFree", this.GetSqoTypeInfo(), true);
+            this.storageEngine.SaveValue(oid, "IsFree", this.GetSqoTypeInfo(), true, transaction);
         }
 #if ASYNC
         internal async Task MarkRawInfoAsFreeAsync(int oid)

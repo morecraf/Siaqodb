@@ -26,7 +26,7 @@ namespace Sqo.Core
         }
         #region IByteTransformer Members
 
-        public byte[] GetBytes(object obj)
+        public byte[] GetBytes(object obj,LightningDB.LightningTransaction transaction)
         {
             DictionaryInfo dInfo =null;
 
@@ -51,7 +51,7 @@ namespace Sqo.Core
                     dInfo.ValueTypeId = valueTypeId;
                 }
             }
-            return rawSerializer.SerializeDictionary(obj, fi.Header.Length, ti.Header.version, dInfo, serializer);
+            return rawSerializer.SerializeDictionary(obj, fi.Header.Length, ti.Header.version, dInfo, serializer, transaction);
         }
 
         public object GetObject(byte[] bytes)

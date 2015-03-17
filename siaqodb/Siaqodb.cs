@@ -54,7 +54,7 @@ namespace Sqo
         bool opened;
         internal List<object> circularRefCache = new List<object>();
         bool storeOnlyReferencesOfListItems;//used only in StoreObjectPartially to store only references of list items
-
+       
         /// <summary>
         /// Raised before an object is saved in database
         /// </summary>
@@ -319,7 +319,7 @@ namespace Sqo
             List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
             this.indexManager.BuildAllIndexes(typesForIndexes);
 
-            this.RecoverAfterCrash();
+         
             cacheForManager = new Sqo.Cache.CacheForManager();
         }
 #if !WinRT
@@ -333,6 +333,8 @@ namespace Sqo
             this.opened = true;
             this.path = path;
             this.metaCache = new MetaCache();
+           
+
             storageEngine = new StorageEngine(this.path);
             indexManager = new IndexManager(this);
             storageEngine.indexManager = indexManager;
@@ -351,7 +353,7 @@ namespace Sqo
             storageEngine.LoadAllTypes();
             List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
             this.indexManager.BuildAllIndexes(typesForIndexes);
-            this.RecoverAfterCrash();
+          
             cacheForManager = new Sqo.Cache.CacheForManager();
 
         }
@@ -1380,25 +1382,7 @@ savedObject(this, e);
 		}
 
 
-        internal List<KeyValuePair<int, int>> LoadOidsForJoin<TResult, TOuter, TInner>(SqoQuery<TOuter> outer, SqoQuery<TInner> inner, System.Linq.Expressions.Expression outerExpression, System.Linq.Expressions.Expression innerExpression)
-        {
-
-            SqoTypeInfo tiOuter = this.GetSqoTypeInfo<TOuter>();
-            SqoTypeInfo tiInner = this.GetSqoTypeInfo<TInner>();
-
-            JoinTranslator t = new JoinTranslator();
-            string criteriaOuter = t.Translate(outerExpression);
-
-            string criteriaInner = t.Translate(innerExpression);
-            List<int> oidOuter = outer.GetFilteredOids();
-            List<int> oidInner = inner.GetFilteredOids();
-
-            List<KeyValuePair<int, int>> oidsPairs = storageEngine.LoadJoin(tiOuter, criteriaOuter, oidOuter, tiInner, criteriaInner, oidInner);
-
-            return oidsPairs;
-
-
-        }
+       
 #if ASYNC
         internal async Task<List<KeyValuePair<int, int>>> LoadOidsForJoinAsync<TResult, TOuter, TInner>(SqoQuery<TOuter> outer, SqoQuery<TInner> inner, System.Linq.Expressions.Expression outerExpression, System.Linq.Expressions.Expression innerExpression)
         {
@@ -1849,7 +1833,8 @@ savedObject(this, e);
         /// <param name="type">Type of objects to be deleted</param>>
         public void DropType(Type type)
         {
-            this.DropType(type, false);
+            SqoTypeInfo ti = this.GetSqoTypeInfo(type);
+            storageEngine.DropType(ti);
         }
 #if ASYNC
         /// <summary>
@@ -1861,25 +1846,7 @@ savedObject(this, e);
             await this.DropTypeAsync(type, false);
         }
 #endif
-        /// <summary>
-        ///  Delete all objects of Type provided
-        /// </summary>
-        /// <param name="type">Type of objects to be deleted</param>
-        /// <param name="claimFreespace">If this is TRUE all dynamic length data associated with objects will be marked as free and Shrink method is able to free the space</param>
-        public void DropType(Type type, bool claimFreespace)
-        {
-            lock (_locker)
-            {
-                if (!opened)
-                {
-                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
-                }
-                SqoTypeInfo ti = GetSqoTypeInfo(type);
-                storageEngine.DropType(ti,claimFreespace);
-                indexManager.DropIndexes(ti,claimFreespace);
-                this.metaCache.Remove(type);
-            }
-        }
+        
 #if ASYNC
         /// <summary>
         ///  Delete all objects of Type provided
@@ -2226,7 +2193,7 @@ savedObject(this, e);
             }
             SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(metaType.Name);
             
-            return storageEngine.SaveValue(oid, field, tinf,value);
+            return storageEngine.SaveValue(oid, field, tinf,value,null);
            
         }
         
@@ -2392,14 +2359,7 @@ savedObject(this, e);
             storageEngine.DropTransactionLog();
 
         }
-        private void RecoverAfterCrash()
-        {
-            SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<Transactions.TransactionObjectHeader>();
-
-            SqoTypeInfo tiTypeHeader = CheckDBAndGetSqoTypeInfo<Transactions.TransactionTypeHeader>();
-
-            storageEngine.RecoverAfterCrash(ti,tiTypeHeader);
-        }
+        
 #if ASYNC
         private async Task RecoverAfterCrashAsync()
         {
@@ -2690,21 +2650,7 @@ savedObject(this, e);
             return storageEngine.GetRawFile();
         }
 
-        internal void ReIndexAll(bool claimFreespace)
-        {
-            List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
-            foreach (SqoTypeInfo ti in typesForIndexes)
-            {
-                if (ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
-                {
-                    this.DropType(ti.Type, claimFreespace);
-                }
-            }
-            indexManager.DeleteAllIndexInfo();
-            this.DropType(typeof(IndexInfo2));
-
-            this.indexManager.BuildAllIndexes(typesForIndexes);
-        }
+       
 #if ASYNC
 
         internal async Task ReIndexAllAsync(bool claimFreespace)

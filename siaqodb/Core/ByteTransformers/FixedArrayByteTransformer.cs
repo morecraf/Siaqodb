@@ -19,7 +19,7 @@ namespace Sqo.Core
             this.ti = ti;
             this.fi = fi;
         }
-        public byte[] GetBytes(object obj)
+        public byte[] GetBytes(object obj, LightningDB.LightningTransaction transaction)
         {
             Type elementType = fi.AttributeType.GetElementType();
             int elementTypeId = MetaExtractor.GetAttributeType(elementType);
@@ -33,7 +33,7 @@ namespace Sqo.Core
                 byte[] elemArray = null;
                 if (elementTypeId == MetaExtractor.complexID)
                 {
-                    elemArray = serializer.GetComplexObjectBytes(elem,true);
+                    elemArray = serializer.GetComplexObjectBytes(elem,true,transaction);
                 }
                 else
                 {

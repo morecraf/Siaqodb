@@ -25,29 +25,35 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
-           
-            SiaqodbConfigurator.SetLicense (@"httexHqCtXdsK1yw6jbR2Fwlg5oZKA80sg2xPkd3etQ=");
-            Siaqodb siaqodb2 = new Siaqodb(Environment.GetFolderPath (Environment.SpecialFolder.Personal));
-            siaqodb2.DropType<EventSlot>();
-            for (int i = 0; i < 7000; i++) {
 
-                EventSlot evslot = new EventSlot ();
-                evslot.ApplicationID = i;
-                evslot.ID = i;
-                evslot.Index = i;
-                evslot.ClientID = i % 100;
-                evslot.SubClientID = i % 100;
-                evslot.CA_ClientID = i % 100;
-                evslot.Comment = "myslot"+i.ToString();
-                siaqodb2.StoreObject (evslot);
+            SiaqodbConfigurator.SetLicense(@"2/LnUmRDCX30610YCRHuw/21gkt6UNimtliHLvNlcMQ=");
+            Siaqodb siaqodb2 = new Siaqodb(Environment.GetFolderPath (Environment.SpecialFolder.Personal));
+            try
+            {
+                //siaqodb2.DropType<EventSlot>();
+                for (int i = 0; i < 100; i++)
+                {
+
+                    EventSlot evslot = new EventSlot();
+                    evslot.ApplicationID = i;
+                    evslot.ID = i;
+                    evslot.Index = i;
+                   
+                    evslot.Comment = "myslot" + i.ToString();
+                    siaqodb2.StoreObject(evslot);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
             //siaqodb2.Flush ();
             int id = 1000;
             DateTime start22 = DateTime.Now;
             var eventSlots = (from EventSlot es in siaqodb2
-                              where (es.ClientID == 99 && es.SubClientID == 99 && es.CA_ClientID == 99)
+                              where (es.ApplicationID == 9 && es.ID == 9 )
                                orderby es.StartDate
-                              select es).Skip (20).Take (20).ToList();
+                              select es).ToList();
             string elapsed33 = (DateTime.Now - start22).ToString ();
             //Log("Time elapsed before close " + elapsed);
             SiaqodbConfigurator.VerboseLevel = VerboseLevel.Warn;
@@ -578,25 +584,13 @@ namespace WindowsFormsApplication1
 
     public class EventSlot {
         public int OID{get;set;}
-        [Sqo.Attributes.UniqueConstraint]
-        [Index]
+       
         public int ID{get;set;}
         public int ApplicationID{ get; set;}
-        public int ClientID{ get; set; }
-        public int SubClientID{get;set;}
-        public int CA_ClientID{get;set;}
-        public int Index{ get; set; }
-        public int CategoryID{ get; set; }
-        public string DField{get;set;}
-        [Index]
+       public int Index{ get; set; }
+       
         public DateTime StartDate{get;set;}
-        public DateTime StartTime{ get; set; }
-        public DateTime EndTime{ get; set; }
-        public int TimeIncrement{get;set;}
-        public int MaxNOReservations {get;set;}
-        public bool Locked{get;set;}
-        public bool HasTimeSlotSeries{get;set;}
-        [Text] 
+   
         public String Comment{ get; set; }
         //public List<TimeSlot> TimeSlots{get;set;}
         public bool Modified{ get; set; }

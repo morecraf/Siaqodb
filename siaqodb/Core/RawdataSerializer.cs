@@ -64,7 +64,7 @@ namespace Sqo.Core
             }
         }
 
-        public byte[] SerializeArray(object obj, Type objectType, int length, int realLength, int dbVersion, ATuple<int, int> arrayMeta, ObjectSerializer objSerializer,bool elementIsText)
+        public byte[] SerializeArray(object obj, Type objectType, int length, int realLength, int dbVersion, ATuple<int, int> arrayMeta, ObjectSerializer objSerializer, bool elementIsText, LightningDB.LightningTransaction transaction)
         {
 
             byte[] b = new byte[length];
@@ -79,7 +79,7 @@ namespace Sqo.Core
             }
 
 
-            ArrayInfo arrayInfo = this.SerializeArray(obj, objectType, objSerializer, dbVersion, elementIsText);
+            ArrayInfo arrayInfo = this.SerializeArray(obj, objectType, objSerializer, dbVersion, elementIsText,transaction);
            
             RawdataInfo rinfo = this.GetNewRawinfo(arrayMeta, arrayInfo.rawArray.Length, length - MetaExtractor.ExtraSizeForArray, arrayInfo.NrElements);
             int rawOID = rinfo.OID;
@@ -131,7 +131,7 @@ namespace Sqo.Core
         }
 #endif
 
-        private ArrayInfo SerializeArray(object obj, Type objectType, ObjectSerializer objSerializer,int dbVersion,bool elementIsText)
+        private ArrayInfo SerializeArray(object obj, Type objectType, ObjectSerializer objSerializer,int dbVersion,bool elementIsText,LightningDB.LightningTransaction transaction)
         {
             
             ArrayInfo arrInfo = new ArrayInfo();
@@ -186,7 +186,7 @@ namespace Sqo.Core
                     byte[] elemArray = null;
                     if (elementTypeId == MetaExtractor.complexID)
                     {
-                        elemArray = objSerializer.GetComplexObjectBytes(elem);
+                        elemArray = objSerializer.GetComplexObjectBytes(elem,transaction);
                     }
                     else if (elementTypeId == MetaExtractor.jaggedArrayID)
                     {
@@ -197,7 +197,7 @@ namespace Sqo.Core
                         }
                         else
                         {
-                            ArrayInfo arrElemInfo = SerializeArray(elem, elementType, objSerializer, dbVersion, elementIsText);
+                            ArrayInfo arrElemInfo = SerializeArray(elem, elementType, objSerializer, dbVersion, elementIsText,transaction);
                             byte[] jaggedArray = arrElemInfo.rawArray;
                             
                             int jaggedArrayLength=jaggedArray.Length + elementSize;
@@ -463,7 +463,7 @@ namespace Sqo.Core
 
 #endif
       
-        public byte[] SerializeDictionary(object obj, int length, int dbVersion, DictionaryInfo dictInfo,ObjectSerializer objSerializer)
+        public byte[] SerializeDictionary(object obj, int length, int dbVersion, DictionaryInfo dictInfo,ObjectSerializer objSerializer,LightningDB.LightningTransaction transaction)
         {
             byte[] b = new byte[length];
             if (obj == null)
@@ -495,7 +495,7 @@ namespace Sqo.Core
                 #region key
                 if (dictInfo.KeyTypeId == MetaExtractor.complexID )
                 {
-                    keyArray = objSerializer.GetComplexObjectBytes(elem);
+                    keyArray = objSerializer.GetComplexObjectBytes(elem,transaction);
                 }
                 else if (elem is IList)
                 {
@@ -512,7 +512,7 @@ namespace Sqo.Core
                 #region value
                 if (dictInfo.ValueTypeId == MetaExtractor.complexID )
                 {
-                    valueArray = objSerializer.GetComplexObjectBytes(dictionary[elem]);
+                    valueArray = objSerializer.GetComplexObjectBytes(dictionary[elem],transaction);
                 }
                 else if (dictionary[elem] is IList)
                 {
@@ -1511,9 +1511,9 @@ namespace Sqo.Core
             }
         }
 #endif
-        internal void MarkRawInfoAsFree(int oid)
+        internal void MarkRawInfoAsFree(int oid,LightningDB.LightningTransaction transaction)
         {
-            this.manager.MarkRawInfoAsFree(oid);
+            this.manager.MarkRawInfoAsFree(oid, transaction);
         }
 #if ASYNC
         internal async Task MarkRawInfoAsFreeAsync(int oid)

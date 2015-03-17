@@ -17,7 +17,6 @@ namespace Sqo
         int DeleteObjectBy<T>(System.Collections.Generic.Dictionary<string, object> criteria);
         event EventHandler<DeletingEventsArgs> DeletingObject;
         void DropType(Type type);
-        void DropType(Type type, bool claimFreespace);
         void DropType<T>();
         void EndBulkInsert(params Type[] types);
 #if !UNITY3D

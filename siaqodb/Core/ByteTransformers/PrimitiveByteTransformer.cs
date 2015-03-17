@@ -20,7 +20,7 @@ namespace Sqo.Core
 
         #region IByteTransformer Members
 
-        public byte[] GetBytes(object obj)
+        public byte[] GetBytes(object obj, LightningDB.LightningTransaction transaction)
         {
             return ByteConverter.SerializeValueType(obj, fi.AttributeType, fi.Header.Length, fi.Header.RealLength, ti.Header.version);
         }

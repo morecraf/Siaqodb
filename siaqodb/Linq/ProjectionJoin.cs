@@ -279,28 +279,12 @@ namespace Sqo
 
         }
 #endif
-		public IEnumerator<T> GetEnumerator()
-		{
-			Enumerator e = this.enumerator;
-			SqoQuery<TOuter> SqoQueryOuterImp = SqoQueryOuter as SqoQuery<TOuter>;
-			SqoQuery<TInner> SqoQueryInnerImp = SqoQueryInner as SqoQuery<TInner>;
-			if (SqoQueryOuterImp != null)
-			{
-				List<KeyValuePair<int, int>> oids = SqoQueryOuterImp.Siaqodb.LoadOidsForJoin<T, TOuter, TInner>(SqoQueryOuterImp, SqoQueryInnerImp, outerExpression, innerExpression);
+        public IEnumerator<T> GetEnumerator()
+        {
 
-				e.oids = oids;
-				e.siaqodb = SqoQueryOuterImp.Siaqodb;
-				e.outerType = typeof(TOuter);
-				e.innerType = typeof(TInner);
-				
-			}
-			else
-			{
-                throw new LINQUnoptimizeException("cannot optimize");
-			}
-			//this.enumerator = null;
-			return e;
-		}
+            throw new LINQUnoptimizeException("cannot optimize");
+
+        }
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{

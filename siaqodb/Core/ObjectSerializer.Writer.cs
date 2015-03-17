@@ -10,6 +10,7 @@ using Sqo.Exceptions;
 using Sqo.Utilities;
 using System.Collections;
 using System.Reflection;
+using LightningDB;
 
 #if ASYNC
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace Sqo.Core
             await file.WriteAsync(position, oidBuff).ConfigureAwait(false);
         }
 #endif
-        public void SerializeObject(ObjectInfo oi, RawdataSerializer rawSerializer)
+        public byte[] SerializeObject(ObjectInfo oi, RawdataSerializer rawSerializer,LightningTransaction transaction)
         {
 
             if (oi.Oid > oi.SqoTypeInfo.Header.numberOfRecords)
@@ -55,16 +56,9 @@ namespace Sqo.Core
                 throw new SiaqodbException("Object is already deleted from database");
             }
 
-            long position = MetaHelper.GetSeekPosition(oi.SqoTypeInfo, oi.Oid);
+            byte[] buffer = GetObjectBytes(oi, rawSerializer, transaction);
 
-            byte[] buffer = GetObjectBytes(oi, rawSerializer);
-
-            file.Write(position, buffer);
-
-            if (oi.Inserted)
-            {
-                SaveNrRecords(oi.SqoTypeInfo, oi.SqoTypeInfo.Header.numberOfRecords);
-            }
+            return buffer;
 
 
         }
@@ -162,7 +156,7 @@ namespace Sqo.Core
 
         }
 #endif
-        internal byte[] GetObjectBytes(ObjectInfo oi, RawdataSerializer rawSerializer)
+        internal byte[] GetObjectBytes(ObjectInfo oi, RawdataSerializer rawSerializer, LightningTransaction transaction)
         {
 
             byte[] oidBuff = ByteConverter.IntToByteArray(oi.Oid);
@@ -197,7 +191,7 @@ namespace Sqo.Core
                 }
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, oi.SqoTypeInfo, parentOID);
 
-                by = byteTransformer.GetBytes(oi.AtInfo[ai]);
+                by = byteTransformer.GetBytes(oi.AtInfo[ai],transaction);
 
                 Array.Copy(by, 0, buffer, curentIndex, by.Length);
                 curentIndex += by.Length;
@@ -253,9 +247,9 @@ namespace Sqo.Core
         }
         
 #endif
-        public byte[] GetComplexObjectBytes(object obj,bool returnOnlyOID_TID)
+        public byte[] GetComplexObjectBytes(object obj, bool returnOnlyOID_TID, LightningTransaction transaction)
         {
-            ComplexObjectEventArgs args = new ComplexObjectEventArgs(obj,returnOnlyOID_TID);
+            ComplexObjectEventArgs args = new ComplexObjectEventArgs(obj, returnOnlyOID_TID, transaction);
             this.OnNeedSaveComplexObject(args);
             byte[] by = new byte[MetaExtractor.GetAbsoluteSizeOfField(MetaExtractor.complexID)];
             byte[] complexOID = ByteConverter.IntToByteArray(args.SavedOID);
@@ -277,9 +271,9 @@ namespace Sqo.Core
             return by;
         }
 #endif
-        public byte[] GetComplexObjectBytes(object obj)
+        public byte[] GetComplexObjectBytes(object obj,LightningTransaction transaction)
         {
-            return this.GetComplexObjectBytes(obj, false);
+            return this.GetComplexObjectBytes(obj, false,transaction);
         }
 #if ASYNC
         public async Task<byte[]> GetComplexObjectBytesAsync(object obj)
@@ -308,15 +302,13 @@ namespace Sqo.Core
 
         }
 #endif
-        internal void MarkObjectAsDelete(int oid, SqoTypeInfo ti)
+        internal byte[] MarkObjectAsDelete(int oid, SqoTypeInfo ti)
         {
 
-            long position = MetaHelper.GetSeekPosition(ti, oid);
             int deletedOID = (-1) * oid;
             byte[] deletedOidBuff = ByteConverter.IntToByteArray(deletedOID);
-
-            file.Write(position, deletedOidBuff);
-
+            return deletedOidBuff;
+           
         }
 #if ASYNC
         internal async Task MarkObjectAsDeleteAsync(int oid, SqoTypeInfo ti)
@@ -349,7 +341,7 @@ namespace Sqo.Core
         }
 
 #endif
-        internal bool SaveFieldValue(int oid, string field, SqoTypeInfo ti, object value, RawdataSerializer rawSerializer)
+        internal ATuple<int,byte[]> SaveFieldValue(int oid, string field, SqoTypeInfo ti, object value, RawdataSerializer rawSerializer,LightningTransaction transaction)
         {
            
             long position = MetaHelper.GetSeekPosition(ti, oid);
@@ -378,11 +370,10 @@ namespace Sqo.Core
             byte[] by = null;
             
             IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti, oid);
-            by = byteTransformer.GetBytes(value);
+            by = byteTransformer.GetBytes(value,transaction);
 
-            file.Write((long)(position + (long)ai.Header.PositionInRecord), by);
-
-            return true;
+            return new ATuple<int, byte[]>(ai.Header.PositionInRecord, by);
+            
 
 
         }
@@ -427,14 +418,15 @@ namespace Sqo.Core
         }
 #endif
 
-        internal int InsertEmptyObject(SqoTypeInfo tinf)
+        internal ATuple<int,byte[]> InsertEmptyObject(SqoTypeInfo tinf)
         {
             int oid = GetNextOID(tinf);
+            byte[] objBytes = new byte[tinf.Header.lengthOfRecord];
             byte[] oidBuff = ByteConverter.IntToByteArray(oid);
-            long position = MetaHelper.GetSeekPosition(tinf, oid);
-            file.Write(position, oidBuff);
-            SaveNrRecords(tinf, tinf.Header.numberOfRecords + 1);
-            return oid;
+            Array.Copy(oidBuff, 0, objBytes, 0, oidBuff.Length);
+            tinf.Header.numberOfRecords++;
+
+            return new ATuple<int,byte[]>(oid,objBytes);
         }
 
         internal void SaveObjectTable(SqoTypeInfo actualTypeinfo, SqoTypeInfo oldSqoTypeInfo, ObjectTable table, RawdataSerializer rawSerializer)
@@ -509,7 +501,7 @@ namespace Sqo.Core
                         }
                         else
                         {
-                            by = this.GetComplexObjectBytes(fieldVal);
+                            by = this.GetComplexObjectBytes(fieldVal,null);
                         }
                     }
                     else if (typeof(IList).IsAssignableFrom(ai.AttributeType))//array
@@ -521,7 +513,7 @@ namespace Sqo.Core
                         else
                         {
 
-                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this,ai.IsText);
+                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this,ai.IsText,null);
 
                         }
                     }
@@ -536,12 +528,12 @@ namespace Sqo.Core
                             }
                             else
                             {
-                                by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this, ai.IsText);
+                                by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this, ai.IsText,null);
                             }
                         }
                         else
                         {
-                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this, ai.IsText);
+                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this, ai.IsText,null);
 
                         }
                     }
@@ -555,7 +547,7 @@ namespace Sqo.Core
                         else
                         {
                             IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, actualTypeinfo, 0);
-                            by = byteTransformer.GetBytes(fieldVal);
+                            by = byteTransformer.GetBytes(fieldVal,null);
 
                         }
 

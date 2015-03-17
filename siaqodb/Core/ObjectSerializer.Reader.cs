@@ -19,48 +19,28 @@ namespace Sqo.Core
 {
     partial class ObjectSerializer
     {
-        public void ReadObject(object obj, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
+        public void ReadObject(object obj, byte[] objBytes, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
         {
 
-            //long position = (long)ti.Header.headerSize + (long)((long)(oid - 1) * (long)ti.Header.lengthOfRecord);
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
-            byte[] b = new byte[recordLength];
-            if (oidEnd == 0 && oidStart == 0)
-            {
-                file.Read(position, b);
-            }
-            else
-            {
-                int recordPosition = (oid - oidStart) * recordLength;
-                Array.Copy(preloadedBytes, recordPosition, b, 0, b.Length);
-            }
+
             int fieldPosition = 0;
-            byte[] oidBuff = GetFieldBytes(b, fieldPosition, 4);
+            byte[] oidBuff = GetFieldBytes(objBytes, fieldPosition, 4);
             int oidFromFile = ByteConverter.ByteArrayToInt(oidBuff);
             //eventual make comparison
 
             foreach (FieldSqoInfo ai in ti.Fields)
             {
-                byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
+                byte[] field = GetFieldBytes(objBytes, ai.Header.PositionInRecord, ai.Header.Length);
 
                 IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
 
                 object fieldVal = null;
-                try
-                {
-                    fieldVal = byteTransformer.GetObject(field);
-                }
-                catch (Exception ex)
-                {
-                    if (ti.Type!=null && ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
-                        throw new IndexCorruptedException();
-                    SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded, will be set to default.", VerboseLevel.Info);
-                    fieldVal = MetaHelper.GetDefault(ai.AttributeType);
-                }
+
+                fieldVal = byteTransformer.GetObject(field);
+
                 if (ai.AttributeTypeId == MetaExtractor.documentID)
-                { 
-                    DocumentInfo dinfo=fieldVal as DocumentInfo;
+                {
+                    DocumentInfo dinfo = fieldVal as DocumentInfo;
                     if (dinfo != null)
                     {
                         if (SiaqodbConfigurator.DocumentSerializer == null)
@@ -70,8 +50,8 @@ namespace Sqo.Core
                         fieldVal = SiaqodbConfigurator.DocumentSerializer.Deserialize(ai.AttributeType, dinfo.Document);
                         //put in weak cache to be able to update the document
                         DocumentEventArgs args = new DocumentEventArgs();
-                        args.ParentObject=obj;
-                        args.DocumentInfoOID=dinfo.OID;
+                        args.ParentObject = obj;
+                        args.DocumentInfoOID = dinfo.OID;
                         args.FieldName = ai.Name;
                         args.TypeInfo = ti;
                         this.OnNeedCacheDocument(args);
@@ -212,9 +192,9 @@ namespace Sqo.Core
             return args.ComplexObject;
         }
 #endif
-        public void ReadObject<T>(T obj, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
+        public void ReadObject<T>(T obj, byte[] objBytes, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
         {
-            this.ReadObject((object)obj, ti, oid, rawSerializer);
+            this.ReadObject((object)obj, objBytes, ti, oid, rawSerializer);
         }
         #if ASYNC
         public async Task ReadObjectAsync<T>(T obj, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
@@ -222,9 +202,9 @@ namespace Sqo.Core
             await this.ReadObjectAsync((object)obj, ti, oid, rawSerializer).ConfigureAwait(false);
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid, string fieldName)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid,byte[] objBytes, string fieldName)
         {
-            return ReadFieldValue(ti, oid, fieldName, null);
+            return ReadFieldValue(ti, oid, objBytes, fieldName, null);
         }
         #if ASYNC
         public async Task<object> ReadFieldValueAsync(SqoTypeInfo ti, int oid, string fieldName)
@@ -232,9 +212,9 @@ namespace Sqo.Core
             return await ReadFieldValueAsync(ti, oid, fieldName, null).ConfigureAwait(false);
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid, byte[] objBytes, FieldSqoInfo fi)
         {
-            return this.ReadFieldValue(ti, oid, fi, null);
+            return this.ReadFieldValue(ti, oid,objBytes, fi, null);
         }
         #if ASYNC
         public async Task<object> ReadFieldValueAsync(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
@@ -242,7 +222,7 @@ namespace Sqo.Core
             return await this.ReadFieldValueAsync(ti, oid, fi, null).ConfigureAwait(false);
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid, string fieldName, RawdataSerializer rawSerializer)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid,byte[] objBytes, string fieldName, RawdataSerializer rawSerializer)
         {
 
             FieldSqoInfo fi = FindField(ti.Fields, fieldName);
@@ -250,7 +230,7 @@ namespace Sqo.Core
             {
                 throw new SiaqodbException("Field:" + fieldName + " not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
             }
-            return this.ReadFieldValue(ti, oid, fi, rawSerializer);
+            return this.ReadFieldValue(ti, oid,objBytes, fi, rawSerializer);
 
         }
         #if ASYNC
@@ -266,39 +246,22 @@ namespace Sqo.Core
 
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid, FieldSqoInfo fi, RawdataSerializer rawSerializer)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid, byte[] objBytes, FieldSqoInfo fi, RawdataSerializer rawSerializer)
         {
 
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
             if (fi == null)
             {
                 throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
             }
             byte[] b = new byte[fi.Header.Length];
-            if (oidEnd == 0 && oidStart == 0)
-            {
-                file.Read((long)(position + (long)fi.Header.PositionInRecord), b);
-            }
-            else
-            {
-                int fieldPosition = (oid - oidStart) * recordLength + fi.Header.PositionInRecord;
-                Array.Copy(preloadedBytes, fieldPosition, b, 0, b.Length);
-            }
+
+            Array.Copy(objBytes, fi.Header.PositionInRecord, b, 0, b.Length);
+
             IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, fi, ti);
-            try
-            {
-                return byteTransformer.GetObject(b);
-            }
-            catch (Exception ex)
-            {
-                if (ti.Type != null && ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
-                {
-                    throw new IndexCorruptedException();
-                }
-                SiaqodbConfigurator.LogMessage("Field's" + fi.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
-                return MetaHelper.GetDefault(fi.AttributeType);
-            }
+
+            return byteTransformer.GetObject(b);
+
+
 
         }
 #if ASYNC
@@ -338,18 +301,11 @@ namespace Sqo.Core
 
         }
 #endif
-        public KeyValuePair<int, int> ReadOIDAndTID(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
+        public KeyValuePair<int, int> ReadOIDAndTID(SqoTypeInfo ti, int oid,byte[] objBytes, FieldSqoInfo fi)
         {
 
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
-            if (fi == null)
-            {
-                throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
-            }
             byte[] b = new byte[fi.Header.Length];
-
-            file.Read((long)(position + (long)fi.Header.PositionInRecord), b);
+            Array.Copy(objBytes, fi.Header.PositionInRecord, b, 0, b.Length);
 
             return ReadOIDAndTID(b);
 
@@ -380,14 +336,14 @@ namespace Sqo.Core
             int tidOfComplexObj = ByteConverter.ByteArrayToInt(tidOfComplexObjBuff);
             return new KeyValuePair<int, int>(oidOfComplexObj, tidOfComplexObj);
         }
-        public int ReadOidOfComplex(SqoTypeInfo ti, int oid, string fieldName, RawdataSerializer rawSerializer)
+        public int ReadOidOfComplex(SqoTypeInfo ti, int oid,byte[] objBytes, string fieldName, RawdataSerializer rawSerializer)
         {
             FieldSqoInfo fi = FindField(ti.Fields, fieldName);
             if (fi == null)
             {
                 throw new SiaqodbException("Field:" + fieldName + " not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
             }
-            return this.ReadOidOfComplex(ti, oid, fi, rawSerializer);
+            return this.ReadOidOfComplex(ti, oid,objBytes, fi, rawSerializer);
         }
 #if ASYNC
         public async Task<int> ReadOidOfComplexAsync(SqoTypeInfo ti, int oid, string fieldName, RawdataSerializer rawSerializer)
@@ -400,19 +356,15 @@ namespace Sqo.Core
             return await this.ReadOidOfComplexAsync(ti, oid, fi, rawSerializer).ConfigureAwait(false);
         }
 #endif
-        public int ReadOidOfComplex(SqoTypeInfo ti, int oid, FieldSqoInfo fi, RawdataSerializer rawSerializer)
+        public int ReadOidOfComplex(SqoTypeInfo ti, int oid,byte[] objBytes, FieldSqoInfo fi, RawdataSerializer rawSerializer)
         {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
+            
             if (fi == null)
             {
                 throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
             }
-            byte[] b = new byte[fi.Header.Length];
-
-            file.Read((long)(position + (long)fi.Header.PositionInRecord), b);
-
-            byte[] oidOfComplexObjBuff = GetFieldBytes(b, 0, 4);
+           
+            byte[] oidOfComplexObjBuff = GetFieldBytes(objBytes, fi.Header.PositionInRecord, 4);
             int oidOfComplexObj = ByteConverter.ByteArrayToInt(oidOfComplexObjBuff);
             return oidOfComplexObj;
         }
@@ -434,21 +386,12 @@ namespace Sqo.Core
             return oidOfComplexObj;
         }
 #endif
-        internal bool IsObjectDeleted(int oid, SqoTypeInfo ti)
+        internal bool IsObjectDeleted(int oid, byte[] objBytes)
         {
 
-            // long position = (long)ti.Header.headerSize + (long)((long)(oid - 1) * (long)ti.Header.lengthOfRecord);
-            long position = MetaHelper.GetSeekPosition(ti, oid);
             byte[] bytes = new byte[4];//oid size-int size
-            if (oidStart == 0 && oidEnd == 0)
-            {
-                file.Read(position, bytes);
-            }
-            else
-            {
-                int oidPosition = (oid - oidStart) * ti.Header.lengthOfRecord;
-                Array.Copy(preloadedBytes, oidPosition, bytes, 0, bytes.Length);
-            }
+            Array.Copy(objBytes, 0, bytes, 0, bytes.Length);
+
             int oidFromFile = ByteConverter.ByteArrayToInt(bytes);
             if (oid == -oidFromFile)
                 return true;
@@ -825,17 +768,17 @@ namespace Sqo.Core
         }
 
 #endif
-        internal List<KeyValuePair<int, int>> ReadComplexArrayOids(int oid, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)
+        internal List<KeyValuePair<int, int>> ReadComplexArrayOids(int oid,byte[] objBytes, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)
         {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
+            
             if (fi == null)
             {
                 throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
             }
             byte[] b = new byte[fi.Header.Length];
 
-            file.Read((long)(position + (long)fi.Header.PositionInRecord), b);
+            Array.Copy(objBytes, fi.Header.PositionInRecord, b, 0, b.Length);
+
             return rawdataSerializer.ReadComplexArrayOids(b, ti.Header.version, this);
         }
 #if ASYNC
@@ -853,17 +796,16 @@ namespace Sqo.Core
             return rawdataSerializer.ReadComplexArrayOids(b, ti.Header.version, this);
         }
 #endif
-        internal int ReadFirstTID(int oid, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)
+        internal int ReadFirstTID(int oid, byte[] objBytes, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)
         {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
+           
             if (fi == null)
             {
                 throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
             }
             byte[] b = new byte[fi.Header.Length];
-
-            file.Read((long)(position + (long)fi.Header.PositionInRecord), b);
+            Array.Copy(objBytes, fi.Header.PositionInRecord, b, 0, b.Length);
+            
             return rawdataSerializer.ReadComplexArrayFirstTID(b, ti.Header.version, this);
         }
 #if ASYNC
