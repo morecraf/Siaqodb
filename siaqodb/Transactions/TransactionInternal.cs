@@ -2,29 +2,20 @@
 using System.Collections.Generic;
 using Sqo.Core;
 using Sqo.Meta;
+using LightningDB;
 
 namespace Sqo.Transactions
 {
     class TransactionInternal
     {
         internal Transaction transaction;
-        internal Dictionary<ObjectSerializer, KeyValuePair<SqoTypeInfo, int>> nrRecordsBeforeCommit = new Dictionary<ObjectSerializer, KeyValuePair<SqoTypeInfo, int>>();
-        internal Siaqodb siaqodbInstance;
-        internal List<TransactionObject> transactionObjects = new List<TransactionObject>();
-        internal List<SqoTypeInfo> tiInvolvedInTransaction = new List<SqoTypeInfo>();
-        public TransactionInternal(Transaction tr,Siaqodb siaqodb)
+        internal LightningTransaction lmdbTransaction;
+        public TransactionInternal(Transaction sTransaction,LightningDB.LightningTransaction lmdbTransaction)
         {
-            transaction = tr;
-            siaqodbInstance = siaqodb;
+            this.transaction = sTransaction;
+            this.lmdbTransaction = lmdbTransaction;
         }
-        public void AddTransactionObject(TransactionObject trObj)
-        {
-            transactionObjects.Add(trObj);
-            if (!tiInvolvedInTransaction.Contains(trObj.objInfo.SqoTypeInfo))
-            {
-                tiInvolvedInTransaction.Add(trObj.objInfo.SqoTypeInfo);
-            }
-        }
+       
 
     }
 }

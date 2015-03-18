@@ -13,6 +13,7 @@ using System.IO;
 using Sqo.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
+using Sqo.Transactions;
 
 namespace WindowsFormsApplication1
 {
@@ -27,33 +28,44 @@ namespace WindowsFormsApplication1
         {
 
             SiaqodbConfigurator.SetLicense(@"2/LnUmRDCX30610YCRHuw/21gkt6UNimtliHLvNlcMQ=");
-            Siaqodb siaqodb2 = new Siaqodb(Environment.GetFolderPath (Environment.SpecialFolder.Personal));
+            Siaqodb siaqodb2 = new Siaqodb(@"c:\work\temp\_lmdbtests\");
+            ITransaction transaction = siaqodb2.BeginTransaction();
+            DateTime start22 = DateTime.Now;
             try
             {
                 //siaqodb2.DropType<EventSlot>();
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 10000; i++)
                 {
 
                     EventSlot evslot = new EventSlot();
                     evslot.ApplicationID = i;
                     evslot.ID = i;
                     evslot.Index = i;
-                   
+                    //evslot.Friend = new EventSlot();
+                    //evslot.Friend.ID = i + 1;
+                   // evslot.Friend.StartDate = DateTime.Now;
                     evslot.Comment = "myslot" + i.ToString();
-                    siaqodb2.StoreObject(evslot);
+
+                    //evslot.TickNested = new Tick();
+                   // evslot.TickNested.MyInt = i + 1;
+                    siaqodb2.StoreObject(evslot, transaction);
                 }
+                transaction.Commit();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
             //siaqodb2.Flush ();
-            int id = 1000;
-            DateTime start22 = DateTime.Now;
+            //int id = 1000;
+            string elapsed12 = (DateTime.Now - start22).ToString();
+            //string s = "s";
+            start22 = DateTime.Now;
             var eventSlots = (from EventSlot es in siaqodb2
-                              where (es.ApplicationID == 9 && es.ID == 9 )
-                               orderby es.StartDate
+                              where (es.ApplicationID == 9 )
+                              // orderby es.StartDate
                               select es).ToList();
+            var alle3 = siaqodb2.LoadAll<EventSlot>();
             string elapsed33 = (DateTime.Now - start22).ToString ();
             //Log("Time elapsed before close " + elapsed);
             SiaqodbConfigurator.VerboseLevel = VerboseLevel.Warn;
@@ -231,7 +243,7 @@ namespace WindowsFormsApplication1
 
         public int OID { get; set; }
 
-        [Index]
+      
         public int MyInt;
         public string mystring;
         public DateTime mydate;
@@ -594,6 +606,8 @@ namespace WindowsFormsApplication1
         public String Comment{ get; set; }
         //public List<TimeSlot> TimeSlots{get;set;}
         public bool Modified{ get; set; }
+       public  EventSlot Friend { get; set; }
+       public Tick TickNested { get; set; }
     }  
 
 }

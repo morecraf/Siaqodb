@@ -640,7 +640,7 @@ namespace Sqo.Core
         }
 #endif
 
-        public object DeserializeDictionary(Type objectType,byte[] bytes, int dbVersion,ObjectSerializer objSerializer,Type parentType,string fieldName)
+        public object DeserializeDictionary(Type objectType, byte[] bytes, int dbVersion, ObjectSerializer objSerializer, Type parentType, string fieldName, LightningDB.LightningTransaction transaction)
         {
             if (bytes[0] == 1) //is null
             {
@@ -696,7 +696,7 @@ namespace Sqo.Core
                 Array.Copy(arrayData, currentIndex, keyBytes, 0, keyLen);
                 if (keyTypeId == MetaExtractor.complexID)
                 {
-                    key = objSerializer.ReadComplexObject(keyBytes, parentType, fieldName);
+                    key = objSerializer.ReadComplexObject(keyBytes, parentType, fieldName, transaction);
                 }
                 else
                 {
@@ -708,7 +708,7 @@ namespace Sqo.Core
                 Array.Copy(arrayData, currentIndex, valueBytes, 0, valueLen);
                 if (valueTypeId == MetaExtractor.complexID)
                 {
-                    val = objSerializer.ReadComplexObject(valueBytes, parentType, fieldName);
+                    val = objSerializer.ReadComplexObject(valueBytes, parentType, fieldName, transaction);
                 }
                 else
                 {
@@ -916,7 +916,7 @@ namespace Sqo.Core
             //}
         }
 #endif
-        public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText,bool elementIsText, ObjectSerializer objSerializer, Type parentType, string fieldName)
+        public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText,bool elementIsText, ObjectSerializer objSerializer, Type parentType, string fieldName,LightningDB.LightningTransaction transaction)
         {
 
             bool isArray = objectType.IsArray;
@@ -943,7 +943,7 @@ namespace Sqo.Core
             byte[] arrayData = new byte[info.Length];
             File.Read(info.Position, arrayData);
 
-            return DeserializeArrayInternal(objectType, arrayData, checkEncrypted, dbVersion, isText,elementIsText,nrElem,objSerializer,parentType,fieldName);
+            return DeserializeArrayInternal(objectType, arrayData, checkEncrypted, dbVersion, isText,elementIsText,nrElem,objSerializer,parentType,fieldName,transaction);
 
         }
 #if ASYNC
@@ -979,7 +979,7 @@ namespace Sqo.Core
 
         }
 #endif
-        private object DeserializeArrayInternal(Type objectType, byte[] arrayData, bool checkEncrypted, int dbVersion, bool isText,bool elementIsText, int nrElem, ObjectSerializer objSerializer, Type parentType, string fieldName)
+        private object DeserializeArrayInternal(Type objectType, byte[] arrayData, bool checkEncrypted, int dbVersion, bool isText, bool elementIsText, int nrElem, ObjectSerializer objSerializer, Type parentType, string fieldName, LightningDB.LightningTransaction transaction)
         {
             bool isArray = objectType.IsArray;
             Type elementType = objectType.GetElementType();
@@ -1062,7 +1062,7 @@ namespace Sqo.Core
                            
                             Array.Copy(arrayData, currentIndex, jaggedArrayBytes, 0, jaggedArrayBytes.Length);
                             currentIndex += jaggedArrayBytes.Length;
-                            obj = DeserializeArrayInternal(elementType, jaggedArrayBytes, checkEncrypted, dbVersion, isText,elementIsText, nrJaggedElem, objSerializer, parentType, fieldName);
+                            obj = DeserializeArrayInternal(elementType, jaggedArrayBytes, checkEncrypted, dbVersion, isText,elementIsText, nrJaggedElem, objSerializer, parentType, fieldName,transaction);
 
                         }
                     }
@@ -1102,7 +1102,7 @@ namespace Sqo.Core
                     }
                     else if (elementTypeId == MetaExtractor.complexID)
                     {
-                        obj = objSerializer.ReadComplexObject(elemBytes, parentType, fieldName);
+                        obj = objSerializer.ReadComplexObject(elemBytes, parentType, fieldName, transaction);
                     }
                     else
                     {
@@ -1280,9 +1280,9 @@ namespace Sqo.Core
         }
       
 #endif
-        public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText,bool elemnIsText)
+        public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText, bool elemnIsText, LightningDB.LightningTransaction transaction)
         {
-            return this.DeserializeArray(objectType, bytes, checkEncrypted, dbVersion, isText,elemnIsText, null, null, null);
+            return this.DeserializeArray(objectType, bytes, checkEncrypted, dbVersion, isText, elemnIsText, null, null, null, transaction);
         }
 #if ASYNC
         public async Task<object> DeserializeArrayAsync(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText, bool elemnIsText)

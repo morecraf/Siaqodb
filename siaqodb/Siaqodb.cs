@@ -505,7 +505,7 @@ namespace Sqo
             {
                 return;
             }
-            SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(e.ComplexObject);
+            SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(e.ComplexObject,e.Transaction);
             if (ti != null)
             {
 
@@ -530,7 +530,7 @@ namespace Sqo
                     }
                     else
                     {
-                        oid = storageEngine.SaveObject(e.ComplexObject, ti);
+                        oid = storageEngine.SaveObject(e.ComplexObject, ti,e.Transaction);
                     }
                     SavedEventsArgs saved = new SavedEventsArgs(e.ComplexObject.GetType(), e.ComplexObject);
                     saved.Inserted = inserted;
@@ -712,39 +712,8 @@ savedObject(this, e);
         /// <param name="obj">Object to be stored</param>
 		public void StoreObject(object obj)
 		{
-            lock (_locker)
-            {
-                SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj);
-                if (ti != null)
-                {
-                    if ((ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || ti.Type==typeof(IndexInfo2))
-                    { }
-                    else
-                    {
-                        circularRefCache.Clear();
-                    }
-                    circularRefCache.Add(obj);
-                    bool inserted = false;
-#if UNITY3D
-                    if (this.savedObject != null)//optimization 
-                    {
-                        inserted = metaCache.GetOIDOfObject(obj, ti) == 0;
-                    }
-#else
-                    if (this.SavedObject != null)//optimization 
-                    {
-                        inserted = metaCache.GetOIDOfObject(obj, ti) == 0;
-                    }
-#endif
-                    storageEngine.SaveObject(obj, ti);
-                    SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
-                    saved.Inserted = inserted;
-                    this.OnSavedObject(saved);
 
-
-                }
-            }
-
+            this.StoreObject(obj, null);
 		}
 #if ASYNC
         /// <summary>
@@ -827,7 +796,7 @@ savedObject(this, e);
             lock (_locker)
             {
                 this.storeOnlyReferencesOfListItems = onlyReferences;
-                SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj);
+                SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj,null);
                 if (ti != null)
                 {
                     circularRefCache.Clear();
@@ -878,25 +847,36 @@ savedObject(this, e);
         {
             lock (_locker)
             {
-                if (transaction == null)
-                {
-                    throw new ArgumentNullException("transaction");
-                }
-                 SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj);
+                LightningDB.LightningTransaction lmdbTr = transaction == null ? null : Transactions.TransactionManager.GetLMDBTransaction(((Transactions.Transaction)transaction).ID);
+                   
+                SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj,lmdbTr);
                 if (ti != null)
                 {
-                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
+                    if ((ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || ti.Type == typeof(IndexInfo2))
+                    { }
+                    else
                     {
-                        throw new SiaqodbException("Transaction closed!");
+                        circularRefCache.Clear();
                     }
-                    //circularRefCache.Clear();
-                    //circularRefCache.Add(obj); 
-
-                    //circularRefCache is filled with obj just before Commit in TransactionManager, so not need to be added here
-                    storageEngine.SaveObject(obj, ti, null, (Transactions.Transaction)transaction);
-
+                    circularRefCache.Add(obj);
+                    bool inserted = false;
+#if UNITY3D
+                    if (this.savedObject != null)//optimization 
+                    {
+                        inserted = metaCache.GetOIDOfObject(obj, ti) == 0;
+                    }
+#else
+                    if (this.SavedObject != null)//optimization 
+                    {
+                        inserted = metaCache.GetOIDOfObject(obj, ti) == 0;
+                    }
+#endif
+                    storageEngine.SaveObject(obj, ti, lmdbTr);
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
+                    saved.Inserted = inserted;
                     this.OnSavedObject(saved);
+
+
                 }
             }
         }
@@ -940,8 +920,8 @@ savedObject(this, e);
             }
         }
 #endif
-        
-        private SqoTypeInfo GetSqoTypeInfoToStoreObject(object obj)
+       
+        private SqoTypeInfo GetSqoTypeInfoToStoreObject(object obj,LightningDB.LightningTransaction transaction)
         {
             if (!opened)
             {
@@ -956,7 +936,7 @@ savedObject(this, e);
                 return null;
             }
 
-            return this.GetSqoTypeInfoToStoreObject(obj.GetType());
+            return this.GetSqoTypeInfoToStoreObject(obj.GetType(),transaction);
         }
 #if ASYNC
         private async Task<SqoTypeInfo> GetSqoTypeInfoToStoreObjectAsync(object obj)
@@ -977,7 +957,8 @@ savedObject(this, e);
             return await this.GetSqoTypeInfoToStoreObjectAsync(obj.GetType());
         }
 #endif
-        private SqoTypeInfo GetSqoTypeInfoToStoreObject(Type objType)
+       
+        private SqoTypeInfo GetSqoTypeInfoToStoreObject(Type objType,LightningDB.LightningTransaction transaction )
         {
             if (!opened)
             {
@@ -993,7 +974,14 @@ savedObject(this, e);
             else
             {
                 ti = MetaExtractor.GetSqoTypeInfo(objType);
-                storageEngine.SaveType(ti);
+                if (transaction == null)
+                {
+                    storageEngine.SaveType(ti);
+                }
+                else
+                {
+                    storageEngine.SaveType(ti,transaction);
+                }
                 this.metaCache.AddType(objType, ti);
                 this.indexManager.BuildIndexes(ti);
 
@@ -1651,8 +1639,9 @@ savedObject(this, e);
                 {
                     return false;
                 }
+                LightningDB.LightningTransaction lmdbTr = transaction == null ? null : Transactions.TransactionManager.GetLMDBTransaction(((Transactions.Transaction)transaction).ID);
 
-                int OID_deleted = storageEngine.DeleteObjectBy(fieldNames, obj, ti, (Transactions.Transaction)transaction);
+                int OID_deleted = storageEngine.DeleteObjectBy(fieldNames, obj, ti, lmdbTr);
                 DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, OID_deleted);
                 this.OnDeletedObject(deletedEv);
 
@@ -2122,12 +2111,13 @@ savedObject(this, e);
                     }
                 }
 
+                LightningDB.LightningTransaction lmdbTr = transaction == null ? null : Transactions.TransactionManager.GetLMDBTransaction(((Transactions.Transaction)transaction).ID);
 
-                SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(obj);
+                SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(obj, lmdbTr);
                 if (ti != null)
                 {
-
-                    bool stored = storageEngine.UpdateObjectBy(fieldNames, obj, ti, (Transactions.Transaction)transaction);
+                   
+                    bool stored = storageEngine.UpdateObjectBy(fieldNames, obj, ti, lmdbTr);
 
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     saved.Inserted = false;
@@ -2199,7 +2189,7 @@ savedObject(this, e);
         
 
         #region private methods
-        private bool DeleteObjInternal(object obj, SqoTypeInfo ti,Transactions.ITransaction transaction)
+        private bool DeleteObjInternal(object obj, SqoTypeInfo ti, Transactions.ITransaction transaction)
         {
             int oid = metaCache.GetOIDOfObject(obj, ti);
             if (oid <= 0 || oid > ti.Header.numberOfRecords)
@@ -2213,14 +2203,11 @@ savedObject(this, e);
             {
                 return false;
             }
-            if(transaction==null)
-            {
-                storageEngine.DeleteObject(obj, ti);
-            }
-            else
-            {
-                storageEngine.DeleteObject(obj, ti, (Transactions.Transaction)transaction, null);
-            }
+            LightningDB.LightningTransaction lmdbTr = transaction == null ? null : Transactions.TransactionManager.GetLMDBTransaction(((Transactions.Transaction)transaction).ID);
+
+
+            storageEngine.DeleteObject(obj, ti, lmdbTr);
+
             DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
             this.OnDeletedObject(deletedEv);
             return true;
@@ -2346,19 +2333,13 @@ savedObject(this, e);
         /// <returns> Transaction object</returns>
         public Transactions.ITransaction BeginTransaction()
         {
-            this.circularRefCache.Clear();
-            return Transactions.TransactionManager.BeginTransaction(this);
+            lock (_syncRoot)
+            {
+                this.circularRefCache.Clear();
+                return Transactions.TransactionManager.BeginTransaction(this.storageEngine.GetNewTransaction());
+            }
         }
-        internal Transactions.TransactionsStorage GetTransactionLogStorage()
-        {
-            return storageEngine.GetTransactionLogStorage();
-        }
-        internal void DropTransactionLog()
-        {
-
-            storageEngine.DropTransactionLog();
-
-        }
+      
         
 #if ASYNC
         private async Task RecoverAfterCrashAsync()
@@ -2370,10 +2351,7 @@ savedObject(this, e);
             await storageEngine.RecoverAfterCrashAsync(ti, tiTypeHeader);
         }
 #endif
-        internal void TransactionCommitStatus(bool started)
-        {
-            storageEngine.TransactionCommitStatus(started);
-        }
+      
        
         internal void Flush<T>()
         {
@@ -2541,59 +2519,7 @@ savedObject(this, e);
             }
         }
 
-        public void StartBulkInsert(params Type[] types)
-        {
-            Monitor.Enter(_locker);
-            foreach (Type t in types)
-            {
-                SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(t);
-                if (ti != null)
-                {
-                    this.PutIndexPersiststenceState(ti, false);
-                }
-            }
-        }
-#if ASYNC
-        public async Task StartBulkInsertAsync(params Type[] types)
-        {
-            foreach (Type t in types)
-            {
-                SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(t);
-                if (ti != null)
-                {
-                    this.PutIndexPersiststenceState(ti, false);
-                }
-            }
-        }
-#endif
-        public void EndBulkInsert(params Type[] types)
-        {
-            foreach (Type t in types)
-            {
-                SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(t);
-                if (ti != null)
-                {
-                    this.PutIndexPersiststenceState(ti, true);
-                    this.PersistIndexDirtyNodes(ti);
-                }
-            }
-            Monitor.Exit(_locker);
-        }
-#if ASYNC
-        public async Task EndBulkInsertAsync(params Type[] types)
-        {
-            foreach (Type t in types)
-            {
-                SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(t);
-                if (ti != null)
-                {
-                    this.PutIndexPersiststenceState(ti, true);
-                    this.PersistIndexDirtyNodes(ti);
-                }
-            }
-            
-        }
-#endif
+       
 
         #region Indexes
         internal bool IsObjectDeleted(int oid, SqoTypeInfo ti)
@@ -2624,7 +2550,7 @@ savedObject(this, e);
 
         internal int AllocateNewOID<T>()
         {
-            SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(typeof(T));
+            SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(typeof(T),null);
             if (ti != null)
             {
                 return storageEngine.AllocateNewOID(ti);
@@ -2877,7 +2803,7 @@ savedObject(this, e);
         }
         internal void GetOIDForAMSByField(object obj, string fieldName)
         {
-            SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(obj.GetType());
+            SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(obj.GetType(),null);
             List<int> oids = storageEngine.LoadOidsByField(ti, fieldName, obj);
 
             if (oids.Count > 1)
@@ -2941,7 +2867,7 @@ savedObject(this, e);
 
         internal string GetFileName(Type type)
         {
-            SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(type);
+            SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(type,null);
             return storageEngine.GetFileName(ti);
         }
     }

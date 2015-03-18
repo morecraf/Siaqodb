@@ -11,7 +11,7 @@ namespace Sqo.Core
     interface IByteTransformer
     {
         byte[] GetBytes(object obj,LightningDB.LightningTransaction transaction);
-        object GetObject(byte[] bytes);
+        object GetObject(byte[] bytes, LightningDB.LightningTransaction transaction);
 #if ASYNC
         Task<byte[]> GetBytesAsync(object obj);
         Task<object> GetObjectAsync(byte[] bytes);

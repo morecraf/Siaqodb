@@ -54,7 +54,7 @@ namespace Sqo.Core
             return rawArray;
         }
 
-        public object GetObject(byte[] arrayData)
+        public object GetObject(byte[] arrayData, LightningDB.LightningTransaction transaction)
         {
             bool isArray = fi.AttributeType.IsArray;
             Type elementType = fi.AttributeType.GetElementType();
@@ -87,7 +87,7 @@ namespace Sqo.Core
                 object obj = null;
                 if (elementTypeId == MetaExtractor.complexID)
                 {
-                    obj = serializer.ReadComplexObject(elemBytes, ti.Type, fi.Name);
+                    obj = serializer.ReadComplexObject(elemBytes, ti.Type, fi.Name,transaction);
                 }
                 else
                 {

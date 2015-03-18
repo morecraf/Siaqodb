@@ -18,7 +18,7 @@ namespace Sqo
         event EventHandler<DeletingEventsArgs> DeletingObject;
         void DropType(Type type);
         void DropType<T>();
-        void EndBulkInsert(params Type[] types);
+        
 #if !UNITY3D
         void ExportToXML<T>(System.Xml.XmlWriter writer);
         void ExportToXML<T>(System.Xml.XmlWriter writer, System.Collections.Generic.IList<T> objects);
@@ -43,7 +43,7 @@ namespace Sqo
         ISqoQuery<T> Query<T>();
         event EventHandler<SavedEventsArgs> SavedObject;
         event EventHandler<SavingEventsArgs> SavingObject;
-        void StartBulkInsert(params Type[] types);
+
         void StoreObject(object obj);
         void StoreObject(object obj, Sqo.Transactions.ITransaction transaction);
         void StoreObjectPartially(object obj, params string[] properties);

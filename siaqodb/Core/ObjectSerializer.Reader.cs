@@ -19,7 +19,7 @@ namespace Sqo.Core
 {
     partial class ObjectSerializer
     {
-        public void ReadObject(object obj, byte[] objBytes, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
+        public void ReadObject(object obj, byte[] objBytes, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer, LightningDB.LightningTransaction transaction)
         {
 
 
@@ -36,7 +36,7 @@ namespace Sqo.Core
 
                 object fieldVal = null;
 
-                fieldVal = byteTransformer.GetObject(field);
+                fieldVal = byteTransformer.GetObject(field,transaction);
 
                 if (ai.AttributeTypeId == MetaExtractor.documentID)
                 {
@@ -166,7 +166,7 @@ namespace Sqo.Core
 
         }
 #endif
-        public object ReadComplexObject(byte[] field, Type parentType, string fieldName)
+        public object ReadComplexObject(byte[] field, Type parentType, string fieldName, LightningDB.LightningTransaction transaction)
         {
             byte[] oidOfComplexObjBuff = GetFieldBytes(field, 0, 4);
             int oidOfComplexObj = ByteConverter.ByteArrayToInt(oidOfComplexObjBuff);
@@ -175,6 +175,7 @@ namespace Sqo.Core
             ComplexObjectEventArgs args = new ComplexObjectEventArgs(oidOfComplexObj, tidOfComplexObj);
             args.ParentType = parentType;
             args.FieldName = fieldName;
+            args.Transaction = transaction;
             this.OnNeedReadComplexObject(args);
             return args.ComplexObject;
         }
@@ -192,9 +193,9 @@ namespace Sqo.Core
             return args.ComplexObject;
         }
 #endif
-        public void ReadObject<T>(T obj, byte[] objBytes, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
+        public void ReadObject<T>(T obj, byte[] objBytes, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer,LightningDB.LightningTransaction transaction)
         {
-            this.ReadObject((object)obj, objBytes, ti, oid, rawSerializer);
+            this.ReadObject((object)obj, objBytes, ti, oid, rawSerializer,transaction);
         }
         #if ASYNC
         public async Task ReadObjectAsync<T>(T obj, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
@@ -202,9 +203,9 @@ namespace Sqo.Core
             await this.ReadObjectAsync((object)obj, ti, oid, rawSerializer).ConfigureAwait(false);
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid,byte[] objBytes, string fieldName)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid,byte[] objBytes, string fieldName,LightningDB.LightningTransaction transaction)
         {
-            return ReadFieldValue(ti, oid, objBytes, fieldName, null);
+            return ReadFieldValue(ti, oid, objBytes, fieldName, null, transaction);
         }
         #if ASYNC
         public async Task<object> ReadFieldValueAsync(SqoTypeInfo ti, int oid, string fieldName)
@@ -212,9 +213,9 @@ namespace Sqo.Core
             return await ReadFieldValueAsync(ti, oid, fieldName, null).ConfigureAwait(false);
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid, byte[] objBytes, FieldSqoInfo fi)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid, byte[] objBytes, FieldSqoInfo fi, LightningDB.LightningTransaction transaction)
         {
-            return this.ReadFieldValue(ti, oid,objBytes, fi, null);
+            return this.ReadFieldValue(ti, oid, objBytes, fi, null, transaction);
         }
         #if ASYNC
         public async Task<object> ReadFieldValueAsync(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
@@ -222,7 +223,7 @@ namespace Sqo.Core
             return await this.ReadFieldValueAsync(ti, oid, fi, null).ConfigureAwait(false);
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid,byte[] objBytes, string fieldName, RawdataSerializer rawSerializer)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid,byte[] objBytes, string fieldName, RawdataSerializer rawSerializer,LightningDB.LightningTransaction transaction)
         {
 
             FieldSqoInfo fi = FindField(ti.Fields, fieldName);
@@ -230,7 +231,7 @@ namespace Sqo.Core
             {
                 throw new SiaqodbException("Field:" + fieldName + " not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
             }
-            return this.ReadFieldValue(ti, oid,objBytes, fi, rawSerializer);
+            return this.ReadFieldValue(ti, oid,objBytes, fi, rawSerializer,transaction);
 
         }
         #if ASYNC
@@ -246,7 +247,7 @@ namespace Sqo.Core
 
         }
 #endif
-        public object ReadFieldValue(SqoTypeInfo ti, int oid, byte[] objBytes, FieldSqoInfo fi, RawdataSerializer rawSerializer)
+        public object ReadFieldValue(SqoTypeInfo ti, int oid, byte[] objBytes, FieldSqoInfo fi, RawdataSerializer rawSerializer, LightningDB.LightningTransaction transaction)
         {
 
             if (fi == null)
@@ -259,7 +260,7 @@ namespace Sqo.Core
 
             IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, fi, ti);
 
-            return byteTransformer.GetObject(b);
+            return byteTransformer.GetObject(b,transaction);
 
 
 

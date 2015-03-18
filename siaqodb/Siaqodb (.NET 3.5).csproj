@@ -253,8 +253,6 @@
     <Compile Include="Transactions\Transaction.cs" />
     <Compile Include="Transactions\TransactionInternal.cs" />
     <Compile Include="Transactions\TransactionManager.cs" />
-    <Compile Include="Transactions\TransactionObject.cs" />
-    <Compile Include="Transactions\TransactionsStorage.cs" />
     <Compile Include="Utilities\ATuple.cs" />
     <Compile Include="Utilities\Convertor.cs" />
     <Compile Include="Utilities\Decryptor.cs" />

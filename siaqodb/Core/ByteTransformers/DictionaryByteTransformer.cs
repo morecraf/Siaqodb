@@ -54,9 +54,9 @@ namespace Sqo.Core
             return rawSerializer.SerializeDictionary(obj, fi.Header.Length, ti.Header.version, dInfo, serializer, transaction);
         }
 
-        public object GetObject(byte[] bytes)
+        public object GetObject(byte[] bytes, LightningDB.LightningTransaction transaction)
         {
-            return rawSerializer.DeserializeDictionary(fi.AttributeType, bytes, ti.Header.version,serializer,ti.Type,fi.Name);
+            return rawSerializer.DeserializeDictionary(fi.AttributeType, bytes, ti.Header.version, serializer, ti.Type, fi.Name, transaction);
         }
 
         #endregion

@@ -25,44 +25,7 @@ namespace Sqo
 {
     partial class StorageEngine
     {
-        internal void SaveObject(object oi, SqoTypeInfo ti, ObjectInfo objInfo, Transactions.Transaction transaction)
-        {
-
-            TransactionObject trObject = new TransactionObject(this);
-            trObject.currentObject = oi;
-            trObject.objInfo = objInfo == null ? MetaExtractor.GetObjectInfo(oi, ti,metaCache) : objInfo;
-            trObject.serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            trObject.Operation = TransactionObject.OperationType.InsertOrUpdate;
-
-            CheckForConcurencyOnly(oi, trObject.objInfo, ti, trObject.serializer);
-
-            CheckConstraints(trObject.objInfo, ti);
-
-            TransactionManager.transactions[transaction.ID].AddTransactionObject(trObject);
-
-
-        }
-#if ASYNC
-        internal async Task SaveObjectAsync(object oi, SqoTypeInfo ti, ObjectInfo objInfo, Transactions.Transaction transaction)
-        {
-
-            TransactionObject trObject = new TransactionObject(this);
-            trObject.currentObject = oi;
-            trObject.objInfo = objInfo == null ? MetaExtractor.GetObjectInfo(oi, ti, metaCache) : objInfo;
-            trObject.serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            trObject.Operation = TransactionObject.OperationType.InsertOrUpdate;
-
-            await CheckForConcurencyOnlyAsync(oi, trObject.objInfo, ti, trObject.serializer).ConfigureAwait(false);
-
-            await CheckConstraintsAsync(trObject.objInfo, ti).ConfigureAwait(false);
-
-            TransactionManager.transactions[transaction.ID].AddTransactionObject(trObject);
-
-
-        }
-#endif
+        
         internal int SaveObject(object oi, SqoTypeInfo ti)
         {
            
@@ -100,17 +63,19 @@ namespace Sqo
             CheckConstraints(objInfo, ti);
 
             Dictionary<string, object> oldValuesOfIndexedFields = this.indexManager.PrepareUpdateIndexes(objInfo, ti);
-           
+
 
             string dbName = GetFileByType(ti);
             byte[] objBytes = serializer.SerializeObject(objInfo, this.rawSerializer, transaction);
 
-            using (var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-            {
-                byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
-                transaction.Put(db, key, objBytes);
+            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-            }
+
+            byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
+            transaction.Put(db, key, objBytes);
+
+
+
             if (objInfo.Inserted)
             {
                 this.SaveType(objInfo.SqoTypeInfo, transaction);
@@ -121,15 +86,15 @@ namespace Sqo
             if (trans == null)
             {
                 transaction.Commit();
-               
-                
+
+
             }
 
             return objInfo.Oid;
 
 
-
         }
+        
 #if ASYNC
         internal async Task<int> SaveObjectAsync(object oi, SqoTypeInfo ti, ObjectInfo objInfo)
         {
@@ -256,23 +221,23 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedSaveComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedSaveComplexObject);
 
-            if (oid > 0 && oid <= ti.Header.numberOfRecords )
+            if (oid > 0 && oid <= ti.Header.numberOfRecords)
             {
 
-                var valuesToSave= serializer.SaveFieldValue(oid, field, ti, value, this.rawSerializer,transaction);
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-                {
-                    byte[] key = ByteConverter.IntToByteArray(oid);
+                var valuesToSave = serializer.SaveFieldValue(oid, field, ti, value, this.rawSerializer, transaction);
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-                    byte[] objBytes = transaction.Get(db, key);
-                    if (serializer.IsObjectDeleted(oid, objBytes))
-                        return false;
+                byte[] key = ByteConverter.IntToByteArray(oid);
 
-                    Array.Copy(valuesToSave.Value, 0, objBytes, valuesToSave.Name, valuesToSave.Value.Length);
-                    transaction.Put(db, key, objBytes);
-                    return true;
-                }
-                
+                byte[] objBytes = transaction.Get(db, key);
+                if (serializer.IsObjectDeleted(oid, objBytes))
+                    return false;
+
+                Array.Copy(valuesToSave.Value, 0, objBytes, valuesToSave.Name, valuesToSave.Value.Length);
+                transaction.Put(db, key, objBytes);
+                return true;
+
+
             }
             else
                 return false;
@@ -309,18 +274,19 @@ namespace Sqo
                 {
                     byte[] key = ByteConverter.IntToByteArray(oid);
                     transaction.Put(db, key, emptyObj.Value);
-                    
-                   
+
+
+
+                    this.SaveType(tinf, transaction);
+                    transaction.Commit();
                 }
-                this.SaveType(tinf, transaction);
-                transaction.Commit();
                 return oid;
             }
         }
-        internal bool UpdateObjectBy(string[] fieldNames, object obj, SqoTypeInfo ti, Transaction transact)
+        internal bool UpdateObjectBy(string[] fieldNames, object obj, SqoTypeInfo ti, LightningTransaction transact)
         {
 
-            ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti,metaCache);
+            ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti, metaCache);
             int i = 0;
             ICriteria wPrev = null;
 
@@ -359,19 +325,9 @@ namespace Sqo
             else if (oids.Count == 1)
             {
                 objInfo.Oid = oids[0];
-               
-                if (transact == null)
-                {
-                    using (var transaction = env.BeginTransaction())
-                    {
-                        this.SaveObject(obj, ti, objInfo, transaction);
-                        transaction.Commit();
-                    }
-                }
-                else
-                {
-                    this.SaveObject(obj, ti, objInfo, transact);
-                }
+
+                this.SaveObject(obj, ti, objInfo, transact);
+
                 return true;
             }
             else
@@ -543,7 +499,7 @@ namespace Sqo
         }
 #endif
         
-        internal void DeleteObject(object obj, SqoTypeInfo ti)
+        internal void DeleteObject(object obj, SqoTypeInfo ti,LightningTransaction trans)
         {
             ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti,metaCache);
 
@@ -551,18 +507,23 @@ namespace Sqo
 
             lock (_syncRoot)
             {
-                using (var transaction = env.BeginTransaction())
+                LightningTransaction transaction = trans;
+                if (trans == null)
                 {
-                    CheckForConcurency(obj, objInfo, ti, serializer, true, transaction);
-
-                    this.MarkObjectAsDelete(serializer, objInfo.Oid, ti,transaction);
-
-                    this.indexManager.UpdateIndexesAfterDelete(objInfo, ti);
-
-                    metaCache.SetOIDToObject(obj, -1, ti);
-
-                    transaction.Commit();
+                    transaction = env.BeginTransaction();
                 }
+
+                CheckForConcurency(obj, objInfo, ti, serializer, true, transaction);
+
+                this.MarkObjectAsDelete(serializer, objInfo.Oid, ti, transaction);
+
+                this.indexManager.UpdateIndexesAfterDelete(objInfo, ti);
+
+                metaCache.SetOIDToObject(obj, -1, ti);
+
+                if (trans == null)
+                    transaction.Commit();
+
 
 
             }
@@ -586,42 +547,8 @@ namespace Sqo
 
         }
 #endif
-        internal void DeleteObject(object obj, SqoTypeInfo ti, Transaction transact, ObjectInfo objInfo)
-        {
-            lock (_syncRoot)
-            {
-
-                TransactionObject trObject = new TransactionObject(this);
-                trObject.currentObject = obj;
-                trObject.objInfo = objInfo == null ? MetaExtractor.GetObjectInfo(obj, ti,metaCache) : objInfo;
-                trObject.serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-                trObject.Operation = TransactionObject.OperationType.Delete;
-
-                CheckForConcurencyOnly(obj, trObject.objInfo, ti, trObject.serializer);
-
-                TransactionManager.transactions[transact.ID].transactionObjects.Add(trObject);
-            }
-        }
-#if ASYNC
-        internal async Task DeleteObjectAsync(object obj, SqoTypeInfo ti, Transaction transact, ObjectInfo objInfo)
-        {
-
-
-            TransactionObject trObject = new TransactionObject(this);
-            trObject.currentObject = obj;
-            trObject.objInfo = objInfo == null ? MetaExtractor.GetObjectInfo(obj, ti, metaCache) : objInfo;
-            trObject.serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            trObject.Operation = TransactionObject.OperationType.Delete;
-
-            await CheckForConcurencyOnlyAsync(obj, trObject.objInfo, ti, trObject.serializer).ConfigureAwait(false);
-
-            TransactionManager.transactions[transact.ID].transactionObjects.Add(trObject);
-
-        }
-#endif
-        internal int DeleteObjectBy(string[] fieldNames, object obj, SqoTypeInfo ti, Transaction transaction)
+        
+        internal int DeleteObjectBy(string[] fieldNames, object obj, SqoTypeInfo ti, LightningTransaction transaction)
         {
             ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti,metaCache);
             int i = 0;
@@ -667,28 +594,8 @@ namespace Sqo
                 metaCache.SetOIDToObject(obj, oids[0], ti);
 
                 ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-                lock (_syncRoot)
-                {
-                    if (transaction == null)
-                    {
-
-                        using (var tr= env.BeginTransaction())
-                        {
-                            CheckForConcurency(obj, objInfo, ti, serializer, true, tr);
-
-                            this.MarkObjectAsDelete(serializer, objInfo.Oid, ti, tr);
-
-                            this.indexManager.UpdateIndexesAfterDelete(objInfo, ti);
-                            tr.Commit();
-                        }
-
-
-                    }
-                    else
-                    {
-                        this.DeleteObject(obj, ti, transaction, objInfo);
-                    }
-                }
+                this.DeleteObject(obj, ti, transaction);
+                
                 return oids[0];
             }
             else
@@ -903,7 +810,7 @@ namespace Sqo
                                 byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
 
                                 byte[] objBytes = transaction.Get(db, key);
-                                tickCount = (ulong)serializer.ReadFieldValue(ti, objInfo.Oid,objBytes, fi);
+                                tickCount = (ulong)serializer.ReadFieldValue(ti, objInfo.Oid, objBytes, fi, transaction);
                             }
                             if (objInfo.TickCount != 0)
                             {
@@ -927,15 +834,15 @@ namespace Sqo
                         {
 
                             var valuesToSave = serializer.SaveFieldValue(objInfo.Oid, "tickCount", ti, tickCount, this.rawSerializer, transaction);
-                            using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-                            {
-                                byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
+                            var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-                                byte[] objBytes = transaction.Get(db, key);
-                                Array.Copy(valuesToSave.Value, 0, objBytes, valuesToSave.Name, valuesToSave.Value.Length);
-                                transaction.Put(db, key, objBytes);
+                            byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
 
-                            }
+                            byte[] objBytes = transaction.Get(db, key);
+                            Array.Copy(valuesToSave.Value, 0, objBytes, valuesToSave.Name, valuesToSave.Value.Length);
+                            transaction.Put(db, key, objBytes);
+
+
                         }
                     }
                 }
@@ -1005,7 +912,7 @@ namespace Sqo
                                     byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
 
                                     byte[] objBytes = transaction.Get(db, key);
-                                    tickCount = (ulong)serializer.ReadFieldValue(ti, objInfo.Oid, objBytes, fi);
+                                    tickCount = (ulong)serializer.ReadFieldValue(ti, objInfo.Oid, objBytes, fi, transaction);
                                 }
                             }
 
@@ -1067,31 +974,31 @@ namespace Sqo
             return ti.Header.numberOfRecords;
         }
 #endif
-        private void MarkObjectAsDelete(ObjectSerializer serializer, int oid, SqoTypeInfo ti,LightningTransaction transaction)
+        private void MarkObjectAsDelete(ObjectSerializer serializer, int oid, SqoTypeInfo ti, LightningTransaction transaction)
         {
             foreach (FieldSqoInfo ai in ti.Fields)
             {
                 IByteTransformer byteTrans = ByteTransformerFactory.GetByteTransformer(null, null, ai, ti);
                 if (byteTrans is ArrayByteTranformer || byteTrans is DictionaryByteTransformer)
                 {
-                   ATuple<int,int> arrayInfo= this.GetArrayMetaOfField(ti, oid, ai);
-                   if (arrayInfo.Name > 0)
-                   {
-                       rawSerializer.MarkRawInfoAsFree(arrayInfo.Name, transaction);//this helps Shrink method to detect unused rawdata blocks.
-                   }
+                    ATuple<int, int> arrayInfo = this.GetArrayMetaOfField(ti, oid, ai);
+                    if (arrayInfo.Name > 0)
+                    {
+                        rawSerializer.MarkRawInfoAsFree(arrayInfo.Name, transaction);//this helps Shrink method to detect unused rawdata blocks.
+                    }
                 }
             }
             byte[] deletedOid = serializer.MarkObjectAsDelete(oid, ti);
-            using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-            {
-                
-                byte[] key = ByteConverter.IntToByteArray(oid);
+            var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-                byte[] objBytes = transaction.Get(db, key);
-                Array.Copy(deletedOid, 0, objBytes, 0, deletedOid.Length);
-                transaction.Put(db, key, objBytes);
-           
-            }
+
+            byte[] key = ByteConverter.IntToByteArray(oid);
+
+            byte[] objBytes = transaction.Get(db, key);
+            Array.Copy(deletedOid, 0, objBytes, 0, deletedOid.Length);
+            transaction.Put(db, key, objBytes);
+
+
 
 
         }

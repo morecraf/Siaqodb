@@ -29,9 +29,9 @@ namespace Sqo.Core
             return this.serializer.GetComplexObjectBytes(obj, transaction);
         }
 
-        public object GetObject(byte[] bytes)
+        public object GetObject(byte[] bytes, LightningDB.LightningTransaction transaction)
         {
-            return this.serializer.ReadComplexObject(bytes, ti.Type, fi.Name);
+            return this.serializer.ReadComplexObject(bytes, ti.Type, fi.Name, transaction);
         }
 #if ASYNC
         public async Task<byte[]> GetBytesAsync(object obj)

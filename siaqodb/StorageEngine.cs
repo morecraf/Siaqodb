@@ -230,14 +230,13 @@ namespace Sqo
             {
                 ti.Header.TID = metaCache.GetNextTID();
             }
-            using (var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create))
-            {
-                byte[] key = ByteConverter.StringToByteArray("h");
-                transaction.Put(db, key, new byte[10]);
-               
-                
-            }
-            transaction.Commit();
+            var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
+
+            byte[] key = ByteConverter.StringToByteArray(GetFileByType(ti));
+            transaction.Put(db, key, ObjectSerializer.SerializeType(ti));
+
+
+
 
         }
 #if ASYNC
@@ -276,7 +275,7 @@ namespace Sqo
             string onlyTypeName = typeName.Substring(0, typeName.LastIndexOf(','));
             string fileName = onlyTypeName + "." + assemblyName;
 
-            fileName = fileName.GetHashCode().ToString();
+            //fileName = fileName.GetHashCode().ToString();
 
 #if SILVERLIGHT
             if (!SiaqodbConfigurator.UseLongDBFileNames && !fileName.StartsWith("Sqo.Indexes.BTreeNode"))
@@ -880,7 +879,7 @@ namespace Sqo
                                  byte[] tiBytes = current.Value.Value;
                                  if (tiBytes != null)
                                  {
-                                     SqoTypeInfo ti= ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tiBytes, false);
+                                     SqoTypeInfo ti= ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tiBytes, true);
                                      this.CompareSchema(ti);
                                  }
                                  current = cursor.MoveNext();
@@ -1382,313 +1381,7 @@ namespace Sqo
         
 
         #region TRANSACTIONS
-        public void RecoverAfterCrash(SqoTypeInfo tiObjectHeader,SqoTypeInfo tiType)
-        {
-            lock (_syncRoot)
-            {
-
-                IList<TransactionObjectHeader> headers = this.LoadAll<TransactionObjectHeader>(tiObjectHeader);
-                
-                if (headers.Count > 0)
-                {
-                    TransactionsStorage storage = this.GetTransactionLogStorage();
-
-                    foreach (TransactionObjectHeader header in headers)
-                    {
-                        byte[] objectBytes = new byte[header.BatchSize];
-                        storage.Read(header.Position, objectBytes);
-                        Type objType = Type.GetType(header.TypeName);
-                        SqoTypeInfo tiObject = null;
-
-                        if (metaCache.Contains(objType))
-                        {
-                            tiObject = metaCache.GetSqoTypeInfo(objType);
-                        }
-                        else
-                        {
-                            tiObject = MetaExtractor.GetSqoTypeInfo(objType);
-                        }
-
-                        if (tiObject.Header.lengthOfRecord != header.BatchSize)
-                        {
-                            throw new SiaqodbException("Type schema is different,so objects cannot be rollback after crash");
-                        }
-
-                        ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(tiObject), useElevatedTrust);
-                        serializer.SerializeObject(objectBytes, header.OIDofObject, tiObject, false);
-                    }
-                    storage.Close();
-                }
-                IList<TransactionTypeHeader> tHeaders = this.LoadAll<TransactionTypeHeader>(tiType);
-                foreach (TransactionTypeHeader tHeader in tHeaders)
-                {
-                    //reset number of records   
-                    Type t = Type.GetType(tHeader.TypeName);
-                    SqoTypeInfo ti = null;
-
-                    if (metaCache.Contains(t))
-                    {
-                        ti = metaCache.GetSqoTypeInfo(t);
-                    }
-                    else
-                    {
-                        ti = MetaExtractor.GetSqoTypeInfo(t);
-                    }
-                    ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-                    serializer.SaveNrRecords(ti, tHeader.NumberOfRecords);
-
-                    indexManager.ReBuildIndexesAfterCrash(ti);
-                }
-                
-                this.DropType(tiObjectHeader);
-                this.DropType(tiType);
-                this.DropTransactionLog();
-            }
-        }
-#if ASYNC
-        public async Task RecoverAfterCrashAsync(SqoTypeInfo tiObjectHeader, SqoTypeInfo tiType)
-        {
-
-
-            IList<TransactionObjectHeader> headers = await this.LoadAllAsync<TransactionObjectHeader>(tiObjectHeader).ConfigureAwait(false);
-
-            if (headers.Count > 0)
-            {
-                TransactionsStorage storage = this.GetTransactionLogStorage();
-
-                foreach (TransactionObjectHeader header in headers)
-                {
-                    byte[] objectBytes = new byte[header.BatchSize];
-                    await storage.ReadAsync(header.Position, objectBytes).ConfigureAwait(false);
-                    Type objType = Type.GetType(header.TypeName);
-                    SqoTypeInfo tiObject = null;
-
-                    if (metaCache.Contains(objType))
-                    {
-                        tiObject = metaCache.GetSqoTypeInfo(objType);
-                    }
-                    else
-                    {
-                        tiObject = MetaExtractor.GetSqoTypeInfo(objType);
-                    }
-
-                    if (tiObject.Header.lengthOfRecord != header.BatchSize)
-                    {
-                        throw new SiaqodbException("Type schema is different,so objects cannot be rollback after crash");
-                    }
-
-                    ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(tiObject), useElevatedTrust);
-                    await serializer.SerializeObjectAsync(objectBytes, header.OIDofObject, tiObject, false).ConfigureAwait(false);
-                }
-                await storage.CloseAsync().ConfigureAwait(false);
-            }
-            IList<TransactionTypeHeader> tHeaders = await this.LoadAllAsync<TransactionTypeHeader>(tiType).ConfigureAwait(false);
-            foreach (TransactionTypeHeader tHeader in tHeaders)
-            {
-                //reset number of records   
-                Type t = Type.GetType(tHeader.TypeName);
-                SqoTypeInfo ti = null;
-
-                if (metaCache.Contains(t))
-                {
-                    ti = metaCache.GetSqoTypeInfo(t);
-                }
-                else
-                {
-                    ti = MetaExtractor.GetSqoTypeInfo(t);
-                }
-                ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-                await serializer.SaveNrRecordsAsync(ti, tHeader.NumberOfRecords).ConfigureAwait(false);
-
-                await indexManager.ReBuildIndexesAfterCrashAsync(ti).ConfigureAwait(false);
-            }
-
-            await this.DropTypeAsync(tiObjectHeader).ConfigureAwait(false);
-            await this.DropTypeAsync(tiType).ConfigureAwait(false);
-            this.DropTransactionLog();
-
-        }
-#endif
-        public bool DropTransactionLog()
-        {
-            lock (_syncRoot)
-            {
-                string fileName = path + Path.DirectorySeparatorChar + "transactionlog.slog";
-                
-#if SILVERLIGHT
-                if (!this.useElevatedTrust)
-                {
-                    IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
-
-                    if (isf.FileExists(fileName))
-                    {
-                        try
-                        {
-                            isf.DeleteFile(fileName);
-
-                            return true;
-                        }
-                        catch (IsolatedStorageException ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                else
-                {
-                    if (File.Exists(fileName))
-                    {
-                        File.Delete(fileName);
-                        return true;
-                    }
-                }
-
-
-#elif MONODROID
-				
-				if (File.Exists(fileName))
-				{
-					try
-					{
-						File.Delete(fileName);
-						return true;
-					}
-					catch (UnauthorizedAccessException ex) //monodroid bug!!!:https://bugzilla.novell.com/show_bug.cgi?id=684172
-					{
-						FileStream file = new FileStream(fileName, FileMode.OpenOrCreate,FileAccess.ReadWrite);
-						file.SetLength(0);
-						file.Close();
-						return true;
-					}
-				}
-#elif UNITY3D
-
-
-                if (File.Exists(fileName))
-                {
-                    try
-                    {
-                        File.Delete(fileName);
-                        return true;
-                    }
-                    catch (UnauthorizedAccessException ex) //monodroid bug!!!:https://bugzilla.novell.com/show_bug.cgi?id=684172
-                    {
-                        FileStream file = new FileStream(fileName, FileMode.OpenOrCreate,FileAccess.ReadWrite);
-                        file.SetLength(0);
-                        file.Close();
-                        return true;
-                    }
-                }
-#elif WinRT
-                try
-                {
-                    StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(this.storageFolder.Path).AsTask().Result;
-
-                    StorageFile file = storageFolder.GetFileAsync(Path.GetFileName(fileName)).AsTask().Result;
-                    file.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask().Wait();
-                }
-                catch (AggregateException ae)
-                {
-                    foreach (var e in ae.InnerExceptions)
-                    {
-                        if (e is FileNotFoundException)
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }
-                catch (FileNotFoundException ex)
-                {
-                    return false;
-                }
-            return true;
-#else
-                if (File.Exists(fileName))
-                {
-                    File.Delete(fileName);
-                    return true;
-                }
-#endif
-                return false;
-            }
-        }
-        public TransactionsStorage GetTransactionLogStorage()
-        {
-            
-
-            string fileFull = path + Path.DirectorySeparatorChar + "transactionlog.slog";
-            TransactionsStorage transactStorage = new TransactionsStorage(fileFull,this.useElevatedTrust);
-            return transactStorage;
-        }
-        internal void RollbackObject(object oi, SqoTypeInfo ti)
-        {
-
-
-            ObjectInfo objInfo = MetaExtractor.GetObjectInfo(oi, ti,metaCache);
-
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedSaveComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedSaveComplexObject);
-
-            Dictionary<string, object> oldValuesOfIndexedFields = this.indexManager.PrepareUpdateIndexes(objInfo, ti);
-
-            serializer.SerializeObject(objInfo, this.rawSerializer,null);
-
-            this.indexManager.UpdateIndexes(objInfo, ti, oldValuesOfIndexedFields);
-
-        }
-#if ASYNC
-        internal async Task RollbackObjectAsync(object oi, SqoTypeInfo ti)
-        {
-
-
-            ObjectInfo objInfo = MetaExtractor.GetObjectInfo(oi, ti, metaCache);
-
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedSaveComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedSaveComplexObjectAsync);
-
-            Dictionary<string, object> oldValuesOfIndexedFields = await this.indexManager.PrepareUpdateIndexesAsync(objInfo, ti).ConfigureAwait(false);
-
-            await serializer.SerializeObjectAsync(objInfo, this.rawSerializer).ConfigureAwait(false);
-
-            await this.indexManager.UpdateIndexesAsync(objInfo, ti, oldValuesOfIndexedFields).ConfigureAwait(false);
-
-        }
-#endif
-        internal void RollbackDeletedObject(object obj, SqoTypeInfo ti)
-        {
-            ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti,metaCache);
-
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            lock (_syncRoot)
-            {
-                serializer.RollbackDeleteObject(objInfo.Oid, ti);
-                this.indexManager.UpdateIndexes(objInfo, ti, new Dictionary<string, object>());
-            }
-        }
-#if ASYNC
-        internal async Task RollbackDeletedObjectAsync(object obj, SqoTypeInfo ti)
-        {
-            ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti, metaCache);
-
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-
-            await serializer.RollbackDeleteObjectAsync(objInfo.Oid, ti).ConfigureAwait(false);
-            await this.indexManager.UpdateIndexesAsync(objInfo, ti, new Dictionary<string, object>()).ConfigureAwait(false);
-
-        }
-       
-#endif
-       
-        internal void TransactionCommitStatus(bool started)
-        {
-            this.rawSerializer.TransactionCommitStatus(started);
-        }
+        
 
         internal byte[] GetObjectBytes(int oid,SqoTypeInfo ti)
         {
@@ -1866,6 +1559,12 @@ namespace Sqo
             }
             return fileName;
         }
-    }
+   
         #endregion
+        public LightningDB.LightningTransaction GetNewTransaction()
+        {
+            return env.BeginTransaction();
+        }
+    }
+    
 }

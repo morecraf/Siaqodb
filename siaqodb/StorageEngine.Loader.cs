@@ -74,7 +74,7 @@ namespace Sqo
                                 circularRefCache.Clear();
                                 circularRefCache.Add(oid, ti, currentObj);
 
-                                serializer.ReadObject<T>(currentObj, crObjBytes,ti, oid, this.rawSerializer);
+                                serializer.ReadObject<T>(currentObj, crObjBytes, ti, oid, this.rawSerializer,transaction);
 
                                 metaCache.SetOIDToObject(currentObj, oid, ti);
                                 if (SiaqodbConfigurator.RaiseLoadEvents)
@@ -391,6 +391,7 @@ namespace Sqo
                                 }
 
                             }
+                            current = cursor.MoveNext();
                         }
                     }
                 }
@@ -458,7 +459,7 @@ namespace Sqo
                                     {
                                         continue;
                                     }
-                                    object val = isOIDField ? oid : serializer.ReadFieldValue(ti, oid, crObjBytes, where.AttributeName[0], this.rawSerializer);
+                                    object val = isOIDField ? oid : serializer.ReadFieldValue(ti, oid, crObjBytes, where.AttributeName[0], this.rawSerializer,transaction);
 
                                     if (Match(where, val))
                                     {
@@ -466,6 +467,7 @@ namespace Sqo
                                     }
 
                                 }
+                                current = cursor.MoveNext();
                             }
 
                         }
@@ -900,7 +902,7 @@ namespace Sqo
                                 {
                                     if (serializer.IsObjectDeleted(oid, crObjBytes))
                                     {
-                                        object val = serializer.ReadFieldValue(ti, oid,crObjBytes, where.AttributeName[0]);
+                                        object val = serializer.ReadFieldValue(ti, oid,crObjBytes, where.AttributeName[0],transaction);
                                         if (Match(where, val))
                                         {
                                             oids.Add(oid);
@@ -912,6 +914,7 @@ namespace Sqo
                                     }
 
                                 }
+                                current = cursor.MoveNext();
                                 
                             }
                         }
@@ -985,7 +988,7 @@ namespace Sqo
                         byte[] key = ByteConverter.IntToByteArray(oid);
 
                         byte[] objBytes = transaction.Get(db, key);
-                        serializer.ReadObject<T>(currentObj, objBytes, ti, oid, rawSerializer);
+                        serializer.ReadObject<T>(currentObj, objBytes, ti, oid, rawSerializer, transaction);
 
                         metaCache.SetOIDToObject(currentObj, oid, ti);
                         if (SiaqodbConfigurator.RaiseLoadEvents)
@@ -1073,11 +1076,8 @@ namespace Sqo
             else
             {
                 ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-                //if there is a Nested object of same type we have to reset
-                serializer.ResetPreload();
 
-
-                e.ComplexObject = this.LoadObjectByOID(ti, e.SavedOID, false);
+                e.ComplexObject = this.LoadObjectByOID(ti, e.SavedOID, false,e.Transaction);
 
 
             }
@@ -1157,7 +1157,7 @@ namespace Sqo
                         byte[] key = ByteConverter.IntToByteArray(oid);
 
                         byte[] objBytes = transaction.Get(db, key);
-                        serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer);
+                        serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer, transaction);
 
                         metaCache.SetOIDToObject(currentObj, oid, ti);
                         if (SiaqodbConfigurator.RaiseLoadEvents)
@@ -1230,7 +1230,7 @@ namespace Sqo
                     byte[] key = ByteConverter.IntToByteArray(oid);
 
                     byte[] objBytes = transaction.Get(db, key);
-                    return serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer);
+                    return serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer,transaction);
                 }
             }
         }
@@ -1275,6 +1275,7 @@ namespace Sqo
                                 }
                                 oids.Add(oid);
                             }
+                            current = cursor.MoveNext();
                         }
                     }
                 }
@@ -1428,7 +1429,7 @@ namespace Sqo
 #endif
         internal object LoadObjectByOID(SqoTypeInfo ti, int oid)
         {
-            return this.LoadObjectByOID(ti, oid, true);
+            return this.LoadObjectByOID(ti, oid, true,null);
         }
 #if ASYNC
         internal async Task<object> LoadObjectByOIDAsync(SqoTypeInfo ti, int oid)
@@ -1437,7 +1438,7 @@ namespace Sqo
         }
 #endif
 
-        internal object LoadObjectByOID(SqoTypeInfo ti, int oid, bool clearCache)
+        internal object LoadObjectByOID(SqoTypeInfo ti, int oid, bool clearCache, LightningDB.LightningTransaction trans)
         {
             object currentObj = null;
 
@@ -1466,19 +1467,20 @@ namespace Sqo
                 circularRefCache.Clear();
             }
             circularRefCache.Add(oid, ti, currentObj);
-            using (var transaction = env.BeginTransaction())
-            {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-                {
-                    byte[] key = ByteConverter.IntToByteArray(oid);
+            var transaction = trans == null ? env.BeginTransaction() : trans;
 
-                    byte[] objBytes = transaction.Get(db, key);
-                    if (serializer.IsObjectDeleted(oid, objBytes))
-                        return null;
-                    serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer);
-                }
+            using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+            {
+                byte[] key = ByteConverter.IntToByteArray(oid);
+
+                byte[] objBytes = transaction.Get(db, key);
+                if (serializer.IsObjectDeleted(oid, objBytes))
+                    return null;
+                serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer, transaction);
             }
-           
+            if (trans == null)
+                transaction.Dispose();
+
             metaCache.SetOIDToObject(currentObj, oid, ti);
 
             if (SiaqodbConfigurator.RaiseLoadEvents)
@@ -1572,7 +1574,7 @@ namespace Sqo
 
             if (oid > 0 && oid <= ti.Header.numberOfRecords )
             {
-                return (T)this.LoadObjectByOID(ti, oid, clearCache);
+                return (T)this.LoadObjectByOID(ti, oid, clearCache,null);
             }
             else
             {
@@ -1629,6 +1631,7 @@ namespace Sqo
                                 }
                                 count++;
                             }
+                            current = cursor.MoveNext();
                         }
                     }
                 }

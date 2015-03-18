@@ -48,21 +48,21 @@ namespace Sqo.Core
             
         }
 
-        public object GetObject(byte[] bytes)
+        public object GetObject(byte[] bytes, LightningDB.LightningTransaction transaction)
         {
             object fieldVal = null;
             if (fi.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.complexID) || fi.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.jaggedArrayID))// array of complexType
             {
-                fieldVal = rawSerializer.DeserializeArray(fi.AttributeType, bytes, true, ti.Header.version, fi.IsText,false, this.serializer, ti.Type, fi.Name);
+                fieldVal = rawSerializer.DeserializeArray(fi.AttributeType, bytes, true, ti.Header.version, fi.IsText,false, this.serializer, ti.Type, fi.Name,transaction);
             }
             else if (fi.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.textID))
             {
-                fieldVal = rawSerializer.DeserializeArray(fi.AttributeType, bytes, true, ti.Header.version, false,true);
+                fieldVal = rawSerializer.DeserializeArray(fi.AttributeType, bytes, true, ti.Header.version, false,true,transaction);
             }
             else
             {
 
-                fieldVal = rawSerializer.DeserializeArray(fi.AttributeType, bytes, true, ti.Header.version, fi.IsText,false);
+                fieldVal = rawSerializer.DeserializeArray(fi.AttributeType, bytes, true, ti.Header.version, fi.IsText, false, transaction);
             }
             return fieldVal;
         }
