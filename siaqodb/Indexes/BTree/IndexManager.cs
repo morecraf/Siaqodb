@@ -8,6 +8,8 @@ using System.Reflection;
 using Sqo.Utilities;
 using Sqo.MetaObjects;
 using Sqo.Exceptions;
+using LightningDB;
+using Sqo.Core;
 #if ASYNC
 using System.Threading.Tasks;
 
@@ -18,68 +20,29 @@ namespace Sqo.Indexes
     {
 
         Siaqodb siaqodb;
-        Cache.CacheForIndexes cacheIndexes;
-#if UNITY3D
-        DummyBtree dummy;
-#endif
+        Dictionary<string, string> existingIndexes = new Dictionary<string, string>();
+        const string sys_indexinfo = "sys_indexinfo";
         public IndexManager(Siaqodb siaqodb)
         {
             this.siaqodb = siaqodb;
-#if UNITY3D
-            dummy = new DummyBtree(siaqodb);
-#endif
         }
-        public bool LoadOidsByIndex(SqoTypeInfo ti, string fieldName, Where where, List<int> oids)
+        public bool LoadOidsByIndex(SqoTypeInfo ti, string fieldName, Where where, List<int> oids,LightningDB.LightningTransaction transaction)
         {
-            if (cacheIndexes != null)
+            string indexName = fieldName + ti.TypeName;
+            if(existingIndexes.ContainsKey(indexName))
             {
-                IBTree index = cacheIndexes.GetIndex(ti, fieldName);
+                IBTree index = new BTree(indexName, transaction);
                 if (index != null && where.OperationType != OperationType.Contains && where.OperationType != OperationType.NotEqual && where.OperationType != OperationType.EndWith)
                 {
-                    try
-                    {
-                        this.LoadOidsByIndex(index, where, oids);
-                    }
-                    catch (IndexCorruptedException ex)
-                    {
-                        SiaqodbConfigurator.LogMessage("Index has corrupted, will be rebuild", VerboseLevel.Info);
-                        index=this.RenewIndex(ti, fieldName);
-                        this.LoadOidsByIndex(index, where, oids);
-                    }
+
+                    this.LoadOidsByIndex(index, where, oids);
+
                     return true;
                 }
             }
             return false;
         }
-#if ASYNC
-        public async Task<bool> LoadOidsByIndexAsync(SqoTypeInfo ti, string fieldName, Where where, List<int> oids)
-        {
-            if (cacheIndexes != null)
-            {
-                IBTree index = cacheIndexes.GetIndex(ti, fieldName);
-                if (index != null && where.OperationType != OperationType.Contains && where.OperationType != OperationType.NotEqual && where.OperationType != OperationType.EndWith)
-                {
-                    bool error = false;
-                    try
-                    {
-                        await this.LoadOidsByIndexAsync(index, where, oids).ConfigureAwait(false);
-                    }
-                    catch (IndexCorruptedException ex)
-                    {
-                        error = true;
-                    }
-                    if (error)
-                    {
-                        SiaqodbConfigurator.LogMessage("Index has corrupted, will be rebuild", VerboseLevel.Info);
-                        index = await this.RenewIndexAsync(ti, fieldName);
-                        await this.LoadOidsByIndexAsync(index, where, oids).ConfigureAwait(false);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-#endif
+
        private void LoadOidsByIndex(IBTree index, Where where, List<int> oids)
        {
            if (where.OperationType == OperationType.Equal)
@@ -152,166 +115,49 @@ namespace Sqo.Indexes
            }
 
        }
-#if ASYNC
-       private async Task LoadOidsByIndexAsync(IBTree index, Where where, List<int> oids)
-       {
-           if (where.OperationType == OperationType.Equal)
-           {
-               int[] oidsFound = await index.FindItemAsync(where.Value).ConfigureAwait(false);
-               if (oidsFound != null)
-               {
-                   oids.AddRange(oidsFound);
 
-               }
-           }
-
-           else if (where.OperationType == OperationType.GreaterThan)
-           {
-               List<int> oidsFound = await index.FindItemsBiggerThanAsync(where.Value).ConfigureAwait(false);
-               if (oidsFound != null)
-               {
-                   oidsFound.Reverse();
-                   oids.AddRange(oidsFound);
-
-               }
-
-           }
-           else if (where.OperationType == OperationType.GreaterThanOrEqual)
-           {
-               List<int> oidsFound = await index.FindItemsBiggerThanOrEqualAsync(where.Value).ConfigureAwait(false);
-               if (oidsFound != null)
-               {
-                   oidsFound.Reverse();
-                   oids.AddRange(oidsFound);
-
-
-               }
-
-           }
-           else if (where.OperationType == OperationType.LessThan)
-           {
-               List<int> oidsFound = await index.FindItemsLessThanAsync(where.Value).ConfigureAwait(false);
-               if (oidsFound != null)
-               {
-                   oids.AddRange(oidsFound);
-
-               }
-           }
-           else if (where.OperationType == OperationType.LessThanOrEqual)
-           {
-               List<int> oidsFound = await index.FindItemsLessThanOrEqualAsync(where.Value).ConfigureAwait(false);
-               if (oidsFound != null)
-               {
-                   oids.AddRange(oidsFound);
-
-               }
-           }
-           else if (where.OperationType == OperationType.StartWith)
-           {
-               List<int> oidsFound = null;
-               if (where.Value2 != null && where.Value2 is StringComparison)
-               {
-                   oidsFound = await index.FindItemsStartsWithAsync(where.Value, false, (StringComparison)where.Value2).ConfigureAwait(false);
-               }
-               else
-               {
-                   oidsFound = await index.FindItemsStartsWithAsync(where.Value, true, StringComparison.Ordinal).ConfigureAwait(false);
-               }
-               if (oidsFound != null)
-               {
-                   oids.AddRange(oidsFound);
-
-               }
-
-           }
-
-       }
-
-#endif
-       internal void BuildAllIndexes(List<SqoTypeInfo> typeInfos)
+       internal void BuildAllIndexes(List<SqoTypeInfo> typeInfos,LightningDB.LightningTransaction transaction)
        {
 
            foreach (SqoTypeInfo ti in typeInfos)
            {
-               BuildIndexes(ti);
+               BuildIndexes(ti, transaction);
            }
-
-       }
-#if ASYNC
-       internal async Task BuildAllIndexesAsync(List<SqoTypeInfo> SqoTypeInfos)
-       {
-
-           foreach (SqoTypeInfo ti in SqoTypeInfos)
+           //if an index gets removed we have to clean also the DB with index headers
+           foreach (string indexStored in GetStoredIndexes(transaction))
            {
-               await BuildIndexesAsync(ti).ConfigureAwait(false);
-           }
-
-       }
-#endif
-       internal void BuildIndexes(SqoTypeInfo ti)
-       {
-           if (ti.Type == typeof(IndexInfo2) || ti.Type == typeof(RawdataInfo))
-           {
-               return;
-           }
-           Dictionary<FieldSqoInfo, IBTree> dict = new Dictionary<FieldSqoInfo, IBTree>();
-           foreach (FieldSqoInfo f in ti.IndexedFields)
-           {
-               IBTree index = this.GetIndex(f, ti);
-               dict.Add(f, index);
-           }
-           if (dict.Count > 0)
-           {
-
-               if (cacheIndexes == null)
+               if (!existingIndexes.ContainsKey(indexStored))
                {
-                   cacheIndexes = new Cache.CacheForIndexes();
+                   this.DropIndex(indexStored,transaction);
                }
-               cacheIndexes.Add(ti, dict);
            }
-
 
        }
-#if ASYNC
-       internal async Task BuildIndexesAsync(SqoTypeInfo ti)
+
+       private void DropIndex(string indexName, LightningTransaction transaction)
        {
-           if (ti.Type == typeof(IndexInfo2) || ti.Type == typeof(RawdataInfo))
-           {
-               return;
-           }
-           Dictionary<FieldSqoInfo, IBTree> dict = new Dictionary<FieldSqoInfo, IBTree>();
-           foreach (FieldSqoInfo f in ti.IndexedFields)
-           {
-               IBTree index = await this.GetIndexAsync(f, ti).ConfigureAwait(false);
-               dict.Add(f, index);
-           }
-           if (dict.Count > 0)
-           {
-
-               if (cacheIndexes == null)
-               {
-                   cacheIndexes = new Cache.CacheForIndexes();
-               }
-               cacheIndexes.Add(ti, dict);
-           }
-
-
-       }
-#endif
-       internal void ReBuildIndexesAfterCrash(SqoTypeInfo ti)
-       {
-           DropIndexes(ti,false);
+           var db = transaction.OpenDatabase(sys_indexinfo, DatabaseOpenFlags.Create);
+           byte[] key = ByteConverter.StringToByteArray(indexName);
+           transaction.Delete(db, key);
            
-           BuildIndexes(ti);
+          
        }
-#if ASYNC
-       internal async Task ReBuildIndexesAfterCrashAsync(SqoTypeInfo ti)
+       internal void BuildIndexes(SqoTypeInfo ti,LightningDB.LightningTransaction transaction)
        {
-           await DropIndexesAsync(ti, false).ConfigureAwait(false);
-           await BuildIndexesAsync(ti).ConfigureAwait(false);
+           if (ti.Type == typeof(RawdataInfo))
+           {
+               return;
+           }   
+           foreach (FieldSqoInfo f in ti.IndexedFields)
+           {
+               IBTree index = this.GetIndex(f, ti, transaction);
+               existingIndexes.Add(index.IndexName, index.IndexName);
+           }
+           
+
        }
-#endif
-       internal void DropIndexes(SqoTypeInfo ti,bool claimFreeSpace)
+
+       /*internal void DropIndexes(SqoTypeInfo ti,bool claimFreeSpace)
        {
            if (cacheIndexes != null)
            {
@@ -329,314 +175,111 @@ namespace Sqo.Indexes
                }
            }
        }
-#if ASYNC
-       internal async Task DropIndexesAsync(SqoTypeInfo ti, bool claimFreeSpace)
-       {
-           if (cacheIndexes != null)
-           {
+        */
 
-               if (cacheIndexes.ContainsType(ti))
-               {
+       public IBTree GetIndex(FieldSqoInfo finfo, SqoTypeInfo tinfo, LightningDB.LightningTransaction transaction)
+       {
 
-                   Dictionary<FieldSqoInfo, IBTree> indexes = cacheIndexes.GetIndexes(ti);
-                   foreach (FieldSqoInfo fi in indexes.Keys)
-                   {
-                       await indexes[fi].DropAsync(claimFreeSpace).ConfigureAwait(false);
-                   }
-                   storedIndexes = null;
-                   cacheIndexes.RemoveType(ti);
-               }
-           }
-       }
-#endif
-       
-       public IBTree GetIndex(string field, SqoTypeInfo tinfo)
-       {
-           return this.cacheIndexes.GetIndex(tinfo, field);
-       }
-        
-       public IBTree GetIndex(FieldSqoInfo finfo, SqoTypeInfo tinfo)
-       {
-           Type t = typeof(BTree<>).MakeGenericType(finfo.AttributeType);
-           ConstructorInfo ctor = t.GetConstructor(new Type[] { typeof(Siaqodb) });
-           IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
-           IndexInfo2 indexInfo = null;
            string indexName = finfo.Name + tinfo.TypeName;
-           try
+           BTree index = new BTree(indexName, transaction);
+           bool indexExists = false;
+
+           foreach (string ii in GetStoredIndexes(transaction))
            {
-               foreach (IndexInfo2 ii in StoredIndexes)
+               if (indexName.StartsWith(ii) || ii.StartsWith(indexName))
                {
-                   if (indexName.StartsWith(ii.IndexName) || ii.IndexName.StartsWith(indexName))
-                   {
-                       indexInfo = ii;
-                       break;
-                   }
+                   indexExists = true;
+                   break;
                }
            }
-           catch (Exception ex)
-           {
-               SiaqodbConfigurator.LogMessage("IndexInfo cannot be loaded, index will be rebuild", VerboseLevel.Info);
-           }
-           bool indexExists = false;
-           if (indexInfo == null)
-           {
-               indexInfo = this.BuildIndex(finfo, tinfo, index);
-           }
-           else
-           {
-               indexExists = true;
-           }
-           index.SetIndexInfo(indexInfo);
+
            if (!indexExists)
            {
-               index.Persist();
-           }
-           Type nodeType = typeof(BTreeNode<>).MakeGenericType(finfo.AttributeType);
-           if (indexInfo.RootOID > 0 && indexExists)
-           {
-               object rootP = null;
-               try
-               {
-                   rootP = siaqodb.LoadObjectByOID(nodeType, indexInfo.RootOID);
-               }
-               catch (IndexCorruptedException ex)
-               {
-                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
-                   {
-                       storedIndexes.Remove(indexInfo);
-                   }
-                   siaqodb.Delete(indexInfo);             
-                   indexInfo = this.BuildIndex(finfo, tinfo, index);
-                   index.SetIndexInfo(indexInfo);
-                   index.Persist();
-               }
-               if (rootP != null)
-               {
-                   index.SetRoot(rootP);
-               }
+               this.BuildIndex(finfo, tinfo, index, transaction);
            }
 
            return index;
        }
-#if ASYNC
-       public async Task<IBTree> GetIndexAsync(FieldSqoInfo finfo, SqoTypeInfo tinfo)
-       {
-           Type t = typeof(BTree<>).MakeGenericType(finfo.AttributeType);
-           ConstructorInfo ctor = t.GetConstructor(new Type[] { typeof(Siaqodb) });
-           IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
-           IndexInfo2 indexInfo = null;
-           string indexName = finfo.Name + tinfo.TypeName;
-           try
-           {
-               IList<IndexInfo2> stIndexes = await this.GetStoredIndexesAsync().ConfigureAwait(false);
-               foreach (IndexInfo2 ii in stIndexes)
-               {
-                   if (ii.IndexName == indexName)
-                   {
-                       indexInfo = ii;
-                       break;
-                   }
-               }
-           }
-           catch (Exception ex)
-           {
-               SiaqodbConfigurator.LogMessage("IndexInfo cannot be loaded, index will be rebuild", VerboseLevel.Info);
-           }
-           bool indexExists = false;
-           if (indexInfo == null)
-           {
-               indexInfo = await this.BuildIndexAsync(finfo, tinfo, index).ConfigureAwait(false);
-           }
-           else
-           {
-               indexExists = true;
-           }
-           index.SetIndexInfo(indexInfo);
-           Type nodeType = typeof(BTreeNode<>).MakeGenericType(finfo.AttributeType);
-           if (indexInfo.RootOID > 0 && indexExists)
-           {
-               object rootP = null;
-               bool error = false;
-               try
-               {
-                   rootP = await siaqodb.LoadObjectByOIDAsync(nodeType, indexInfo.RootOID).ConfigureAwait(false);
-               }
-               catch (IndexCorruptedException ex)
-               {
-                   error = true;
-               }
-               if (error)
-               {
-                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
-                   {
-                       storedIndexes.Remove(indexInfo);
-                   }
-                   await siaqodb.DeleteAsync(indexInfo);
-                   indexInfo =await this.BuildIndexAsync(finfo, tinfo, index);
-                   index.SetIndexInfo(indexInfo);
-                   index.Persist();
-               }
-               if (rootP != null)
-               {
-                   index.SetRoot(rootP);
-               }
-           }
 
-           return index;
+       private void BuildIndex(FieldSqoInfo finfo, SqoTypeInfo tinfo,BTree index, LightningDB.LightningTransaction transaction)
+       {
+           this.FillIndex(finfo, tinfo, index,transaction);
+           var db = transaction.OpenDatabase(sys_indexinfo, DatabaseOpenFlags.Create);
+           byte[] key = ByteConverter.StringToByteArray(index.IndexName);
+           transaction.Put(db, key, key);
+           storedIndexes.Add(index.IndexName);
        }
-#endif
-       private IndexInfo2 BuildIndex(FieldSqoInfo finfo, SqoTypeInfo tinfo, IBTree index)
+
+       public void FillIndex(FieldSqoInfo finfo, SqoTypeInfo ti,IBTree index, LightningDB.LightningTransaction transaction)
        {
-           this.FillIndex(finfo, tinfo, index);
-           IndexInfo2 ii = new IndexInfo2();
-           ii.IndexName = finfo.Name + tinfo.TypeName;
-           ii.RootOID = index.GetRootOid();
-           siaqodb.StoreObject(ii);
-           storedIndexes.Add(ii);
-           return ii;
-       }
-#if ASYNC
-       private async Task<IndexInfo2> BuildIndexAsync(FieldSqoInfo finfo, SqoTypeInfo tinfo, IBTree index)
-       {
-           await this.FillIndexAsync(finfo, tinfo, index).ConfigureAwait(false);
-           IndexInfo2 ii = new IndexInfo2();
-           ii.IndexName = finfo.Name + tinfo.TypeName;
-           ii.RootOID = index.GetRootOid();
-           await siaqodb.StoreObjectAsync(ii).ConfigureAwait(false);
-           storedIndexes.Add(ii);
-           return ii;
-       }
-#endif
-       public void FillIndex(FieldSqoInfo finfo, SqoTypeInfo ti, IBTree index)
-       {
-           int nrRecords = ti.Header.numberOfRecords;
-           for (int i = 0; i < nrRecords; i++)
+           var all = siaqodb.GetAllValues(ti, finfo, transaction);
+           foreach (var item in all)
            {
-
-
-               int oid = i + 1;
-               if (siaqodb.IsObjectDeleted(oid, ti))
-               {
-                   continue;
-               }
-               index.AddItem(siaqodb.LoadValue(oid,finfo.Name,ti.Type), new int[] { oid });
-
-           }
-          
-       }
-#if ASYNC
-       public async Task FillIndexAsync(FieldSqoInfo finfo, SqoTypeInfo ti, IBTree index)
-       {
-           int nrRecords = ti.Header.numberOfRecords;
-           for (int i = 0; i < nrRecords; i++)
-           {
-
-
-               int oid = i + 1;
-               if (await siaqodb.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-               {
-                   continue;
-               }
-               await index.AddItemAsync(await siaqodb.LoadValueAsync(oid, finfo.Name, ti.Type).ConfigureAwait(false), new int[] { oid }).ConfigureAwait(false);
-
+               index.AddItem(item.Value, item.Name);
            }
 
        }
-#endif
-       private IList<IndexInfo2> storedIndexes;
-       public IList<IndexInfo2> StoredIndexes
+
+       private IList<string> storedIndexes;
+       public IList<string> GetStoredIndexes(LightningDB.LightningTransaction transaction)
        {
-           get
-           {
-               if (storedIndexes == null)
-               {
-                 storedIndexes = siaqodb.LoadAll<IndexInfo2>();
-               }
-               return storedIndexes;
-           }
-       }
-#if ASYNC
-       public async Task<IList<IndexInfo2>> GetStoredIndexesAsync()
-       {
+
            if (storedIndexes == null)
            {
-               storedIndexes = await siaqodb.LoadAllAsync<IndexInfo2>().ConfigureAwait(false);
+               storedIndexes = new List<string>();
+
+               var db = transaction.OpenDatabase(sys_indexinfo, DatabaseOpenFlags.Create);
+
+               using (var cursor = transaction.CreateCursor(db))
+               {
+                   var current = cursor.MoveNext();
+
+                   while (current.HasValue)
+                   {
+
+                       byte[] indexNameBytes = current.Value.Key;
+                       string indexName = ByteConverter.ByteArrayToString(indexNameBytes);
+                       storedIndexes.Add(indexName);
+
+                       current = cursor.MoveNext();
+                   }
+               }
+
+
            }
            return storedIndexes;
 
        }
-#endif
-       public void UpdateIndexesAfterDelete(ObjectInfo objInfo, SqoTypeInfo ti)
+
+       public void UpdateIndexesAfterDelete(ObjectInfo objInfo, SqoTypeInfo ti, LightningTransaction transaction)
        {
-           if (cacheIndexes != null)
+
+           foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
-               if (cacheIndexes.ContainsType(ti))
-               {
+               string indexName = fi.Name + ti.TypeName;
+               IBTree index = new BTree(indexName, transaction);
+              
+               index.DeleteItem(objInfo.AtInfo[fi], objInfo.Oid);
 
-                   foreach (FieldSqoInfo fi in objInfo.AtInfo.Keys)
-                   {
-                       IBTree index = cacheIndexes.GetIndex(ti, fi);
-                       if (index != null)
-                       {
-
-                           // remove oid=> a node can remain with ZERO oids but is np
-                           index.RemoveOid(objInfo.AtInfo[fi], objInfo.Oid);
-                           index.Persist();
-
-                       }
-                   }
-
-               }
            }
+
        }
-#if ASYNC
-       public async Task UpdateIndexesAfterDeleteAsync(ObjectInfo objInfo, SqoTypeInfo ti)
+
+       public void UpdateIndexesAfterDelete(int oid, SqoTypeInfo ti, LightningTransaction transaction)
        {
-           if (cacheIndexes != null)
+
+
+           foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
-               if (cacheIndexes.ContainsType(ti))
-               {
+               string indexName = fi.Name + ti.TypeName;
+               IBTree index = new BTree(indexName, transaction);
+               object indexedVal = this.siaqodb.LoadValue(oid, fi.Name, ti.Type, transaction);
+              
+               index.DeleteItem(indexedVal, oid);
 
-                   foreach (FieldSqoInfo fi in objInfo.AtInfo.Keys)
-                   {
-                       IBTree index = cacheIndexes.GetIndex(ti, fi);
-                       if (index != null)
-                       {
-
-                           // remove oid=> a node can remain with ZERO oids but is np
-                           await index.RemoveOidAsync(objInfo.AtInfo[fi], objInfo.Oid).ConfigureAwait(false);
-                           await index.PersistAsync().ConfigureAwait(false);
-
-                       }
-                   }
-
-               }
            }
-       }
-#endif
-       public void UpdateIndexesAfterDelete(int oid, SqoTypeInfo ti)
-       {
-           if (cacheIndexes != null)
-           {
-               if (cacheIndexes.ContainsType(ti))
-               {
 
-                   foreach (FieldSqoInfo fi in ti.Fields)
-                   {
-                       IBTree index = cacheIndexes.GetIndex(ti, fi);
-                       if (index != null)
-                       {
 
-                           object indexedVal = this.siaqodb.LoadValue(oid, fi.Name, ti.Type);
-                           // remove oid=> a node can remain with ZERO oids but is np
-                           index.RemoveOid(indexedVal, oid);
-                           index.Persist();      
-
-                       }
-                   }
-
-               }
-           }
        }
 #if ASYNC
        public async Task UpdateIndexesAfterDeleteAsync(int oid, SqoTypeInfo ti)
@@ -664,70 +307,66 @@ namespace Sqo.Indexes
            }
        }
 #endif
-       public void UpdateIndexes(ObjectInfo objInfo, SqoTypeInfo ti, Dictionary<string, object> oldValuesOfIndexedFields)
+       public void UpdateIndexes(ObjectInfo objInfo, SqoTypeInfo ti, Dictionary<string, object> oldValuesOfIndexedFields, LightningTransaction transaction)
        {
-           if (ti.Type == typeof(IndexInfo2) || ti.Type == typeof(RawdataInfo))
+           if (ti.Type == typeof(RawdataInfo))
            {
                return;
            }
-           if (cacheIndexes != null)
+
+
+           foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
-               if (cacheIndexes.ContainsType(ti))
+               string indexName = fi.Name + ti.TypeName;
+               IBTree index = new BTree(indexName, transaction);
+
+               if (oldValuesOfIndexedFields.ContainsKey(fi.Name))//update occur
                {
-
-                   foreach (FieldSqoInfo fi in objInfo.AtInfo.Keys)
+                   int c = 0;
+                   if (objInfo.AtInfo[fi] == null || oldValuesOfIndexedFields[fi.Name] == null)
                    {
-                       IBTree index = cacheIndexes.GetIndex(ti, fi);
-                       if (index != null)
-                       {
-                           if (oldValuesOfIndexedFields.ContainsKey(fi.Name))//update occur
-                           {
-                               int c = 0;
-                               if (objInfo.AtInfo[fi] == null || oldValuesOfIndexedFields[fi.Name] == null)
-                               {
-                                   if (objInfo.AtInfo[fi] == oldValuesOfIndexedFields[fi.Name])
-                                       c = 0;
-                                   else if (objInfo.AtInfo[fi] == null)
-                                       c = -1;
-                                   else if (oldValuesOfIndexedFields[fi.Name] == null)
-                                       c = 1;
-                               }
-                               else
-                               {
-                                   Type fieldType = objInfo.AtInfo[fi].GetType();
-                                   object currentFieldVal = objInfo.AtInfo[fi];
-                                   if (fieldType.IsEnum())
-                                   {
-                                       Type enumType = Enum.GetUnderlyingType(fieldType);
-
-                                       currentFieldVal = Convertor.ChangeType(objInfo.AtInfo[fi], enumType);
-                                   }
-                                   c = ((IComparable)currentFieldVal).CompareTo(oldValuesOfIndexedFields[fi.Name]);
-                               }
-                               if (c == 0)//do nothing because values are equal
-                               {
-
-                               }
-                               else
-                               {
-                                   //first remove oid=> a node can remain with ZERO oids but is np
-                                   index.RemoveOid(oldValuesOfIndexedFields[fi.Name], objInfo.Oid);
-                                   //add new value(updated)
-                                   index.AddItem(objInfo.AtInfo[fi],new int[]{ objInfo.Oid});
-                                   index.Persist();
-                               }
-                           }
-                           else//insert
-                           {
-                               index.AddItem(objInfo.AtInfo[fi], new int[] { objInfo.Oid });
-                               index.Persist();
-                           }
-
-                       }
+                       if (objInfo.AtInfo[fi] == oldValuesOfIndexedFields[fi.Name])
+                           c = 0;
+                       else if (objInfo.AtInfo[fi] == null)
+                           c = -1;
+                       else if (oldValuesOfIndexedFields[fi.Name] == null)
+                           c = 1;
                    }
+                   else
+                   {
+                       Type fieldType = objInfo.AtInfo[fi].GetType();
+                       object currentFieldVal = objInfo.AtInfo[fi];
+                       if (fieldType.IsEnum())
+                       {
+                           Type enumType = Enum.GetUnderlyingType(fieldType);
 
+                           currentFieldVal = Convertor.ChangeType(objInfo.AtInfo[fi], enumType);
+                       }
+                       c = ((IComparable)currentFieldVal).CompareTo(oldValuesOfIndexedFields[fi.Name]);
+                   }
+                   if (c == 0)//do nothing because values are equal
+                   {
+
+                   }
+                   else
+                   {
+                       //first remove oid=> a node can remain with ZERO oids but is np
+                       index.DeleteItem(oldValuesOfIndexedFields[fi.Name], objInfo.Oid);
+                       //add new value(updated)
+                       index.AddItem(objInfo.AtInfo[fi],  objInfo.Oid );
+                       
+                   }
                }
+               else//insert
+               {
+                   index.AddItem(objInfo.AtInfo[fi], objInfo.Oid );
+                  
+               }
+
+
            }
+
+
        }
 #if ASYNC
        public async Task UpdateIndexesAsync(ObjectInfo objInfo, SqoTypeInfo ti, Dictionary<string, object> oldValuesOfIndexedFields)
@@ -796,31 +435,29 @@ namespace Sqo.Indexes
            }
        }
 #endif
-       public Dictionary<string, object> PrepareUpdateIndexes(ObjectInfo objInfo, SqoTypeInfo ti)
+       public Dictionary<string, object> PrepareUpdateIndexes(ObjectInfo objInfo, SqoTypeInfo ti,LightningTransaction transaction)
        {
            
            Dictionary<string, object> oldValues = new Dictionary<string, object>();
-           if (ti.Type == typeof(IndexInfo2)||ti.Type==typeof(RawdataInfo))
+           if (ti.Type == typeof(RawdataInfo))
            {
                return oldValues;
            }
-           if (cacheIndexes != null)
+
+           if (objInfo.Oid > 0 && objInfo.Oid <= ti.Header.numberOfRecords)
            {
-               if (cacheIndexes.ContainsType(ti))
+
+               foreach (FieldSqoInfo fi in ti.IndexedFields)
                {
-                   if (objInfo.Oid > 0 && objInfo.Oid <= ti.Header.numberOfRecords)
-                   {
-                       foreach (FieldSqoInfo fi in objInfo.AtInfo.Keys)
-                       {
-                           IBTree index = cacheIndexes.GetIndex(ti, fi);
-                           if (index != null)
-                           {
-                               oldValues[fi.Name] = siaqodb.LoadValue( objInfo.Oid, fi.Name, ti.Type);
-                           }
-                       }
-                   }
+                   string indexName = fi.Name + ti.TypeName;
+                   IBTree index = new BTree(indexName, transaction);
+
+                   oldValues[fi.Name] = siaqodb.LoadValue(objInfo.Oid, fi.Name, ti.Type,transaction);
+
                }
+
            }
+
            return oldValues;
 
        }
@@ -854,23 +491,19 @@ namespace Sqo.Indexes
 
        }
 #endif
-       public object GetValueForFutureUpdateIndex(int oid, string fieldName, SqoTypeInfo ti)
+       public object GetValueForFutureUpdateIndex(int oid, string fieldName, SqoTypeInfo ti,LightningTransaction transaction)
        {
-          
-           if (cacheIndexes != null)
-           {
-               if (cacheIndexes.ContainsType(ti))
-               {
-                   if (oid > 0 && oid <= ti.Header.numberOfRecords)
-                   {
-                       IBTree index = cacheIndexes.GetIndex(ti, fieldName);
-                       if (index != null)
-                       {
-                           return siaqodb.LoadValue(oid, fieldName, ti.Type);
-                       }
 
-                   }
+           if (oid > 0 && oid <= ti.Header.numberOfRecords)
+           {
+               string indexName = fieldName + ti.TypeName;
+               if (existingIndexes.ContainsKey(indexName))
+               {
+                   IBTree index = new BTree(indexName, transaction);
+                   return siaqodb.LoadValue(oid, fieldName, ti.Type,transaction);
+
                }
+
            }
 
            return null;
@@ -898,56 +531,48 @@ namespace Sqo.Indexes
            return null;
        }
 #endif
-       public void UpdateIndexes(int oid, string fieldName, SqoTypeInfo ti, object oldValue, object newValue)
+       public void UpdateIndexes(int oid, string fieldName, SqoTypeInfo ti, object oldValue, object newValue,LightningTransaction transaction)
        {
 
-           if (cacheIndexes != null)
+           string indexName = fieldName + ti.TypeName;
+           if (existingIndexes.ContainsKey(indexName))
            {
-               if (cacheIndexes.ContainsType(ti))
+               IBTree index = new BTree(indexName, transaction);
+               int c = 0;
+               if (newValue == null || oldValue == null)
                {
-                   IBTree index = cacheIndexes.GetIndex(ti, fieldName);
-                   if (index != null)
+                   if (newValue == oldValue)
+                       c = 0;
+                   else if (newValue == null)
+                       c = -1;
+                   else if (oldValue == null)
+                       c = 1;
+               }
+               else
+               {
+                   Type fieldType = newValue.GetType();
+                   object currentFieldVal = newValue;
+                   if (fieldType.IsEnum())
                    {
+                       Type enumType = Enum.GetUnderlyingType(fieldType);
 
-                       int c = 0;
-                       if (newValue == null || oldValue == null)
-                       {
-                           if (newValue == oldValue)
-                               c = 0;
-                           else if (newValue == null)
-                               c = -1;
-                           else if (oldValue == null)
-                               c = 1;
-                       }
-                       else
-                       {
-                           Type fieldType = newValue.GetType();
-                           object currentFieldVal = newValue;
-                           if (fieldType.IsEnum())
-                           {
-                               Type enumType = Enum.GetUnderlyingType(fieldType);
-
-                               currentFieldVal = Convertor.ChangeType(newValue, enumType);
-                           }
-                           c = ((IComparable)currentFieldVal).CompareTo(oldValue);
-                       }
-                       if (c == 0)//do nothing because values are equal
-                       {
-
-                       }
-                       else
-                       {
-                           //first remove oid=> a node can remain with ZERO oids but is np
-                           index.RemoveOid(oldValue, oid);
-                           //add new value(updated)
-                           index.AddItem(newValue, new int[] { oid });
-                           index.Persist();
-                       }
+                       currentFieldVal = Convertor.ChangeType(newValue, enumType);
                    }
+                   c = ((IComparable)currentFieldVal).CompareTo(oldValue);
+               }
+               if (c == 0)//do nothing because values are equal
+               {
 
                }
+               else
+               {
+                   //first remove oid=> a node can remain with ZERO oids but is np
+                   index.DeleteItem(oldValue, oid);
+                   //add new value(updated)
+                   index.AddItem(newValue,  oid );
+                   
+               }
            }
-
        }
 #if ASYNC
        public async Task UpdateIndexesAsync(int oid, string fieldName, SqoTypeInfo ti, object oldValue, object newValue)
@@ -1002,156 +627,7 @@ namespace Sqo.Indexes
 
        }
 #endif
-       internal void Close()
-       {
-           this.cacheIndexes = null;
-       }
-
-       internal void Persist(SqoTypeInfo ti)
-       {
-           if (cacheIndexes != null)
-           {
-               if (cacheIndexes.ContainsType(ti))
-               {
-
-                   foreach (FieldSqoInfo fi in ti.Fields)
-                   {
-                       IBTree index = cacheIndexes.GetIndex(ti, fi);
-                       if (index != null)
-                       {
-                           index.Persist();
-                       }
-                   }
-               }
-           }
-       }
-#if ASYNC
-       internal async Task PersistAsync(SqoTypeInfo ti)
-       {
-           if (cacheIndexes != null)
-           {
-               if (cacheIndexes.ContainsType(ti))
-               {
-
-                   foreach (FieldSqoInfo fi in ti.Fields)
-                   {
-                       IBTree index = cacheIndexes.GetIndex(ti, fi);
-                       if (index != null)
-                       {
-                           await index.PersistAsync().ConfigureAwait(false);
-                       }
-                   }
-               }
-           }
-       }
-#endif
-
-       internal void PutIndexPersistenceOnOff(SqoTypeInfo ti, bool on)
-       {
-           if (cacheIndexes != null)
-           {
-               if (cacheIndexes.ContainsType(ti))
-               {
-
-                   foreach (FieldSqoInfo fi in ti.Fields)
-                   {
-                       IBTree index = cacheIndexes.GetIndex(ti, fi);
-                       if (index != null)
-                       {
-                           index.AllowPersistance(on);
-                       }
-                   }
-               }
-           }
-       }
-
-       internal void DeleteAllIndexInfo()
-       {
-           cacheIndexes = null;
-           storedIndexes = null;
-       }
-       private IBTree RenewIndex(SqoTypeInfo ti, string fieldName)
-       {
-           FieldSqoInfo finfo = MetaHelper.FindField(ti.Fields, fieldName);
-           IndexInfo2 indexInfo = null;
-           if (finfo != null)
-           {
-
-               string indexName = finfo.Name + ti.TypeName;
-
-               foreach (IndexInfo2 ii in StoredIndexes)
-               {
-                   if (indexName.StartsWith(ii.IndexName) || ii.IndexName.StartsWith(indexName))
-                   {
-                       indexInfo = ii;
-                       break;
-                   }
-               }
-
-               if (indexInfo != null)
-               {
-                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
-                   {
-                       storedIndexes.Remove(indexInfo);
-                   }
-                   siaqodb.Delete(indexInfo);
-                   
-               }
-               Type t = typeof(BTree<>).MakeGenericType(finfo.AttributeType);
-               ConstructorInfo ctor = t.GetConstructor(new Type[] { typeof(Siaqodb) });
-               IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
-
-               indexInfo = this.BuildIndex(finfo, ti, index);
-               index.SetIndexInfo(indexInfo);
-               index.Persist();
-               cacheIndexes.Set(ti, finfo, index);
-
-               return index;
-           }
-           return null;
-       }
-#if ASYNC
-       private async Task<IBTree> RenewIndexAsync(SqoTypeInfo ti, string fieldName)
-       {
-           FieldSqoInfo finfo = MetaHelper.FindField(ti.Fields, fieldName);
-           IndexInfo2 indexInfo = null;
-           if (finfo != null)
-           {
-
-               string indexName = finfo.Name + ti.TypeName;
-               IList<IndexInfo2> stIndexes = await this.GetStoredIndexesAsync().ConfigureAwait(false);
-
-               foreach (IndexInfo2 ii in stIndexes)
-               {
-                   if (indexName.StartsWith(ii.IndexName) || ii.IndexName.StartsWith(indexName))
-                   {
-                       indexInfo = ii;
-                       break;
-                   }
-               }
-
-               if (indexInfo != null)
-               {
-                   if (storedIndexes != null && storedIndexes.Contains(indexInfo))
-                   {
-                       storedIndexes.Remove(indexInfo);
-                   }
-                   await siaqodb.DeleteAsync(indexInfo);
-
-               }
-               Type t = typeof(BTree<>).MakeGenericType(finfo.AttributeType);
-               ConstructorInfo ctor = t.GetConstructor(new Type[] { typeof(Siaqodb) });
-               IBTree index = (IBTree)ctor.Invoke(new object[] { this.siaqodb });
-               indexInfo = await this.BuildIndexAsync(finfo, ti, index);
-               index.SetIndexInfo(indexInfo);
-               await index.PersistAsync();
-               cacheIndexes.Set(ti, finfo, index);
-
-               return index;
-           }
-           return null;
-       }
-#endif
+      
 
     }
 }

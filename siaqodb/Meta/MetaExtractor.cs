@@ -239,29 +239,14 @@ namespace Sqo.Meta
                 }
                 else if (fType.IsArray && fTypeId != documentID)
                 {
-                    if ( ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>) && (ai.Name == "Keys" || ai.Name == "_childrenOIDs"))
-                    {
-                        ai.AttributeTypeId += MetaExtractor.FixedArrayTypeId;
-                        if (ai.Name == "Keys")
-                        {
-                            ai.Header.Length = ai.Header.Length * Indexes.BTreeNode<int>.KEYS_PER_NODE;
-                        }
-                        else
-                        {
-                            ai.Header.Length = ai.Header.Length * Indexes.BTreeNode<int>.CHILDREN_PER_NODE;
-                        }
 
+                    ai.Header.Length += ExtraSizeForArray;//store OID from rawdata + number of elements
+                    ai.AttributeTypeId += MetaExtractor.ArrayTypeIDExtra;
 
-                    }
-                    else
-                    {
-                        ai.Header.Length += ExtraSizeForArray;//store OID from rawdata + number of elements
-                        ai.AttributeTypeId += MetaExtractor.ArrayTypeIDExtra;
-                    }
                 }
                 else if (ai.IsText)
                 {
-                    ai.Header.Length += ExtraSizeForArray; 
+                    ai.Header.Length += ExtraSizeForArray;
                 }
                 ai.Header.RealLength = maxLength == -1 ? GetAbsoluteSizeOfField(fTypeId) : maxLength;
                 ai.Header.PositionInRecord = lengthOfRecord;

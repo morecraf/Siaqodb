@@ -51,6 +51,7 @@ namespace Sqo
         LightningEnvironment env;
         const int OneMega = 1024 * 1024;
         const string sys_dbs = "sdbs";
+       
 
 #if UNITY3D
         private EventHandler<LoadingObjectEventArgs> loadingObject;
@@ -344,8 +345,7 @@ namespace Sqo
         {
 
             CacheCustomFileNames.AddFileNameForType(new SqoTypeInfo(typeof(Sqo.MetaObjects.RawdataInfo)).TypeName, "rawdatainfo", false);
-            CacheCustomFileNames.AddFileNameForType(new SqoTypeInfo(typeof(Sqo.Indexes.IndexInfo2)).TypeName, "indexinfo2", false);
-
+           
             using (var transaction = env.BeginTransaction())
             {
 
@@ -364,18 +364,6 @@ namespace Sqo
                         }
                     }
 
-
-                    dbName = this.GetFileByType(new SqoTypeInfo(typeof(Sqo.Indexes.IndexInfo2)).TypeName);
-                    seralizer = SerializerFactory.GetSerializer(path, dbName, this.useElevatedTrust);
-                    tinfoBuffer = transaction.Get(db,ByteConverter.StringToByteArray(dbName));
-                    if (tinfoBuffer != null)
-                    {
-                        SqoTypeInfo ti = ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tinfoBuffer, true);
-                        if (ti != null)
-                        {
-                            this.CompareSchema(ti);
-                        }
-                    }
                 }
 
             }
@@ -1441,7 +1429,7 @@ namespace Sqo
         {
             if (LoadingObject != null)
             {
-                if (args.ObjectType != typeof(Sqo.MetaObjects.RawdataInfo) && args.ObjectType != typeof(Sqo.Indexes.IndexInfo2))
+                if (args.ObjectType != typeof(Sqo.MetaObjects.RawdataInfo) )
                 {
                     LoadingObject(this, args);
                 }
@@ -1451,7 +1439,7 @@ namespace Sqo
         {
             if (LoadedObject != null)
             {
-                if (obj.GetType() != typeof(Sqo.MetaObjects.RawdataInfo) && obj.GetType() != typeof(Sqo.Indexes.IndexInfo2))
+                if (obj.GetType() != typeof(Sqo.MetaObjects.RawdataInfo) )
                 {
                     LoadedObjectEventArgs args = new LoadedObjectEventArgs(oid, obj);
                     LoadedObject(this, args);

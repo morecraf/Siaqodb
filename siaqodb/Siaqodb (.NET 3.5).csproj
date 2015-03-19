@@ -123,7 +123,6 @@
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
     <Compile Include="Cache\CacheDocuments.cs" />
-    <Compile Include="Cache\CacheForIndexes.cs" />
     <Compile Include="Cache\CacheForManager.cs" />
     <Compile Include="Cache\CacheOIDs.cs" />
     <Compile Include="Cache\CircularRefCache.cs" />
@@ -134,7 +133,6 @@
     <Compile Include="Core\ByteTransformers\ByteTransformerFactory.cs" />
     <Compile Include="Core\ByteTransformers\ComplexTypeTransformer.cs" />
     <Compile Include="Core\ByteTransformers\DictionaryByteTransformer.cs" />
-    <Compile Include="Core\ByteTransformers\FixedArrayByteTransformer.cs" />
     <Compile Include="Core\ByteTransformers\PrimitiveByteTransformer.cs" />
     <Compile Include="Core\FileFactory.cs" />
     <Compile Include="Core\ByteTransformers\IByteTransformer.cs" />
@@ -156,10 +154,8 @@
     <Compile Include="Exceptions\OptimisticConcurrencyException.cs" />
     <Compile Include="Exceptions\UniqueConstraintException.cs" />
     <Compile Include="Indexes\BTree\BTree.cs" />
-    <Compile Include="Indexes\BTree\BTreeNode.cs" />
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
-    <Compile Include="Indexes\IndexInfo.cs" />
     <Compile Include="Internal\_bs.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="Lightning\Collections\CursorEnumerable.cs" />

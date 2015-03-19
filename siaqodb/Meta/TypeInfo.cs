@@ -17,17 +17,6 @@ namespace Sqo.Meta
                 this.typeName = "Sqo.MetaObjects.RawdataInfo";
                 this.type = type;
             }
-            else if (type == typeof(Sqo.Indexes.IndexInfo2))
-            {
-                this.typeName = "Sqo.Indexes.IndexInfo2";
-                this.type = type;
-            }
-            else if(type.IsGenericType() && type.GetGenericTypeDefinition()==typeof(Sqo.Indexes.BTreeNode<>))
-            {
-                this.typeName = type.Namespace + "." + type.Name;
-                AddGenericsInfo(type, ref this.typeName);
-                this.type = type;
-            }
             
             else
             {

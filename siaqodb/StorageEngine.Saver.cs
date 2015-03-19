@@ -61,27 +61,23 @@ namespace Sqo
             CheckForConcurency(oi, objInfo, ti, serializer, false, transaction);
 
             CheckConstraints(objInfo, ti);
-
-            Dictionary<string, object> oldValuesOfIndexedFields = this.indexManager.PrepareUpdateIndexes(objInfo, ti);
-
-
             string dbName = GetFileByType(ti);
-            byte[] objBytes = serializer.SerializeObject(objInfo, this.rawSerializer, transaction);
-
             var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
+            Dictionary<string, object> oldValuesOfIndexedFields = this.indexManager.PrepareUpdateIndexes(objInfo, ti,transaction);
+
+           
+            byte[] objBytes = serializer.SerializeObject(objInfo, this.rawSerializer, transaction);
 
             byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
             transaction.Put(db, key, objBytes);
-
-
 
             if (objInfo.Inserted)
             {
                 this.SaveType(objInfo.SqoTypeInfo, transaction);
             }
             metaCache.SetOIDToObject(oi, objInfo.Oid, ti);
-            this.indexManager.UpdateIndexes(objInfo, ti, oldValuesOfIndexedFields);
+            this.indexManager.UpdateIndexes(objInfo, ti, oldValuesOfIndexedFields,transaction);
 
             if (trans == null)
             {
@@ -157,13 +153,13 @@ namespace Sqo
 
                     }
 
-                    object oldPropVal = indexManager.GetValueForFutureUpdateIndex(oid, backingField, tiOfProp);
+                    object oldPropVal = indexManager.GetValueForFutureUpdateIndex(oid, backingField, tiOfProp, transaction);
 
                     this.SaveValue(oid, backingField, tiOfProp, objOfProp,transaction);
 
 
 
-                    indexManager.UpdateIndexes(oid, backingField, tiOfProp, oldPropVal, objOfProp);
+                    indexManager.UpdateIndexes(oid, backingField, tiOfProp, oldPropVal, objOfProp, transaction);
                 }
                 transaction.Commit();
 
@@ -517,7 +513,7 @@ namespace Sqo
 
                 this.MarkObjectAsDelete(serializer, objInfo.Oid, ti, transaction);
 
-                this.indexManager.UpdateIndexesAfterDelete(objInfo, ti);
+                this.indexManager.UpdateIndexesAfterDelete(objInfo, ti,transaction);
 
                 metaCache.SetOIDToObject(obj, -1, ti);
 
@@ -719,7 +715,7 @@ namespace Sqo
                     {
                         this.MarkObjectAsDelete(serializer, oid, ti,transaction);
 
-                        this.indexManager.UpdateIndexesAfterDelete(oid, ti);
+                        this.indexManager.UpdateIndexesAfterDelete(oid, ti,transaction);
                     }
                     transaction.Commit();
                 }

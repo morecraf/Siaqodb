@@ -21,21 +21,7 @@ namespace Sqo.Core
                 if (ti.Type != null) //is null when loaded by SiaqodbManager
                 {
 
-                    if (ti.Type.IsGenericType())
-                    {
-                        if (ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>) && (fi.Name == "Keys" || fi.Name == "_childrenOIDs"))
-                        {
-                            return new FixedArrayByteTransformer(serializer, ti, fi);
-                        }
-                        else
-                        {
-                            return new ArrayByteTranformer(serializer, rawSerializer, ti, fi, parentOID);
-                        }
-                    }
-                    else
-                    {
-                        return new ArrayByteTranformer(serializer, rawSerializer, ti, fi, parentOID);
-                    }
+                    return new ArrayByteTranformer(serializer, rawSerializer, ti, fi, parentOID);
                 }
                 return new ArrayByteTranformer(serializer, rawSerializer, ti, fi, parentOID);
             }

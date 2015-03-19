@@ -436,11 +436,9 @@ namespace Sqo
 
             int nrRecords = ti.Header.numberOfRecords;
             bool isOIDField = where.AttributeName[0] == "OID";
-            if (!indexManager.LoadOidsByIndex(ti, where.AttributeName[0], where, oids))
+            using (var transaction = env.BeginTransaction())
             {
-
-
-                using (var transaction = env.BeginTransaction())
+                if (!indexManager.LoadOidsByIndex(ti, where.AttributeName[0], where, oids, transaction))
                 {
                     using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
                     {
@@ -459,7 +457,7 @@ namespace Sqo
                                     {
                                         continue;
                                     }
-                                    object val = isOIDField ? oid : serializer.ReadFieldValue(ti, oid, crObjBytes, where.AttributeName[0], this.rawSerializer,transaction);
+                                    object val = isOIDField ? oid : serializer.ReadFieldValue(ti, oid, crObjBytes, where.AttributeName[0], this.rawSerializer, transaction);
 
                                     if (Match(where, val))
                                     {
@@ -1212,8 +1210,11 @@ namespace Sqo
         }
         
 #endif
-       
         internal object LoadValue(int oid, string fieldName, SqoTypeInfo ti)
+        {
+            return this.LoadValue(oid, fieldName, ti, null);
+        }
+        internal object LoadValue(int oid, string fieldName, SqoTypeInfo ti, LightningTransaction trans)
         {
             if (fieldName == "OID")
             {
@@ -1222,17 +1223,20 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-
-            using (var transaction = env.BeginTransaction())
+            LightningTransaction transaction = trans;
+            if (trans == null)
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-                {
-                    byte[] key = ByteConverter.IntToByteArray(oid);
-
-                    byte[] objBytes = transaction.Get(db, key);
-                    return serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer,transaction);
-                }
+                transaction = env.BeginTransaction();
             }
+
+            using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+            {
+                byte[] key = ByteConverter.IntToByteArray(oid);
+
+                byte[] objBytes = transaction.Get(db, key);
+                return serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer, transaction);
+            }
+
         }
 #if ASYNC
         internal async Task<object> LoadValueAsync(int oid, string fieldName, SqoTypeInfo ti)
@@ -1908,5 +1912,37 @@ namespace Sqo
              }
              return existingRawdataInfoOIDs;*/
          }
+         internal List<ATuple<int, object>> GetAllValues(SqoTypeInfo ti, FieldSqoInfo fi, LightningDB.LightningTransaction transaction)
+         {
+             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
+             List<ATuple<int, object>> all = new List<ATuple<int, object>>();
+             var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
+
+             using (var cursor = transaction.CreateCursor(db))
+             {
+                 var current = cursor.MoveNext();
+
+                 while (current.HasValue)
+                 {
+                     byte[] crObjBytes = current.Value.Value;
+                     byte[] oidBytes = current.Value.Key;
+                     int oid = ByteConverter.ByteArrayToInt(oidBytes);
+                     if (crObjBytes != null)
+                     {
+                         if (serializer.IsObjectDeleted(oid, crObjBytes))
+                         {
+                             continue;
+                         }
+                        object value= serializer.ReadFieldValue(ti, oid, crObjBytes, fi.Name, this.rawSerializer, transaction);
+                        ATuple<int, object> retVal = new ATuple<int, object>(oid, value);
+                        all.Add(retVal);
+                     }
+                     current = cursor.MoveNext();
+                 }
+             }
+             return all;
+         }
+   
+       
     }
 }

@@ -20,7 +20,7 @@ namespace Sqo.Cache
         {
             if (Sqo.Utilities.SqoLicense.isStarterEdition)
             {
-                if (type != typeof(Sqo.MetaObjects.RawdataInfo) && type != typeof(Sqo.Indexes.IndexInfo2) && ti.Header.numberOfRecords > 100)
+                if (type != typeof(Sqo.MetaObjects.RawdataInfo)  && ti.Header.numberOfRecords > 100)
                 {
                     throw new Sqo.Exceptions.InvalidLicenseException("Siaqodb Starter edition may store maximum 100 objects per type!");
                 }

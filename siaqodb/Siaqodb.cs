@@ -317,10 +317,17 @@ namespace Sqo
             
             storageEngine.LoadAllTypes();
             List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
-            this.indexManager.BuildAllIndexes(typesForIndexes);
-
+            this.BuildIndexes(typesForIndexes);
          
             cacheForManager = new Sqo.Cache.CacheForManager();
+        }
+
+        private void BuildIndexes(List<SqoTypeInfo> typesForIndexes)
+        {
+            var transaction=storageEngine.GetNewTransaction();
+            this.indexManager.BuildAllIndexes(typesForIndexes, transaction);
+            transaction.Commit();
+            
         }
 #if !WinRT
         /// <summary>
@@ -352,8 +359,7 @@ namespace Sqo
 #endif
             storageEngine.LoadAllTypes();
             List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
-            this.indexManager.BuildAllIndexes(typesForIndexes);
-          
+            this.BuildIndexes(typesForIndexes);
             cacheForManager = new Sqo.Cache.CacheForManager();
 
         }
@@ -641,27 +647,17 @@ savedObject(this, e);
 #else
         protected virtual void OnSavingObject(SavingEventsArgs e)
 		{
-			if (SavingObject != null)
-			{
-                if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Sqo.Indexes.IndexInfo2))
-                { }
-                else
-                {
-                    SavingObject(this, e);
-                }
-			}
+            if (SavingObject != null)
+            {
+                SavingObject(this, e);
+            }
 		}
 		protected virtual void OnSavedObject(SavedEventsArgs e)
 		{
-			if (SavedObject != null)
-			{
-                if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Sqo.Indexes.IndexInfo2))
-                { }
-                else
-                {
-                    SavedObject(this, e);
-                }
-			}
+            if (SavedObject != null)
+            {
+                SavedObject(this, e);
+            }
 		}
 		protected virtual void OnDeletingObject(DeletingEventsArgs e)
 		{
@@ -852,12 +848,9 @@ savedObject(this, e);
                 SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj,lmdbTr);
                 if (ti != null)
                 {
-                    if ((ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || ti.Type == typeof(IndexInfo2))
-                    { }
-                    else
-                    {
-                        circularRefCache.Clear();
-                    }
+
+                    circularRefCache.Clear();
+
                     circularRefCache.Add(obj);
                     bool inserted = false;
 #if UNITY3D
@@ -983,7 +976,16 @@ savedObject(this, e);
                     storageEngine.SaveType(ti,transaction);
                 }
                 this.metaCache.AddType(objType, ti);
-                this.indexManager.BuildIndexes(ti);
+                if (transaction == null)
+                {
+                    transaction = storageEngine.GetNewTransaction();
+                    this.indexManager.BuildIndexes(ti, transaction);
+                    transaction.Commit();
+                }
+                else
+                {
+                    this.indexManager.BuildIndexes(ti, transaction);
+                }
 
             }
             if (ti.IsOld)
@@ -1178,7 +1180,7 @@ savedObject(this, e);
                 this.opened = false;
                 this.metaCache = null;
                 this.storageEngine.Close();
-                this.indexManager.Close();
+               
             }
         }
 #if ASYNC
@@ -1394,12 +1396,15 @@ savedObject(this, e);
 
 #endif
 
-
         internal object LoadValue(int oid, string fieldName, Type type)
+        {
+            return this.LoadValue(oid, fieldName, type, null);
+        }
+        internal object LoadValue(int oid, string fieldName, Type type,LightningDB.LightningTransaction transaction)
         {
 
             SqoTypeInfo ti = this.GetSqoTypeInfo(type);
-            return storageEngine.LoadValue(oid, fieldName, ti);
+            return storageEngine.LoadValue(oid, fieldName, ti,transaction);
 
         }
 #if ASYNC
@@ -2399,31 +2404,7 @@ savedObject(this, e);
             return storageEngine.InsertObjectByMeta(tinf);
         }
 
-        internal Sqo.Indexes.IBTree GetIndex(string field, Type type)
-        {
-            SqoTypeInfo ti = this.GetSqoTypeInfo(type);
-            return indexManager.GetIndex(field, ti);
-        }
-        /// <summary>
-        /// Get a list of unique values for a field index
-        /// </summary>
-        /// <typeparam name="T">Type where index is defined</typeparam>
-        /// <typeparam name="TIndex">Type of field indexed</typeparam>
-        /// <param name="fieldName">Name of field or automatic property which is indexed</param>
-        /// <returns></returns>
-        public IList<TIndex> LoadIndexValues<T, TIndex>(string fieldName)
-        {
-            string fieldNameAsInDB = MetaHelper.GetFieldAsInDB(fieldName, typeof(T));
-            Sqo.Indexes.IBTree index = this.GetIndex(fieldNameAsInDB, typeof(T));
-            if (index != null)
-            {
-                Sqo.Indexes.IBTree<TIndex> indexT=(Sqo.Indexes.IBTree<TIndex>)index;
-                return indexT.DumpKeys();
-            }
-
-            throw new SiaqodbException("Index not exists for field:" + fieldName);
-            
-        }
+        
         /// <summary>
         /// Load all objects in Lazy mode, objects are activated/read from db when it is accessed
         /// by index or by enumerator
@@ -2532,14 +2513,7 @@ savedObject(this, e);
             return await storageEngine.IsObjectDeletedAsync(oid, ti);
         }
 #endif
-        internal void PutIndexPersiststenceState(SqoTypeInfo ti, bool on)
-        {
-            indexManager.PutIndexPersistenceOnOff(ti, on);
-        }
-        internal void PersistIndexDirtyNodes(SqoTypeInfo ti)
-        {
-            indexManager.Persist(ti);
-        }
+        
 #if ASYNC
         internal async Task PersistIndexDirtyNodesAsync(SqoTypeInfo ti)
         {
@@ -2548,15 +2522,7 @@ savedObject(this, e);
 #endif
         #endregion
 
-        internal int AllocateNewOID<T>()
-        {
-            SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(typeof(T),null);
-            if (ti != null)
-            {
-                return storageEngine.AllocateNewOID(ti);
-            }
-            return 0;
-        }
+       
 #if ASYNC
         internal async Task<int> AllocateNewOIDAsync<T>()
         {
@@ -2667,9 +2633,7 @@ savedObject(this, e);
 
                 foreach (SqoTypeInfo ti in existingTypes)
                 {
-                    if (ti.Type == typeof(Sqo.MetaObjects.RawdataInfo) ||
-                        ti.Type == typeof(Sqo.Indexes.IndexInfo2) ||
-                        (ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)))
+                    if (ti.Type == typeof(Sqo.MetaObjects.RawdataInfo))
                     {
                         continue;
                     }
@@ -2703,9 +2667,7 @@ savedObject(this, e);
                 {
                     foreach (SqoTypeInfo ti in existingTypes)
                     {
-                        if (ti.Type == typeof(Sqo.MetaObjects.RawdataInfo) ||
-                            ti.Type == typeof(Sqo.Indexes.IndexInfo2) ||
-                            (ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)))
+                        if (ti.Type == typeof(Sqo.MetaObjects.RawdataInfo) )
                         {
                             continue;
                         }
@@ -2869,6 +2831,17 @@ savedObject(this, e);
         {
             SqoTypeInfo ti = GetSqoTypeInfoToStoreObject(type,null);
             return storageEngine.GetFileName(ti);
+        }
+        /// <summary>
+        /// Returns OIDs and values for a field
+        /// </summary>
+        /// <param name="ti"></param>
+        /// <param name="fi"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        internal List<ATuple<int, object>> GetAllValues(SqoTypeInfo ti, FieldSqoInfo fi, LightningDB.LightningTransaction transaction)
+        {
+            return storageEngine.GetAllValues(ti, fi, transaction);
         }
     }
    

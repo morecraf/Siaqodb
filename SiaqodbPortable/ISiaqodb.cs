@@ -35,8 +35,7 @@ namespace Sqo
         IObjectList<T> LoadAllLazy<T>();
         System.Collections.Generic.List<int> LoadAllOIDs(MetaType type);
         event EventHandler<LoadedObjectEventArgs> LoadedObject;
-        System.Collections.Generic.IList<TIndex> LoadIndexValues<T, TIndex>(string fieldName);
-        event EventHandler<LoadingObjectEventArgs> LoadingObject;
+         event EventHandler<LoadingObjectEventArgs> LoadingObject;
         T LoadObjectByOID<T>(int oid);
         System.Collections.Generic.List<int> LoadOids<T>(System.Linq.Expressions.Expression expression);
         object LoadValue(int oid, string fieldName, MetaType mt);
