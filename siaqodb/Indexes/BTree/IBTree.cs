@@ -10,7 +10,7 @@ namespace Sqo.Indexes
     interface IBTree
     {
         void AddItem(object new_key,int oid);
-        int[] FindItem(object target_key);
+        IEnumerable<int> FindItem(object target_key);
         List<int> FindItemsLessThan(object target_key);
         List<int> FindItemsLessThanOrEqual(object target_key);
         List<int> FindItemsBiggerThan(object target_key);

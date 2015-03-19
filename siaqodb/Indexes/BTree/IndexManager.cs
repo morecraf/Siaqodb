@@ -47,7 +47,7 @@ namespace Sqo.Indexes
        {
            if (where.OperationType == OperationType.Equal)
            {
-               int[] oidsFound = index.FindItem(where.Value);
+               var oidsFound = index.FindItem(where.Value);
                if (oidsFound != null)
                {
                    oids.AddRange(oidsFound);

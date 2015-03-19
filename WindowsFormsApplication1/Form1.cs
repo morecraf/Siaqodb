@@ -34,7 +34,7 @@ namespace WindowsFormsApplication1
             try
             {
                 //siaqodb2.DropType<EventSlot>();
-                for (int i = 0; i < 10000; i++)
+                for (int i = 0; i < 100; i++)
                 {
 
                     EventSlot evslot = new EventSlot();
@@ -62,7 +62,7 @@ namespace WindowsFormsApplication1
             //string s = "s";
             start22 = DateTime.Now;
             var eventSlots = (from EventSlot es in siaqodb2
-                              where (es.ApplicationID == 9 )
+                              where (es.ID == 9 )
                               // orderby es.StartDate
                               select es).ToList();
             var alle3 = siaqodb2.LoadAll<EventSlot>();
@@ -596,7 +596,7 @@ namespace WindowsFormsApplication1
 
     public class EventSlot {
         public int OID{get;set;}
-       
+       [Index]
         public int ID{get;set;}
         public int ApplicationID{ get; set;}
        public int Index{ get; set; }
