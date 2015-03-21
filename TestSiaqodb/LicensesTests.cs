@@ -13,7 +13,7 @@ namespace TestSiaqodb
     [TestClass]
     public class LicensesTests
     {
-        string objPath = @"e:\sqoo\temp\tests_db\";
+        string objPath = @"c:\work\temp\unitTests_siaqodbLMDB\";
         public LicensesTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;

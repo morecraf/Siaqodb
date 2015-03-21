@@ -1183,6 +1183,12 @@ savedObject(this, e);
                
             }
         }
+        public void Dispose()
+        {
+            this.opened = false;
+            this.metaCache = null;
+            this.storageEngine.Close();
+        }
 #if ASYNC
         /// <summary>
         /// Close database
@@ -1829,6 +1835,10 @@ savedObject(this, e);
         {
             SqoTypeInfo ti = this.GetSqoTypeInfo(type);
             storageEngine.DropType(ti);
+            var transaction = storageEngine.GetNewTransaction();
+            indexManager.DropIndexes(ti,transaction);
+            transaction.Commit();
+            this.metaCache.Remove(type);
         }
 #if ASYNC
         /// <summary>

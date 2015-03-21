@@ -14,7 +14,7 @@ namespace TestSiaqodb
 	[TestClass]
 	public class JoinTest34
 	{
-        string objPath = @"e:\sqoo\temp\tests_db\";
+        string objPath = @"c:\work\temp\unitTests_siaqodbLMDB\";
 		public JoinTest34()
 		{
             //SiaqodbConfigurator.SetTrialLicense("8roM1WSU/nmeKWoIahigyWMQWO6UENLECJGz6PT8O4I=");

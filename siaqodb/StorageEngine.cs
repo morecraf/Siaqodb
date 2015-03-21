@@ -31,7 +31,7 @@ using Windows.Storage;
 namespace Sqo
 {
     [Obfuscation(Feature = "Apply to member * when event: renaming", Exclude = true)]
-    partial class StorageEngine
+    partial class StorageEngine :IDisposable
     {
         #region VAR DECLARATIONS
 
@@ -154,8 +154,8 @@ namespace Sqo
         {
             this.env = new LightningEnvironment(path, EnvironmentOpenFlags.None);
 
-            env.MapSize = 20 * OneMega;
-            env.MaxDatabases = 20;
+            env.MapSize = 30 * OneMega;
+            env.MaxDatabases = 100;
             
             env.Open();
 
@@ -548,6 +548,7 @@ namespace Sqo
                             string typeName = ByteConverter.ByteArrayToString(keyBytes);
                             if (typeName.StartsWith("indexinfo") || typeName.StartsWith("rawdatainfo") || typeName.StartsWith("Sqo.Indexes.BTreeNode"))//engine types
                             {
+                                current = cursor.MoveNext();
                                 continue;
                             }
                             byte[] tiBytes = current.Value.Value;
@@ -862,13 +863,17 @@ namespace Sqo
                                  string typeName = ByteConverter.ByteArrayToString(keyBytes);
                                  if (typeName.StartsWith("indexinfo") || typeName.StartsWith("rawdatainfo") || typeName.StartsWith("Sqo.Indexes.BTreeNode"))//engine types
                                  {
+                                     current = cursor.MoveNext();
                                      continue;
                                  }
                                  byte[] tiBytes = current.Value.Value;
                                  if (tiBytes != null)
                                  {
                                      SqoTypeInfo ti= ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tiBytes, true);
-                                     this.CompareSchema(ti);
+                                     if (ti != null)
+                                     {
+                                         this.CompareSchema(ti);
+                                     }
                                  }
                                  current = cursor.MoveNext();
                              }
@@ -1197,14 +1202,17 @@ namespace Sqo
         {
             using (var transaction = env.BeginTransaction())
             {
-                string dbname=this.GetFileByType(ti);
+                string dbname = this.GetFileByType(ti);
                 var db = transaction.OpenDatabase(dbname, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 transaction.DropDatabase(db, true);
-                using (var sysdb = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create))
-                {
+                var sysdb = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
 
-                    transaction.Delete(sysdb,ByteConverter.StringToByteArray(dbname));
+                byte[] val = transaction.Get(sysdb, ByteConverter.StringToByteArray(dbname));
+                if (val != null)
+                {
+                    transaction.Delete(sysdb, ByteConverter.StringToByteArray(dbname));
                 }
+
                 transaction.Commit();
                 return true;
             }
@@ -1486,7 +1494,7 @@ namespace Sqo
             {
                 SerializerFactory.CloseAll();
                 rawSerializer.Close();
-                
+                env.Dispose();
 
             }
         }
@@ -1552,6 +1560,11 @@ namespace Sqo
         public LightningDB.LightningTransaction GetNewTransaction()
         {
             return env.BeginTransaction();
+        }
+
+        public void Dispose()
+        {
+            this.env.Dispose();
         }
     }
     

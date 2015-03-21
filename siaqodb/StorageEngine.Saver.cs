@@ -53,14 +53,16 @@ namespace Sqo
 
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedSaveComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedSaveComplexObject);
+            //TODO LMDB- pass transaction
+            CheckConstraints(objInfo, ti);
             LightningTransaction transaction = trans;
             if (trans == null)
             {
                 transaction = env.BeginTransaction();
             }
+            
             CheckForConcurency(oi, objInfo, ti, serializer, false, transaction);
 
-            CheckConstraints(objInfo, ti);
             string dbName = GetFileByType(ti);
             var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
@@ -801,13 +803,13 @@ namespace Sqo
 
                         if (objInfo.Oid > 0 && objInfo.Oid <= ti.Header.numberOfRecords) //update or delete
                         {
-                            using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-                            {
-                                byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
+                            var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-                                byte[] objBytes = transaction.Get(db, key);
-                                tickCount = (ulong)serializer.ReadFieldValue(ti, objInfo.Oid, objBytes, fi, transaction);
-                            }
+                            byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
+
+                            byte[] objBytes = transaction.Get(db, key);
+                            tickCount = (ulong)serializer.ReadFieldValue(ti, objInfo.Oid, objBytes, fi, transaction);
+
                             if (objInfo.TickCount != 0)
                             {
                                 if (tickCount != objInfo.TickCount)

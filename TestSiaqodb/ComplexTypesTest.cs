@@ -12,7 +12,7 @@ namespace TestSiaqodb.M.S
     [TestClass]
     public class ComplexTypesTest
     {
-        string objPath = @"e:\sqoo\temp\tests_db\";
+        string objPath = @"c:\work\temp\unitTests_siaqodbLMDB\";
         public ComplexTypesTest()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;

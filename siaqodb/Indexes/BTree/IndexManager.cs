@@ -124,24 +124,18 @@ namespace Sqo.Indexes
                BuildIndexes(ti, transaction);
            }
            //if an index gets removed we have to clean also the DB with index headers
-           foreach (string indexStored in GetStoredIndexes(transaction))
+           //TODO LMDB
+           /*foreach (string indexStored in GetStoredIndexes(transaction))
            {
                if (!existingIndexes.ContainsKey(indexStored))
                {
                    this.DropIndex(indexStored,transaction);
                }
-           }
+           }*/
 
        }
 
-       private void DropIndex(string indexName, LightningTransaction transaction)
-       {
-           var db = transaction.OpenDatabase(sys_indexinfo, DatabaseOpenFlags.Create);
-           byte[] key = ByteConverter.StringToByteArray(indexName);
-           transaction.Delete(db, key);
-           
-          
-       }
+      
        internal void BuildIndexes(SqoTypeInfo ti,LightningDB.LightningTransaction transaction)
        {
            if (ti.Type == typeof(RawdataInfo))
@@ -627,7 +621,34 @@ namespace Sqo.Indexes
 
        }
 #endif
-      
 
+
+
+       internal void DropIndexes(SqoTypeInfo ti,LightningTransaction transaction)
+       {
+           foreach (FieldSqoInfo fi in ti.IndexedFields)
+           {
+               string indexName = fi.Name + ti.TypeName;
+
+               DropIndex(indexName, transaction);
+               existingIndexes.Remove(indexName);
+           }
+          
+           
+       }
+       private void DropIndex(string indexName, LightningTransaction transaction)
+       {
+           IBTree index = new BTree(indexName, transaction);
+           index.Drop();
+           var db = transaction.OpenDatabase(sys_indexinfo, DatabaseOpenFlags.Create);
+
+           byte[] val = transaction.Get(db, ByteConverter.StringToByteArray(indexName));
+           if (val != null)
+           {
+
+               transaction.Delete(db, ByteConverter.StringToByteArray(indexName));
+           }
+
+       }
     }
 }

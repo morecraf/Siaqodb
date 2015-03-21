@@ -29,7 +29,7 @@ namespace WindowsFormsApplication1
 
             SiaqodbConfigurator.SetLicense(@"2/LnUmRDCX30610YCRHuw/21gkt6UNimtliHLvNlcMQ=");
             Siaqodb siaqodb2 = new Siaqodb(@"c:\work\temp\_lmdbtests\");
-            ITransaction transaction = siaqodb2.BeginTransaction();
+           // ITransaction transaction = siaqodb2.BeginTransaction();
             DateTime start22 = DateTime.Now;
             try
             {
@@ -48,9 +48,9 @@ namespace WindowsFormsApplication1
 
                     //evslot.TickNested = new Tick();
                    // evslot.TickNested.MyInt = i + 1;
-                    siaqodb2.StoreObject(evslot, transaction);
+                    //siaqodb2.StoreObject(evslot, transaction);
                 }
-                transaction.Commit();
+                //transaction.Commit();
             }
             catch (Exception ex)
             {

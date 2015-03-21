@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Sqo
 {
-    public interface ISiaqodb
+    public interface ISiaqodb :IDisposable
     {
         Sqo.Transactions.ITransaction BeginTransaction();
         ISqoQuery<T> Cast<T>();

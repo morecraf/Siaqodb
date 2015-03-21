@@ -149,6 +149,7 @@ namespace Sqo.Core
 			if (objectType == typeof(double)) return BitConverter.GetBytes((double)obj);
 			//if (objectType == typeof(decimal)) return BitConverter.GetBytes((double)obj);
 			if (objectType == typeof(char)) return BitConverter.GetBytes((char)obj);
+            if (objectType == typeof(string)) return StringToByteArray((string)obj);
 
 			if (objectType == typeof(IntPtr)) throw new NotSupportedException("IntPtr type is not supported.");
 			if (objectType == typeof(UIntPtr)) throw new NotSupportedException("UIntPtr type is not supported.");
@@ -513,7 +514,7 @@ namespace Sqo.Core
 			if (objectType == typeof(float)) return BitConverter.ToSingle(bytes, 0);
 			if (objectType == typeof(double)) return BitConverter.ToDouble(bytes, 0);
 			if (objectType == typeof(char)) return BitConverter.ToChar(bytes, 0);
-
+            if (objectType == typeof(string)) return ByteArrayToString(bytes);
 			if (objectType == typeof(IntPtr))
 			{
 				throw new NotSupportedTypeException("Type: IntPtr not supported");

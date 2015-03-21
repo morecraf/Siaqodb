@@ -27,6 +27,10 @@ namespace Sqo.Indexes
             this.db = transaction.OpenDatabase(indexName, DatabaseOpenFlags.Create | DatabaseOpenFlags.DuplicatesSort);
 
         }
+        public void Drop()
+        {
+            transaction.DropDatabase(db, true);
+        }
         public string IndexName { get { return indexName; } }
 
         // Add a new item to the tree.

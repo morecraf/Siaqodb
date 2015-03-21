@@ -19,6 +19,8 @@ namespace Sqo.Indexes
         void DeleteItem(object target_key,int oid);
        
         string IndexName { get; }
+
+        void Drop();
     }
    
 }

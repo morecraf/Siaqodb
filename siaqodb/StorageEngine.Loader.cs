@@ -53,6 +53,7 @@ namespace Sqo
                             {
                                 if (serializer.IsObjectDeleted(oid, crObjBytes))
                                 {
+                                    current = cursor.MoveNext();
                                     continue;
                                 }
                                 if (SiaqodbConfigurator.RaiseLoadEvents)
@@ -61,11 +62,13 @@ namespace Sqo
                                     this.OnLoadingObject(args);
                                     if (args.Cancel)
                                     {
+                                        current = cursor.MoveNext();
                                         continue;
                                     }
                                     else if (args.Replace != null)
                                     {
                                         ol.Add((T)args.Replace);
+                                        current = cursor.MoveNext();
                                         continue;
                                     }
                                 }
@@ -380,6 +383,7 @@ namespace Sqo
                             {
                                 if (serializer.IsObjectDeleted(oid, crObjBytes))
                                 {
+                                    current = cursor.MoveNext();
                                     continue;
                                 }
                                 int oidOfComplex = serializer.ReadOidOfComplex(ti, oid, crObjBytes,fieldName, this.rawSerializer);
@@ -455,6 +459,7 @@ namespace Sqo
                                 {
                                     if (serializer.IsObjectDeleted(oid, crObjBytes))
                                     {
+                                        current = cursor.MoveNext();
                                         continue;
                                     }
                                     object val = isOIDField ? oid : serializer.ReadFieldValue(ti, oid, crObjBytes, where.AttributeName[0], this.rawSerializer, transaction);
@@ -908,6 +913,8 @@ namespace Sqo
                                     }
                                     else
                                     {
+
+                                        current = cursor.MoveNext(); 
                                         continue;
                                     }
 
@@ -1275,6 +1282,7 @@ namespace Sqo
                             {
                                 if (serializer.IsObjectDeleted(oid, crObjBytes))
                                 {
+                                    current = cursor.MoveNext();
                                     continue;
                                 }
                                 oids.Add(oid);
@@ -1631,6 +1639,7 @@ namespace Sqo
                             {
                                 if (serializer.IsObjectDeleted(oid, crObjBytes))
                                 {
+                                    current = cursor.MoveNext();
                                     continue;
                                 }
                                 count++;
@@ -1931,6 +1940,7 @@ namespace Sqo
                      {
                          if (serializer.IsObjectDeleted(oid, crObjBytes))
                          {
+                             current = cursor.MoveNext();
                              continue;
                          }
                         object value= serializer.ReadFieldValue(ti, oid, crObjBytes, fi.Name, this.rawSerializer, transaction);
