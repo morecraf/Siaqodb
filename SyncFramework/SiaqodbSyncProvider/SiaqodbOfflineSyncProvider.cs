@@ -163,6 +163,8 @@ namespace SiaqodbSyncProvider
                     foreach (var item in response.UpdatedItems)
                     {
                         var offlineEntity = (SiaqodbOfflineEntity)item;
+                        offlineEntity.IsDirty = false;
+                        offlineEntity.IsTombstone = false;
                         this.SaveEntityByPK(offlineEntity);
                     }
                 }
@@ -177,6 +179,8 @@ namespace SiaqodbSyncProvider
                         foreach (var conflict in response.Conflicts)
                         {
                             var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
+                            offlineEntity.IsDirty = false;
+                            offlineEntity.IsTombstone = false;
                             this.SaveEntity(offlineEntity);
 
                         }
@@ -186,7 +190,38 @@ namespace SiaqodbSyncProvider
                 ICollection<IOfflineEntity> changesJustUploaded = this.currentChanges[state];
                 foreach (IOfflineEntity enI in changesJustUploaded)
                 {
+                    
                     SiaqodbOfflineEntity en = enI as SiaqodbOfflineEntity;
+                    //check if we did not updated above
+                    if (null != response.UpdatedItems && 0 != response.UpdatedItems.Count)
+                    {
+                        bool existsUpdated = false;
+                        foreach (var item in response.UpdatedItems)
+                        {
+                            var offlineEntity = (SiaqodbOfflineEntity)item;
+                            if (EntitiesEqualByPK(offlineEntity, en))
+                            {
+                                existsUpdated = true;
+                            }
+                        }
+                        if (existsUpdated)
+                            continue;
+                    }
+                    if (response.Conflicts != null && response.Conflicts.Count > 0)
+                    {
+                        bool existsUpdated = false;
+                        foreach (var conflict in response.Conflicts)
+                        {
+                            var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
+                            if (EntitiesEqualByPK(offlineEntity, en))
+                            {
+                                existsUpdated = true;
+                            }
+                        }
+                        if (existsUpdated)
+                            continue;
+                    }
+
                     if (en.IsTombstone)
                     {
                         en.IsDirty = false;
@@ -215,7 +250,53 @@ namespace SiaqodbSyncProvider
             this.OnSyncProgress(new SyncProgressEventArgs("Downloading changes from server..."));
             currentChanges.Remove(state);
         }
-        
+        private bool EntitiesEqualByPK(SiaqodbOfflineEntity a, SiaqodbOfflineEntity b)
+        {
+            if (a.GetType() == b.GetType())//has same type, eq: Customer
+            {
+                List<PropertyInfo> piPK = new List<PropertyInfo>();
+                PropertyInfo[] pi = a.GetType().GetProperties(flags);
+                foreach (PropertyInfo p in pi)
+                {
+#if SILVERLIGHT
+                    Type ty = typeof(Microsoft.Synchronization.ClientServices.KeyAttribute);
+
+#else
+                 Type ty = typeof(KeyAttribute);
+#endif
+                    object[] pk = p.GetCustomAttributes(ty, false);
+
+                    if (pk.Length > 0)
+                    {
+                        piPK.Add(p);
+
+                    }
+                }
+
+                if (piPK.Count > 0)
+                {
+                    foreach (PropertyInfo pk in piPK)
+                    {
+                        var valA=pk.GetValue(a);
+                        var valB = pk.GetValue(b);
+                        if (valA == null || valB == null)
+                        {
+                            if (valA != valB)
+                                return false;
+                        }
+                        else
+                        {
+                            int vomp=((IComparable)valA).CompareTo((IComparable)valB);
+                            if (vomp != 0)
+                                return false;
+                        }
+                    }
+                    return true;
+                }
+          
+            }
+            return false;
+        }
         public void SaveAnchor(byte[] anchor)
         {
 #if SILVERLIGHT
