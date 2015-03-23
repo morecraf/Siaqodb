@@ -90,7 +90,7 @@ namespace TestSiaqodb
 			nop.Flush();
 			IObjectList<Customer> listC = nop.LoadAll<Customer>();
 			Assert.AreEqual(listC.Count, 10);
-
+            nop.Close();
 			
 			
 		}
@@ -112,7 +112,7 @@ namespace TestSiaqodb
             IObjectList<Customer> listC = nop.LoadAll<Customer>();
 
             Assert.AreEqual(100, listC[0].stringWithoutAtt.Length);
-
+            nop.Close();
 
 
         }
@@ -138,7 +138,7 @@ namespace TestSiaqodb
 			IObjectList<Something32> listC = nop.LoadAll<Something32>();
 			Assert.AreEqual(listC.Count, 10);
 
-
+            nop.Close();
 
 		}
 		[TestMethod]
@@ -157,7 +157,7 @@ namespace TestSiaqodb
 			nop.Flush();
             string t = (DateTime.Now - start).ToString();
             Console.WriteLine(t);
-			
+            nop.Close();
 		}
 		[TestMethod]
 		public void TestInsertAllTypeOfFields()
@@ -257,6 +257,7 @@ namespace TestSiaqodb
                 Assert.AreEqual(d.Text, dL.Text);
                 
             }
+            nop.Close();
 
 		}
 		[TestMethod]
@@ -283,8 +284,8 @@ namespace TestSiaqodb
 			nop=new Siaqodb(objPath);
 			IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
 			Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
-			
 
+            nop.Close();
 
 		}
 		[TestMethod]
@@ -313,7 +314,7 @@ namespace TestSiaqodb
 			Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
 			Assert.AreEqual(10, listCUpdate.Count);
 
-
+            nop.Close();
 			
 		}
 		[TestMethod]
@@ -340,7 +341,7 @@ namespace TestSiaqodb
 			IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
 			Assert.AreEqual(1, listCUpdate.Count);
 
-
+            nop.Close();
 
 		}
 		[TestMethod]
@@ -365,7 +366,7 @@ namespace TestSiaqodb
 			Assert.AreEqual(0, listC.Count);
 			Assert.AreEqual(0, nrSaves);
 
-
+            nop.Close();
 		}
 		[TestMethod]
 		public void TestSavedEvent()
@@ -387,7 +388,7 @@ namespace TestSiaqodb
 
 			Assert.AreEqual(10, listC.Count);
 			Assert.AreEqual(10, nrSaves);
-
+            nop.Close();
 
 		}
 		[TestMethod]
@@ -415,7 +416,7 @@ namespace TestSiaqodb
 
 			Assert.AreEqual(8, listDeleted.Count);
 			Assert.AreEqual(3, listDeleted[0].OID);
-			
+            nop.Close();
 		}
 		[TestMethod]
 		public void TestDeleteEvents()
@@ -442,6 +443,7 @@ namespace TestSiaqodb
 
 			Assert.AreEqual(10, listDeleted.Count);
 			Assert.AreEqual(1, listDeleted[0].OID);
+            nop.Close();
 
 		}
         //removed for safety reason
@@ -508,6 +510,7 @@ namespace TestSiaqodb
             int count = nop.Count<Customer>();
             Assert.AreEqual(160, listC.Count);
             Assert.AreEqual(159, count);
+            nop.Close();
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
@@ -529,6 +532,7 @@ namespace TestSiaqodb
             nop.Delete(listC[0]);
 
             nop.StoreObject(listC[0]);
+            nop.Close();
 
           
         }
@@ -542,6 +546,7 @@ namespace TestSiaqodb
             Customer cu = new Customer();
             cu.ID = 78;
             nop.Delete(cu);
+            nop.Close();
         }
         [TestMethod]
         public void TestXMLExportImport()
@@ -573,6 +578,7 @@ namespace TestSiaqodb
                 Assert.AreEqual(cust[i].ID, l[i].ID);
                 Assert.AreEqual(cust[i].Name, l[i].Name);
             }
+            sq.Close();
         }
         [TestMethod]
         public void TestXMLExportImportCompleteType()
@@ -646,6 +652,7 @@ namespace TestSiaqodb
                 Assert.AreEqual(myEnum.doi, dL.enn);
                 Assert.AreEqual("Abramé", dL.str);
             }
+            sq.Close();
         }
         [TestMethod]
         public void TestXMLExportImportCompleteTypeNullable()
@@ -673,6 +680,7 @@ namespace TestSiaqodb
 
             xmlSerRea.Close();
             Assert.AreEqual(10, l.Count);
+            sq.Close();
             
         }
         [TestMethod]
@@ -697,7 +705,7 @@ namespace TestSiaqodb
 
             sq.StoreObject(c1);
 
-           
+            sq.Close();
             
         }
         [TestMethod]
@@ -724,7 +732,7 @@ namespace TestSiaqodb
             sq.StoreObject(c1,tr);
             tr.Commit();
 
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -753,7 +761,7 @@ namespace TestSiaqodb
             list[1].S = "ceva";
             sq.StoreObject(list[1]);//should throw exception
 
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -789,7 +797,7 @@ namespace TestSiaqodb
             it.S = "someNew";
             stored = sq.UpdateObjectBy("Age", it);
             Assert.IsFalse(stored);
-
+            sq.Close();
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
@@ -812,7 +820,7 @@ namespace TestSiaqodb
 
             sq.UpdateObjectBy("ID", emp);
 
-
+            sq.Close();
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
@@ -828,7 +836,7 @@ namespace TestSiaqodb
 
             sq.UpdateObjectBy("IDhh", emp);
 
-
+            sq.Close();
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
@@ -854,7 +862,7 @@ namespace TestSiaqodb
             emp.CustomerID = 30;
 
             sq.UpdateObjectBy(emp,"ID","CustomerID");
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -878,7 +886,7 @@ namespace TestSiaqodb
             bool s=sq.UpdateObjectBy(emp, "ID", "CustomerID","Name");
 
             Assert.IsTrue(s);
-
+            sq.Close();
         }
         [TestMethod]
         public void TestDeleteObjectBy()
@@ -914,7 +922,7 @@ namespace TestSiaqodb
             s = sq.DeleteObjectBy("ID",emp);
 
             Assert.IsTrue(s);
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -951,6 +959,7 @@ namespace TestSiaqodb
             emp.S = "gg";
 
             s = sq.UpdateObjectBy(emp, "Age", "integ");
+            sq.Close();
         }
 
         [TestMethod]
@@ -966,7 +975,7 @@ namespace TestSiaqodb
             sq.StoreObject(c);
             IObjectList<ClassWithEvents> ll = sq.LoadAll<ClassWithEvents>();
 
-
+            sq.Close();
 
 
         }
@@ -996,7 +1005,7 @@ namespace TestSiaqodb
 
 
             Assert.AreEqual(10, q.Count<ClassIndexes>());
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -1037,6 +1046,7 @@ namespace TestSiaqodb
 
 
             Assert.AreEqual(11, q.Count<ClassIndexes>());
+            sq.Close();
         }
         [TestMethod]
         public void TestIndexSaveAndClose()
@@ -1058,6 +1068,7 @@ namespace TestSiaqodb
 
 
             Assert.AreEqual(10, q.Count<ClassIndexes>());
+            sq.Close();
         }
         [TestMethod]
         public void TestIndexAllOperations()
@@ -1098,6 +1109,7 @@ namespace TestSiaqodb
 
 
             Assert.AreEqual(70, q.Count<ClassIndexes>());
+            sq.Close();
         }
         [TestMethod]
         public void TestIndexUpdateObjectBy()
@@ -1145,8 +1157,8 @@ namespace TestSiaqodb
                 where clss.two == 6
                 select clss;
             Assert.AreEqual(11, q.Count<ClassIndexes>());
-            
 
+            sq.Close();
         }
         [TestMethod]
         public void TestIndexDelete()
@@ -1194,6 +1206,7 @@ namespace TestSiaqodb
                 select clss;
 
             Assert.AreEqual(7, q.Count<ClassIndexes>());
+            sq.Close();
         }
         [TestMethod]
         public void TestIndexAllFieldTypes()
@@ -1356,6 +1369,7 @@ namespace TestSiaqodb
                       select di;
 
             Assert.AreEqual(10, q19.ToList().Count);
+            sq.Close();
         }
         [TestMethod]
         public void TestAttributesOnProps()
@@ -1395,6 +1409,7 @@ namespace TestSiaqodb
                 except = true;
             }
             Assert.AreEqual(true, except);
+            sq.Close();
 
         }
         [TestMethod]
@@ -1435,6 +1450,7 @@ namespace TestSiaqodb
                 except = true;
             }
             Assert.AreEqual(true, except);
+            sq.Close();
 
         }
         [TestMethod]
@@ -1523,6 +1539,9 @@ namespace TestSiaqodb
                 select clss;
 
             Assert.AreEqual(10, q.ToList<RealPOCO>().Count);
+            sq.DropType<RealPOCO>();
+            sq.DropType<RealPOCO1>();
+            sq.Close();
 
         }
         [TestMethod]
@@ -1643,6 +1662,7 @@ namespace TestSiaqodb
                 exCatched++;
             }
             Assert.AreEqual(1, exCatched);
+            sq.Close();
 
 
 
@@ -1706,7 +1726,7 @@ namespace TestSiaqodb
             list = sq.LoadAll<Customer>();
             Assert.AreEqual(10, list.Count);
 
-            
+            sq.Close();
             
         }
         [TestMethod]
@@ -1751,6 +1771,7 @@ namespace TestSiaqodb
             {
                 Assert.AreEqual("updated", c.Name);
             }
+            sq.Close();
 
         }
         [TestMethod]
@@ -1789,6 +1810,7 @@ namespace TestSiaqodb
                 Assert.AreEqual(8, list.Count);
                 
             }
+            sq.Close();
             
         }
         [TestMethod]
@@ -1831,7 +1853,7 @@ namespace TestSiaqodb
             tr.Rollback();
             list = sq.LoadAll<Employee>();
             Assert.AreEqual(list[0].Name, "ANOTHER");
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -1895,7 +1917,7 @@ namespace TestSiaqodb
 
             list = sq.LoadAll<Employee>();
             Assert.AreEqual(list.Count, 2);
-
+            sq.Close();
             
         }
         [TestMethod]
@@ -1947,6 +1969,7 @@ namespace TestSiaqodb
 
 
             transac2t.Commit();//here do debug and stop after a few commits to be able to simulate crash recovery
+            sq.Close();
         }
         [TestMethod]
         public void TestTransactionManyTypes()
@@ -2043,6 +2066,7 @@ namespace TestSiaqodb
 
             Assert.AreEqual(list[0].Name, "updated");
             Assert.AreEqual(list2[0].Name, "updatedE");
+            sq.Close();
 
         }
          [TestMethod]
@@ -2150,6 +2174,7 @@ namespace TestSiaqodb
             Assert.AreEqual(list[0].Name, "updated");
             Assert.AreEqual(list2[0].Name, "updatedE");
             Assert.AreEqual(list3[0].dt[0], new DateTime(2007, 1, 1));
+            sq.Close();
 
         }
         [TestMethod]
@@ -2187,7 +2212,7 @@ namespace TestSiaqodb
             {
                 Assert.IsTrue(hu.Name.StartsWith("bb"));
             }
-
+            sq.Close();
         }
         [TestMethod]
         public void TestListsAllTypes()
@@ -2289,6 +2314,7 @@ namespace TestSiaqodb
                 ii++;
 
             }
+            sq.Close();
         }
         [TestMethod]
         public void TestOpen2Databases()
@@ -2312,7 +2338,8 @@ namespace TestSiaqodb
             IList<POCO> poc2 = s2.LoadAll<POCO>();
             
             Assert.AreEqual(0, poc2.Count);
-           
+            s1.Close();
+            s2.Close();
         }
         [TestMethod]
         public void TestLoadingEvents()
@@ -2332,7 +2359,7 @@ namespace TestSiaqodb
                 sq.StoreObject(cls);
             }
             IList<POCO> all = sq.LoadAll<POCO>();
-
+            sq.Close();
         }
 
         void sq_LoadedObject(object sender, LoadedObjectEventArgs e)
@@ -2377,6 +2404,7 @@ namespace TestSiaqodb
                 }
 
             }
+            sq.Close();
         }
         [TestMethod]
         public void TestDateTimeKind()
@@ -2411,7 +2439,7 @@ namespace TestSiaqodb
             Assert.AreEqual(DateTimeKind.Unspecified, lis[0].dt.Kind);
             Assert.AreEqual(DateTimeKind.Unspecified, lis[1].dt.Kind);
             Assert.AreEqual(DateTimeKind.Unspecified, lis[2].dt.Kind);
-
+            sq.Close();
         }
         [TestMethod]
         public void TestShrink()
@@ -2526,7 +2554,9 @@ namespace TestSiaqodb
                        select dll).ToList();
 
             Assert.AreEqual(15, q21.Count);
+            sq.Close();
         }
+        /* TODO LMDB uncomment
         [TestMethod]
         public void TestIndexShrink()
         {
@@ -2697,6 +2727,7 @@ namespace TestSiaqodb
                       select di;
 
             Assert.AreEqual(5, q19.ToList().Count);
+            sq.Close();
         }
 
         [TestMethod]
@@ -2718,9 +2749,9 @@ namespace TestSiaqodb
             IObjectList<Customer> listC = nop.LoadAll<Customer>();
             Assert.AreEqual(listC.Count, 10000);
 
+            nop.Close();
 
-
-        }
+        }*/
 	}
     public class RealPOCO
     {

@@ -16,9 +16,9 @@ namespace Sqo.MetaObjects
         {
             this.storageEngine = storageEngine;
         }
-        public RawdataInfo GetRawdataInfo(int oid)
+        public RawdataInfo GetRawdataInfo(int oid,LightningDB.LightningTransaction transaction)
         {
-            RawdataInfo info = storageEngine.LoadObjectByOID<RawdataInfo>(this.GetSqoTypeInfo(), oid,false);
+            RawdataInfo info = storageEngine.LoadObjectByOID<RawdataInfo>(this.GetSqoTypeInfo(transaction), oid,false,transaction);
             return info;
         }
 #if ASYNC
@@ -29,53 +29,9 @@ namespace Sqo.MetaObjects
         }
 #endif
         
-        public RawdataInfo GetFreeRawdataInfo(int rawLength)
+        public void SaveRawdataInfo(RawdataInfo rawdataInfo,LightningDB.LightningTransaction transaction)
         {
-            Where w = new Where("IsFree", OperationType.Equal, true);
-            w.StorageEngine=this.storageEngine;
-            w.ParentSqoTypeInfo = this.GetSqoTypeInfo();
-            w.ParentType.Add(w.ParentSqoTypeInfo.Type);
-            Where w1 = new Where("Length", OperationType.GreaterThanOrEqual, rawLength);
-            w1.StorageEngine=storageEngine;
-            w1.ParentSqoTypeInfo = this.GetSqoTypeInfo();
-            w1.ParentType.Add(w1.ParentSqoTypeInfo.Type);
-            And and = new And();
-            and.Add(w,w1);
-
-            List<int> oids = and.GetOIDs();
-            if (oids.Count > 0)
-            {
-                return this.GetRawdataInfo(oids[0]);
-            }
-
-            return null;
-        }
-#if ASYNC
-        public async Task<RawdataInfo> GetFreeRawdataInfoAsync(int rawLength)
-        {
-            Where w = new Where("IsFree", OperationType.Equal, true);
-            w.StorageEngine = this.storageEngine;
-            w.ParentSqoTypeInfo = this.GetSqoTypeInfo();
-            w.ParentType.Add(w.ParentSqoTypeInfo.Type);
-            Where w1 = new Where("Length", OperationType.GreaterThanOrEqual, rawLength);
-            w1.StorageEngine = storageEngine;
-            w1.ParentSqoTypeInfo = this.GetSqoTypeInfo();
-            w1.ParentType.Add(w1.ParentSqoTypeInfo.Type);
-            And and = new And();
-            and.Add(w, w1);
-
-            List<int> oids = await and.GetOIDsAsync().ConfigureAwait(false);
-            if (oids.Count > 0)
-            {
-                return await this.GetRawdataInfoAsync(oids[0]).ConfigureAwait(false);
-            }
-
-            return null;
-        }
-#endif
-        public void SaveRawdataInfo(RawdataInfo rawdataInfo)
-        {
-            storageEngine.SaveObject(rawdataInfo, GetSqoTypeInfo());
+            storageEngine.SaveObject(rawdataInfo, GetSqoTypeInfo(transaction),transaction);
         }
 #if ASYNC
         public async Task SaveRawdataInfoAsync(RawdataInfo rawdataInfo)
@@ -83,12 +39,12 @@ namespace Sqo.MetaObjects
             await storageEngine.SaveObjectAsync(rawdataInfo, GetSqoTypeInfo()).ConfigureAwait(false);
         }
 #endif
-        public int GetNextOID()
+        public int GetNextOID(LightningDB.LightningTransaction transaction)
         {
-            SqoTypeInfo ti = this.GetSqoTypeInfo();
+            SqoTypeInfo ti = this.GetSqoTypeInfo(transaction);
             return ti.Header.numberOfRecords + 1;
         }
-        private SqoTypeInfo GetSqoTypeInfo()
+        private SqoTypeInfo GetSqoTypeInfo(LightningDB.LightningTransaction transaction)
         {
             SqoTypeInfo ti = null;
             if (this.storageEngine.metaCache.Contains(typeof(RawdataInfo)))
@@ -99,7 +55,7 @@ namespace Sqo.MetaObjects
             {
                 ti = MetaExtractor.GetSqoTypeInfo(typeof(RawdataInfo));
                
-                storageEngine.SaveType(ti);
+                storageEngine.SaveType(ti,transaction);
                 this.storageEngine.metaCache.AddType(typeof(RawdataInfo), ti);
                
 
@@ -108,7 +64,7 @@ namespace Sqo.MetaObjects
         }
         internal void MarkRawInfoAsFree(int oid,LightningDB.LightningTransaction transaction)
         {
-            this.storageEngine.SaveValue(oid, "IsFree", this.GetSqoTypeInfo(), true, transaction);
+            this.storageEngine.SaveValue(oid, "IsFree", this.GetSqoTypeInfo(transaction), true, transaction);
         }
 #if ASYNC
         internal async Task MarkRawInfoAsFreeAsync(int oid)

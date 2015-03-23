@@ -1236,13 +1236,17 @@ namespace Sqo
                 transaction = env.BeginTransaction();
             }
 
-            using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-            {
-                byte[] key = ByteConverter.IntToByteArray(oid);
+            var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-                byte[] objBytes = transaction.Get(db, key);
-                return serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer, transaction);
-            }
+            byte[] key = ByteConverter.IntToByteArray(oid);
+
+            byte[] objBytes = transaction.Get(db, key);
+            var fieldVal= serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer, transaction);
+            if (trans == null)
+                transaction.Abort();
+
+            return fieldVal;
+
 
         }
 #if ASYNC
@@ -1580,13 +1584,17 @@ namespace Sqo
 #endif
         internal T LoadObjectByOID<T>(SqoTypeInfo ti, int oid, bool clearCache)
         {
-
+            return this.LoadObjectByOID<T>(ti, oid, clearCache, null);
+        }
+        internal T LoadObjectByOID<T>(SqoTypeInfo ti, int oid, bool clearCache,LightningTransaction transaction)
+        {
+            
 
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
             if (oid > 0 && oid <= ti.Header.numberOfRecords )
             {
-                return (T)this.LoadObjectByOID(ti, oid, clearCache,null);
+                return (T)this.LoadObjectByOID(ti, oid, clearCache,transaction);
             }
             else
             {
@@ -1740,7 +1748,7 @@ namespace Sqo
                     byte[] key = ByteConverter.IntToByteArray(oid);
 
                     byte[] objBytes = transaction.Get(db, key);
-                    return serializer.ReadComplexArrayOids(oid,objBytes, fi, ti, this.rawSerializer);
+                    return serializer.ReadComplexArrayOids(oid,objBytes, fi, ti, this.rawSerializer,transaction);
                 }
             }
         }
@@ -1761,7 +1769,7 @@ namespace Sqo
                     byte[] key = ByteConverter.IntToByteArray(oid);
 
                     byte[] objBytes = transaction.Get(db, key);
-                    return serializer.ReadFirstTID(oid, objBytes,fi, ti, this.rawSerializer);
+                    return serializer.ReadFirstTID(oid, objBytes, fi, ti, this.rawSerializer, transaction);
                 }
             }
         }

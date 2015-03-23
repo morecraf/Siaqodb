@@ -81,7 +81,7 @@ namespace Sqo.Core
 
             ArrayInfo arrayInfo = this.SerializeArray(obj, objectType, objSerializer, dbVersion, elementIsText,transaction);
            
-            RawdataInfo rinfo = this.GetNewRawinfo(arrayMeta, arrayInfo.rawArray.Length, length - MetaExtractor.ExtraSizeForArray, arrayInfo.NrElements);
+            RawdataInfo rinfo = this.GetNewRawinfo(arrayMeta, arrayInfo.rawArray.Length, length - MetaExtractor.ExtraSizeForArray, arrayInfo.NrElements,transaction);
             int rawOID = rinfo.OID;
 
             byte[] rawOIDBytes = ByteConverter.SerializeValueType(rawOID, typeof(int), dbVersion);
@@ -529,7 +529,7 @@ namespace Sqo.Core
             }
             
             ATuple<int, int> arrayMeta = new ATuple<int, int>(dictInfo.RawOID, nrElements);
-            RawdataInfo rinfo = this.GetNewRawinfo(arrayMeta, rawLength, 0, nrElements);//element length does not matter because it's stored in place by dictionaryInfo
+            RawdataInfo rinfo = this.GetNewRawinfo(arrayMeta, rawLength, 0, nrElements,transaction);//element length does not matter because it's stored in place by dictionaryInfo
             int rawOID = rinfo.OID;
 
             byte[] rawOIDBytes = ByteConverter.SerializeValueType(rawOID, typeof(int), dbVersion);
@@ -663,7 +663,7 @@ namespace Sqo.Core
             int valueTypeId = (int)ByteConverter.DeserializeValueType(typeof(int), valueTypeIdBytes, dbVersion);
 
 
-            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID);
+            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID,transaction);
             if (info == null)
             {
                 return null;
@@ -810,15 +810,15 @@ namespace Sqo.Core
 
         }
 #endif
-        private RawdataInfo GetNewRawinfo(ATuple<int, int> arrayMeta, int rawLength,int elemLength,int nrElem)
+        private RawdataInfo GetNewRawinfo(ATuple<int, int> arrayMeta, int rawLength,int elemLength,int nrElem,LightningDB.LightningTransaction transaction)
         {
             if (arrayMeta==null || arrayMeta.Name == 0 || _transactionCommitStarted)//insert
             {
-                return GetNextFreeOne(rawLength,elemLength);
+                return GetNextFreeOne(rawLength,elemLength,transaction);
             }
             else//already exists array meta defined
             {
-                RawdataInfo info = manager.GetRawdataInfo(arrayMeta.Name);
+                RawdataInfo info = manager.GetRawdataInfo(arrayMeta.Name,transaction);
                 if (rawLength <= info.Length)//means has enough space
                 {
                    return info;
@@ -826,8 +826,8 @@ namespace Sqo.Core
                 else//find new free space with enough length
                 {
                     info.IsFree = true;
-                    manager.SaveRawdataInfo(info);
-                    return GetNextFreeOne(rawLength,elemLength);
+                    manager.SaveRawdataInfo(info,transaction);
+                    return GetNextFreeOne(rawLength,elemLength,transaction);
                 }
             }
         }
@@ -854,7 +854,7 @@ namespace Sqo.Core
             }
         }
 #endif
-        private RawdataInfo GetNextFreeOne(int rawLength, int elemLength)
+        private RawdataInfo GetNextFreeOne(int rawLength, int elemLength,LightningDB.LightningTransaction transaction)
         {
             /*RawdataInfo existingFree = manager.GetFreeRawdataInfo(rawLength);
             if (existingFree != null)
@@ -871,15 +871,15 @@ namespace Sqo.Core
                 RawdataInfo info = new RawdataInfo();
                 info.Length = rawLength * 2;//allowing to store double number of elements to avoid allocation of new space for every new element
                 info.ElementLength = elemLength;
-                info.OID = manager.GetNextOID();
+                info.OID = manager.GetNextOID(transaction);
                 long position = 0;
                 if (info.OID - 1 > 0)
                 {
-                    RawdataInfo prev = manager.GetRawdataInfo(info.OID - 1);
+                    RawdataInfo prev = manager.GetRawdataInfo(info.OID - 1,transaction);
                     position = prev.Position + prev.Length;
                 }
                 info.Position = position;
-                manager.SaveRawdataInfo(info);
+                manager.SaveRawdataInfo(info,transaction);
 
                 return info;
             //}
@@ -934,7 +934,7 @@ namespace Sqo.Core
             int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, dbVersion);
 
 
-            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID);
+            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID,transaction);
             if (info == null)
             {
                 return null;
@@ -1290,7 +1290,7 @@ namespace Sqo.Core
             return await this.DeserializeArrayAsync(objectType, bytes, checkEncrypted, dbVersion, isText, elemnIsText, null, null, null).ConfigureAwait(false);
         }
 #endif
-        public List<KeyValuePair<int, int>> ReadComplexArrayOids( byte[] bytes, int dbVersion, ObjectSerializer objSerializer)
+        public List<KeyValuePair<int, int>> ReadComplexArrayOids( byte[] bytes, int dbVersion, ObjectSerializer objSerializer,LightningDB.LightningTransaction transaction)
         {
 
             List<KeyValuePair<int, int>> list = new List<KeyValuePair<int, int>>();
@@ -1308,7 +1308,7 @@ namespace Sqo.Core
             Array.Copy(bytes, MetaExtractor.ExtraSizeForArray - 4, nrElemeBytes, 0, 4);
             int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, dbVersion);
 
-            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID);
+            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID,transaction);
             if (info == null)
             {
                 return list;
@@ -1380,7 +1380,7 @@ namespace Sqo.Core
 
         }
 #endif
-        public int ReadComplexArrayFirstTID(byte[] bytes, int dbVersion, ObjectSerializer objSerializer)
+        public int ReadComplexArrayFirstTID(byte[] bytes, int dbVersion, ObjectSerializer objSerializer,LightningDB.LightningTransaction transaction)
         {
 
            
@@ -1397,7 +1397,7 @@ namespace Sqo.Core
             Array.Copy(bytes, MetaExtractor.ExtraSizeForArray - 4, nrElemeBytes, 0, 4);
             int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, dbVersion);
 
-            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID);
+            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID,transaction);
             if (info == null)
             {
                 return -1;
@@ -1522,10 +1522,6 @@ namespace Sqo.Core
         }
 #endif
 
-        internal object DeserializeTextArray(Type type, byte[] bytes, bool p1, int p2)
-        {
-            throw new NotImplementedException();
-        }
 
        
     }

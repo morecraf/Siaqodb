@@ -769,7 +769,7 @@ namespace Sqo.Core
         }
 
 #endif
-        internal List<KeyValuePair<int, int>> ReadComplexArrayOids(int oid,byte[] objBytes, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)
+        internal List<KeyValuePair<int, int>> ReadComplexArrayOids(int oid,byte[] objBytes, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer,LightningDB.LightningTransaction transaction)
         {
             
             if (fi == null)
@@ -780,7 +780,7 @@ namespace Sqo.Core
 
             Array.Copy(objBytes, fi.Header.PositionInRecord, b, 0, b.Length);
 
-            return rawdataSerializer.ReadComplexArrayOids(b, ti.Header.version, this);
+            return rawdataSerializer.ReadComplexArrayOids(b, ti.Header.version, this,transaction);
         }
 #if ASYNC
         internal async Task<List<KeyValuePair<int, int>>> ReadComplexArrayOidsAsync(int oid, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)
@@ -797,7 +797,7 @@ namespace Sqo.Core
             return rawdataSerializer.ReadComplexArrayOids(b, ti.Header.version, this);
         }
 #endif
-        internal int ReadFirstTID(int oid, byte[] objBytes, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)
+        internal int ReadFirstTID(int oid, byte[] objBytes, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer,LightningDB.LightningTransaction transaction)
         {
            
             if (fi == null)
@@ -807,7 +807,7 @@ namespace Sqo.Core
             byte[] b = new byte[fi.Header.Length];
             Array.Copy(objBytes, fi.Header.PositionInRecord, b, 0, b.Length);
             
-            return rawdataSerializer.ReadComplexArrayFirstTID(b, ti.Header.version, this);
+            return rawdataSerializer.ReadComplexArrayFirstTID(b, ti.Header.version, this,transaction);
         }
 #if ASYNC
         internal async Task<int> ReadFirstTIDAsync(int oid, FieldSqoInfo fi, SqoTypeInfo ti, RawdataSerializer rawdataSerializer)

@@ -154,8 +154,8 @@ namespace Sqo
         {
             this.env = new LightningEnvironment(path, EnvironmentOpenFlags.None);
 
-            env.MapSize = 30 * OneMega;
-            env.MaxDatabases = 100;
+            env.MapSize = 100 * OneMega;
+            env.MaxDatabases = 200;
             
             env.Open();
 
