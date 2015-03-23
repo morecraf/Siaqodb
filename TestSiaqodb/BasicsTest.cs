@@ -76,374 +76,393 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void TestInsert()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
 
-			for (int i = 10; i < 20; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
-				//c.Vasiel = "momo" + i.ToString();
-				nop.StoreObject(c);
-			}
-			nop.Flush();
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
-			Assert.AreEqual(listC.Count, 10);
-            nop.Close();
+                for (int i = 10; i < 20; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
+                    //c.Vasiel = "momo" + i.ToString();
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                Assert.AreEqual(listC.Count, 10);
+                
+            }
 			
 			
 		}
         [TestMethod]
         public void TestStringWithoutAttribute()
         {
-            Siaqodb nop = new Siaqodb(objPath);
-            nop.DropType<Customer>();
-
-            for (int i = 10; i < 20; i++)
+            using (Siaqodb nop = new Siaqodb(objPath))
             {
-                Customer c = new Customer();
-                c.ID = i;
-                c.Name = "ADH" + i.ToString();
-                c.stringWithoutAtt = "hjqhdlkqwjhedlqkjwhedlkjqhwelkdjhqlwekhdqlkwjehdlkqwjhedlkjqhweljkdhqwlkejdhlqkwjhedlkqjwhedlkjqhwekldjhqlkwejdhlqkjwehdlkqjwhedlkjhwedkljqhweldkjhqwelkhdqlwkjehdlqkjwhedlkjqwhedlkjhqweljdhqwlekjdhlqkwjehdlkjqwhedlkjwq________________________********************************************************************";
-                nop.StoreObject(c);
+                nop.DropType<Customer>();
+
+                for (int i = 10; i < 20; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
+                    c.stringWithoutAtt = "hjqhdlkqwjhedlqkjwhedlkjqhwelkdjhqlwekhdqlkwjehdlkqwjhedlkjqhweljkdhqwlkejdhlqkwjhedlkqjwhedlkjqhwekldjhqlkwejdhlqkjwehdlkqjwhedlkjhwedkljqhweldkjhqwelkhdqlwkjehdlqkjwhedlkjqwhedlkjhqweljdhqwlekjdhlqkwjehdlkjqwhedlkjwq________________________********************************************************************";
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
+
+                Assert.AreEqual(100, listC[0].stringWithoutAtt.Length);
+               
             }
-            nop.Flush();
-            IObjectList<Customer> listC = nop.LoadAll<Customer>();
-
-            Assert.AreEqual(100, listC[0].stringWithoutAtt.Length);
-            nop.Close();
-
 
         }
 		[TestMethod]
 		[ExpectedException(typeof(Sqo.Exceptions.TypeChangedException))]
 		public void TestSchemaChanged()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-            //nop.DropType<Something32>();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            { //nop.DropType<Something32>();
 
-			for (int i = 10; i < 20; i++)
-			{
-				Something32 c = new Something32();
-				c.one = i;
-				c.three = i;
-				//c.two = i;
+                for (int i = 10; i < 20; i++)
+                {
+                    Something32 c = new Something32();
+                    c.one = i;
+                    c.three = i;
+                    //c.two = i;
 
-				nop.StoreObject(c);
+                    nop.StoreObject(c);
 
 
-			}
-			nop.Flush();
-			IObjectList<Something32> listC = nop.LoadAll<Something32>();
-			Assert.AreEqual(listC.Count, 10);
+                }
+                nop.Flush();
+                IObjectList<Something32> listC = nop.LoadAll<Something32>();
+                Assert.AreEqual(listC.Count, 10);
 
-            nop.Close();
+            }
 
 		}
 		[TestMethod]
 		public void TestMassInsert()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			DateTime start = DateTime.Now;
-			for (int i = 0; i < 100; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                DateTime start = DateTime.Now;
+                for (int i = 0; i < 100; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
-            string t = (DateTime.Now - start).ToString();
-            Console.WriteLine(t);
-            nop.Close();
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                string t = (DateTime.Now - start).ToString();
+                Console.WriteLine(t);
+            }
 		}
 		[TestMethod]
 		public void TestInsertAllTypeOfFields()
 		{
-           
-            Siaqodb nop = new Siaqodb(objPath);
-            nop.DropType<D40>();
-			D40 d = new D40();
-			d.b = 10;
 
-			d.bo = true;
-			d.c = 'c';
-			d.d = 10;
-			d.de = 10;
-			d.dt = DateTime.Now;
+            D40 d = new D40();
+            d.b = 10;
+
+            d.bo = true;
+            d.c = 'c';
+            d.d = 10;
+            d.de = 10;
+            d.dt = DateTime.Now;
             d.dtsofs = DateTime.Now;
             d.f = 10;
-			d.g = Guid.NewGuid();
-			d.ID = 10;
-			d.iu = 10;
-			d.l = 10;
-			d.s = 1;
-			d.sb = 1;
-			d.ts = new TimeSpan();
-			d.ul = 10;
-			d.us = 1;
-			d.enn = myEnum.unu;
-			d.str = "Abramé";
+            d.g = Guid.NewGuid();
+            d.ID = 10;
+            d.iu = 10;
+            d.l = 10;
+            d.s = 1;
+            d.sb = 1;
+            d.ts = new TimeSpan();
+            d.ul = 10;
+            d.us = 1;
+            d.enn = myEnum.unu;
+            d.str = "Abramé";
             d.Text = "this is a text with unlimitted nr of chars! ";
             Guid g = d.g;
             TimeSpan ts = d.ts;
             DateTime dt = d.dt;
             DateTimeOffset dtsofs = d.dtsofs;
-            nop.StoreObject(d);
-
-            IObjectList<D40> all1 = nop.LoadAll<D40>();
-            foreach (D40 dL in all1)
+            using (Siaqodb nop = new Siaqodb(objPath))
             {
-                Assert.AreEqual(d.b, dL.b);
-                Assert.AreEqual(d.bo, dL.bo);
-                Assert.AreEqual(d.c, dL.c);
-                Assert.AreEqual(d.d, dL.d);
-                Assert.AreEqual(d.de, dL.de);
-                Assert.AreEqual(DateTime.Now.Month, dL.dt.Month);
-                Assert.AreEqual(DateTime.Now.Day, dL.dt.Day);
-                Assert.AreEqual(DateTime.Now.Year, dL.dt.Year);
-                Assert.AreEqual(dt, dL.dt);
-                Assert.AreEqual(dtsofs, dL.dtsofs);
-                Assert.AreEqual(dtsofs.Offset, dL.dtsofs.Offset);
-                Assert.AreEqual(d.f, dL.f);
-                Assert.AreEqual(g, dL.g);
-                Assert.AreEqual(d.ID, dL.ID);
-                Assert.AreEqual(d.iu, dL.iu);
-                Assert.AreEqual(d.l, dL.l);
-                Assert.AreEqual(d.s, dL.s);
-                Assert.AreEqual(d.sb, dL.sb);
-                Assert.AreEqual(ts, dL.ts);
-                Assert.AreEqual(d.ul, dL.ul);
-                Assert.AreEqual(d.us, dL.us);
-                Assert.AreEqual(myEnum.unu, dL.enn);
-                Assert.AreEqual("Abramé", dL.str);
-                Assert.AreEqual(d.Text, dL.Text);
+                nop.DropType<D40>();
+               
+               
+                nop.StoreObject(d);
+
+                IObjectList<D40> all1 = nop.LoadAll<D40>();
+                foreach (D40 dL in all1)
+                {
+                    Assert.AreEqual(d.b, dL.b);
+                    Assert.AreEqual(d.bo, dL.bo);
+                    Assert.AreEqual(d.c, dL.c);
+                    Assert.AreEqual(d.d, dL.d);
+                    Assert.AreEqual(d.de, dL.de);
+                    Assert.AreEqual(DateTime.Now.Month, dL.dt.Month);
+                    Assert.AreEqual(DateTime.Now.Day, dL.dt.Day);
+                    Assert.AreEqual(DateTime.Now.Year, dL.dt.Year);
+                    Assert.AreEqual(dt, dL.dt);
+                    Assert.AreEqual(dtsofs, dL.dtsofs);
+                    Assert.AreEqual(dtsofs.Offset, dL.dtsofs.Offset);
+                    Assert.AreEqual(d.f, dL.f);
+                    Assert.AreEqual(g, dL.g);
+                    Assert.AreEqual(d.ID, dL.ID);
+                    Assert.AreEqual(d.iu, dL.iu);
+                    Assert.AreEqual(d.l, dL.l);
+                    Assert.AreEqual(d.s, dL.s);
+                    Assert.AreEqual(d.sb, dL.sb);
+                    Assert.AreEqual(ts, dL.ts);
+                    Assert.AreEqual(d.ul, dL.ul);
+                    Assert.AreEqual(d.us, dL.us);
+                    Assert.AreEqual(myEnum.unu, dL.enn);
+                    Assert.AreEqual("Abramé", dL.str);
+                    Assert.AreEqual(d.Text, dL.Text);
 
 
+
+                }
 
             }
-
-            nop.Close();
-            nop = new Siaqodb(objPath);
-            IObjectList<D40> all = nop.LoadAll<D40>();
-            foreach (D40 dL in all)
+            using (Siaqodb nop = new Siaqodb(objPath))
             {
-                Assert.AreEqual(d.b, dL.b);
-                Assert.AreEqual(d.bo, dL.bo);
-                Assert.AreEqual(d.c, dL.c);
-                Assert.AreEqual(d.d, dL.d);
-                Assert.AreEqual(d.de, dL.de);
-                Assert.AreEqual(DateTime.Now.Month, dL.dt.Month);
-                Assert.AreEqual(DateTime.Now.Day, dL.dt.Day);
-                Assert.AreEqual(DateTime.Now.Year, dL.dt.Year);
-                Assert.AreEqual(dt, dL.dt);
-                Assert.AreEqual(dtsofs, dL.dtsofs);
-                Assert.AreEqual(dtsofs.Offset, dL.dtsofs.Offset);
-                
-                Assert.AreEqual(d.f, dL.f);
-                Assert.AreEqual(g, dL.g);
-                Assert.AreEqual(d.ID, dL.ID);
-                Assert.AreEqual(d.iu, dL.iu);
-                Assert.AreEqual(d.l, dL.l);
-                Assert.AreEqual(d.s, dL.s);
-                Assert.AreEqual(d.sb, dL.sb);
-                Assert.AreEqual(ts, dL.ts);
-                Assert.AreEqual(d.ul, dL.ul);
-                Assert.AreEqual(d.us, dL.us);
-                Assert.AreEqual(myEnum.unu, dL.enn);
-                Assert.AreEqual("Abramé", dL.str);
-                Assert.AreEqual(d.Text, dL.Text);
-                
+                IObjectList<D40> all = nop.LoadAll<D40>();
+                foreach (D40 dL in all)
+                {
+                    Assert.AreEqual(d.b, dL.b);
+                    Assert.AreEqual(d.bo, dL.bo);
+                    Assert.AreEqual(d.c, dL.c);
+                    Assert.AreEqual(d.d, dL.d);
+                    Assert.AreEqual(d.de, dL.de);
+                    Assert.AreEqual(DateTime.Now.Month, dL.dt.Month);
+                    Assert.AreEqual(DateTime.Now.Day, dL.dt.Day);
+                    Assert.AreEqual(DateTime.Now.Year, dL.dt.Year);
+                    Assert.AreEqual(dt, dL.dt);
+                    Assert.AreEqual(dtsofs, dL.dtsofs);
+                    Assert.AreEqual(dtsofs.Offset, dL.dtsofs.Offset);
+
+                    Assert.AreEqual(d.f, dL.f);
+                    Assert.AreEqual(g, dL.g);
+                    Assert.AreEqual(d.ID, dL.ID);
+                    Assert.AreEqual(d.iu, dL.iu);
+                    Assert.AreEqual(d.l, dL.l);
+                    Assert.AreEqual(d.s, dL.s);
+                    Assert.AreEqual(d.sb, dL.sb);
+                    Assert.AreEqual(ts, dL.ts);
+                    Assert.AreEqual(d.ul, dL.ul);
+                    Assert.AreEqual(d.us, dL.us);
+                    Assert.AreEqual(myEnum.unu, dL.enn);
+                    Assert.AreEqual("Abramé", dL.str);
+                    Assert.AreEqual(d.Text, dL.Text);
+
+                }
             }
-            nop.Close();
 
 		}
 		[TestMethod]
 		public void TestUpdate()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
 
-			for (int i = 0; i < 10; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
-			Assert.AreEqual(listC.Count, 10);
-			listC[0].Name = "UPDATEWORK";
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                Assert.AreEqual(listC.Count, 10);
+                listC[0].Name = "UPDATEWORK";
 
-			nop.StoreObject(listC[0]);
-			nop.Close();
-			nop=new Siaqodb(objPath);
-			IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
-			Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
+                nop.StoreObject(listC[0]);
+            }
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
+                Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
 
-            nop.Close();
+            }
 
 		}
 		[TestMethod]
 		public void TestUpdateCheckNrRecords()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
 
-			for (int i = 0; i < 10; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
-			Assert.AreEqual(listC.Count, 10);
-			listC[0].Name = "UPDATEWORK";
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                Assert.AreEqual(listC.Count, 10);
+                listC[0].Name = "UPDATEWORK";
 
-			nop.StoreObject(listC[0]);
-			nop.Close();
-			nop = new Siaqodb(objPath);
-			IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
-			Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
-			Assert.AreEqual(10, listCUpdate.Count);
+                nop.StoreObject(listC[0]);
+            }
 
-            nop.Close();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
+                Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
+                Assert.AreEqual(10, listCUpdate.Count);
+
+            }
 			
 		}
 		[TestMethod]
 		public void TestInsertAfterDrop()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
 
-			for (int i = 0; i < 10; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
-			nop.DropType<Customer>();
-			nop.StoreObject(listC[0]);
-			
-			nop.Close();
-			nop = new Siaqodb(objPath);
-			IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
-			Assert.AreEqual(1, listCUpdate.Count);
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                nop.DropType<Customer>();
+                nop.StoreObject(listC[0]);
 
-            nop.Close();
+            }
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                IObjectList<Customer> listCUpdate = nop.LoadAll<Customer>();
+                Assert.AreEqual(1, listCUpdate.Count);
+
+            }
 
 		}
 		[TestMethod]
 		public void TestSavingEvent()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
-			nop.SavingObject += new EventHandler<SavingEventsArgs>(nop_SavingObject);
-			nop.SavedObject += new EventHandler<SavedEventsArgs>(nop_SavedObject);
-			for (int i = 0; i < 10; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
+                nop.SavingObject += new EventHandler<SavingEventsArgs>(nop_SavingObject);
+                nop.SavedObject += new EventHandler<SavedEventsArgs>(nop_SavedObject);
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
-			
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
 
-			Assert.AreEqual(0, listC.Count);
-			Assert.AreEqual(0, nrSaves);
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
 
-            nop.Close();
+                Assert.AreEqual(0, listC.Count);
+                Assert.AreEqual(0, nrSaves);
+
+            }
 		}
 		[TestMethod]
 		public void TestSavedEvent()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
-			nop.SavedObject += new EventHandler<SavedEventsArgs>(nop_SavedObject);
-			for (int i = 0; i < 10; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
+                nop.SavedObject += new EventHandler<SavedEventsArgs>(nop_SavedObject);
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
 
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
 
-			Assert.AreEqual(10, listC.Count);
-			Assert.AreEqual(10, nrSaves);
-            nop.Close();
+                Assert.AreEqual(10, listC.Count);
+                Assert.AreEqual(10, nrSaves);
+            }
 
 		}
 		[TestMethod]
 		public void TestDelete()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
-			
-			for (int i = 0; i < 10; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
 
-			nop.Delete(listC[0]);
-			nop.Delete(listC[1]);
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
 
-			IObjectList<Customer> listDeleted = nop.LoadAll<Customer>();
+                nop.Delete(listC[0]);
+                nop.Delete(listC[1]);
 
-			Assert.AreEqual(8, listDeleted.Count);
-			Assert.AreEqual(3, listDeleted[0].OID);
-            nop.Close();
+                IObjectList<Customer> listDeleted = nop.LoadAll<Customer>();
+
+                Assert.AreEqual(8, listDeleted.Count);
+                Assert.AreEqual(3, listDeleted[0].OID);
+            }
 		}
 		[TestMethod]
 		public void TestDeleteEvents()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
-			nop.DropType<Customer>();
-			nop.DeletingObject += new EventHandler<DeletingEventsArgs>(nop_DeletingObject);
-			for (int i = 0; i < 10; i++)
-			{
-				Customer c = new Customer();
-				c.ID = i;
-				c.Name = "ADH" + i.ToString();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
+                nop.DeletingObject += new EventHandler<DeletingEventsArgs>(nop_DeletingObject);
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-				nop.StoreObject(c);
-			}
-			nop.Flush();
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
 
-			IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
 
-			nop.Delete(listC[0]);
-			nop.Delete(listC[1]);
+                nop.Delete(listC[0]);
+                nop.Delete(listC[1]);
 
-			IObjectList<Customer> listDeleted = nop.LoadAll<Customer>();
+                IObjectList<Customer> listDeleted = nop.LoadAll<Customer>();
 
-			Assert.AreEqual(10, listDeleted.Count);
-			Assert.AreEqual(1, listDeleted[0].OID);
-            nop.Close();
+                Assert.AreEqual(10, listDeleted.Count);
+                Assert.AreEqual(1, listDeleted[0].OID);
+            }
 
 		}
         //removed for safety reason
@@ -493,46 +512,48 @@ namespace TestSiaqodb
         [TestMethod]
         public void TestCount()
         {
-            Siaqodb nop = new Siaqodb(objPath);
-            nop.DropType<Customer>();
-            for (int i = 0; i < 160; i++)
+            using (Siaqodb nop = new Siaqodb(objPath))
             {
-                Customer c = new Customer();
-                c.ID = i;
-                c.Name = "ADH" + i.ToString();
+                nop.DropType<Customer>();
+                for (int i = 0; i < 160; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-                nop.StoreObject(c);
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                nop.Delete(listC[0]);
+                int count = nop.Count<Customer>();
+                Assert.AreEqual(160, listC.Count);
+                Assert.AreEqual(159, count);
             }
-            nop.Flush();
-
-            IObjectList<Customer> listC = nop.LoadAll<Customer>();
-            nop.Delete(listC[0]);
-            int count = nop.Count<Customer>();
-            Assert.AreEqual(160, listC.Count);
-            Assert.AreEqual(159, count);
-            nop.Close();
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
         public void TestSaveDeletedObject()
         {
-            Siaqodb nop = new Siaqodb(objPath);
-            nop.DropType<Customer>();
-            for (int i = 0; i < 10; i++)
+            using (Siaqodb nop = new Siaqodb(objPath))
             {
-                Customer c = new Customer();
-                c.ID = i;
-                c.Name = "ADH" + i.ToString();
+                nop.DropType<Customer>();
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
 
-                nop.StoreObject(c);
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+
+                IObjectList<Customer> listC = nop.LoadAll<Customer>();
+                nop.Delete(listC[0]);
+
+                nop.StoreObject(listC[0]);
             }
-            nop.Flush();
-
-            IObjectList<Customer> listC = nop.LoadAll<Customer>();
-            nop.Delete(listC[0]);
-
-            nop.StoreObject(listC[0]);
-            nop.Close();
 
           
         }
@@ -540,18 +561,20 @@ namespace TestSiaqodb
         [ExpectedException(typeof(SiaqodbException))]
         public void TestDeleteUnSavedObject()
         {
-            Siaqodb nop = new Siaqodb(objPath);
-            nop.DropType<Customer>();
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<Customer>();
 
-            Customer cu = new Customer();
-            cu.ID = 78;
-            nop.Delete(cu);
-            nop.Close();
+                Customer cu = new Customer();
+                cu.ID = 78;
+                nop.Delete(cu);
+                nop.Close();
+            }
         }
         [TestMethod]
         public void TestXMLExportImport()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Customer>();
             for (int i = 0; i < 10; i++)
             {
@@ -578,12 +601,12 @@ namespace TestSiaqodb
                 Assert.AreEqual(cust[i].ID, l[i].ID);
                 Assert.AreEqual(cust[i].Name, l[i].Name);
             }
-            sq.Close();
+          }
         }
         [TestMethod]
         public void TestXMLExportImportCompleteType()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<D40>();
             for (int i = 0; i < 10; i++)
             {
@@ -652,12 +675,12 @@ namespace TestSiaqodb
                 Assert.AreEqual(myEnum.doi, dL.enn);
                 Assert.AreEqual("Abramé", dL.str);
             }
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestXMLExportImportCompleteTypeNullable()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<D40Nullable>();
             for (int i = 0; i < 10; i++)
             {
@@ -680,14 +703,14 @@ namespace TestSiaqodb
 
             xmlSerRea.Close();
             Assert.AreEqual(10, l.Count);
-            sq.Close();
+           }
             
         }
         [TestMethod]
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUniqueExceptionInsert()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ItemUnique>();
 
             ItemUnique c = new ItemUnique();
@@ -705,14 +728,14 @@ namespace TestSiaqodb
 
             sq.StoreObject(c1);
 
-            sq.Close();
+           }
             
         }
         [TestMethod]
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUniqueExceptionInsertTransaction()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ItemUnique>();
 
             ItemUnique c = new ItemUnique();
@@ -732,14 +755,14 @@ namespace TestSiaqodb
             sq.StoreObject(c1,tr);
             tr.Commit();
 
-            sq.Close();
+           }
 
         }
         [TestMethod]
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUniqueExceptionUpdate()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ItemUnique>();
 
             ItemUnique c = new ItemUnique();
@@ -761,13 +784,13 @@ namespace TestSiaqodb
             list[1].S = "ceva";
             sq.StoreObject(list[1]);//should throw exception
 
-            sq.Close();
+           }
 
         }
         [TestMethod]
         public void TestUpdateObjectBy()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ItemUnique>();
 
             ItemUnique c = new ItemUnique();
@@ -797,13 +820,13 @@ namespace TestSiaqodb
             it.S = "someNew";
             stored = sq.UpdateObjectBy("Age", it);
             Assert.IsFalse(stored);
-            sq.Close();
+           }
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
         public void TestUpdateObjectByDuplicates()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Employee>();
 
             Employee emp = new Employee();
@@ -820,13 +843,13 @@ namespace TestSiaqodb
 
             sq.UpdateObjectBy("ID", emp);
 
-            sq.Close();
+           }
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
         public void TestUpdateObjectByFieldNotExists()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Employee>();
 
             Employee emp = new Employee();
@@ -836,13 +859,13 @@ namespace TestSiaqodb
 
             sq.UpdateObjectBy("IDhh", emp);
 
-            sq.Close();
+           }
         }
         [TestMethod]
         [ExpectedException(typeof(SiaqodbException))]
         public void TestUpdateObjectByManyFieldsDuplicates()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Employee>();
 
             Employee emp = new Employee();
@@ -862,13 +885,13 @@ namespace TestSiaqodb
             emp.CustomerID = 30;
 
             sq.UpdateObjectBy(emp,"ID","CustomerID");
-            sq.Close();
+           }
 
         }
         [TestMethod]
         public void TestUpdateObjectByManyFields()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Employee>();
 
             Employee emp = new Employee();
@@ -886,12 +909,12 @@ namespace TestSiaqodb
             bool s=sq.UpdateObjectBy(emp, "ID", "CustomerID","Name");
 
             Assert.IsTrue(s);
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestDeleteObjectBy()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Employee>();
 
             Employee emp = new Employee();
@@ -922,14 +945,14 @@ namespace TestSiaqodb
             s = sq.DeleteObjectBy("ID",emp);
 
             Assert.IsTrue(s);
-            sq.Close();
+           }
 
         }
         [TestMethod]
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUpdateObjectByManyFieldsConstraints()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ItemUnique>();
 
             ItemUnique emp = new ItemUnique();
@@ -959,13 +982,13 @@ namespace TestSiaqodb
             emp.S = "gg";
 
             s = sq.UpdateObjectBy(emp, "Age", "integ");
-            sq.Close();
+           }
         }
 
         [TestMethod]
         public void TestEventsVariable()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             //sq.DropType<ClassWithEvents>();
 
             ClassWithEvents c = new ClassWithEvents();
@@ -975,14 +998,14 @@ namespace TestSiaqodb
             sq.StoreObject(c);
             IObjectList<ClassWithEvents> ll = sq.LoadAll<ClassWithEvents>();
 
-            sq.Close();
+           }
 
 
         }
         [TestMethod]
         public void TestIndexFirstInsert()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ClassIndexes>();
             for (int i = 0; i < 100; i++)
             {
@@ -998,82 +1021,93 @@ namespace TestSiaqodb
             
             Assert.AreEqual(10, q.Count<ClassIndexes>());
 
-            sq = new Siaqodb(objPath);
-             q = from ClassIndexes clss in sq
-                    where clss.two == 10
-                    select clss;
+            
+           }
+          using (Siaqodb sq = new Siaqodb(objPath))
+          {
+              var q = from ClassIndexes clss in sq
+                  where clss.two == 10
+                  select clss;
 
 
-            Assert.AreEqual(10, q.Count<ClassIndexes>());
-            sq.Close();
+              Assert.AreEqual(10, q.Count<ClassIndexes>());
+          }
 
         }
         [TestMethod]
         public void TestIndexUpdate()
         {
-            Siaqodb sq = new Siaqodb(objPath);
-            sq.DropType<ClassIndexes>();
-            for (int i = 0; i < 100; i++)
+            using (Siaqodb sq = new Siaqodb(objPath))
             {
-                ClassIndexes cls = new ClassIndexes();
-                cls.one = i % 10;
-                cls.two = i % 10 + 1;
-                sq.StoreObject(cls);
+                sq.DropType<ClassIndexes>();
+                for (int i = 0; i < 100; i++)
+                {
+                    ClassIndexes cls = new ClassIndexes();
+                    cls.one = i % 10;
+                    cls.two = i % 10 + 1;
+                    sq.StoreObject(cls);
+                }
             }
-            sq = new Siaqodb(objPath);
-            var q = from ClassIndexes clss in sq
+            using (Siaqodb sq = new Siaqodb(objPath))
+            {
+                var q = from ClassIndexes clss in sq
+                        where clss.one == 9
+                        select clss;
+
+
+                q.ToList<ClassIndexes>()[0].one = 5;
+
+                sq.StoreObject(q.ToList<ClassIndexes>()[0]);
+
+                sq.StoreObject(q.ToList<ClassIndexes>()[1]);//just update nothing change
+            }
+            using (Siaqodb sq = new Siaqodb(objPath))
+            {
+
+                var q = from ClassIndexes clss in sq
                     where clss.one == 9
                     select clss;
 
 
-            q.ToList<ClassIndexes>()[0].one = 5;
+                Assert.AreEqual(9, q.Count<ClassIndexes>());
 
-            sq.StoreObject(q.ToList<ClassIndexes>()[0]);
-
-            sq.StoreObject(q.ToList<ClassIndexes>()[1]);//just update nothing change
-
-            sq = new Siaqodb(objPath);
-            q = from ClassIndexes clss in sq
-                where clss.one == 9
-                select clss;
+                 q = from ClassIndexes clss in sq
+                    where clss.one == 5
+                    select clss;
 
 
-            Assert.AreEqual(9, q.Count<ClassIndexes>());
-
-            q = from ClassIndexes clss in sq
-                where clss.one == 5
-                select clss;
-
-
-            Assert.AreEqual(11, q.Count<ClassIndexes>());
-            sq.Close();
+                Assert.AreEqual(11, q.Count<ClassIndexes>());
+            }
         }
         [TestMethod]
         public void TestIndexSaveAndClose()
         {
-            Siaqodb sq = new Siaqodb(objPath);
-            sq.DropType<ClassIndexes>();
-            for (int i = 0; i < 100; i++)
+            using (Siaqodb sq = new Siaqodb(objPath))
             {
-                ClassIndexes cls = new ClassIndexes();
-                cls.one = i % 10;
-                cls.two = i % 10 + 1;
-                sq.StoreObject(cls);
+                sq.DropType<ClassIndexes>();
+                for (int i = 0; i < 100; i++)
+                {
+                    ClassIndexes cls = new ClassIndexes();
+                    cls.one = i % 10;
+                    cls.two = i % 10 + 1;
+                    sq.StoreObject(cls);
+                }
+
             }
+            using (Siaqodb sq = new Siaqodb(objPath))
+            {
+                var q = from ClassIndexes clss in sq
+                        where clss.one == 9
+                        select clss;
 
-            sq = new Siaqodb(objPath);
-            var q = from ClassIndexes clss in sq
-                    where clss.one == 9
-                    select clss;
 
-
-            Assert.AreEqual(10, q.Count<ClassIndexes>());
-            sq.Close();
+                Assert.AreEqual(10, q.Count<ClassIndexes>());
+            }
         }
         [TestMethod]
         public void TestIndexAllOperations()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ClassIndexes>();
             for (int i = 0; i < 100; i++)
             {
@@ -1082,8 +1116,9 @@ namespace TestSiaqodb
                 cls.two = i % 10 + 1;
                 sq.StoreObject(cls);
             }
-            sq.Close();
-            sq = new Siaqodb(objPath);
+           }
+            using(Siaqodb sq = new Siaqodb(objPath))
+            {
             var q = from ClassIndexes clss in sq
                     where clss.one <=2
                     select clss;
@@ -1109,12 +1144,12 @@ namespace TestSiaqodb
 
 
             Assert.AreEqual(70, q.Count<ClassIndexes>());
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestIndexUpdateObjectBy()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ClassIndexes>();
             for (int i = 0; i < 100; i++)
             {
@@ -1125,8 +1160,9 @@ namespace TestSiaqodb
                 cls.ID2=i;
                 sq.StoreObject(cls);
             }
+          }
 
-            sq = new Siaqodb(objPath);
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
             var q = from ClassIndexes clss in sq
                     where clss.two == 4
                     select clss;
@@ -1158,12 +1194,12 @@ namespace TestSiaqodb
                 select clss;
             Assert.AreEqual(11, q.Count<ClassIndexes>());
 
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestIndexDelete()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ClassIndexes>();
             for (int i = 0; i < 100; i++)
             {
@@ -1174,7 +1210,9 @@ namespace TestSiaqodb
                 cls.ID2 = i;
                 sq.StoreObject(cls);
             }
-            sq = new Siaqodb(objPath);
+          }
+          using (Siaqodb sq = new Siaqodb(objPath))
+          {
 
             var q = from ClassIndexes clss in sq
                     where clss.two == 7
@@ -1182,17 +1220,20 @@ namespace TestSiaqodb
 
 
             sq.Delete(q.ToList<ClassIndexes>()[0]);
-            sq = new Siaqodb(objPath);
-            q = from ClassIndexes clss in sq
+          }
+          using (Siaqodb sq = new Siaqodb(objPath))
+          {
+            var q = from ClassIndexes clss in sq
                 where clss.two == 7
                 select clss;
 
             Assert.AreEqual(9, q.Count<ClassIndexes>());
 
             sq.DeleteObjectBy("ID", q.ToList<ClassIndexes>()[0]);
-            
-            sq = new Siaqodb(objPath);
-            q = from ClassIndexes clss in sq
+          }
+          using (Siaqodb sq = new Siaqodb(objPath))
+          {
+            var q = from ClassIndexes clss in sq
                 where clss.two == 7
                 select clss;
 
@@ -1206,17 +1247,18 @@ namespace TestSiaqodb
                 select clss;
 
             Assert.AreEqual(7, q.Count<ClassIndexes>());
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestIndexAllFieldTypes()
         {
-            Siaqodb sq = new Siaqodb(objPath);
-            sq.DropType<D40WithIndexes>();
-
             DateTime dt = new DateTime(2010, 1, 1);
             Guid guid = Guid.NewGuid();
-            TimeSpan tspan=new TimeSpan();
+            TimeSpan tspan = new TimeSpan();
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
+            sq.DropType<D40WithIndexes>();
+
+            
             for (int i = 0; i < 10; i++)
             {
                 D40WithIndexes d = new D40WithIndexes();
@@ -1253,8 +1295,8 @@ namespace TestSiaqodb
                 cls.ID2 = i;
                 sq.StoreObject(cls);
             }
-            sq.Close();
-            sq = new Siaqodb(objPath);
+           }
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
             byte byt = 5;
             var q1 = from D40WithIndexes di in sq
                      where di.b == byt
@@ -1369,12 +1411,12 @@ namespace TestSiaqodb
                       select di;
 
             Assert.AreEqual(10, q19.ToList().Count);
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestAttributesOnProps()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ClassWithPropertiesAtt>();
             for (int i = 0; i < 10; i++)
             {
@@ -1409,13 +1451,13 @@ namespace TestSiaqodb
                 except = true;
             }
             Assert.AreEqual(true, except);
-            sq.Close();
+           }
 
         }
         [TestMethod]
         public void TestPOCO()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<POCO>();
             for (int i = 0; i < 10; i++)
             {
@@ -1450,7 +1492,7 @@ namespace TestSiaqodb
                 except = true;
             }
             Assert.AreEqual(true, except);
-            sq.Close();
+           }
 
         }
         [TestMethod]
@@ -1477,7 +1519,7 @@ namespace TestSiaqodb
             SiaqodbConfigurator.PropertyUseField("MyStrProp", "mystr", typeof(RealPOCO));
             SiaqodbConfigurator.PropertyUseField("MyStrProp", "mystr", typeof(RealPOCO1));
 
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<RealPOCO>();
             for (int i = 0; i < 10; i++)
             {
@@ -1499,10 +1541,10 @@ namespace TestSiaqodb
 
             Assert.AreEqual(5, q.Count<RealPOCO>());
 
-            sq.Close();
+           }
 
-            sq = new Siaqodb(objPath);
-             q = from RealPOCO clss in sq
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
+             var q = from RealPOCO clss in sq
                     where clss.ID == 1
                     select clss;
 
@@ -1541,13 +1583,13 @@ namespace TestSiaqodb
             Assert.AreEqual(10, q.ToList<RealPOCO>().Count);
             sq.DropType<RealPOCO>();
             sq.DropType<RealPOCO1>();
-            sq.Close();
+           }
 
         }
         [TestMethod]
         public void TestOptimisticConcurency()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ForConcurencyClass>();
             List<ForConcurencyClass> lis = new List<ForConcurencyClass>();
             for (int i = 0; i < 10; i++)
@@ -1662,7 +1704,7 @@ namespace TestSiaqodb
                 exCatched++;
             }
             Assert.AreEqual(1, exCatched);
-            sq.Close();
+           }
 
 
 
@@ -1670,7 +1712,7 @@ namespace TestSiaqodb
         [TestMethod]
         public void TestTransactionInsert()
         { 
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Customer>();
             IList<Customer> list = null;
             ITransaction transact = sq.BeginTransaction();
@@ -1697,13 +1739,13 @@ namespace TestSiaqodb
             }
             list = sq.LoadAll<Customer>();
             Assert.AreEqual(10, list.Count);
-            sq.Close();
-            sq.Open(objPath);
-            list = sq.LoadAll<Customer>();
+           }
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
+            var list = sq.LoadAll<Customer>();
             Assert.AreEqual(10, list.Count);
 
 
-            transact = sq.BeginTransaction();
+            var transact = sq.BeginTransaction();
             try
             {
                 for (int i = 0; i < 10; i++)
@@ -1726,13 +1768,13 @@ namespace TestSiaqodb
             list = sq.LoadAll<Customer>();
             Assert.AreEqual(10, list.Count);
 
-            sq.Close();
+           }
             
         }
         [TestMethod]
         public void TestTransactionUpdateInsert()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Customer>();
             IList<Customer> list = null;
             ITransaction transact = sq.BeginTransaction();
@@ -1771,13 +1813,13 @@ namespace TestSiaqodb
             {
                 Assert.AreEqual("updated", c.Name);
             }
-            sq.Close();
+           }
 
         }
         [TestMethod]
         public void TestTransactionDelete()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Customer>();
             IList<Customer> list = null;
             ITransaction transact = sq.BeginTransaction();
@@ -1810,13 +1852,13 @@ namespace TestSiaqodb
                 Assert.AreEqual(8, list.Count);
                 
             }
-            sq.Close();
+           }
             
         }
         [TestMethod]
         public void TestUpdateObjectByManyFieldsTransaction()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Employee>();
 
             Employee emp = new Employee();
@@ -1853,13 +1895,13 @@ namespace TestSiaqodb
             tr.Rollback();
             list = sq.LoadAll<Employee>();
             Assert.AreEqual(list[0].Name, "ANOTHER");
-            sq.Close();
+           }
 
         }
         [TestMethod]
         public void TestDeleteObjectByTransactions()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<Employee>();
 
             Employee emp = new Employee();
@@ -1917,13 +1959,13 @@ namespace TestSiaqodb
 
             list = sq.LoadAll<Employee>();
             Assert.AreEqual(list.Count, 2);
-            sq.Close();
+           }
             
         }
         [TestMethod]
         public void TestTransactionCrash()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
 
             IList<Customer> list = sq.LoadAll<Customer>();
             IList<Employee> list2 = sq.LoadAll<Employee>();
@@ -1969,12 +2011,12 @@ namespace TestSiaqodb
 
 
             transac2t.Commit();//here do debug and stop after a few commits to be able to simulate crash recovery
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestTransactionManyTypes()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
 
             
             sq.DropType<Customer>();
@@ -2066,13 +2108,13 @@ namespace TestSiaqodb
 
             Assert.AreEqual(list[0].Name, "updated");
             Assert.AreEqual(list2[0].Name, "updatedE");
-            sq.Close();
+           }
 
         }
          [TestMethod]
         public void TestTransactionLists()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
 
 
             sq.DropType<Customer>();
@@ -2174,13 +2216,13 @@ namespace TestSiaqodb
             Assert.AreEqual(list[0].Name, "updated");
             Assert.AreEqual(list2[0].Name, "updatedE");
             Assert.AreEqual(list3[0].dt[0], new DateTime(2007, 1, 1));
-            sq.Close();
+           }
 
         }
         [TestMethod]
         public void TestIndexStringStartWith()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<ClassIndexesString>();
             ClassIndexesString cls = new ClassIndexesString() { Name = "aaa" };
             sq.StoreObject(cls);
@@ -2212,17 +2254,18 @@ namespace TestSiaqodb
             {
                 Assert.IsTrue(hu.Name.StartsWith("bb"));
             }
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestListsAllTypes()
         {
-            Siaqodb sq = new Siaqodb(objPath);
-            sq.DropType<D40WithLists>();
-
             DateTime dt = new DateTime(2010, 1, 1);
             Guid guid = Guid.NewGuid();
             TimeSpan tspan = new TimeSpan();
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
+            sq.DropType<D40WithLists>();
+
+          
             for (int i = 0; i < 10; i++)
             {
                 D40WithLists d = new D40WithLists();
@@ -2283,10 +2326,10 @@ namespace TestSiaqodb
                        select dll).ToList();
 
             Assert.AreEqual(10, q21.Count);
-            sq.Close();
-            sq = new Siaqodb(objPath);
-            all1 = sq.LoadAll<D40WithLists>();
-            ii = 0;
+           }
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
+            var all1 = sq.LoadAll<D40WithLists>();
+            var ii = 0;
             foreach (D40WithLists dL in all1)
             {
 
@@ -2314,7 +2357,7 @@ namespace TestSiaqodb
                 ii++;
 
             }
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestOpen2Databases()
@@ -2345,7 +2388,7 @@ namespace TestSiaqodb
         public void TestLoadingEvents()
         {
             //SiaqodbConfigurator.SetRaiseLoadEvents(true);
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.LoadingObject += new EventHandler<LoadingObjectEventArgs>(sq_LoadingObject);
             sq.LoadedObject += new EventHandler<LoadedObjectEventArgs>(sq_LoadedObject);
             sq.DropType<POCO>();
@@ -2359,7 +2402,7 @@ namespace TestSiaqodb
                 sq.StoreObject(cls);
             }
             IList<POCO> all = sq.LoadAll<POCO>();
-            sq.Close();
+           }
         }
 
         void sq_LoadedObject(object sender, LoadedObjectEventArgs e)
@@ -2376,7 +2419,7 @@ namespace TestSiaqodb
         public void TestNestedSelfObject()
         {
             //SiaqodbConfigurator.SetRaiseLoadEvents(true);
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
            
             sq.DropType<Person>();
             for (int i = 0; i < 10; i++)
@@ -2404,13 +2447,13 @@ namespace TestSiaqodb
                 }
 
             }
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestDateTimeKind()
         {
             SiaqodbConfigurator.SpecifyStoredDateTimeKind(DateTimeKind.Utc);
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
 
             sq.DropType<D40>();
 
@@ -2439,17 +2482,18 @@ namespace TestSiaqodb
             Assert.AreEqual(DateTimeKind.Unspecified, lis[0].dt.Kind);
             Assert.AreEqual(DateTimeKind.Unspecified, lis[1].dt.Kind);
             Assert.AreEqual(DateTimeKind.Unspecified, lis[2].dt.Kind);
-            sq.Close();
+           }
         }
         [TestMethod]
         public void TestShrink()
         {
-            Siaqodb sq = new Siaqodb(objPath);
-            sq.DropType<D40WithLists>();
-
             DateTime dt = new DateTime(2010, 1, 1);
             Guid guid = Guid.NewGuid();
             TimeSpan tspan = new TimeSpan();
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
+            sq.DropType<D40WithLists>();
+
+            
             for (int i = 0; i < 10; i++)
             {
                 D40WithLists d = new D40WithLists();
@@ -2481,12 +2525,13 @@ namespace TestSiaqodb
             {
                 sq.Delete(all[i]);
             }
-            sq.Close();
+           }
 
             SiaqodbUtil.Shrink(objPath, ShrinkType.Normal);
             SiaqodbUtil.Shrink(objPath, ShrinkType.ForceClaimSpace);
 
-             sq = new Siaqodb(objPath);
+            using (Siaqodb sq = new Siaqodb(objPath))
+            {
             for (int i = 0; i < 10; i++)
             {
                 D40WithLists d = new D40WithLists();
@@ -2554,13 +2599,14 @@ namespace TestSiaqodb
                        select dll).ToList();
 
             Assert.AreEqual(15, q21.Count);
-            sq.Close();
+           }
+        
         }
         /* TODO LMDB uncomment
         [TestMethod]
         public void TestIndexShrink()
         {
-            Siaqodb sq = new Siaqodb(objPath);
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
             sq.DropType<D40WithIndexes>();
 
             DateTime dt = new DateTime(2010, 1, 1);
@@ -2607,7 +2653,7 @@ namespace TestSiaqodb
             {
                 sq.Delete(all30[i]);  
             }
-            sq.Close();
+           }
 
             SiaqodbUtil.Shrink(objPath, ShrinkType.Normal);
             SiaqodbUtil.Shrink(objPath, ShrinkType.ForceClaimSpace);
@@ -2727,7 +2773,7 @@ namespace TestSiaqodb
                       select di;
 
             Assert.AreEqual(5, q19.ToList().Count);
-            sq.Close();
+           }
         }
 
         [TestMethod]
