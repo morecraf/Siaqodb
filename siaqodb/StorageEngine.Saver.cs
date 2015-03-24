@@ -60,33 +60,39 @@ namespace Sqo
             {
                 transaction = env.BeginTransaction();
             }
-            
-            CheckForConcurency(oi, objInfo, ti, serializer, false, transaction);
+            try
+            {
+                CheckForConcurency(oi, objInfo, ti, serializer, false, transaction);
 
-            string dbName = GetFileByType(ti);
-            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
+                string dbName = GetFileByType(ti);
+                var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-            Dictionary<string, object> oldValuesOfIndexedFields = this.indexManager.PrepareUpdateIndexes(objInfo, ti,transaction);
+                Dictionary<string, object> oldValuesOfIndexedFields = this.indexManager.PrepareUpdateIndexes(objInfo, ti, transaction);
 
+
+                byte[] objBytes = serializer.SerializeObject(objInfo, this.rawSerializer, transaction);
+
+                byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
+                transaction.Put(db, key, objBytes);
+
+                if (objInfo.Inserted)
+                {
+                    this.SaveType(objInfo.SqoTypeInfo, transaction);
+                }
+                metaCache.SetOIDToObject(oi, objInfo.Oid, ti);
+                this.indexManager.UpdateIndexes(objInfo, ti, oldValuesOfIndexedFields, transaction);
+                if (trans == null)
+                {
+                    transaction.Commit();
+                }
+
+            }
+            catch(Exception ex)
+            {
+                transaction.Abort();
+                throw ex;
+            }
            
-            byte[] objBytes = serializer.SerializeObject(objInfo, this.rawSerializer, transaction);
-
-            byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
-            transaction.Put(db, key, objBytes);
-
-            if (objInfo.Inserted)
-            {
-                this.SaveType(objInfo.SqoTypeInfo, transaction);
-            }
-            metaCache.SetOIDToObject(oi, objInfo.Oid, ti);
-            this.indexManager.UpdateIndexes(objInfo, ti, oldValuesOfIndexedFields,transaction);
-
-            if (trans == null)
-            {
-                transaction.Commit();
-
-
-            }
 
             return objInfo.Oid;
 
@@ -510,17 +516,24 @@ namespace Sqo
                 {
                     transaction = env.BeginTransaction();
                 }
+                try
+                {
+                    CheckForConcurency(obj, objInfo, ti, serializer, true, transaction);
 
-                CheckForConcurency(obj, objInfo, ti, serializer, true, transaction);
+                    this.MarkObjectAsDelete(serializer, objInfo.Oid, ti, transaction);
 
-                this.MarkObjectAsDelete(serializer, objInfo.Oid, ti, transaction);
+                    this.indexManager.UpdateIndexesAfterDelete(objInfo, ti, transaction);
 
-                this.indexManager.UpdateIndexesAfterDelete(objInfo, ti,transaction);
+                    metaCache.SetOIDToObject(obj, -1, ti);
 
-                metaCache.SetOIDToObject(obj, -1, ti);
-
-                if (trans == null)
-                    transaction.Commit();
+                    if (trans == null)
+                        transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Abort();
+                    throw ex;
+                }
 
 
 

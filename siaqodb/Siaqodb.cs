@@ -1188,6 +1188,13 @@ savedObject(this, e);
             this.opened = false;
             this.metaCache = null;
             this.storageEngine.Close();
+            foreach (Guid trId in Transactions.TransactionManager.transactions.Keys)
+            {
+                if (Transactions.TransactionManager.transactions[trId].transaction.status == Transactions.TransactionStatus.Open)
+                {
+                    Transactions.TransactionManager.transactions[trId].lmdbTransaction.Abort();
+                }
+            }
         }
 #if ASYNC
         /// <summary>

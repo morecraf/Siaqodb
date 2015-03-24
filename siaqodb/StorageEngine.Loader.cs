@@ -1235,18 +1235,25 @@ namespace Sqo
             {
                 transaction = env.BeginTransaction();
             }
+            try
+            {
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-            var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
+                byte[] key = ByteConverter.IntToByteArray(oid);
 
-            byte[] key = ByteConverter.IntToByteArray(oid);
-
-            byte[] objBytes = transaction.Get(db, key);
-            var fieldVal= serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer, transaction);
-            if (trans == null)
+                byte[] objBytes = transaction.Get(db, key);
+                var fieldVal = serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer, transaction);
+                if (trans == null)
+                    transaction.Abort();
+                return fieldVal;
+            }
+            catch (Exception ex)
+            {
                 transaction.Abort();
+                throw ex;
+            }
 
-            return fieldVal;
-
+           
 
         }
 #if ASYNC
@@ -1484,18 +1491,25 @@ namespace Sqo
             }
             circularRefCache.Add(oid, ti, currentObj);
             var transaction = trans == null ? env.BeginTransaction() : trans;
-
-            using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+            try
             {
-                byte[] key = ByteConverter.IntToByteArray(oid);
+                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                {
+                    byte[] key = ByteConverter.IntToByteArray(oid);
 
-                byte[] objBytes = transaction.Get(db, key);
-                if (serializer.IsObjectDeleted(oid, objBytes))
-                    return null;
-                serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer, transaction);
+                    byte[] objBytes = transaction.Get(db, key);
+                    if (objBytes == null || serializer.IsObjectDeleted(oid, objBytes))
+                        return null;
+                    serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer, transaction);
+                }
+                if (trans == null)
+                    transaction.Abort();
             }
-            if (trans == null)
-                transaction.Dispose();
+            catch(Exception ex)
+            {
+                transaction.Abort();
+                throw ex;
+            }
 
             metaCache.SetOIDToObject(currentObj, oid, ti);
 

@@ -152,7 +152,7 @@ namespace Sqo
 
         public StorageEngine(string path )
         {
-            this.env = new LightningEnvironment(path, EnvironmentOpenFlags.None);
+            this.env = new LightningEnvironment(path, EnvironmentOpenFlags.NoLock);
 
             env.MapSize = 200 * OneMega;
             env.MaxDatabases = 200;
@@ -1495,7 +1495,7 @@ namespace Sqo
                 SerializerFactory.CloseAll();
                 rawSerializer.Close();
                 env.Dispose();
-
+                
             }
         }
         #if ASYNC

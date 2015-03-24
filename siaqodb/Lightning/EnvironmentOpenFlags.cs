@@ -6,7 +6,7 @@ namespace LightningDB
     /// Options to open LMDB environment
     /// </summary>
     [Flags]
-   internal enum EnvironmentOpenFlags
+    public enum EnvironmentOpenFlags
     {
         /// <summary>
         /// No special options.
@@ -40,7 +40,7 @@ namespace LightningDB
         /// This flag may be changed at any time using mdb_env_set_flags().
         /// </summary>
         NoSync = 0x10000,
-        
+
         /// <summary>
         /// MDB_RDONLY. Open the environment in read-only mode. 
         /// No write operations will be allowed. 
@@ -56,13 +56,13 @@ namespace LightningDB
         /// This flag may be changed at any time using mdb_env_set_flags().
         /// </summary>
         NoMetaSync = 0x40000,
-        
+
         /// <summary>
         /// MDB_WRITEMAP Use a writeable memory map unless MDB_RDONLY is set. 
         /// This is faster and uses fewer mallocs, but loses protection from application bugs like wild pointer writes and other bad updates into the database. 
         /// Incompatible with nested transactions.
         /// </summary>
-        WriteMap = 0x80000, 
+        WriteMap = 0x80000,
 
         /// <summary>
         /// MDB_MAPASYNC. When using MDB_WRITEMAP, use asynchronous flushes to disk. 
@@ -70,6 +70,28 @@ namespace LightningDB
         /// Calling mdb_env_sync() ensures on-disk database integrity until next commit. 
         /// This flag may be changed at any time using mdb_env_set_flags().
         /// </summary>
-        MapAsync = 0x100000
+        MapAsync = 0x100000,
+
+        /// <summary>
+        /// MDB_NOTLS. tie reader locktable slots to MDB_txn objects instead of to threads
+        /// </summary>
+        NoThreadLocalStorage = 0x200000,
+
+        /// <summary>
+        /// MDB_NOLOCK. don't do any locking, caller must manage their own locks
+        /// </summary>
+        NoLock = 0x400000,
+
+        /// <summary>
+        /// MDB_NORDAHEAD. don't do readahead (no effect on Windows)
+        /// </summary>
+        NoReadAhead = 0x800000,
+
+        /// <summary>
+        /// MDB_NOMEMINIT. don't initialize malloc'd memory before writing to datafile
+        /// </summary>
+        NoMemoryInitialization = 0x1000000
+
     }
+
 }
