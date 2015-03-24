@@ -1726,8 +1726,8 @@ namespace TestSiaqodb
                     c.Name = "GTA" + i.ToString();
                     sq.StoreObject(c, transact);
                 }
-
-                list = sq.LoadAll<Customer>();
+                throw new Exception("jj");
+                //list = sq.LoadAll<Customer>();
                 Assert.AreEqual(0, list.Count);
 
 
@@ -2485,7 +2485,8 @@ namespace TestSiaqodb
             Assert.AreEqual(DateTimeKind.Unspecified, lis[2].dt.Kind);
            }
         }
-        [TestMethod]
+        /* TODO LMDB uncomment
+         [TestMethod]
         public void TestShrink()
         {
             DateTime dt = new DateTime(2010, 1, 1);
@@ -2603,7 +2604,7 @@ namespace TestSiaqodb
            }
         
         }
-        /* TODO LMDB uncomment
+       
         [TestMethod]
         public void TestIndexShrink()
         {

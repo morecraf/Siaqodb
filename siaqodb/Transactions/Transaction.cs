@@ -13,10 +13,12 @@ namespace Sqo.Transactions
     {
         internal Guid ID;
         internal TransactionStatus status;
+        TransactionManager transactionManager;
         
-        internal Transaction()
+        internal Transaction(TransactionManager manager)
         {
             ID = Guid.NewGuid();
+            this.transactionManager = manager;
         }
         /// <summary>
         /// Commit transaction to database
@@ -27,7 +29,7 @@ namespace Sqo.Transactions
             {
                 throw new SiaqodbException("Transaction closed");
             }
-            TransactionManager.CommitTransaction(this.ID);
+            transactionManager.CommitTransaction(this.ID);
 
         }
 #if ASYNC
@@ -54,7 +56,7 @@ namespace Sqo.Transactions
             {
                 throw new SiaqodbException("Transaction closed");
             }
-            TransactionManager.RollbackTransaction(this.ID);
+            transactionManager.RollbackTransaction(this.ID);
         }
 #if ASYNC
         /// <summary>
@@ -69,8 +71,13 @@ namespace Sqo.Transactions
             await TransactionManager.RollbackTransactionAsync(this.ID);
         }
 #endif
-        
 
+
+
+        public void Dispose()
+        {
+            transactionManager.RollbackTransaction(this.ID);
+        }
     }
     internal enum TransactionStatus { Open, Closed };
 }

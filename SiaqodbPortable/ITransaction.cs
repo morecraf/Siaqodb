@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Sqo;
 namespace Sqo.Transactions
 {
-    public interface ITransaction
+    public interface ITransaction:IDisposable
     {
         void Commit();
         void Rollback();

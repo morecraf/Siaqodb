@@ -48,10 +48,8 @@ namespace Sqo
         List<ATuple<Type, String>> includePropertiesCache;
         List<object> parentsComparison;
         bool useElevatedTrust;
-        LightningEnvironment env;
-        const int OneMega = 1024 * 1024;
+        TransactionManager transactionManager;
         const string sys_dbs = "sdbs";
-       
 
 #if UNITY3D
         private EventHandler<LoadingObjectEventArgs> loadingObject;
@@ -150,15 +148,10 @@ namespace Sqo
 
         #region CTOR
 
-        public StorageEngine(string path )
+        public StorageEngine(string path,TransactionManager transactionManager )
         {
-            this.env = new LightningEnvironment(path, EnvironmentOpenFlags.NoLock);
-
-            env.MapSize = 200 * OneMega;
-            env.MaxDatabases = 200;
+            this.transactionManager = transactionManager;
             
-            env.Open();
-
             if (!SqoLicense.LicenseValid())
             {
                 throw new InvalidLicenseException("License not valid!");
@@ -207,23 +200,11 @@ namespace Sqo
 
         public void SaveType(SqoTypeInfo ti)
         {
-           
-            using (var transaction = env.BeginTransaction())
-            {
 
-                try
-                {
-                    this.SaveType(ti, transaction);
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Abort();
-                    throw ex;
-                }
-                
-            }
+            var transaction = transactionManager.GetActiveTransaction();
 
+
+            this.SaveType(ti, transaction);
         }
         public void SaveType(SqoTypeInfo ti, LightningTransaction transaction)
         {
@@ -346,13 +327,13 @@ namespace Sqo
 
             CacheCustomFileNames.AddFileNameForType(new SqoTypeInfo(typeof(Sqo.MetaObjects.RawdataInfo)).TypeName, "rawdatainfo", false);
            
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
 
                 string dbName = this.GetFileByType(new SqoTypeInfo(typeof(Sqo.MetaObjects.RawdataInfo)).TypeName);
                 ObjectSerializer seralizer = SerializerFactory.GetSerializer(path, dbName, this.useElevatedTrust);
 
-                using (var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create))
+                var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
                 {
                     byte[] tinfoBuffer = transaction.Get(db,ByteConverter.StringToByteArray(dbName));
                     if (tinfoBuffer != null)
@@ -534,9 +515,9 @@ namespace Sqo
 #else
             List<SqoTypeInfo> list = new List<SqoTypeInfo>();
 
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create))
+                var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
                 {
                    using (var cursor = transaction.CreateCursor(db))
                     {
@@ -849,9 +830,9 @@ namespace Sqo
             if (Directory.Exists(path))
 			{
 				 this.LoadMetaDataTypes();
-                 using (var transaction = env.BeginTransaction())
+                 var transaction=transactionManager.GetActiveTransaction();
                  {
-                     using (var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create))
+                     var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
                      {
                          using (var cursor = transaction.CreateCursor(db))
                          {
@@ -1200,11 +1181,12 @@ namespace Sqo
 #endif
         internal bool DropType(SqoTypeInfo ti)
         {
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
                 string dbname = this.GetFileByType(ti);
                 var db = transaction.OpenDatabase(dbname, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 transaction.DropDatabase(db, true);
+                db = transaction.OpenDatabase(dbname, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 var sysdb = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
 
                 byte[] val = transaction.Get(sysdb, ByteConverter.StringToByteArray(dbname));
@@ -1213,7 +1195,7 @@ namespace Sqo
                     transaction.Delete(sysdb, ByteConverter.StringToByteArray(dbname));
                 }
 
-                transaction.Commit();
+               
                 return true;
             }
         }
@@ -1359,9 +1341,9 @@ namespace Sqo
 #endif
         internal SqoTypeInfo GetSqoTypeInfo(string typeName)
         {
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var sysdb = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create))
+                var sysdb = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
                 {
                     byte[] keyBytes=ByteConverter.StringToByteArray( GetFileByType(typeName));
                     byte[] tiBytes = transaction.Get(sysdb, keyBytes);
@@ -1494,7 +1476,7 @@ namespace Sqo
             {
                 SerializerFactory.CloseAll();
                 rawSerializer.Close();
-                env.Dispose();
+                transactionManager.Dispose();
                 
             }
         }
@@ -1557,14 +1539,11 @@ namespace Sqo
         }
    
         #endregion
-        public LightningDB.LightningTransaction GetNewTransaction()
-        {
-            return env.BeginTransaction();
-        }
+      
 
         public void Dispose()
         {
-            this.env.Dispose();
+            this.transactionManager.Dispose();
         }
     }
     

@@ -36,9 +36,9 @@ namespace Sqo
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
             int nrRecords = ti.Header.numberOfRecords;
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     using (var cursor = transaction.CreateCursor(db))
                     {
@@ -363,12 +363,13 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, dbName, useElevatedTrust);
             insideOids.Sort();
             int nrRecords = ti.Header.numberOfRecords;
+            
             List<int> oids = new List<int>();
             if (insideOids.Count == 0)
                 return oids;
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     using (var cursor = transaction.CreateCursor(db))
                     {
@@ -440,11 +441,11 @@ namespace Sqo
 
             int nrRecords = ti.Header.numberOfRecords;
             bool isOIDField = where.AttributeName[0] == "OID";
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
                 if (!indexManager.LoadOidsByIndex(ti, where.AttributeName[0], where, oids, transaction))
                 {
-                    using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                    var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                     {
                         using (var cursor = transaction.CreateCursor(db))
                         {
@@ -888,9 +889,9 @@ namespace Sqo
             List<int> oids = new List<int>();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
                 {
-                    using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                    var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                     {
                         using (var cursor = transaction.CreateCursor(db))
                         {
@@ -965,9 +966,9 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs> (serializer_NeedCacheDocument);
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     foreach (int oid in oids)
                     {
@@ -1134,9 +1135,9 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     foreach (int oid in oids)
                     {
@@ -1221,7 +1222,7 @@ namespace Sqo
         {
             return this.LoadValue(oid, fieldName, ti, null);
         }
-        internal object LoadValue(int oid, string fieldName, SqoTypeInfo ti, LightningTransaction trans)
+        internal object LoadValue(int oid, string fieldName, SqoTypeInfo ti, LightningTransaction transaction)
         {
             if (fieldName == "OID")
             {
@@ -1230,30 +1231,18 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-            LightningTransaction transaction = trans;
-            if (trans == null)
-            {
-                transaction = env.BeginTransaction();
-            }
-            try
-            {
-                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-                byte[] key = ByteConverter.IntToByteArray(oid);
+            var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
 
-                byte[] objBytes = transaction.Get(db, key);
-                var fieldVal = serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer, transaction);
-                if (trans == null)
-                    transaction.Abort();
-                return fieldVal;
-            }
-            catch (Exception ex)
-            {
-                transaction.Abort();
-                throw ex;
-            }
+            byte[] key = ByteConverter.IntToByteArray(oid);
 
-           
+            byte[] objBytes = transaction.Get(db, key);
+            var fieldVal = serializer.ReadFieldValue(ti, oid, objBytes, fieldName, this.rawSerializer, transaction);
+            
+            return fieldVal;
+
+
+
 
         }
 #if ASYNC
@@ -1276,9 +1265,9 @@ namespace Sqo
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
 
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     using (var cursor = transaction.CreateCursor(db))
                     {
@@ -1461,7 +1450,7 @@ namespace Sqo
         }
 #endif
 
-        internal object LoadObjectByOID(SqoTypeInfo ti, int oid, bool clearCache, LightningDB.LightningTransaction trans)
+        internal object LoadObjectByOID(SqoTypeInfo ti, int oid, bool clearCache, LightningDB.LightningTransaction transaction)
         {
             object currentObj = null;
 
@@ -1490,26 +1479,17 @@ namespace Sqo
                 circularRefCache.Clear();
             }
             circularRefCache.Add(oid, ti, currentObj);
-            var transaction = trans == null ? env.BeginTransaction() : trans;
-            try
-            {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
-                {
-                    byte[] key = ByteConverter.IntToByteArray(oid);
 
-                    byte[] objBytes = transaction.Get(db, key);
-                    if (objBytes == null || serializer.IsObjectDeleted(oid, objBytes))
-                        return null;
-                    serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer, transaction);
-                }
-                if (trans == null)
-                    transaction.Abort();
-            }
-            catch(Exception ex)
+            var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
             {
-                transaction.Abort();
-                throw ex;
+                byte[] key = ByteConverter.IntToByteArray(oid);
+
+                byte[] objBytes = transaction.Get(db, key);
+                if (objBytes == null || serializer.IsObjectDeleted(oid, objBytes))
+                    return null;
+                serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer, transaction);
             }
+          
 
             metaCache.SetOIDToObject(currentObj, oid, ti);
 
@@ -1644,9 +1624,9 @@ namespace Sqo
 
 
             int count = 0;
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     using (var cursor = transaction.CreateCursor(db))
                     {
@@ -1734,9 +1714,9 @@ namespace Sqo
         internal KeyValuePair<int, int> LoadOIDAndTID(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     byte[] key = ByteConverter.IntToByteArray(oid);
 
@@ -1755,9 +1735,9 @@ namespace Sqo
         internal List<KeyValuePair<int, int>> LoadComplexArray(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     byte[] key = ByteConverter.IntToByteArray(oid);
 
@@ -1776,9 +1756,9 @@ namespace Sqo
         internal int LoadComplexArrayTID(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            using (var transaction = env.BeginTransaction())
+            var transaction=transactionManager.GetActiveTransaction();
             {
-                using (var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey))
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
                 {
                     byte[] key = ByteConverter.IntToByteArray(oid);
 
