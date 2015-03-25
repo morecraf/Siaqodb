@@ -18,11 +18,6 @@ namespace Sqo.Core
             }
             else if (typeof(IList).IsAssignableFrom(fi.AttributeType) || fi.IsText)//array
             {
-                if (ti.Type != null) //is null when loaded by SiaqodbManager
-                {
-
-                    return new ArrayByteTranformer(serializer, rawSerializer, ti, fi, parentOID);
-                }
                 return new ArrayByteTranformer(serializer, rawSerializer, ti, fi, parentOID);
             }
             else if (fi.AttributeTypeId == MetaExtractor.dictionaryID)
@@ -34,9 +29,6 @@ namespace Sqo.Core
                 return new PrimitiveByteTransformer(fi, ti);
             }
         }
-        public static IByteTransformer GetByteTransformer(ObjectSerializer serializer, RawdataSerializer rawSerializer, FieldSqoInfo fi, SqoTypeInfo ti)
-        {
-            return GetByteTransformer(serializer, rawSerializer, fi, ti, -1);
-        }
+        
     }
 }

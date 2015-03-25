@@ -2626,12 +2626,6 @@ savedObject(this, e);
 #endif
 
 
-
-        internal Core.ISqoFile GetRawFile()
-        {
-            return storageEngine.GetRawFile();
-        }
-
        
 #if ASYNC
 

@@ -184,7 +184,7 @@ namespace Sqo
 #endif
         private static void ShrinkNormal(Siaqodb siaqodb)
         {
-             var allOrderByPos = (from RawdataInfo ri in siaqodb
+             /*var allOrderByPos = (from RawdataInfo ri in siaqodb
                                  where ri.IsFree == false
                                  orderby ri.Position
                                  select ri).ToList();
@@ -223,7 +223,7 @@ namespace Sqo
             }
             file.Length = memStreamNew.Length;
             file.Write(0, memStreamNew.ToArray());
-
+            */
                              
         }
 #if ASYNC

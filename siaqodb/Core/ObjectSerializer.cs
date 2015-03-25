@@ -21,14 +21,12 @@ namespace Sqo.Core
     [Obfuscation(Feature = "Apply to member * when event: renaming", Exclude = true)]
     partial class  ObjectSerializer
     {
-        string filePath;
-        ISqoFile file;
+        
         readonly object _syncRoot = new object();
        
         public ObjectSerializer(string filePath,bool useElevatedTrust)
         {
-            this.filePath = filePath;
-            file = FileFactory.Create(filePath, false,useElevatedTrust);
+           
         }
         private static byte[] SerializeTypeToBuffer(SqoTypeInfo ti)
         {
@@ -321,21 +319,20 @@ namespace Sqo.Core
         public void Open(bool useElevatedTrust)
         {
 
-            file = FileFactory.Create(filePath, false, useElevatedTrust);
+           
         }
         public void MakeEmpty()
         {
-            file.Length = 0;
+           
         }
         public void SetLength(long newLength)
         {
-            file.Length = newLength;
+           
         }
 
         public void Close()
         {
-            file.Flush();
-            file.Close();
+         
         }
         #if ASYNC
         public async Task CloseAsync()
@@ -347,14 +344,11 @@ namespace Sqo.Core
         
         public bool IsClosed
         {
-            get { return file.IsClosed; }
+            get { return false; }
         }
         public void Flush()
         {
-            lock (file)
-            {
-                file.Flush();
-            }
+           
         }
 #if ASYNC
         public async Task FlushAsync()

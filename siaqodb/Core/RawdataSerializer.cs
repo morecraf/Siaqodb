@@ -7,6 +7,7 @@ using Sqo.Meta;
 using System.IO;
 using Sqo.MetaObjects;
 using Sqo.Utilities;
+using LightningDB;
 
 #if ASYNC
 using System.Threading.Tasks;
@@ -32,39 +33,9 @@ namespace Sqo.Core
         }
         
         static Dictionary<string, ISqoFile> filesCache = new Dictionary<string, ISqoFile>();
-        public ISqoFile File 
-        {
+        
 
-            get
-            {
-                lock (_syncRoot)
-                {
-                    if (this.file == null)
-                    {
-                        if (filesCache.ContainsKey(storageEngine.path))
-                        {
-                            this.file= filesCache[storageEngine.path];
-                        }
-                        else
-                        {
-                            if (SiaqodbConfigurator.EncryptedDatabase)
-                            {
-                                this.file = FileFactory.Create(storageEngine.path + Path.DirectorySeparatorChar + "rawdata.esqr", false, this.useElevatedTrust);
-                            }
-                            else
-                            {
-                                this.file = FileFactory.Create(storageEngine.path + Path.DirectorySeparatorChar + "rawdata.sqr", false, this.useElevatedTrust);
-                            }
-                            filesCache.Add(storageEngine.path, this.file);
-
-                        }
-                    }
-                    return this.file;
-                }
-            }
-        }
-
-        public byte[] SerializeArray(object obj, Type objectType, int length, int realLength, int dbVersion, ATuple<int, int> arrayMeta, ObjectSerializer objSerializer, bool elementIsText, LightningDB.LightningTransaction transaction)
+        public byte[] SerializeArray(object obj, Type objectType, int length, int realLength, int dbVersion, string dbName,string fieldName, ObjectSerializer objSerializer, bool elementIsText,int parentOID, LightningDB.LightningTransaction transaction)
         {
 
             byte[] b = new byte[length];
@@ -80,17 +51,18 @@ namespace Sqo.Core
 
 
             ArrayInfo arrayInfo = this.SerializeArray(obj, objectType, objSerializer, dbVersion, elementIsText,transaction);
-           
-            RawdataInfo rinfo = this.GetNewRawinfo(arrayMeta, arrayInfo.rawArray.Length, length - MetaExtractor.ExtraSizeForArray, arrayInfo.NrElements,transaction);
-            int rawOID = rinfo.OID;
-
-            byte[] rawOIDBytes = ByteConverter.SerializeValueType(rawOID, typeof(int), dbVersion);
+            //notused anymore
+            //byte[] rawOIDBytes = ByteConverter.SerializeValueType(rawOID, typeof(int), dbVersion);
+            //Array.Copy(rawOIDBytes, 0, b, 1, rawOIDBytes.Length);
             byte[] nrElementsBytes = ByteConverter.SerializeValueType(arrayInfo.NrElements, typeof(int), dbVersion);
-            Array.Copy(rawOIDBytes, 0, b, 1, rawOIDBytes.Length);
-            Array.Copy(nrElementsBytes, 0, b, rawOIDBytes.Length + 1, nrElementsBytes.Length);
+          
+            Array.Copy(nrElementsBytes, 0, b, 5, nrElementsBytes.Length);
 
-            
-            File.Write(rinfo.Position, arrayInfo.rawArray);
+            string rawKey = parentOID + fieldName;
+            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create);
+
+            byte[] key = ByteConverter.StringToByteArray(rawKey);
+            transaction.Put(db, key, arrayInfo.rawArray);
 
             return b;
 
@@ -463,7 +435,7 @@ namespace Sqo.Core
 
 #endif
       
-        public byte[] SerializeDictionary(object obj, int length, int dbVersion, DictionaryInfo dictInfo,ObjectSerializer objSerializer,LightningDB.LightningTransaction transaction)
+        public byte[] SerializeDictionary(object obj, int length, int dbVersion, DictionaryInfo dictInfo,ObjectSerializer objSerializer,string dbName,string fieldName,int parentOID,LightningDB.LightningTransaction transaction)
         {
             byte[] b = new byte[length];
             if (obj == null)
@@ -527,26 +499,25 @@ namespace Sqo.Core
                 #endregion
 
             }
-            
-            ATuple<int, int> arrayMeta = new ATuple<int, int>(dictInfo.RawOID, nrElements);
-            RawdataInfo rinfo = this.GetNewRawinfo(arrayMeta, rawLength, 0, nrElements,transaction);//element length does not matter because it's stored in place by dictionaryInfo
-            int rawOID = rinfo.OID;
 
-            byte[] rawOIDBytes = ByteConverter.SerializeValueType(rawOID, typeof(int), dbVersion);
+            //byte[] rawOIDBytes = ByteConverter.SerializeValueType(rawOID, typeof(int), dbVersion);
             byte[] nrElementsBytes = ByteConverter.SerializeValueType(nrElements, typeof(int), dbVersion);
             byte[] keyTypeIdBytes = ByteConverter.SerializeValueType(dictInfo.KeyTypeId, typeof(int), dbVersion);
             byte[] valueTypeIdBytes = ByteConverter.SerializeValueType(dictInfo.ValueTypeId, typeof(int), dbVersion);
 
-            int index = 1;
-            Array.Copy(rawOIDBytes, 0, b, index, rawOIDBytes.Length);
-            index += rawOIDBytes.Length;
+            int index = 5;
+            
             Array.Copy(nrElementsBytes, 0, b, index, nrElementsBytes.Length);
             index += nrElementsBytes.Length;
             Array.Copy(keyTypeIdBytes, 0, b, index, keyTypeIdBytes.Length);
             index += keyTypeIdBytes.Length;
             Array.Copy(valueTypeIdBytes, 0, b, index, valueTypeIdBytes.Length);
 
-            File.Write(rinfo.Position, rawArray);
+            string rawKey = parentOID + fieldName;
+            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create);
+
+            byte[] key = ByteConverter.StringToByteArray(rawKey);
+            transaction.Put(db, key, rawArray);
 
             return b;
         }
@@ -640,7 +611,7 @@ namespace Sqo.Core
         }
 #endif
 
-        public object DeserializeDictionary(Type objectType, byte[] bytes, int dbVersion, ObjectSerializer objSerializer, Type parentType, string fieldName, LightningDB.LightningTransaction transaction)
+        public object DeserializeDictionary(Type objectType, byte[] bytes, int dbVersion, ObjectSerializer objSerializer, Type parentType,string dbName, string fieldName,int parentOID, LightningDB.LightningTransaction transaction)
         {
             if (bytes[0] == 1) //is null
             {
@@ -663,15 +634,13 @@ namespace Sqo.Core
             int valueTypeId = (int)ByteConverter.DeserializeValueType(typeof(int), valueTypeIdBytes, dbVersion);
 
 
-            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID,transaction);
-            if (info == null)
-            {
-                return null;
-            }
-            
+            string rawKey = parentOID + fieldName;
+            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create);
+            byte[] dbkey = ByteConverter.StringToByteArray(rawKey);
+            byte[] arrayData = transaction.Get(db, dbkey);
 
-            byte[] arrayData = new byte[info.Length];
-            File.Read(info.Position, arrayData);
+            if (arrayData == null)
+                return null;
 
             object objToReturn = Activator.CreateInstance(objectType);
             IDictionary actualDict = (IDictionary)objToReturn;
@@ -916,7 +885,7 @@ namespace Sqo.Core
             //}
         }
 #endif
-        public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText,bool elementIsText, ObjectSerializer objSerializer, Type parentType, string fieldName,LightningDB.LightningTransaction transaction)
+        public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText,bool elementIsText, ObjectSerializer objSerializer, Type parentType,string dbName, string fieldName,int parentOID,LightningDB.LightningTransaction transaction)
         {
 
             bool isArray = objectType.IsArray;
@@ -925,23 +894,23 @@ namespace Sqo.Core
             {
                 return null;
             }
-            byte[] oidBytes = new byte[4];
+            //notused
+            /*byte[] oidBytes = new byte[4];
             Array.Copy(bytes, 1, oidBytes, 0, 4);
             int rawInfoOID = (int)ByteConverter.DeserializeValueType(typeof(int), oidBytes, dbVersion);
-
+            */
             byte[] nrElemeBytes = new byte[4];
             Array.Copy(bytes, MetaExtractor.ExtraSizeForArray - 4, nrElemeBytes, 0, 4);
             int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, dbVersion);
 
+            string rawKey = parentOID + fieldName;
+            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create);
+            byte[] key = ByteConverter.StringToByteArray(rawKey);
+            byte[] arrayData = transaction.Get(db, key);
 
-            RawdataInfo info = manager.GetRawdataInfo(rawInfoOID,transaction);
-            if (info == null)
-            {
+            if (arrayData == null)
                 return null;
-            }
-
-            byte[] arrayData = new byte[info.Length];
-            File.Read(info.Position, arrayData);
+           
 
             return DeserializeArrayInternal(objectType, arrayData, checkEncrypted, dbVersion, isText,elementIsText,nrElem,objSerializer,parentType,fieldName,transaction);
 
@@ -1280,19 +1249,12 @@ namespace Sqo.Core
         }
       
 #endif
-        public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText, bool elemnIsText, LightningDB.LightningTransaction transaction)
-        {
-            return this.DeserializeArray(objectType, bytes, checkEncrypted, dbVersion, isText, elemnIsText, null, null, null, transaction);
-        }
-#if ASYNC
-        public async Task<object> DeserializeArrayAsync(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText, bool elemnIsText)
-        {
-            return await this.DeserializeArrayAsync(objectType, bytes, checkEncrypted, dbVersion, isText, elemnIsText, null, null, null).ConfigureAwait(false);
-        }
-#endif
+       
         public List<KeyValuePair<int, int>> ReadComplexArrayOids( byte[] bytes, int dbVersion, ObjectSerializer objSerializer,LightningDB.LightningTransaction transaction)
         {
-
+            return null;
+            //TODO LMDB
+            /*
             List<KeyValuePair<int, int>> list = new List<KeyValuePair<int, int>>();
 
             if (bytes[0] == 1) //is null
@@ -1332,7 +1294,7 @@ namespace Sqo.Core
 
             }
             return list;
-
+            */
         }
 #if ASYNC
         public async Task<List<KeyValuePair<int, int>>> ReadComplexArrayOidsAsync(byte[] bytes, int dbVersion, ObjectSerializer objSerializer)
@@ -1382,7 +1344,9 @@ namespace Sqo.Core
 #endif
         public int ReadComplexArrayFirstTID(byte[] bytes, int dbVersion, ObjectSerializer objSerializer,LightningDB.LightningTransaction transaction)
         {
-
+            return -1;
+            //TODO LMDB
+            /*
            
             if (bytes[0] == 1) //is null
             {
@@ -1424,7 +1388,7 @@ namespace Sqo.Core
 
             }
             return -1;
-
+            */
         }
 #if ASYNC
         public async Task<int> ReadComplexArrayFirstTIDAsync(byte[] bytes, int dbVersion, ObjectSerializer objSerializer)
@@ -1481,7 +1445,7 @@ namespace Sqo.Core
         }
         internal void Flush()
         {
-            this.File.Flush();
+            
         }
 #if ASYNC
         internal async Task FlushAsync()
@@ -1491,13 +1455,7 @@ namespace Sqo.Core
 #endif
         internal void Close()
         {
-            this.Flush();
-            if (filesCache.ContainsKey(storageEngine.path))
-            {
-                filesCache.Remove(storageEngine.path);
-                file.Close();
-                this.file = null;
-            }
+            
         }
         #if ASYNC
         internal async Task CloseAsync()
@@ -1523,7 +1481,17 @@ namespace Sqo.Core
 #endif
 
 
-       
+
+
+        internal void DeleteRawRecord(int oid, string dbName, string fieldName, LightningTransaction transaction)
+        {
+            string rawKey = oid + fieldName;
+            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create);
+
+            byte[] key = ByteConverter.StringToByteArray(rawKey);
+            transaction.Delete(db, key);
+
+        }
     }
     
 }

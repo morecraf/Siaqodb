@@ -1519,10 +1519,6 @@ namespace Sqo
 
 
 
-        internal ISqoFile GetRawFile()
-        {
-            return this.rawSerializer.File;
-        }
 
         internal string GetFileName(SqoTypeInfo ti)
         {

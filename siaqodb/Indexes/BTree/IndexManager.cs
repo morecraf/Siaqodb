@@ -28,7 +28,7 @@ namespace Sqo.Indexes
         }
         public bool LoadOidsByIndex(SqoTypeInfo ti, string fieldName, Where where, List<int> oids,LightningDB.LightningTransaction transaction)
         {
-            string indexName = fieldName + ti.TypeName;
+            string indexName = BuildIndexName(fieldName, ti);
             if(existingIndexes.ContainsKey(indexName))
             {
                 IBTree index = new BTree(indexName, transaction);
@@ -174,7 +174,7 @@ namespace Sqo.Indexes
        public IBTree GetIndex(FieldSqoInfo finfo, SqoTypeInfo tinfo, LightningDB.LightningTransaction transaction)
        {
 
-           string indexName = finfo.Name + tinfo.TypeName;
+           string indexName = BuildIndexName(finfo.Name, tinfo);
            BTree index = new BTree(indexName, transaction);
            bool indexExists = false;
 
@@ -250,7 +250,7 @@ namespace Sqo.Indexes
 
            foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
-               string indexName = fi.Name + ti.TypeName;
+               string indexName = BuildIndexName(fi.Name, ti);
                IBTree index = new BTree(indexName, transaction);
               
                index.DeleteItem(objInfo.AtInfo[fi], objInfo.Oid);
@@ -265,7 +265,7 @@ namespace Sqo.Indexes
 
            foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
-               string indexName = fi.Name + ti.TypeName;
+               string indexName = BuildIndexName(fi.Name, ti);
                IBTree index = new BTree(indexName, transaction);
                object indexedVal = this.siaqodb.LoadValue(oid, fi.Name, ti.Type, transaction);
               
@@ -311,7 +311,7 @@ namespace Sqo.Indexes
 
            foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
-               string indexName = fi.Name + ti.TypeName;
+               string indexName = BuildIndexName(fi.Name, ti);
                IBTree index = new BTree(indexName, transaction);
 
                if (oldValuesOfIndexedFields.ContainsKey(fi.Name))//update occur
@@ -443,7 +443,7 @@ namespace Sqo.Indexes
 
                foreach (FieldSqoInfo fi in ti.IndexedFields)
                {
-                   string indexName = fi.Name + ti.TypeName;
+                   string indexName = BuildIndexName(fi.Name, ti);
                    IBTree index = new BTree(indexName, transaction);
 
                    oldValues[fi.Name] = siaqodb.LoadValue(objInfo.Oid, fi.Name, ti.Type,transaction);
@@ -490,7 +490,7 @@ namespace Sqo.Indexes
 
            if (oid > 0 && oid <= ti.Header.numberOfRecords)
            {
-               string indexName = fieldName + ti.TypeName;
+               string indexName = BuildIndexName(fieldName, ti);
                if (existingIndexes.ContainsKey(indexName))
                {
                    IBTree index = new BTree(indexName, transaction);
@@ -528,7 +528,7 @@ namespace Sqo.Indexes
        public void UpdateIndexes(int oid, string fieldName, SqoTypeInfo ti, object oldValue, object newValue,LightningTransaction transaction)
        {
 
-           string indexName = fieldName + ti.TypeName;
+           string indexName = BuildIndexName(fieldName, ti);
            if (existingIndexes.ContainsKey(indexName))
            {
                IBTree index = new BTree(indexName, transaction);
@@ -628,7 +628,7 @@ namespace Sqo.Indexes
        {
            foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
-               string indexName = fi.Name + ti.TypeName;
+               string indexName = BuildIndexName(fi.Name, ti);
 
                DropIndex(indexName, transaction);
                existingIndexes.Remove(indexName);
@@ -649,6 +649,10 @@ namespace Sqo.Indexes
                transaction.Delete(db, ByteConverter.StringToByteArray(indexName));
            }
 
+       }
+       private string BuildIndexName(string fieldName, SqoTypeInfo ti)
+       {
+           return string.Format("idx{0}{1}", fieldName, ti.GetDBName());
        }
     }
 }

@@ -21,20 +21,7 @@ namespace Sqo.Core
     partial class ObjectSerializer
     {
 
-        internal void SaveOID(int oid, SqoTypeInfo ti)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            byte[] oidBuff = ByteConverter.IntToByteArray(oid);
-            file.Write(position, oidBuff);
-        }
-        #if ASYNC
-        internal async Task SaveOIDAsync(int oid, SqoTypeInfo ti)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            byte[] oidBuff = ByteConverter.IntToByteArray(oid);
-            await file.WriteAsync(position, oidBuff).ConfigureAwait(false);
-        }
-#endif
+       
         public byte[] SerializeObject(ObjectInfo oi, RawdataSerializer rawSerializer,LightningTransaction transaction)
         {
 
@@ -98,37 +85,11 @@ namespace Sqo.Core
 
         }
 #endif
-        public void SerializeObject(byte[] objectData, int oid, SqoTypeInfo ti, bool insert)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-
-            file.Write(position, objectData);
-
-            if (insert)
-            {
-                SaveNrRecords(ti, ti.Header.numberOfRecords + 1);
-            }
-
-
-        }
-#if ASYNC
-        public async Task SerializeObjectAsync(byte[] objectData, int oid, SqoTypeInfo ti, bool insert)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-
-            await file.WriteAsync(position, objectData).ConfigureAwait(false);
-
-            if (insert)
-            {
-                await SaveNrRecordsAsync(ti, ti.Header.numberOfRecords + 1).ConfigureAwait(false);
-            }
-
-
-        }
-#endif
         public int SerializeObjectWithNewOID(byte[] objectData, SqoTypeInfo ti)
         {
-            int oid = GetNextOID(ti);
+            return -1;
+            //TODO LMDB
+            /* int oid = GetNextOID(ti);
             byte[] oidBuff = ByteConverter.IntToByteArray(oid);
             Array.Copy(oidBuff, 0, objectData, 0, oidBuff.Length);
            
@@ -137,7 +98,7 @@ namespace Sqo.Core
             file.Write(position, objectData);
 
             SaveNrRecords(ti, ti.Header.numberOfRecords + 1);
-            return oid;
+            return oid;*/
 
         }
 #if ASYNC
@@ -184,12 +145,8 @@ namespace Sqo.Core
                     }
 
                 }
-                int parentOID = -1;
-                if (!oi.Inserted)
-                {
-                    parentOID = oi.Oid;
-                }
-                IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, oi.SqoTypeInfo, parentOID);
+                
+                IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, oi.SqoTypeInfo, oi.Oid);
 
                 by = byteTransformer.GetBytes(oi.AtInfo[ai],transaction);
 
@@ -286,22 +243,7 @@ namespace Sqo.Core
 
             return typeInfo.Header.numberOfRecords + 1;
         }
-        public void SaveNrRecords(SqoTypeInfo ti, int nrRecords)
-        {
-            ti.Header.numberOfRecords = nrRecords;
-            byte[] nrRecodsBuf = ByteConverter.IntToByteArray(ti.Header.numberOfRecords);
-            file.Write(ti.Header.typeNameSize + 16, nrRecodsBuf);
-
-        }
-#if ASYNC
-        public async Task SaveNrRecordsAsync(SqoTypeInfo ti, int nrRecords)
-        {
-            ti.Header.numberOfRecords = nrRecords;
-            byte[] nrRecodsBuf = ByteConverter.IntToByteArray(ti.Header.numberOfRecords);
-            await file.WriteAsync(ti.Header.typeNameSize + 16, nrRecodsBuf).ConfigureAwait(false);
-
-        }
-#endif
+        
         internal byte[] MarkObjectAsDelete(int oid, SqoTypeInfo ti)
         {
 
@@ -322,25 +264,7 @@ namespace Sqo.Core
 
         }
 #endif
-        internal void RollbackDeleteObject(int oid, SqoTypeInfo ti)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            byte[] oidBuff = ByteConverter.IntToByteArray(oid);
-            lock (file)
-            {
-                file.Write(position, oidBuff);
-            }
-        }
-#if ASYNC
-        internal async Task RollbackDeleteObjectAsync(int oid, SqoTypeInfo ti)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            byte[] oidBuff = ByteConverter.IntToByteArray(oid);
-            await file.WriteAsync(position, oidBuff).ConfigureAwait(false);
-            
-        }
-
-#endif
+       
         internal ATuple<int,byte[]> SaveFieldValue(int oid, string field, SqoTypeInfo ti, object value, RawdataSerializer rawSerializer,LightningTransaction transaction)
         {
            
@@ -431,6 +355,8 @@ namespace Sqo.Core
 
         internal void SaveObjectTable(SqoTypeInfo actualTypeinfo, SqoTypeInfo oldSqoTypeInfo, ObjectTable table, RawdataSerializer rawSerializer)
         {
+            //TODO LMDB
+            /*
             Dictionary<FieldSqoInfo, FieldSqoInfo> joinedFields = JoinFieldsSqoInfo(actualTypeinfo, oldSqoTypeInfo);
 
             foreach (ObjectRow row in table.Rows)
@@ -513,7 +439,7 @@ namespace Sqo.Core
                         else
                         {
 
-                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this,ai.IsText,null);
+                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, "",this,ai.IsText,oid,null);
 
                         }
                     }
@@ -528,12 +454,12 @@ namespace Sqo.Core
                             }
                             else
                             {
-                                by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this, ai.IsText,null);
+                                by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null,"", this, ai.IsText,oid,null);
                             }
                         }
                         else
                         {
-                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, this, ai.IsText,null);
+                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null,"", this, ai.IsText,oid,null);
 
                         }
                     }
@@ -566,7 +492,7 @@ namespace Sqo.Core
 
                 file.Write(position, buffer);
 
-            }
+            }*/
 
         }
         
@@ -723,42 +649,16 @@ namespace Sqo.Core
             }
             return fields;
         }
-        public void SaveComplexFieldContent(KeyValuePair<int, int> oid_Tid, FieldSqoInfo fi, SqoTypeInfo ti, int oid)
-        {
-            byte[] by = new byte[MetaExtractor.GetAbsoluteSizeOfField(MetaExtractor.complexID)];
-            byte[] complexOID = ByteConverter.IntToByteArray(oid_Tid.Key);
-            byte[] complexTID = ByteConverter.IntToByteArray(oid_Tid.Value);
-            Array.Copy(complexOID, 0, by, 0, complexOID.Length);
-            Array.Copy(complexTID, 0, by, 4, complexTID.Length);
-
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            file.Write((long)(position + (long)fi.Header.PositionInRecord), by);
-
-
-        }
-#if ASYNC
-        public async Task SaveComplexFieldContentAsync(KeyValuePair<int, int> oid_Tid, FieldSqoInfo fi, SqoTypeInfo ti, int oid)
-        {
-            byte[] by = new byte[MetaExtractor.GetAbsoluteSizeOfField(MetaExtractor.complexID)];
-            byte[] complexOID = ByteConverter.IntToByteArray(oid_Tid.Key);
-            byte[] complexTID = ByteConverter.IntToByteArray(oid_Tid.Value);
-            Array.Copy(complexOID, 0, by, 0, complexOID.Length);
-            Array.Copy(complexTID, 0, by, 4, complexTID.Length);
-
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            await file.WriteAsync((long)(position + (long)fi.Header.PositionInRecord), by).ConfigureAwait(false);
-
-
-        }
-#endif
+      
         internal void SaveArrayOIDFieldContent(SqoTypeInfo ti, FieldSqoInfo fi, int objectOID, int newOID)
         {
-            byte[] arrayOID = ByteConverter.IntToByteArray(newOID);
+           //TODO LMDB
+            /*byte[] arrayOID = ByteConverter.IntToByteArray(newOID);
             long position = MetaHelper.GetSeekPosition(ti, objectOID);
              //an array field has size=9 (isNull(bool) + oid of array table(int)+ nrElements(int)
               //so write oid after first byte which is null/not null
             long writePosition=(long)(position + (long)fi.Header.PositionInRecord+1L);
-            file.Write(writePosition, arrayOID);
+            file.Write(writePosition, arrayOID);*/
         }
 
         [System.Reflection.Obfuscation(Exclude = true)]

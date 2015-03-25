@@ -940,32 +940,18 @@ namespace Sqo
             }
         }
 #endif
-        internal int AllocateNewOID(SqoTypeInfo ti)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.SaveNrRecords(ti, ti.Header.numberOfRecords + 1);
-            return ti.Header.numberOfRecords;
-        }
-#if ASYNC
-        internal async Task<int> AllocateNewOIDAsync(SqoTypeInfo ti)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            await serializer.SaveNrRecordsAsync(ti, ti.Header.numberOfRecords + 1).ConfigureAwait(false);
-            return ti.Header.numberOfRecords;
-        }
-#endif
+  
         private void MarkObjectAsDelete(ObjectSerializer serializer, int oid, SqoTypeInfo ti, LightningTransaction transaction)
         {
             foreach (FieldSqoInfo ai in ti.Fields)
             {
-                IByteTransformer byteTrans = ByteTransformerFactory.GetByteTransformer(null, null, ai, ti);
+                IByteTransformer byteTrans = ByteTransformerFactory.GetByteTransformer(null, null, ai, ti,oid);
                 if (byteTrans is ArrayByteTranformer || byteTrans is DictionaryByteTransformer)
                 {
-                    ATuple<int, int> arrayInfo = this.GetArrayMetaOfField(ti, oid, ai);
-                    if (arrayInfo.Name > 0)
-                    {
-                        rawSerializer.MarkRawInfoAsFree(arrayInfo.Name, transaction);//this helps Shrink method to detect unused rawdata blocks.
-                    }
+                    string dbName = string.Format("raw.{0}", ti.GetDBName());
+
+                    rawSerializer.DeleteRawRecord(oid,dbName,ai.Name, transaction);
+
                 }
             }
             byte[] deletedOid = serializer.MarkObjectAsDelete(oid, ti);

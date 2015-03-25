@@ -195,11 +195,7 @@ namespace Sqo
             {
 
                 int oid = i + 1;
-                if (i % rangeSize == 0)
-                {
-                    int oidEnd = i + rangeSize <= nrRecords ? (i + rangeSize) : nrRecords;
-                    serializer.PreLoadBytes(oid, oidEnd, ti);
-                }
+                
                 if (serializer.IsObjectDeleted(oid, null))
                 {
                     ObjectRow row = obTable.NewRow();
@@ -215,7 +211,7 @@ namespace Sqo
                     obTable.Rows.Add(row);
                 }
             }
-            serializer.ResetPreload();
+           
             return obTable;
         }
 #if ASYNC
@@ -1681,18 +1677,6 @@ namespace Sqo
             }
             serializer.ResetPreload();
             return count;
-        }
-#endif
-        internal ATuple<int, int> GetArrayMetaOfField(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            return serializer.GetArrayMetaOfField(ti, oid, fi);
-        }
-#if ASYNC
-        internal async Task<ATuple<int, int>> GetArrayMetaOfFieldAsync(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            return await serializer.GetArrayMetaOfFieldAsync(ti, oid, fi).ConfigureAwait(false);
         }
 #endif
         private bool ExistsInIncludesCache(Type type, string fieldName)

@@ -32,7 +32,7 @@ namespace Sqo.Core
             {
                 byte[] field = GetFieldBytes(objBytes, ai.Header.PositionInRecord, ai.Header.Length);
 
-                IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti);
+                IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, ti, oid);
 
                 object fieldVal = null;
 
@@ -258,7 +258,7 @@ namespace Sqo.Core
 
             Array.Copy(objBytes, fi.Header.PositionInRecord, b, 0, b.Length);
 
-            IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, fi, ti);
+            IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, fi, ti, oid);
 
             return byteTransformer.GetObject(b,transaction);
 
@@ -426,6 +426,8 @@ namespace Sqo.Core
 #endif
         internal void ReadObjectRow(Sqo.Utilities.ObjectRow row, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
         {
+            //TODO LMDB
+            /*
 
             lock (file)
             {
@@ -470,7 +472,7 @@ namespace Sqo.Core
                 }
             }
 
-
+            */
         }
 #if ASYNC
         internal async Task ReadObjectRowAsync(Sqo.Utilities.ObjectRow row, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
@@ -522,11 +524,13 @@ namespace Sqo.Core
 #endif
         internal byte[] ReadObjectBytes(int oid, SqoTypeInfo ti)
         {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
+            return null;
+            //TODO LMDB
+            /*long position = MetaHelper.GetSeekPosition(ti, oid);
             int recordLength = ti.Header.lengthOfRecord;
             byte[] b = new byte[recordLength];
             file.Read(position, b);
-            return b;
+            return b;*/
         }
 #if ASYNC 
         internal async Task<byte[]> ReadObjectBytesAsync(int oid, SqoTypeInfo ti)
@@ -538,129 +542,7 @@ namespace Sqo.Core
             return b;
         }
 #endif
-        internal ATuple<int, int> GetArrayMetaOfField(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
-            if (fi == null)
-            {
-                throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
-            }
-            byte[] bytes = new byte[fi.Header.Length];
-
-            file.Read((long)(position + (long)fi.Header.PositionInRecord), bytes);
-
-            byte[] oidBytes = new byte[4];
-            Array.Copy(bytes, 1, oidBytes, 0, 4);
-            int rawInfoOID = (int)ByteConverter.DeserializeValueType(typeof(int), oidBytes, ti.Header.version);
-
-            byte[] nrElemeBytes = new byte[4];
-            Array.Copy(bytes, MetaExtractor.ExtraSizeForArray - 4, nrElemeBytes, 0, 4);
-            int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, ti.Header.version);
-
-            return new ATuple<int, int>(rawInfoOID, nrElem);
-
-        }
-        #if ASYNC
-        internal async Task<ATuple<int, int>> GetArrayMetaOfFieldAsync(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
-            if (fi == null)
-            {
-                throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
-            }
-            byte[] bytes = new byte[fi.Header.Length];
-
-            await file.ReadAsync((long)(position + (long)fi.Header.PositionInRecord), bytes).ConfigureAwait(false);
-
-            byte[] oidBytes = new byte[4];
-            Array.Copy(bytes, 1, oidBytes, 0, 4);
-            int rawInfoOID = (int)ByteConverter.DeserializeValueType(typeof(int), oidBytes, ti.Header.version);
-
-            byte[] nrElemeBytes = new byte[4];
-            Array.Copy(bytes, MetaExtractor.ExtraSizeForArray - 4, nrElemeBytes, 0, 4);
-            int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, ti.Header.version);
-
-            return new ATuple<int, int>(rawInfoOID, nrElem);
-
-        }
-
-#endif
-        internal DictionaryInfo GetDictInfoOfField(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
-            if (fi == null)
-            {
-                throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
-            }
-            byte[] bytes = new byte[fi.Header.Length];
-
-            file.Read((long)(position + (long)fi.Header.PositionInRecord), bytes);
-
-            byte[] oidBytes = new byte[4];
-            Array.Copy(bytes, 1, oidBytes, 0, 4);
-            int rawInfoOID = (int)ByteConverter.DeserializeValueType(typeof(int), oidBytes,ti.Header.version);
-
-            byte[] nrElemeBytes = new byte[4];
-            Array.Copy(bytes, oidBytes.Length + 1, nrElemeBytes, 0, 4);
-            int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, ti.Header.version);
-
-            byte[] keyTypeIdBytes = new byte[4];
-            Array.Copy(bytes, oidBytes.Length + nrElemeBytes.Length + 1, keyTypeIdBytes, 0, 4);
-            int keyTypeId = (int)ByteConverter.DeserializeValueType(typeof(int), keyTypeIdBytes, ti.Header.version);
-
-            byte[] valueTypeIdBytes = new byte[4];
-            Array.Copy(bytes, oidBytes.Length + nrElemeBytes.Length + keyTypeIdBytes.Length + 1, valueTypeIdBytes, 0, 4);
-            int valueTypeId = (int)ByteConverter.DeserializeValueType(typeof(int), valueTypeIdBytes, ti.Header.version);
-
-            DictionaryInfo di = new DictionaryInfo();
-            di.RawOID = rawInfoOID;
-            di.NrElements = nrElem;
-            di.KeyTypeId = keyTypeId;
-            di.ValueTypeId = valueTypeId;
-            return di;
-
-        }
-#if ASYNC
-        internal async Task<DictionaryInfo> GetDictInfoOfFieldAsync(SqoTypeInfo ti, int oid, FieldSqoInfo fi)
-        {
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            int recordLength = ti.Header.lengthOfRecord;
-            if (fi == null)
-            {
-                throw new SiaqodbException("Field not exists in the Type Definition, if you use a Property you have to use UseVariable Attribute");
-            }
-            byte[] bytes = new byte[fi.Header.Length];
-
-            await file.ReadAsync((long)(position + (long)fi.Header.PositionInRecord), bytes).ConfigureAwait(false);
-
-            byte[] oidBytes = new byte[4];
-            Array.Copy(bytes, 1, oidBytes, 0, 4);
-            int rawInfoOID = (int)ByteConverter.DeserializeValueType(typeof(int), oidBytes, ti.Header.version);
-
-            byte[] nrElemeBytes = new byte[4];
-            Array.Copy(bytes, oidBytes.Length + 1, nrElemeBytes, 0, 4);
-            int nrElem = (int)ByteConverter.DeserializeValueType(typeof(int), nrElemeBytes, ti.Header.version);
-
-            byte[] keyTypeIdBytes = new byte[4];
-            Array.Copy(bytes, oidBytes.Length + nrElemeBytes.Length + 1, keyTypeIdBytes, 0, 4);
-            int keyTypeId = (int)ByteConverter.DeserializeValueType(typeof(int), keyTypeIdBytes, ti.Header.version);
-
-            byte[] valueTypeIdBytes = new byte[4];
-            Array.Copy(bytes, oidBytes.Length + nrElemeBytes.Length + keyTypeIdBytes.Length + 1, valueTypeIdBytes, 0, 4);
-            int valueTypeId = (int)ByteConverter.DeserializeValueType(typeof(int), valueTypeIdBytes, ti.Header.version);
-
-            DictionaryInfo di = new DictionaryInfo();
-            di.RawOID = rawInfoOID;
-            di.NrElements = nrElem;
-            di.KeyTypeId = keyTypeId;
-            di.ValueTypeId = valueTypeId;
-            return di;
-
-        }
-#endif
+       
         [System.Reflection.Obfuscation(Exclude = true)]
         private EventHandler<ComplexObjectEventArgs> needReadComplexObject;
         [System.Reflection.Obfuscation(Exclude = true)]
@@ -830,50 +712,7 @@ namespace Sqo.Core
             Array.Copy(b, fieldPosition, field, 0, fieldSize);
             return field;
         }
-        byte[] preloadedBytes;
-        int oidStart;
-        int oidEnd;
-        public void PreLoadBytes(int oidStart, int oidEnd, SqoTypeInfo ti)
-        {
-
-            this.oidStart = oidStart;
-            this.oidEnd = oidEnd;
-
-            long positionStart = MetaHelper.GetSeekPosition(ti, oidStart);
-            long positionEnd = MetaHelper.GetSeekPosition(ti, oidEnd);
-
-            int recordLength = ti.Header.lengthOfRecord;
-            if (preloadedBytes == null || preloadedBytes.Length != (recordLength + (positionEnd - positionStart)))
-            {
-                preloadedBytes = new byte[recordLength + (positionEnd - positionStart)];
-            }
-            file.Read(positionStart, preloadedBytes);
-
-        }
-#if ASYNC
-        public async Task PreLoadBytesAsync(int oidStart, int oidEnd, SqoTypeInfo ti)
-        {
-
-            this.oidStart = oidStart;
-            this.oidEnd = oidEnd;
-
-            long positionStart = MetaHelper.GetSeekPosition(ti, oidStart);
-            long positionEnd = MetaHelper.GetSeekPosition(ti, oidEnd);
-
-            int recordLength = ti.Header.lengthOfRecord;
-            if (preloadedBytes == null || preloadedBytes.Length != (recordLength + (positionEnd-positionStart)))
-            {
-                preloadedBytes = new byte[recordLength + (positionEnd-positionStart)];
-            }
-            await file.ReadAsync(positionStart, preloadedBytes).ConfigureAwait(false);
-
-        }
-#endif
-        public void ResetPreload()
-        {
-            oidStart = 0;
-            oidEnd = 0;
-        }
+       
 
     }
 }

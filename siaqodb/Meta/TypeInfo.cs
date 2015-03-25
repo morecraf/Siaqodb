@@ -106,6 +106,19 @@ namespace Sqo.Meta
             get { return this.fileNameForManager; }
             set { this.fileNameForManager = value; }
         }
+        public string GetDBName()
+        {
+            string customName = Cache.CacheCustomFileNames.GetFileName(typeName);
+            if (customName != null)
+            {
+                return customName;
+            }
+
+            string assemblyName = typeName.Substring(typeName.LastIndexOf(',') + 1);
+            string onlyTypeName = typeName.Substring(0, typeName.LastIndexOf(','));
+            string fileName =string.Format("{0}.{1}" , onlyTypeName,assemblyName);
+            return fileName;
+        }
 	
 	}
 }
