@@ -1102,6 +1102,16 @@ savedObject(this, e);
                 }
             }
         }
+        public IObjectList<T> LoadAll<T>(Transactions.ITransaction transaction)
+        {
+            if (transaction == null)
+                throw new ArgumentNullException("transaction");
+            lock (_locker)
+            {
+                SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
+                return storageEngine.LoadAll<T>(ti);
+            }
+        }
 #if ASYNC
         /// <summary>
         /// Load all objects of Type provided

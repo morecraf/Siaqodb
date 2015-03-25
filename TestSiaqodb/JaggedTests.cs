@@ -18,7 +18,7 @@ namespace TestSiaqodb
         public JaggedTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;
-              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
+            Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
         }
 
         private TestContext testContextInstance;

@@ -117,6 +117,72 @@ namespace Sqo.Core
 			
 			return BitConverter.ToDouble(bytes, 0);
 		}
+        public static byte[] DecimaToByteArray(decimal obj)
+        {
+            int[] bits = Decimal.GetBits((decimal)obj);
+            byte[] bytes1 = IntToByteArray(bits[0]);
+            byte[] bytes2 = IntToByteArray(bits[1]);
+            byte[] bytes3 = IntToByteArray(bits[2]);
+            byte[] bytes4 = IntToByteArray(bits[3]);
+            byte[] all = new byte[16];
+            Array.Copy(bytes1, 0, all, 0, 4);
+            Array.Copy(bytes2, 0, all, 4, 4);
+            Array.Copy(bytes3, 0, all, 8, 4);
+            Array.Copy(bytes4, 0, all, 12, 4);
+            return all;
+        }
+        public static decimal ByteArrayToDecimal(byte[] bytes)
+        {
+            int[] bits = new int[4];
+            byte[] bytes1 = new byte[4];
+            byte[] bytes2 = new byte[4];
+            byte[] bytes3 = new byte[4];
+            byte[] bytes4 = new byte[4];
+
+            Array.Copy(bytes, 0, bytes1, 0, 4);
+            Array.Copy(bytes, 4, bytes2, 0, 4);
+            Array.Copy(bytes, 8, bytes3, 0, 4);
+            Array.Copy(bytes, 12, bytes4, 0, 4);
+
+
+            bits[0] = ByteArrayToInt(bytes1);
+            bits[1] = ByteArrayToInt(bytes2);
+            bits[2] = ByteArrayToInt(bytes3);
+            bits[3] = ByteArrayToInt(bytes4);
+            return new Decimal(bits);
+        }
+        public static byte[] DateTimeToByteArray(DateTime obj)
+        {
+            DateTime dt = (DateTime)obj;
+            if ((SiaqodbConfigurator.DateTimeKindToSerialize != null) && (dt.Kind != SiaqodbConfigurator.DateTimeKindToSerialize))
+                dt = DateTime.SpecifyKind(dt, SiaqodbConfigurator.DateTimeKindToSerialize.Value);
+
+            return GetBytes(dt.Ticks, typeof(long));
+        }
+        public static DateTime ByteArrayToDateTime(byte[] bytes)
+        {
+            long readLong = ByteArrayToLong(bytes);
+            DateTime dt = new DateTime(readLong);
+            if (SiaqodbConfigurator.DateTimeKindToSerialize != null)
+            {
+                return DateTime.SpecifyKind(dt, SiaqodbConfigurator.DateTimeKindToSerialize.Value);
+            }
+            return dt;
+        }
+        public static object ByteArrayToEnum(byte[] bytes, Type objectType)
+        {
+            Type enumType = Enum.GetUnderlyingType(objectType);
+            object realObject = ReadBytes(bytes, enumType);
+            return Enum.ToObject(objectType, realObject);
+        }
+        public static byte[] EnumToByteArray(object obj, Type objectType)
+        {
+            Type enumType = Enum.GetUnderlyingType(objectType);
+
+            object realObject = Convertor.ChangeType(obj, enumType);
+            return GetBytes(realObject, enumType);
+        }
+
         public static string ByteArrayToString(byte[] bytes)
         {
 
@@ -147,9 +213,13 @@ namespace Sqo.Core
 			if (objectType == typeof(ulong)) return BitConverter.GetBytes((ulong)obj);
 			if (objectType == typeof(float)) return BitConverter.GetBytes((float)obj);
 			if (objectType == typeof(double)) return BitConverter.GetBytes((double)obj);
-			//if (objectType == typeof(decimal)) return BitConverter.GetBytes((double)obj);
+            if (objectType == typeof(decimal)) return DecimaToByteArray((decimal)obj);
 			if (objectType == typeof(char)) return BitConverter.GetBytes((char)obj);
             if (objectType == typeof(string)) return StringToByteArray((string)obj);
+            if (objectType == typeof(DateTime)) return DateTimeToByteArray((DateTime)obj);
+            if (objectType == typeof(Guid)) return ((Guid)obj).ToByteArray();
+            if (objectType == typeof(TimeSpan)) return GetBytes((((TimeSpan)obj).Ticks), typeof(long));
+            if (objectType.IsEnum()) return EnumToByteArray(obj,objectType);
 
 			if (objectType == typeof(IntPtr)) throw new NotSupportedException("IntPtr type is not supported.");
 			if (objectType == typeof(UIntPtr)) throw new NotSupportedException("UIntPtr type is not supported.");
@@ -500,6 +570,9 @@ namespace Sqo.Core
 
             }
         }
+     
+
+
 		internal static object ReadBytes(byte[] bytes, Type objectType)
 		{
 			if (objectType == typeof(bool)) return bytes[0] == (byte)1 ? true : false;
@@ -515,6 +588,12 @@ namespace Sqo.Core
 			if (objectType == typeof(double)) return BitConverter.ToDouble(bytes, 0);
 			if (objectType == typeof(char)) return BitConverter.ToChar(bytes, 0);
             if (objectType == typeof(string)) return ByteArrayToString(bytes);
+            if (objectType == typeof(decimal)) return ByteArrayToDecimal(bytes);
+            if (objectType == typeof(DateTime)) return ByteArrayToDateTime(bytes);
+            if (objectType == typeof(Guid)) return new Guid(bytes);
+            if (objectType == typeof(TimeSpan)) return TimeSpan.FromTicks(ByteArrayToLong(bytes));
+            if (objectType.IsEnum()) return ByteArrayToEnum(bytes, objectType);
+
 			if (objectType == typeof(IntPtr))
 			{
 				throw new NotSupportedTypeException("Type: IntPtr not supported");

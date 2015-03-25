@@ -150,6 +150,15 @@ namespace Sqo.Indexes
                     {
                         ReadDuplicates(firstKV, indexValues, cursor);
                     }
+                    else //move cursor after all duplicates
+                    {
+                        var currentDuplicate = cursor.MoveNextDuplicate();
+                        while (currentDuplicate.HasValue)
+                        {
+                            currentDuplicate = cursor.MoveNextDuplicate();
+                        }
+
+                    }
                 }
                 while (firstKV.HasValue)
                 {

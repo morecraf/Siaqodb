@@ -1441,7 +1441,7 @@ namespace Sqo
 #endif
         internal object LoadObjectByOID(SqoTypeInfo ti, int oid)
         {
-            return this.LoadObjectByOID(ti, oid, true,null);
+            return this.LoadObjectByOID(ti, oid, true,transactionManager.GetActiveTransaction());
         }
 #if ASYNC
         internal async Task<object> LoadObjectByOIDAsync(SqoTypeInfo ti, int oid)
@@ -1578,7 +1578,7 @@ namespace Sqo
 #endif
         internal T LoadObjectByOID<T>(SqoTypeInfo ti, int oid, bool clearCache)
         {
-            return this.LoadObjectByOID<T>(ti, oid, clearCache, null);
+            return this.LoadObjectByOID<T>(ti, oid, clearCache, transactionManager.GetActiveTransaction());
         }
         internal T LoadObjectByOID<T>(SqoTypeInfo ti, int oid, bool clearCache,LightningTransaction transaction)
         {

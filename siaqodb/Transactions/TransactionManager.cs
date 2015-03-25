@@ -19,9 +19,9 @@ namespace Sqo.Transactions
        
         public TransactionManager(string path)
         {
-            this.env = new LightningEnvironment(path, EnvironmentOpenFlags.None);
+            this.env = new LightningEnvironment(path, EnvironmentOpenFlags.NoLock);
 
-            env.MapSize = 200 * OneMega;
+            env.MapSize = 20 * OneMega;
             env.MaxDatabases = 200;
 
             env.Open();
