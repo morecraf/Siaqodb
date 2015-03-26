@@ -1061,24 +1061,20 @@ namespace Sqo
 #if UNITY3D
         protected virtual void OnLoadingObject(LoadingObjectEventArgs args)
         {
-            if (loadingObject != null)
-            {
-                if (args.ObjectType != typeof(Sqo.MetaObjects.RawdataInfo) && args.ObjectType != typeof(Sqo.Indexes.IndexInfo2))
-                {
-                    loadingObject(this, args);
-                }
-            }
+			if (loadingObject != null) {
+                
+				loadingObject (this, args);
+                
+			}
         }
         protected virtual void OnLoadedObject(int oid,object obj)
         {
-            if (loadedObject != null)
-            {
-                if (obj.GetType() != typeof(Sqo.MetaObjects.RawdataInfo) && obj.GetType() != typeof(Sqo.Indexes.IndexInfo2))
-                {
-                    LoadedObjectEventArgs args = new LoadedObjectEventArgs(oid, obj);
-                    loadedObject(this, args);
-                }
-            }
+			if (loadedObject != null) {
+               
+				LoadedObjectEventArgs args = new LoadedObjectEventArgs (oid, obj);
+				loadedObject (this, args);
+                
+			}
         }
         protected void OnNeedSaveComplexObject(ComplexObjectEventArgs args)
         {

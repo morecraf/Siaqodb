@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\xamarin.ios</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC;</DefineConstants>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
@@ -67,18 +67,11 @@
   <ItemGroup>
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
-    <Compile Include="Cache\CacheForIndexes.cs" />
     <Compile Include="Cache\CacheForManager.cs" />
     <Compile Include="Cache\MetaCache.cs" />
     <Compile Include="Core\ByteConverter.cs" />
-    <Compile Include="Core\FileFactory.cs" />
-    <Compile Include="Core\ISqoFile.cs" />
     <Compile Include="Core\ObjectSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
-    <Compile Include="Core\SqoFile.cs" />
-    <Compile Include="Core\SqoISFile.cs" />
-    <Compile Include="Core\SqoISFile2.cs" />
-    <Compile Include="Core\SqoMDFile.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
@@ -114,12 +107,9 @@
     <Compile Include="Transactions\Transaction.cs" />
     <Compile Include="Transactions\TransactionInternal.cs" />
     <Compile Include="Transactions\TransactionManager.cs" />
-    <Compile Include="Transactions\TransactionObject.cs" />
-    <Compile Include="Transactions\TransactionsStorage.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
     <Compile Include="Utilities\EqualityComparer.cs" />
     <Compile Include="Utilities\ExternalMetaHelper.cs" />
-    <Compile Include="Utilities\ImportExport.cs" />
     <Compile Include="Utilities\MetaHelper.cs" />
     <Compile Include="Utilities\ObjectRow.cs" />
     <Compile Include="Utilities\ObjectTable.cs" />
@@ -133,10 +123,7 @@
     <Compile Include="StorageEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\RawdataSerializer.cs" />
-    <Compile Include="Indexes\IndexInfo.cs" />
     <Compile Include="Utilities\Convertor.cs" />
-    <Compile Include="MetaObjects\RawdataInfo.cs" />
-    <Compile Include="MetaObjects\RawdataManager.cs" />
     <Compile Include="Cache\CircularRefCache.cs" />
     <Compile Include="Linq\IncludeSqoQuery.cs" />
     <Compile Include="Utilities\ATuple.cs" />
@@ -154,9 +141,7 @@
     <Compile Include="MetaObjects\ArrayInfo.cs" />
     <Compile Include="StorageEngine.Loader.cs" />
     <Compile Include="StorageEngine.Saver.cs" />
-    <Compile Include="Core\ByteTransformers\FixedArrayByteTransformer.cs" />
     <Compile Include="Indexes\BTree\BTree.cs" />
-    <Compile Include="Indexes\BTree\BTreeNode.cs" />
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
     <Compile Include="SiaqodbUtil.cs" />
@@ -168,10 +153,50 @@
     <Compile Include="Utilities\SqoLicense.cs" />
     <Compile Include="Cache\CacheDocuments.cs" />
     <Compile Include="Linq\SqoQueryExtensionsImpl.cs" />
-    <Compile Include="Exceptions\IndexCorruptedException.cs" />
+    <Compile Include="Lightning\CursorDeleteOption.cs" />
+    <Compile Include="Lightning\CursorGetByOperation.cs" />
+    <Compile Include="Lightning\CursorOperation.cs" />
+    <Compile Include="Lightning\CursorPutOptions.cs" />
+    <Compile Include="Lightning\DatabaseOpenFlags.cs" />
+    <Compile Include="Lightning\EnvironmentOpenFlags.cs" />
+    <Compile Include="Lightning\GetByOperation.cs" />
+    <Compile Include="Lightning\IClosingEventSource.cs" />
+    <Compile Include="Lightning\LightningClosingEventArgs.cs" />
+    <Compile Include="Lightning\LightningConfig.cs" />
+    <Compile Include="Lightning\LightningCursor.cs" />
+    <Compile Include="Lightning\LightningCursorExtensions.cs" />
+    <Compile Include="Lightning\LightningCursorMoveExtensions.cs" />
+    <Compile Include="Lightning\LightningDatabase.cs" />
+    <Compile Include="Lightning\LightningEnvironment.cs" />
+    <Compile Include="Lightning\LightningException.cs" />
+    <Compile Include="Lightning\LightningTransaction.cs" />
+    <Compile Include="Lightning\LightningTransactionExtensions.cs" />
+    <Compile Include="Lightning\LightningTransactionState.cs" />
+    <Compile Include="Lightning\LightningVersionInfo.cs" />
+    <Compile Include="Lightning\PutOptions.cs" />
+    <Compile Include="Lightning\TransactionBeginFlags.cs" />
+    <Compile Include="Lightning\UnixAccessMode.cs" />
+    <Compile Include="Lightning\Collections\CursorEnumerable.cs" />
+    <Compile Include="Lightning\Collections\CursorEnumerator.cs" />
+    <Compile Include="Lightning\Collections\CursorGenericEnumerable.cs" />
+    <Compile Include="Lightning\Collections\CursorGenericEnumerator.cs" />
+    <Compile Include="Lightning\Converters\ConvertFromBytesInstance.cs" />
+    <Compile Include="Lightning\Converters\ConvertToBytesInstance.cs" />
+    <Compile Include="Lightning\Converters\ConverterExtensions.cs" />
+    <Compile Include="Lightning\Converters\ConverterNotFoundException.cs" />
+    <Compile Include="Lightning\Converters\ConverterStore.cs" />
+    <Compile Include="Lightning\Converters\DefaultConverters.cs" />
+    <Compile Include="Lightning\Converters\IConvertFromBytes.cs" />
+    <Compile Include="Lightning\Converters\IConvertToBytes.cs" />
+    <Compile Include="Lightning\Native\INativeLibraryFacade.cs" />
+    <Compile Include="Lightning\Native\MarshalValueStructure.cs" />
+    <Compile Include="Lightning\Native\Native.cs" />
+    <Compile Include="Lightning\Native\NativeLibraryFacades.cs" />
+    <Compile Include="Lightning\Native\ValueStructure.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AsyncLocker\" />
+    <Folder Include="Lightning\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28Xamarin%29.csproj">

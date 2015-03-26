@@ -553,25 +553,17 @@ namespace Sqo
 		{
 			if (savingObject != null)
 			{
-				 if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Sqo.Indexes.IndexInfo2))
-               {}
-else
-{
+				 
 				savingObject(this, e);
-}
+
 			}
 		}
 		protected virtual void OnSavedObject(SavedEventsArgs e)
 		{
-			if (savedObject != null)
-			{
- if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Sqo.Indexes.IndexInfo2))
-               {}
-else
-{				
-savedObject(this, e);
-}
+			if (savedObject != null) {
+				savedObject (this, e);
 			}
+
 		}
 		protected virtual void OnDeletingObject(DeletingEventsArgs e)
 		{
