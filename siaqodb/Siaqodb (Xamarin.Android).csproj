@@ -176,6 +176,7 @@
   <ItemGroup>
     <Folder Include="AsyncLocker\" />
     <Folder Include="Lightning\" />
+    <Folder Include="lib\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
@@ -183,5 +184,8 @@
       <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
       <Name>SiaqodbPortable (Xamarin)</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedNativeLibrary Include="lib\armeabi-v7a\liblmdb.so" />
   </ItemGroup>
 </Project>

@@ -204,4 +204,10 @@
       <Name>SiaqodbPortable (Xamarin)</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="native\ios\liblmdb.a">
+      <IsCxx>False</IsCxx>
+      <Kind>Static</Kind>
+    </NativeReference>
+  </ItemGroup>
 </Project>
