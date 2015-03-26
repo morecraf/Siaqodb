@@ -13,9 +13,7 @@ using Sqo.Cache;
 using System.Reflection;
 using System.Threading;
 using Sqo.Indexes;
-#if WinRT
-using Windows.Storage;
-#endif
+
 #if ASYNC
 using System.Threading.Tasks;
 #endif
@@ -43,9 +41,7 @@ namespace Sqo
         private readonly object _locker = new object();
 
         
-#if WinRT
-        StorageFolder databaseFolder;
-#endif
+
         string path;
         StorageEngine storageEngine;
         Cache.CacheForManager cacheForManager;
@@ -239,13 +235,13 @@ namespace Sqo
         /// Create a new instance of Siaqodb and open the database
         /// </summary>
         /// <param name="path">Physical folder name where objects are stored</param>
-#if !WinRT
+
         public Siaqodb(string path)
         {
             
             this.Open(path);
         }
-#endif
+
 #if SL4
        /// <summary>
         ///Create a new instance of Siaqodb, open database for OOB mode
@@ -335,7 +331,7 @@ namespace Sqo
             
             
         }
-#if !WinRT
+
         /// <summary>
         /// Open database folder
         /// </summary>
@@ -400,67 +396,8 @@ namespace Sqo
             cacheForManager = new Sqo.Cache.CacheForManager();
         }
        #endif
-#endif
-#if WinRT
-        /// <summary>
-        /// Open database folder
-        /// </summary>
-        /// <param name="databaseFolder">path where objects are stored</param>
-        public async Task OpenAsync(StorageFolder databaseFolder)
-        {
-
-            this.opened = true;
-            this.databaseFolder = databaseFolder;
-            this.path = databaseFolder.Path;
-            this.metaCache = new MetaCache();
-            storageEngine = new StorageEngine(this.databaseFolder);
-            indexManager = new IndexManager(this);
-            storageEngine.indexManager = indexManager;
-            storageEngine.metaCache = this.metaCache;
-            storageEngine.NeedSaveComplexObject += new EventHandler<Core.ComplexObjectEventArgs>(storageEngine_NeedSaveComplexObject);
-            storageEngine.NeedSaveComplexObjectAsync += storageEngine_NeedSaveComplexObjectAsync;
-            storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
-            storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
-
-            await storageEngine.LoadAllTypesAsync();
-            List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
-            await this.indexManager.BuildAllIndexesAsync(typesForIndexes);
-
-            await this.RecoverAfterCrashAsync();
-            cacheForManager = new Sqo.Cache.CacheForManager();
-
-            
-        }
-        /// <summary>
-        /// Open database folder
-        /// </summary>
-        /// <param name="databaseFolder">path where objects are stored</param>
-        public void Open(StorageFolder databaseFolder)
-        {
-
-            this.opened = true;
-            this.databaseFolder = databaseFolder;
-            this.path = databaseFolder.Path;
-            this.metaCache = new MetaCache();
-            storageEngine = new StorageEngine(this.databaseFolder);
-            indexManager = new IndexManager(this);
-            storageEngine.indexManager = indexManager;
-            storageEngine.metaCache = this.metaCache;
-            storageEngine.NeedSaveComplexObject += new EventHandler<Core.ComplexObjectEventArgs>(storageEngine_NeedSaveComplexObject);
-            storageEngine.NeedSaveComplexObjectAsync += storageEngine_NeedSaveComplexObjectAsync;
-            storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
-            storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
-
-            storageEngine.LoadAllTypes();
-            List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
-            this.indexManager.BuildAllIndexes(typesForIndexes);
-
-            this.RecoverAfterCrash();
-            cacheForManager = new Sqo.Cache.CacheForManager();
 
 
-        }
-#endif
 #if SL4
         /// <summary>
         /// Open database

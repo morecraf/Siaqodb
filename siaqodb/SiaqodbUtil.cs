@@ -9,9 +9,7 @@ using System.Linq.Expressions;
 #if ASYNC
 using System.Threading.Tasks;
 #endif
-#if WinRT
-using Windows.Storage;
-#endif
+
 namespace Sqo
 {
 

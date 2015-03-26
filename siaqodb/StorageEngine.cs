@@ -19,10 +19,7 @@ using LightningDB;
 using System.Threading.Tasks;
 
 #endif
-#if WinRT
-using Windows.Storage.Search;
-using Windows.Storage;
-#endif
+
 #if SILVERLIGHT
 	using System.IO.IsolatedStorage;
 #endif
@@ -35,9 +32,7 @@ namespace Sqo
     {
         #region VAR DECLARATIONS
 
-#if WinRT
-        internal StorageFolder storageFolder;
-#endif
+
         internal string path;
         private object _syncRoot=new object();
         internal MetaCache metaCache;
@@ -176,22 +171,6 @@ namespace Sqo
            
         }
 
-#if WinRT
-        public StorageEngine(StorageFolder s)
-        {
-
-            if (!SqoLicense.LicenseValid())
-            {
-                  throw new InvalidLicenseException("License not valid!");
-            }
-            this.storageFolder = s;
-            this.path = storageFolder.Path;
-            SerializerFactory.ClearCache(this.storageFolder.Path);
-            this.rawSerializer = new RawdataSerializer(this, useElevatedTrust);
-
-
-        }
-#endif
 
 
         #endregion
@@ -400,37 +379,7 @@ namespace Sqo
 #endif
 
             }
-#elif WinRT
-            //List<string> fileFilter = new List<string>();
-          //  fileFilter.Add("*");
-          //  QueryOptions qo = new QueryOptions();
-            //qo.se = fileFilter;
-           // qo.UserSearchFilter = extension;
-            //StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
-            IReadOnlyList<IStorageFile> files = storageFolder.GetFilesAsync().AsTask().Result;
 
-            List<SqoTypeInfo> list = new List<SqoTypeInfo>();
-
-
-            foreach (IStorageFile f in files)
-            {
-                if (f.FileType != extension)
-                    continue;
-                string typeName = f.Name.Replace(extension, "");
-                if (typeName.StartsWith("Sqo.Indexes.IndexInfo2.") || typeName.StartsWith("Sqo.MetaObjects.RawdataInfo."))//engine types
-                {
-                    continue;
-                }
-                ObjectSerializer seralizer = SerializerFactory.GetSerializer(storageFolder.Path, typeName, useElevatedTrust);
-
-                SqoTypeInfo ti =  seralizer.DeserializeSqoTypeInfo(false);
-                if (ti != null)
-                {
-                    ti.FileNameForManager = typeName;
-                    list.Add(ti);
-                }
-            }
-            return list;
 #else
             List<SqoTypeInfo> list = new List<SqoTypeInfo>();
 
@@ -540,36 +489,7 @@ namespace Sqo
 #endif
 
             }
-#elif WinRT
-            //List<string> fileFilter = new List<string>();
-           // fileFilter.Add("*");
-            //QueryOptions qo = new QueryOptions();
-           // qo.UserSearchFilter = extension;
-            //StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
-            IReadOnlyList<IStorageFile> files = await storageFolder.GetFilesAsync();
 
-            List<SqoTypeInfo> list = new List<SqoTypeInfo>();
-
-
-            foreach (IStorageFile f in files)
-            {
-                if (f.FileType != extension)
-                    continue;
-                string typeName = f.Name.Replace(extension, "");
-                if (typeName.StartsWith("Sqo.Indexes.IndexInfo2.") || typeName.StartsWith("Sqo.MetaObjects.RawdataInfo."))//engine types
-                {
-                    continue;
-                }
-                ObjectSerializer seralizer = SerializerFactory.GetSerializer(storageFolder.Path, typeName, useElevatedTrust);
-
-                SqoTypeInfo ti = await seralizer.DeserializeSqoTypeInfoAsync(false).ConfigureAwait(false);
-                if (ti != null)
-                {
-                    ti.FileNameForManager = typeName;
-                    list.Add(ti);
-                }
-            }
-            return list;
 #else
             List<SqoTypeInfo> list = new List<SqoTypeInfo>();
 
@@ -598,192 +518,43 @@ namespace Sqo
         }
        
 #endif
+
         internal void LoadAllTypes()
         {
-           
-			
-#if SILVERLIGHT
-            string extension = ".sqo";
-            if (SiaqodbConfigurator.EncryptedDatabase)
+
+            var transaction = transactionManager.GetActiveTransaction();
             {
-                extension = ".esqo";
-            }
-
-            if (!this.useElevatedTrust)
-            {
-                IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
-                if (isf.DirectoryExists(path))
+                var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
                 {
-                    //isf.Remove();
-                    //isf = IsolatedStorageFile.GetUserStoreForApplication();
-
-                    //isf.CreateDirectory(path);
-                }
-                else
-                {
-                    isf.CreateDirectory(path);
-                }
-                this.LoadMetaDataTypes();
-
-                string searchPath = Path.Combine(path, "*"+extension);
-                string[] files = isf.GetFileNames(searchPath);
-
-                foreach (string f in files)
-                {
-                    string typeName = f.Replace(extension, "");
-                    //System.Reflection.Assembly a = System.Reflection.Assembly.Load(typeName.Split(',')[1]);
-                    //Type t = Type.GetType(typeName);
-                    if (typeName.StartsWith("indexinfo") || typeName.StartsWith("rawdatainfo"))//engine types
+                    using (var cursor = transaction.CreateCursor(db))
                     {
-                        continue;
-                    }
-                    ObjectSerializer seralizer = SerializerFactory.GetSerializer(path, typeName, useElevatedTrust);
-                    SqoTypeInfo ti = seralizer.DeserializeSqoTypeInfo(true);
-                   
-                    if (ti != null)
-                    {
-                        if (this.GetFileByType(ti) != typeName)//check for custom fileName
+                        var current = cursor.MoveNext();
+
+                        while (current.HasValue)
                         {
-                            continue;
+                            byte[] keyBytes = current.Value.Key;
+                            string typeName = ByteConverter.ByteArrayToString(keyBytes);
+
+                            byte[] tiBytes = current.Value.Value;
+                            if (tiBytes != null)
+                            {
+                                SqoTypeInfo ti = ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tiBytes, true);
+                                if (ti != null)
+                                {
+                                    this.CompareSchema(ti);
+                                }
+                            }
+                            current = cursor.MoveNext();
                         }
-
-                        this.CompareSchema(ti);
                     }
-                   
-
 
                 }
             }
-            else //elevatedTrust
-            {
-#if SL4
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                this.LoadMetaDataTypes();
 
-                System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(path);
-                foreach (FileInfo f in di.EnumerateFiles("*"+extension))
-                {
-                    string typeName = f.Name.Replace(extension, "");
-                    if (typeName.StartsWith("indexinfo") || typeName.StartsWith("rawdatainfo"))//engine types
-                    {
-                        continue;
-                    }
-                    ObjectSerializer seralizer = SerializerFactory.GetSerializer(path, typeName, useElevatedTrust);
-
-                    SqoTypeInfo ti = seralizer.DeserializeSqoTypeInfo(true);
-
-               
-                    if (ti != null)
-                    {
-                        if (this.GetFileByType(ti) != typeName)//check for custom fileName
-                        {
-                            continue;
-                        }
-
-                        this.CompareSchema(ti);
-                    }
-             
-
-
-                }
-#endif
-
-            }
-#elif WinRT
-            this.LoadMetaDataTypes();
-
-            string extension = ".sqo";
-            if (SiaqodbConfigurator.EncryptedDatabase)
-            {
-                extension = ".esqo";
-            }
-            //List<string> fileFilter = new List<string>();
-            ////fileFilter.Add("*");
-            //QueryOptions qo = new QueryOptions();
-            //qo.UserSearchFilter = extension;
-            //StorageFileQueryResult resultQuery = storageFolder.CreateFileQueryWithOptions(qo);
-            IReadOnlyList<StorageFile> files = storageFolder.GetFilesAsync().AsTask().Result;
-
-            List<SqoTypeInfo> listToBuildIndexes = new List<SqoTypeInfo>();
-            foreach (StorageFile f in files)
-            {
-                if (f.FileType != extension)
-                    continue;
-
-                string typeName = f.Name.Replace(extension, "");
-
-                //Type t=Type.GetType(typeName);
-                if (typeName.StartsWith("indexinfo2.") || typeName.StartsWith("rawdatainfo."))//engine types
-                {
-                    continue;
-                }
-                ObjectSerializer seralizer = SerializerFactory.GetSerializer(storageFolder.Path, typeName, this.useElevatedTrust);
-
-                SqoTypeInfo ti = seralizer.DeserializeSqoTypeInfo(true);
-
-
-
-
-                if (ti != null)
-                {
-                    if (this.GetFileByType(ti) != typeName)//check for custom fileName
-                    {
-                        continue;
-                    }
-
-                    this.CompareSchema(ti);
-
-                }
-
-
-            }
-#else
-
-            if (Directory.Exists(path))
-			{
-				
-                 var transaction=transactionManager.GetActiveTransaction();
-                 {
-                     var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
-                     {
-                         using (var cursor = transaction.CreateCursor(db))
-                         {
-                             var current = cursor.MoveNext();
-
-                             while (current.HasValue)
-                             {
-                                 byte[] keyBytes = current.Value.Key;
-                                 string typeName = ByteConverter.ByteArrayToString(keyBytes);
-                                 
-                                 byte[] tiBytes = current.Value.Value;
-                                 if (tiBytes != null)
-                                 {
-                                     SqoTypeInfo ti= ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tiBytes, true);
-                                     if (ti != null)
-                                     {
-                                         this.CompareSchema(ti);
-                                     }
-                                 }
-                                 current = cursor.MoveNext();
-                             }
-                         }
-
-                     }
-                 }
-			}
-			else
-			{ 
-				
-				throw new SiaqodbException("Invalid folder path!");
-			}
-#endif
 
 
         }
-        
+
 #if ASYNC
         internal async Task LoadAllTypesAsync()
         {

@@ -410,16 +410,7 @@ namespace Sqo
         /// </summary>
         public static bool UseLongDBFileNames { get { return useLongDBFileNames; } set { useLongDBFileNames = value; } }
 #endif
-#if WinRT
-        static bool useLargeBuffers = true;
-        /// <summary>
-        /// Set this to true in case that is needed to cache more data,when there is big amount of data to import/insert and use Flush() when inserts are finished.
-        /// Set this to false in case that is needed more reads in the app and when inserts occur that inserts are not in loops, also in OOB mode if you store data on My...folders'
-        /// By default the value set is TRUE
-        /// </summary>
-        public static bool UseLargeBuffers { get { return useLargeBuffers; } set { useLargeBuffers = value; } }
-        
-#endif
+
         /// <summary>
         /// Set custom fileName on disk of database file for Type T
         /// </summary>
