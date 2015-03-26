@@ -1365,12 +1365,19 @@ namespace Sqo.Core
 
         internal void DeleteRawRecord(int oid, string dbName, string fieldName, LightningTransaction transaction)
         {
-            string rawKey = oid + fieldName;
-            var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create);
+            try
+            {
+                string rawKey = oid + fieldName;
+                var db = transaction.OpenDatabase(dbName, DatabaseOpenFlags.Create);
 
-            byte[] key = ByteConverter.StringToByteArray(rawKey);
-            transaction.Delete(db, key);
-
+                byte[] key = ByteConverter.StringToByteArray(rawKey);
+                transaction.Delete(db, key);
+            }
+            catch (LightningException ex)
+            {
+                if (!ex.Message.Contains("MDB_NOTFOUND"))
+                    throw ex;
+            }
         }
     }
     

@@ -262,7 +262,7 @@ namespace Sqo
             
             this.opened = true;
             this.path = path;
-            transactionManager = new Transactions.TransactionManager(path);
+            transactionManager = new Transactions.TransactionManager(path,20*1024*1024,200);
             storageEngine = new StorageEngine(this.path,transactionManager);
             indexManager = new IndexManager(this);
             storageEngine.indexManager = indexManager;
@@ -295,7 +295,7 @@ namespace Sqo
 #if  SILVERLIGHT
             storageEngine = new StorageEngine(this.path, true);
 #else
-            transactionManager = new Transactions.TransactionManager(path);
+            transactionManager = new Transactions.TransactionManager(path,20*1024*1024,200);
             storageEngine = new StorageEngine(this.path, transactionManager);
 #endif
             
@@ -331,12 +331,21 @@ namespace Sqo
             
             
         }
-
         /// <summary>
-        /// Open database folder
+        /// Open database 
         /// </summary>
-        /// <param name="path">path where objects are stored</param>
+        /// <param name="path"></param>
         public void Open(string path)
+        {
+            this.Open(path,20971520,200);
+        }
+/// <summary>
+        /// Open database 
+/// </summary>
+/// <param name="path">database folder</param>
+/// <param name="maxDatabaseSize">max database size in bytes (20 MB is default)</param>
+/// <param name="maxSubDatabases">max number of subdatabases(200 is default)</param>
+        public void Open(string path, long maxDatabaseSize, int maxSubDatabases)
         {
 
             this.opened = true;
@@ -344,7 +353,7 @@ namespace Sqo
             this.metaCache = new MetaCache();
 
 
-            transactionManager = new Transactions.TransactionManager(path);
+            transactionManager = new Transactions.TransactionManager(path, maxDatabaseSize, maxSubDatabases);
             storageEngine = new StorageEngine(this.path, transactionManager);
             indexManager = new IndexManager(this);
             storageEngine.indexManager = indexManager;
@@ -354,9 +363,9 @@ namespace Sqo
 #if ASYNC
             storageEngine.NeedSaveComplexObjectAsync += storageEngine_NeedSaveComplexObjectAsync;
 #endif
-            storageEngine.LoadingObject+=new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
-            storageEngine.LoadedObject+=new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
-             #if UNITY3D || CF || MONODROID
+            storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
+            storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
+#if UNITY3D || CF || MONODROID
 #else
             storageEngine.IndexesSaveAsyncFinished += new EventHandler<IndexesSaveAsyncFinishedArgs>(storageEngine_IndexesSaveAsyncFinished);
 #endif
@@ -1999,74 +2008,7 @@ savedObject(this, e);
 
         }
 #endif
-#if !UNITY3D
-        /// <summary>
-        /// Export to XML all objects of Type provided from database
-        /// </summary>
-        /// <typeparam name="T">Type of objects to be exported</typeparam>
-        /// <param name="writer">XmlWriter</param>
-        public void ExportToXML<T>(System.Xml.XmlWriter writer) 
-        {
-            IObjectList<T> objects = this.LoadAll<T>();
-            this.ExportToXML<T>(writer, objects);
-        }
-        /// <summary>
-        /// Export to XML list of objects provided
-        /// </summary>
-        /// <typeparam name="T">Type of objects</typeparam>
-        /// <param name="writer">XmlWriter</param>
-        /// <param name="objects">list of objects to be exported</param>
-        public void ExportToXML<T>(System.Xml.XmlWriter writer,IList<T> objects) 
-        {
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            if (writer == null)
-            {
-                throw new ArgumentNullException();
-            }
-            if (objects == null)
-            {
-                throw new ArgumentNullException();
-            }
-            ImportExport.ExportToXML<T>(writer,objects,this);
-        }
-        /// <summary>
-        /// Import from XML objects and return a list of them
-        /// </summary>
-        /// <typeparam name="T">Type of objects to be imported</typeparam>
-        /// <param name="reader">XmlReader</param>
-        /// <returns>List of objects imported</returns>
-        public IObjectList<T> ImportFromXML<T>(System.Xml.XmlReader reader) 
-        {
-            if (reader == null)
-            {
-                throw new ArgumentNullException();
-            }
-            return ImportExport.ImportFromXML<T>(reader, this);
-        }
-      
-        /// <summary>
-        /// Import from XML objects and return a list and save into database
-        /// </summary>
-        /// <typeparam name="T">Type of objects to be imported</typeparam>
-        /// <param name="reader">XmlReader</param>
-        /// <param name="importIntoDB">if TRUE objects are saved also in database</param>
-        /// <returns>List of objects imported</returns>
-        public IObjectList<T> ImportFromXML<T>(System.Xml.XmlReader reader, bool importIntoDB) 
-        {
-            IObjectList<T> objects = this.ImportFromXML<T>(reader);
-            if (importIntoDB)
-            {
-                foreach (T o in objects)
-                {
-                    this.StoreObject(o);
-                }
-            }
-            return objects;
-        }
-#endif
+        
      
         
        

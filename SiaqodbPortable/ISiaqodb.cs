@@ -19,14 +19,7 @@ namespace Sqo
         void DropType(Type type);
         void DropType<T>();
         
-#if !UNITY3D
-        void ExportToXML<T>(System.Xml.XmlWriter writer);
-        void ExportToXML<T>(System.Xml.XmlWriter writer, System.Collections.Generic.IList<T> objects);
-        IObjectList<T> ImportFromXML<T>(System.Xml.XmlReader reader);
-        IObjectList<T> ImportFromXML<T>(System.Xml.XmlReader reader, bool importIntoDB);
-#elif !CF && !UNITY3D
-         event EventHandler<IndexesSaveAsyncFinishedArgs> IndexesSaveAsyncFinished;
-#endif
+
         void Flush();
         System.Collections.Generic.List<MetaType> GetAllTypes();
         string GetDBPath();

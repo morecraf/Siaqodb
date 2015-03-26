@@ -243,7 +243,6 @@
     <Compile Include="Utilities\Convertor.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
     <Compile Include="Utilities\ExternalMetaHelper.cs" />
-    <Compile Include="Utilities\ImportExport.cs" />
     <Compile Include="Utilities\MetaHelper.cs" />
     <Compile Include="Utilities\ObjectRow.cs" />
     <Compile Include="Utilities\ObjectTable.cs" />

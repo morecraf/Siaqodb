@@ -5,6 +5,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
 [assembly: Obfuscation(Feature = "encrypt symbol names with password alisia_21", Exclude = false)]
+[assembly: Obfuscation(Feature = "Apply to LightningDB.*: all", Exclude = true, ApplyToMembers = true)]
 #if UNITY3D
 [assembly: Obfuscation(Feature = "Apply to ExpressionCompiler.*: all", Exclude = true, ApplyToMembers = true)]
 [assembly: Obfuscation(Feature = "Apply to System.Linq.jvm.*: all", Exclude = true, ApplyToMembers = true)]

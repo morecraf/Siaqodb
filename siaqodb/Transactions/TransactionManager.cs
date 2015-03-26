@@ -15,14 +15,13 @@ namespace Sqo.Transactions
     class TransactionManager:IDisposable
     {
         LightningEnvironment env;
-        const int OneMega = 1024 * 1024;
        
-        public TransactionManager(string path)
+        public TransactionManager(string path,long maxSize,int maxDbs)
         {
             this.env = new LightningEnvironment(path, EnvironmentOpenFlags.NoLock);
 
-            env.MapSize = 20 * OneMega;
-            env.MaxDatabases = 200;
+            env.MapSize = maxSize;
+            env.MaxDatabases = maxDbs;
 
             env.Open();
         }
