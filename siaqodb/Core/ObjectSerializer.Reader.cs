@@ -387,43 +387,7 @@ namespace Sqo.Core
             return oidOfComplexObj;
         }
 #endif
-        internal bool IsObjectDeleted(int oid, byte[] objBytes)
-        {
-
-            byte[] bytes = new byte[4];//oid size-int size
-            Array.Copy(objBytes, 0, bytes, 0, bytes.Length);
-
-            int oidFromFile = ByteConverter.ByteArrayToInt(bytes);
-            if (oid == -oidFromFile)
-                return true;
-
-            return false;
-
-        }
-#if ASYNC
-        internal async Task<bool> IsObjectDeletedAsync(int oid, SqoTypeInfo ti)
-        {
-
-            // long position = (long)ti.Header.headerSize + (long)((long)(oid - 1) * (long)ti.Header.lengthOfRecord);
-            long position = MetaHelper.GetSeekPosition(ti, oid);
-            byte[] bytes = new byte[4];//oid size-int size
-            if (oidStart == 0 && oidEnd == 0)
-            {
-                await file.ReadAsync(position, bytes).ConfigureAwait(false);
-            }
-            else
-            {
-                int oidPosition = (oid - oidStart) * ti.Header.lengthOfRecord;
-                Array.Copy(preloadedBytes, oidPosition, bytes, 0, bytes.Length);
-            }
-            int oidFromFile = ByteConverter.ByteArrayToInt(bytes);
-            if (oid == -oidFromFile)
-                return true;
-
-            return false;
-
-        }
-#endif
+       
         internal void ReadObjectRow(Sqo.Utilities.ObjectRow row, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
         {
             //TODO LMDB

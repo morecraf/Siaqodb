@@ -234,11 +234,6 @@ namespace Sqo
             }
         
         }
-        public bool BuildIndexesAsync
-        {
-            get;
-            set;
-        }
         /// <summary>
         /// By default this is true for all types. Set this to false to not load childs entities of objects of Type provided
         /// </summary>
@@ -296,11 +291,7 @@ namespace Sqo
         }
         public VerboseLevel VerboseLevel { get; set; }
 
-        public decimal BufferingChunkPercent
-        {
-            get;
-            set;
-        }
+      
         protected void OnLoadRelatedObjectsPropetyChanged(EventArgs e)
         {
             if (this.LoadRelatedObjectsPropetyChanged != null)

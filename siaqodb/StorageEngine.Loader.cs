@@ -51,11 +51,7 @@ namespace Sqo
                             int oid = ByteConverter.ByteArrayToInt(oidBytes);
                             if (crObjBytes != null)
                             {
-                                if (serializer.IsObjectDeleted(oid, crObjBytes))
-                                {
-                                    current = cursor.MoveNext();
-                                    continue;
-                                }
+                               
                                 if (SiaqodbConfigurator.RaiseLoadEvents)
                                 {
                                     LoadingObjectEventArgs args = new LoadingObjectEventArgs(oid, ti.Type);
@@ -180,9 +176,7 @@ namespace Sqo
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
 
             int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
-            if (rangeSize < 1) rangeSize = 1;
-
+         
             obTable.Columns.Add("OID", 0);
             int j = 1;
             foreach (FieldSqoInfo fi in ti.Fields)
@@ -195,21 +189,14 @@ namespace Sqo
             {
 
                 int oid = i + 1;
-                
-                if (serializer.IsObjectDeleted(oid, null))
-                {
-                    ObjectRow row = obTable.NewRow();
-                    row["OID"] = -oid;
-                    obTable.Rows.Add(row);
-                }
-                else
-                {
-                    ObjectRow row = obTable.NewRow();
-                    row["OID"] = oid;
-                    serializer.ReadObjectRow(row, ti, oid, rawSerializer);
 
-                    obTable.Rows.Add(row);
-                }
+
+                ObjectRow row = obTable.NewRow();
+                row["OID"] = oid;
+                serializer.ReadObjectRow(row, ti, oid, rawSerializer);
+
+                obTable.Rows.Add(row);
+
             }
            
             return obTable;
@@ -378,11 +365,7 @@ namespace Sqo
                             int oid = ByteConverter.ByteArrayToInt(oidBytes);
                             if (crObjBytes != null)
                             {
-                                if (serializer.IsObjectDeleted(oid, crObjBytes))
-                                {
-                                    current = cursor.MoveNext();
-                                    continue;
-                                }
+                                
                                 int oidOfComplex = serializer.ReadOidOfComplex(ti, oid, crObjBytes,fieldName, this.rawSerializer);
 
                                 int index = insideOids.BinarySearch(oidOfComplex);//intersection
@@ -454,11 +437,7 @@ namespace Sqo
                                 int oid = ByteConverter.ByteArrayToInt(oidBytes);
                                 if (crObjBytes != null)
                                 {
-                                    if (serializer.IsObjectDeleted(oid, crObjBytes))
-                                    {
-                                        current = cursor.MoveNext();
-                                        continue;
-                                    }
+                                   
                                     object val = isOIDField ? oid : serializer.ReadFieldValue(ti, oid, crObjBytes, where.AttributeName[0], this.rawSerializer, transaction);
 
                                     if (Match(where, val))
@@ -880,82 +859,6 @@ namespace Sqo
             return true;
         }
 
-        internal List<int> LoadFilteredDeletedOids(Where where, SqoTypeInfo ti)
-        {
-            List<int> oids = new List<int>();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            var transaction=transactionManager.GetActiveTransaction();
-                {
-                    var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
-                    {
-                        using (var cursor = transaction.CreateCursor(db))
-                        {
-                            var current = cursor.MoveNext();
-
-                            while (current.HasValue)
-                            {
-                                byte[] crObjBytes = current.Value.Value;
-                                byte[] oidBytes = current.Value.Key;
-                                int oid = ByteConverter.ByteArrayToInt(oidBytes);
-                                if (crObjBytes != null)
-                                {
-                                    if (serializer.IsObjectDeleted(oid, crObjBytes))
-                                    {
-                                        object val = serializer.ReadFieldValue(ti, oid,crObjBytes, where.AttributeName[0],transaction);
-                                        if (Match(where, val))
-                                        {
-                                            oids.Add(oid);
-                                        }
-                                    }
-                                    else
-                                    {
-
-                                        current = cursor.MoveNext(); 
-                                        continue;
-                                    }
-
-                                }
-                                current = cursor.MoveNext();
-                                
-                            }
-                        }
-                    }
-
-
-
-            }
-
-            return oids;
-        }
-#if ASYNC
-        internal async Task<List<int>> LoadFilteredDeletedOidsAsync(Where where, SqoTypeInfo ti)
-        {
-            List<int> oids = new List<int>();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            int nrRecords = ti.Header.numberOfRecords;
-
-            for (int i = 0; i < nrRecords; i++)
-            {
-                int oid = i + 1;
-                if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                {
-                    object val = await serializer.ReadFieldValueAsync(ti, oid, where.AttributeName[0]).ConfigureAwait(false);
-                    if (Match(where, val))
-                    {
-                        oids.Add(oid);
-                    }
-                }
-                else
-                {
-                    continue;
-                }
-            }
-
-            return oids;
-        }
-#endif
         internal IObjectList<T> LoadByOIDs<T>(List<int> oids, SqoTypeInfo ti)
         {
             ObjectList<T> ol = new ObjectList<T>();
@@ -1276,11 +1179,7 @@ namespace Sqo
                             int oid = ByteConverter.ByteArrayToInt(oidBytes);
                             if (crObjBytes != null)
                             {
-                                if (serializer.IsObjectDeleted(oid, crObjBytes))
-                                {
-                                    current = cursor.MoveNext();
-                                    continue;
-                                }
+                               
                                 oids.Add(oid);
                             }
                             current = cursor.MoveNext();
@@ -1481,7 +1380,7 @@ namespace Sqo
                 byte[] key = ByteConverter.IntToByteArray(oid);
 
                 byte[] objBytes = transaction.Get(db, key);
-                if (objBytes == null || serializer.IsObjectDeleted(oid, objBytes))
+                if (objBytes == null )
                     return null;
                 serializer.ReadObject(currentObj, objBytes, ti, oid, rawSerializer, transaction);
             }
@@ -1631,15 +1530,10 @@ namespace Sqo
                         while (current.HasValue)
                         {
                             byte[] crObjBytes = current.Value.Value;
-                            byte[] oidBytes = current.Value.Key;
-                            int oid = ByteConverter.ByteArrayToInt(oidBytes);
+                           
                             if (crObjBytes != null)
                             {
-                                if (serializer.IsObjectDeleted(oid, crObjBytes))
-                                {
-                                    current = cursor.MoveNext();
-                                    continue;
-                                }
+                                
                                 count++;
                             }
                             current = cursor.MoveNext();
@@ -1758,106 +1652,8 @@ namespace Sqo
             return await serializer.ReadFirstTIDAsync(oid, fi, ti, this.rawSerializer).ConfigureAwait(false);
         }
 #endif
-        internal bool IsObjectDeleted(int oid, SqoTypeInfo ti)
-        {
-            /*ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            if (oid > 0 && oid <= ti.Header.numberOfRecords && !serializer.IsObjectDeleted(oid, ti))
-            {
-                return false;
-            }
-            return true;*/
-            throw new NotImplementedException();
-        }
-#if ASYNC
-        internal async Task<bool> IsObjectDeletedAsync(int oid, SqoTypeInfo ti)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            if (oid > 0 && oid <= ti.Header.numberOfRecords && !(await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false)))
-            {
-                return false;
-            }
-            return true;
-        }
-#endif
-
-         internal List<int> GetUsedRawdataInfoOIDs(SqoTypeInfo ti)
-         {
-             throw new NotImplementedException();
-             /*
-             List<int> existingRawdataInfoOIDs = new List<int>();
-             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-             int nrRecords = ti.Header.numberOfRecords;
-             List<FieldSqoInfo> existingDynamicFields = new List<FieldSqoInfo>();
-             foreach (FieldSqoInfo ai in ti.Fields)
-             {
-                 IByteTransformer byteTrans = ByteTransformerFactory.GetByteTransformer(null, null, ai, ti);
-                 if (byteTrans is ArrayByteTranformer || byteTrans is DictionaryByteTransformer)
-                 {
-                     existingDynamicFields.Add(ai);
-                 }
-             }
-             if (existingDynamicFields.Count > 0)
-             {
-                 for (int i = 0; i < nrRecords; i++)
-                 {
-
-                     int oid = i + 1;
-                     if (serializer.IsObjectDeleted(oid, ti))
-                     {
-                         continue;
-                     }
-                     foreach (FieldSqoInfo ai in existingDynamicFields)
-                     {
-                         ATuple<int, int> arrayInfo = this.GetArrayMetaOfField(ti, oid, ai);
-                         if (arrayInfo.Name > 0)
-                         {
-                             existingRawdataInfoOIDs.Add(arrayInfo.Name);
-                         }
-                     }
-                 }
-             }
-             return existingRawdataInfoOIDs;*/
-         }
-#if ASYNC
-         internal async Task<List<int>> GetUsedRawdataInfoOIDsAsync(SqoTypeInfo ti)
-         {
-             List<int> existingRawdataInfoOIDs = new List<int>();
-             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-             int nrRecords = ti.Header.numberOfRecords;
-             List<FieldSqoInfo> existingDynamicFields = new List<FieldSqoInfo>();
-             foreach (FieldSqoInfo ai in ti.Fields)
-             {
-                 IByteTransformer byteTrans = ByteTransformerFactory.GetByteTransformer(null, null, ai, ti);
-                 if (byteTrans is ArrayByteTranformer || byteTrans is DictionaryByteTransformer)
-                 {
-                     existingDynamicFields.Add(ai);
-                 }
-             }
-             if (existingDynamicFields.Count > 0)
-             {
-                 for (int i = 0; i < nrRecords; i++)
-                 {
-
-                     int oid = i + 1;
-                     if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                     {
-                         continue;
-                     }
-                     foreach (FieldSqoInfo ai in existingDynamicFields)
-                     {
-                         ATuple<int, int> arrayInfo = await this.GetArrayMetaOfFieldAsync(ti, oid, ai).ConfigureAwait(false);
-                         if (arrayInfo.Name > 0)
-                         {
-                             existingRawdataInfoOIDs.Add(arrayInfo.Name);
-                         }
-                     }
-                 }
-             }
-             return existingRawdataInfoOIDs;
-         }
-#endif
+       
+         
          internal List<int> LoadOidsByField(SqoTypeInfo ti, string fieldName, object obj)
          {
              ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti, metaCache);
@@ -1869,43 +1665,6 @@ namespace Sqo
              Where w = new Where(fi.Name, OperationType.Equal, objInfo.AtInfo[fi]);
 
              return this.LoadFilteredOids(w, ti);
-         }
-         internal Dictionary<int, ATuple<int, FieldSqoInfo>> GetUsedRawdataInfoOIDsAndFieldInfos(SqoTypeInfo ti)
-         {
-             throw new NotImplementedException();
-             /*Dictionary<int, ATuple<int, FieldSqoInfo>> existingRawdataInfoOIDs = new Dictionary<int, ATuple<int, FieldSqoInfo>>();
-             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-             int nrRecords = ti.Header.numberOfRecords;
-             List<FieldSqoInfo> existingDynamicFields = new List<FieldSqoInfo>();
-             foreach (FieldSqoInfo ai in ti.Fields)
-             {
-                 IByteTransformer byteTrans = ByteTransformerFactory.GetByteTransformer(null, null, ai, ti);
-                 if (byteTrans is ArrayByteTranformer || byteTrans is DictionaryByteTransformer)
-                 {
-                     existingDynamicFields.Add(ai);
-                 }
-             }
-             if (existingDynamicFields.Count > 0)
-             {
-                 for (int i = 0; i < nrRecords; i++)
-                 {
-
-                     int oid = i + 1;
-                     if (serializer.IsObjectDeleted(oid, ti))
-                     {
-                         continue;
-                     }
-                     foreach (FieldSqoInfo ai in existingDynamicFields)
-                     {
-                         ATuple<int, int> arrayInfo = this.GetArrayMetaOfField(ti, oid, ai);
-                         if (arrayInfo.Name > 0)
-                         {
-                             existingRawdataInfoOIDs.Add(arrayInfo.Name, new ATuple<int, FieldSqoInfo>(oid, ai));
-                         }
-                     }
-                 }
-             }
-             return existingRawdataInfoOIDs;*/
          }
          internal List<ATuple<int, object>> GetAllValues(SqoTypeInfo ti, FieldSqoInfo fi, LightningDB.LightningTransaction transaction)
          {
@@ -1924,11 +1683,7 @@ namespace Sqo
                      int oid = ByteConverter.ByteArrayToInt(oidBytes);
                      if (crObjBytes != null)
                      {
-                         if (serializer.IsObjectDeleted(oid, crObjBytes))
-                         {
-                             current = cursor.MoveNext();
-                             continue;
-                         }
+                        
                         object value= serializer.ReadFieldValue(ti, oid, crObjBytes, fi.Name, this.rawSerializer, transaction);
                         ATuple<int, object> retVal = new ATuple<int, object>(oid, value);
                         all.Add(retVal);

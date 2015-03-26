@@ -127,7 +127,7 @@ namespace Sqo.Core
                         tinfoArr = tInfo.TypeName.Split(',');
                     }
                     string fullTypeName = tInfo.TypeName;
-                    if (tinfoArr.Length > 2 && !tInfo.TypeName.StartsWith("Sqo.Indexes.BTreeNode") && !tInfo.TypeName.StartsWith("KeVaSt.BTreeNode"))//written with Silevrlight version
+                    if (tinfoArr.Length > 2)//written with Silevrlight version
                     {
                         fullTypeName = tinfoArr[0] + "," + tinfoArr[1];
                         tInfo.Type = Type.GetType(fullTypeName);

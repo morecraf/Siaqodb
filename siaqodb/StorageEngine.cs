@@ -322,88 +322,7 @@ namespace Sqo
 
 #endif
 
-        internal void LoadMetaDataTypes()
-        {
-
-            CacheCustomFileNames.AddFileNameForType(new SqoTypeInfo(typeof(Sqo.MetaObjects.RawdataInfo)).TypeName, "rawdatainfo", false);
-           
-            var transaction=transactionManager.GetActiveTransaction();
-            {
-
-                string dbName = this.GetFileByType(new SqoTypeInfo(typeof(Sqo.MetaObjects.RawdataInfo)).TypeName);
-                ObjectSerializer seralizer = SerializerFactory.GetSerializer(path, dbName, this.useElevatedTrust);
-
-                var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
-                {
-                    byte[] tinfoBuffer = transaction.Get(db,ByteConverter.StringToByteArray(dbName));
-                    if (tinfoBuffer != null)
-                    {
-                        SqoTypeInfo ti = ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tinfoBuffer, true);
-                        if (ti != null)
-                        {
-                            this.CompareSchema(ti);
-                        }
-                    }
-
-                }
-
-            }
-
-
-        }
        
-#if ASYNC
-        internal async Task LoadMetaDataTypesAsync()
-        {
-            string rawdatainfoName = MetaHelper.GetOldFileNameByType(typeof(Sqo.MetaObjects.RawdataInfo));
-
-            #if !WinRT
-            if (MetaHelper.FileExists(this.path, rawdatainfoName, this.useElevatedTrust))
-            {
-                await this.UpgradeInternalSqoTypeInfosAsync(typeof(Sqo.MetaObjects.RawdataInfo), "rawdatainfo", false).ConfigureAwait(false);
-                string indexinfoName = MetaHelper.GetOldFileNameByType(typeof(Sqo.Indexes.IndexInfo2));
-                if (MetaHelper.FileExists(this.path, indexinfoName, this.useElevatedTrust))
-                {
-                    await this.UpgradeInternalSqoTypeInfosAsync(typeof(Sqo.Indexes.IndexInfo2), "indexinfo2", true).ConfigureAwait(false);
-                }
-            }
-
-            else
-#endif
-            {
-                CacheCustomFileNames.AddFileNameForType(new SqoTypeInfo(typeof(Sqo.MetaObjects.RawdataInfo)).TypeName, "rawdatainfo", false);
-                CacheCustomFileNames.AddFileNameForType(new SqoTypeInfo(typeof(Sqo.Indexes.IndexInfo2)).TypeName, "indexinfo2", false);
-#if KEVAST
-                CacheCustomFileNames.AddFileNameForType(new SqoTypeInfo(typeof(KeVaSt.KVSInfo)).TypeName, "KVSInfo", false);
-#endif
-                ObjectSerializer seralizer = SerializerFactory.GetSerializer(path, this.GetFileByType(new SqoTypeInfo(typeof(Sqo.MetaObjects.RawdataInfo)).TypeName), this.useElevatedTrust);
-                SqoTypeInfo ti = await seralizer.DeserializeSqoTypeInfoAsync(true).ConfigureAwait(false);
-                if (ti != null)
-                {
-                    await this.CompareSchemaAsync(ti).ConfigureAwait(false);
-                }
-
-
-                seralizer = SerializerFactory.GetSerializer(path, this.GetFileByType(new SqoTypeInfo(typeof(Sqo.Indexes.IndexInfo2)).TypeName), this.useElevatedTrust);
-                ti = await seralizer.DeserializeSqoTypeInfoAsync(true).ConfigureAwait(false);
-                if (ti != null)
-                {
-                    await this.CompareSchemaAsync(ti).ConfigureAwait(false);
-                }
-#if KEVAST
-                seralizer = SerializerFactory.GetSerializer(path, this.GetFileByType(new SqoTypeInfo(typeof(KeVaSt.KVSInfo)).TypeName), this.useElevatedTrust);
-                ti = await seralizer.DeserializeSqoTypeInfoAsync(true).ConfigureAwait(false);
-                if (ti != null)
-                {
-                    await this.CompareSchemaAsync(ti).ConfigureAwait(false);
-                }
-#endif
-            }
-
-        }
-       
-#endif
-        
         internal List<SqoTypeInfo> LoadAllTypesForObjectManager()
         {
             string extension = ".sqo";
@@ -527,11 +446,7 @@ namespace Sqo
                         {
                             byte[] keyBytes = current.Value.Key;
                             string typeName = ByteConverter.ByteArrayToString(keyBytes);
-                            if (typeName.StartsWith("indexinfo") || typeName.StartsWith("rawdatainfo") || typeName.StartsWith("Sqo.Indexes.BTreeNode"))//engine types
-                            {
-                                current = cursor.MoveNext();
-                                continue;
-                            }
+                            
                             byte[] tiBytes = current.Value.Value;
                             if (tiBytes != null)
                             {
@@ -829,7 +744,7 @@ namespace Sqo
 
             if (Directory.Exists(path))
 			{
-				 this.LoadMetaDataTypes();
+				
                  var transaction=transactionManager.GetActiveTransaction();
                  {
                      var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
@@ -842,11 +757,7 @@ namespace Sqo
                              {
                                  byte[] keyBytes = current.Value.Key;
                                  string typeName = ByteConverter.ByteArrayToString(keyBytes);
-                                 if (typeName.StartsWith("indexinfo") || typeName.StartsWith("rawdatainfo") || typeName.StartsWith("Sqo.Indexes.BTreeNode"))//engine types
-                                 {
-                                     current = cursor.MoveNext();
-                                     continue;
-                                 }
+                                 
                                  byte[] tiBytes = current.Value.Value;
                                  if (tiBytes != null)
                                  {
@@ -1419,21 +1330,19 @@ namespace Sqo
         {
             if (LoadingObject != null)
             {
-                if (args.ObjectType != typeof(Sqo.MetaObjects.RawdataInfo) )
-                {
-                    LoadingObject(this, args);
-                }
+
+                LoadingObject(this, args);
+
             }
         }
         protected virtual void OnLoadedObject(int oid,object obj)
         {
             if (LoadedObject != null)
             {
-                if (obj.GetType() != typeof(Sqo.MetaObjects.RawdataInfo) )
-                {
-                    LoadedObjectEventArgs args = new LoadedObjectEventArgs(oid, obj);
-                    LoadedObject(this, args);
-                }
+
+                LoadedObjectEventArgs args = new LoadedObjectEventArgs(oid, obj);
+                LoadedObject(this, args);
+
             }
         }
        

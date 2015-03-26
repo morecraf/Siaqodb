@@ -449,12 +449,6 @@ namespace Sqo
             Cache.CacheCustomFileNames.AddFileNameForType(ti.TypeName, fileName, false);
 
         }
-        private static bool buildIndexesAsync = false;
-        public static bool BuildIndexesAsync
-        {
-            get { return buildIndexesAsync; }
-            set { buildIndexesAsync = value; }
-        }
         /// <summary>
         /// By default this is true for all types. Set this to false to not load childs entities of objects of Type provided
         /// </summary>
@@ -520,19 +514,7 @@ namespace Sqo
                 LoggingMethod(message, level);
             }
         }
-        private static decimal bufferingChunkPercent = 10;
-        public static decimal BufferingChunkPercent
-        {
-            get { return bufferingChunkPercent; }
-            set
-            {
-                if (value > 100 || value<=0)
-                {
-                    throw new SiaqodbException("Max percent must be 100");
-                }
-                bufferingChunkPercent = value;
-            }
-        }
+       
         internal static IDocumentSerializer DocumentSerializer;
         /// <summary>
         /// Set your custom document serializer
@@ -663,16 +645,13 @@ namespace Sqo
             {
                 SetDocumentSerializer(config.DocumentSerializer);
             }
-            BuildIndexesAsync = config.BuildIndexesAsync;
+           
             SetRaiseLoadEvents(config.RaiseLoadEvents);
             SpecifyStoredDateTimeKind(config.DateTimeKindToSerialize);
             EnableOptimisticConcurrency(config.OptimisticConcurrencyEnabled);
             LoggingMethod = config.LoggingMethod;
             VerboseLevel = config.VerboseLevel;
-            if (config.BufferingChunkPercent > 0)
-            {
-                BufferingChunkPercent = config.BufferingChunkPercent;
-            }
+            
         }
 
         static void defaultConfigurator_LoadRelatedObjectsPropetyChanged(object sender, EventArgs e)

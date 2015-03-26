@@ -138,10 +138,7 @@ namespace Sqo.Indexes
       
        internal void BuildIndexes(SqoTypeInfo ti,LightningDB.LightningTransaction transaction)
        {
-           if (ti.Type == typeof(RawdataInfo))
-           {
-               return;
-           }   
+          
            foreach (FieldSqoInfo f in ti.IndexedFields)
            {
                IBTree index = this.GetIndex(f, ti, transaction);
@@ -303,12 +300,7 @@ namespace Sqo.Indexes
 #endif
        public void UpdateIndexes(ObjectInfo objInfo, SqoTypeInfo ti, Dictionary<string, object> oldValuesOfIndexedFields, LightningTransaction transaction)
        {
-           if (ti.Type == typeof(RawdataInfo))
-           {
-               return;
-           }
-
-
+          
            foreach (FieldSqoInfo fi in ti.IndexedFields)
            {
                string indexName = BuildIndexName(fi.Name, ti);
@@ -433,10 +425,7 @@ namespace Sqo.Indexes
        {
            
            Dictionary<string, object> oldValues = new Dictionary<string, object>();
-           if (ti.Type == typeof(RawdataInfo))
-           {
-               return oldValues;
-           }
+           
 
            if (objInfo.Oid > 0 && objInfo.Oid <= ti.Header.numberOfRecords)
            {

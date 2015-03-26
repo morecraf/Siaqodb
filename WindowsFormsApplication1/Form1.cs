@@ -29,17 +29,17 @@ namespace WindowsFormsApplication1
 
             SiaqodbConfigurator.SetLicense(@"2/LnUmRDCX30610YCRHuw/21gkt6UNimtliHLvNlcMQ=");
             Siaqodb siaqodb2 = new Siaqodb(@"c:\work\temp\_lmdbtests\");
-           // ITransaction transaction = siaqodb2.BeginTransaction();
+            ITransaction transaction = siaqodb2.BeginTransaction();
             DateTime start22 = DateTime.Now;
             try
             {
                 //siaqodb2.DropType<EventSlot>();
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 10000; i++)
                 {
 
                     EventSlot evslot = new EventSlot();
-                    evslot.ApplicationID = i;
-                    evslot.ID = i;
+                    evslot.ApplicationID = i%100;
+                    evslot.ID = i % 100;
                     evslot.Index = i;
                     //evslot.Friend = new EventSlot();
                     //evslot.Friend.ID = i + 1;
@@ -48,23 +48,25 @@ namespace WindowsFormsApplication1
 
                     //evslot.TickNested = new Tick();
                    // evslot.TickNested.MyInt = i + 1;
-                    //siaqodb2.StoreObject(evslot, transaction);
+                    siaqodb2.StoreObject(evslot, transaction);
                 }
-                //transaction.Commit();
+                transaction.Commit();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-            //siaqodb2.Flush ();
+            siaqodb2.Flush ();
             //int id = 1000;
             string elapsed12 = (DateTime.Now - start22).ToString();
             //string s = "s";
             start22 = DateTime.Now;
             var eventSlots = (from EventSlot es in siaqodb2
-                              where (es.ID == 9 )
+                             where (es.ID == 9 && es.ApplicationID==9)
                               // orderby es.StartDate
-                              select es).ToList();
+                             select es).ToList();
+            string elapsed13 = (DateTime.Now - start22).ToString();
+            start22 = DateTime.Now;
             var alle3 = siaqodb2.LoadAll<EventSlot>();
             string elapsed33 = (DateTime.Now - start22).ToString ();
             //Log("Time elapsed before close " + elapsed);

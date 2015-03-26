@@ -10,29 +10,22 @@ namespace Sqo.Meta
 	class SqoTypeInfo
 	{
 		Type type;
-		public SqoTypeInfo(Type type)
-		{
-            if (type == typeof(Sqo.MetaObjects.RawdataInfo))
-            {
-                this.typeName = "Sqo.MetaObjects.RawdataInfo";
-                this.type = type;
-            }
-            
-            else
-            {
-                
-                this.type = type;
+        public SqoTypeInfo(Type type)
+        {
+
+
+            this.type = type;
 #if SILVERLIGHT
 			string tName = type.AssemblyQualifiedName;
 #else
 
-                string tName = BuildTypeName(type);
+            string tName = BuildTypeName(type);
 #endif
 
-                this.typeName = tName;
-            }
-          
-		}
+            this.typeName = tName;
+
+
+        }
 
         
 		public SqoTypeInfo()

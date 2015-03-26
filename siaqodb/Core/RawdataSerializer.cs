@@ -20,21 +20,16 @@ namespace Sqo.Core
        
 
         StorageEngine storageEngine;
-        ISqoFile file;
-        bool useElevatedTrust;
-        RawdataManager manager;
+        bool useElevatedTrust;    
         static readonly object _syncRoot = new object();
       
         public RawdataSerializer(StorageEngine storageEngine,bool useElevatedTrust)
         {
             this.storageEngine = storageEngine;
             this.useElevatedTrust = useElevatedTrust;
-            this.manager = new RawdataManager(this.storageEngine);
+            
         }
-        
-        static Dictionary<string, ISqoFile> filesCache = new Dictionary<string, ISqoFile>();
-        
-
+     
         public byte[] SerializeArray(object obj, Type objectType, int length, int realLength, int dbVersion, string dbName,string fieldName, ObjectSerializer objSerializer, bool elementIsText,int parentOID, LightningDB.LightningTransaction transaction)
         {
 
@@ -779,112 +774,7 @@ namespace Sqo.Core
 
         }
 #endif
-        private RawdataInfo GetNewRawinfo(ATuple<int, int> arrayMeta, int rawLength,int elemLength,int nrElem,LightningDB.LightningTransaction transaction)
-        {
-            if (arrayMeta==null || arrayMeta.Name == 0 || _transactionCommitStarted)//insert
-            {
-                return GetNextFreeOne(rawLength,elemLength,transaction);
-            }
-            else//already exists array meta defined
-            {
-                RawdataInfo info = manager.GetRawdataInfo(arrayMeta.Name,transaction);
-                if (rawLength <= info.Length)//means has enough space
-                {
-                   return info;
-                }
-                else//find new free space with enough length
-                {
-                    info.IsFree = true;
-                    manager.SaveRawdataInfo(info,transaction);
-                    return GetNextFreeOne(rawLength,elemLength,transaction);
-                }
-            }
-        }
-#if ASYNC
-        private async Task<RawdataInfo> GetNewRawinfoAsync(ATuple<int, int> arrayMeta, int rawLength, int elemLength, int nrElem)
-        {
-            if (arrayMeta == null || arrayMeta.Name == 0 || _transactionCommitStarted)//insert
-            {
-                return await GetNextFreeOneAsync(rawLength, elemLength).ConfigureAwait(false);
-            }
-            else//already exists array meta defined
-            {
-                RawdataInfo info = await manager.GetRawdataInfoAsync(arrayMeta.Name).ConfigureAwait(false);
-                if (rawLength <= info.Length)//means has enough space
-                {
-                    return info;
-                }
-                else//find new free space with enough length
-                {
-                    info.IsFree = true;
-                    await manager.SaveRawdataInfoAsync(info).ConfigureAwait(false);
-                    return await GetNextFreeOneAsync(rawLength, elemLength).ConfigureAwait(false);
-                }
-            }
-        }
-#endif
-        private RawdataInfo GetNextFreeOne(int rawLength, int elemLength,LightningDB.LightningTransaction transaction)
-        {
-            /*RawdataInfo existingFree = manager.GetFreeRawdataInfo(rawLength);
-            if (existingFree != null)
-            {
-                existingFree.IsFree = false;
-                existingFree.Length = rawLength;
-                existingFree.ElementLength = elemLength;
-                manager.SaveRawdataInfo(existingFree);
-
-                return existingFree;
-            }
-            else//get new one
-            {*/
-                RawdataInfo info = new RawdataInfo();
-                info.Length = rawLength * 2;//allowing to store double number of elements to avoid allocation of new space for every new element
-                info.ElementLength = elemLength;
-                info.OID = manager.GetNextOID(transaction);
-                long position = 0;
-                if (info.OID - 1 > 0)
-                {
-                    RawdataInfo prev = manager.GetRawdataInfo(info.OID - 1,transaction);
-                    position = prev.Position + prev.Length;
-                }
-                info.Position = position;
-                manager.SaveRawdataInfo(info,transaction);
-
-                return info;
-            //}
-        }
-#if ASYNC
-        private async Task<RawdataInfo> GetNextFreeOneAsync(int rawLength, int elemLength)
-        {
-            /*RawdataInfo existingFree = manager.GetFreeRawdataInfo(rawLength);
-            if (existingFree != null)
-            {
-                existingFree.IsFree = false;
-                existingFree.Length = rawLength;
-                existingFree.ElementLength = elemLength;
-                manager.SaveRawdataInfo(existingFree);
-
-                return existingFree;
-            }
-            else//get new one
-            {*/
-            RawdataInfo info = new RawdataInfo();
-            info.Length = rawLength * 2;//allowing to store double number of elements to avoid allocation of new space for every new element
-            info.ElementLength = elemLength;
-            info.OID = manager.GetNextOID();
-            long position = 0;
-            if (info.OID - 1 > 0)
-            {
-                RawdataInfo prev = await manager.GetRawdataInfoAsync(info.OID - 1).ConfigureAwait(false);
-                position = prev.Position + prev.Length;
-            }
-            info.Position = position;
-            await manager.SaveRawdataInfoAsync(info).ConfigureAwait(false);
-
-            return info;
-            //}
-        }
-#endif
+      
         public object DeserializeArray(Type objectType, byte[] bytes, bool checkEncrypted, int dbVersion, bool isText,bool elementIsText, ObjectSerializer objSerializer, Type parentType,string dbName, string fieldName,int parentOID,LightningDB.LightningTransaction transaction)
         {
 
@@ -1467,16 +1357,6 @@ namespace Sqo.Core
                 file.Close();
                 this.file = null;
             }
-        }
-#endif
-        internal void MarkRawInfoAsFree(int oid,LightningDB.LightningTransaction transaction)
-        {
-            this.manager.MarkRawInfoAsFree(oid, transaction);
-        }
-#if ASYNC
-        internal async Task MarkRawInfoAsFreeAsync(int oid)
-        {
-            await this.manager.MarkRawInfoAsFreeAsync(oid).ConfigureAwait(false);
         }
 #endif
 

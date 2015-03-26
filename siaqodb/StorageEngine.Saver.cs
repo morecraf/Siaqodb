@@ -219,7 +219,7 @@ namespace Sqo
                 byte[] key = ByteConverter.IntToByteArray(oid);
 
                 byte[] objBytes = transaction.Get(db, key);
-                if (serializer.IsObjectDeleted(oid, objBytes))
+                if (objBytes == null)
                     return false;
 
                 Array.Copy(valuesToSave.Value, 0, objBytes, valuesToSave.Name, valuesToSave.Value.Length);
@@ -954,18 +954,12 @@ namespace Sqo
 
                 }
             }
-            byte[] deletedOid = serializer.MarkObjectAsDelete(oid, ti);
+           // byte[] deletedOid = serializer.MarkObjectAsDelete(oid, ti);
             var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
-
 
             byte[] key = ByteConverter.IntToByteArray(oid);
 
-            byte[] objBytes = transaction.Get(db, key);
-            Array.Copy(deletedOid, 0, objBytes, 0, deletedOid.Length);
-            transaction.Put(db, key, objBytes);
-
-
-
+            transaction.Delete(db, key);
 
         }
 #if ASYNC
@@ -1019,26 +1013,7 @@ namespace Sqo
             }
         }
 #endif
-        internal void MarkRawInfoAsFree(List<int> rawdataInfoOIDs)
-        {
-           var transaction=transactionManager.GetActiveTransaction();
-            {
-                foreach (int oid in rawdataInfoOIDs)
-                {
-                    rawSerializer.MarkRawInfoAsFree(oid,transaction);//this helps Shrink method to detect unused rawdata blocks.
-                }
-                
-            }
-        }
-#if ASYNC
-        internal async Task MarkRawInfoAsFreeAsync(List<int> rawdataInfoOIDs)
-        {
-            foreach (int oid in rawdataInfoOIDs)
-            {
-                await rawSerializer.MarkRawInfoAsFreeAsync(oid).ConfigureAwait(false);//this helps Shrink method to detect unused rawdata blocks.
-            }
-        }
-#endif
+       
         internal void SetFileLength(long newLength, SqoTypeInfo ti)
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
@@ -1058,102 +1033,5 @@ namespace Sqo
 
         }
 #endif
-        internal void AdjustComplexFieldsAfterShrink(SqoTypeInfo ti, IList<ShrinkResult> shrinkResults)
-        {
-            throw new NotImplementedException();
-            /*ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            List<FieldSqoInfo> complexFields = (from FieldSqoInfo fi in ti.Fields
-                                                where fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID
-                                                select fi).ToList();
-            if (complexFields.Count > 0)
-            {
-                foreach (FieldSqoInfo fi in complexFields)
-                {
-                    Dictionary<int,int> oldOidNewOid=new Dictionary<int,int>();
-                    int nrRecords = ti.Header.numberOfRecords;
-                    int k = 0;
-                    for (int i = 0; i < nrRecords; i++)
-                    {
-
-                        int oid = i + 1;
-                        KeyValuePair<int,int> Oid_Tid= serializer.ReadOIDAndTID(ti, oid, fi);
-                        if (Oid_Tid.Key == 0 && Oid_Tid.Value == 0)//mean complex object is null
-                        {
-                            continue;
-                        }
-                        if (k == 0)
-                        {
-                            var shrinkResultsFiltered = from ShrinkResult shrinkRes in shrinkResults
-                                                     where shrinkRes.TID == Oid_Tid.Value
-                                                     select shrinkRes;
-                            
-                            foreach(ShrinkResult shF in shrinkResultsFiltered)
-                            {
-                                oldOidNewOid[shF.Old_OID]=shF.New_OID;
-                            }
-                        }
-                        if (oldOidNewOid.ContainsKey(Oid_Tid.Key))
-                        {
-                            int newOid = oldOidNewOid[Oid_Tid.Key];
-                            
-                            serializer.SaveComplexFieldContent(new KeyValuePair<int,int>(newOid,Oid_Tid.Value), fi, ti, oid);
-                        }
-                        k++;
-                    }
-                }
-            }*/
-        }
-#if ASYNC
-        internal async Task AdjustComplexFieldsAfterShrinkAsync(SqoTypeInfo ti, IList<ShrinkResult> shrinkResults)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            List<FieldSqoInfo> complexFields = (from FieldSqoInfo fi in ti.Fields
-                                                where fi.AttributeTypeId == MetaExtractor.complexID
-                                                select fi).ToList();
-            if (complexFields.Count > 0)
-            {
-                foreach (FieldSqoInfo fi in complexFields)
-                {
-                    Dictionary<int, int> oldOidNewOid = new Dictionary<int, int>();
-                    int nrRecords = ti.Header.numberOfRecords;
-                    int k = 0;
-                    for (int i = 0; i < nrRecords; i++)
-                    {
-
-                        int oid = i + 1;
-                        KeyValuePair<int, int> Oid_Tid = await serializer.ReadOIDAndTIDAsync(ti, oid, fi).ConfigureAwait(false);
-                        if (Oid_Tid.Key == 0 && Oid_Tid.Value == 0)//mean complex object is null
-                        {
-                            continue;
-                        }
-                        if (k == 0)
-                        {
-                            var shrinkResultsFiltered = from ShrinkResult shrinkRes in shrinkResults
-                                                        where shrinkRes.TID == Oid_Tid.Value
-                                                        select shrinkRes;
-
-                            foreach (ShrinkResult shF in shrinkResultsFiltered)
-                            {
-                                oldOidNewOid[shF.Old_OID] = shF.New_OID;
-                            }
-                        }
-                        if (oldOidNewOid.ContainsKey(Oid_Tid.Key))
-                        {
-                            int newOid = oldOidNewOid[Oid_Tid.Key];
-
-                            await serializer.SaveComplexFieldContentAsync(new KeyValuePair<int, int>(newOid, Oid_Tid.Value), fi, ti, oid).ConfigureAwait(false);
-                        }
-                        k++;
-                    }
-                }
-            }
-        }
-#endif
-        internal void AdjustArrayFieldsAfterShrink(SqoTypeInfo ti, FieldSqoInfo fi, int objectOID, int newOID)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.SaveArrayOIDFieldContent(ti, fi, objectOID, newOID);
-
-        }
     }
 }
