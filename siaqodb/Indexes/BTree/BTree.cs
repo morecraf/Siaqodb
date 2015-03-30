@@ -205,10 +205,51 @@ namespace Sqo.Indexes
 
         public List<int> FindItemsStartsWith(object target_key, bool defaultComparer, StringComparison stringComparison)
         {
-            throw new NotImplementedException();
-        }
+            string start=(string)target_key;
+            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            using (var cursor = transaction.CreateCursor(this.db))
+            {
+                var firstKV = cursor.MoveToFirstAfter(keyBytes);
+                List<int> indexValues = new List<int>();
 
-       
+                while (firstKV.HasValue)
+                {
+                    string currentKey = (string)ByteConverter.ReadBytes(firstKV.Value.Key, typeof(string));
+                    if (this.StringCompare(currentKey, start, defaultComparer, stringComparison) >= 0)
+                    {
+                        if (this.StringStartsWith(currentKey, start, defaultComparer, stringComparison))
+                        {
+                            ReadDuplicates(firstKV, indexValues, cursor);
+                        }
+                        else
+                            return indexValues;
+                    }
+                    firstKV = cursor.MoveNext();
+
+
+                }
+
+                return indexValues;
+            }
+        }
+        private int StringCompare(string a,string b,bool defaultComparer, StringComparison stringComparison)
+        {
+            if (defaultComparer)
+            {
+                return string.Compare(a, b);
+            }
+            else
+            {
+                return string.Compare(a, b, stringComparison);
+            }
+        }
+        private bool StringStartsWith(string a, string startsWith, bool defaultComparer, StringComparison stringComparison)
+        {
+            if (defaultComparer)
+                return a.StartsWith(startsWith);
+            else
+                return a.StartsWith(startsWith, stringComparison);
+        }
         public void DeleteItem(object key,int oid)
         {
             byte[] keyBytes = ByteConverter.GetBytes(key, key.GetType());
