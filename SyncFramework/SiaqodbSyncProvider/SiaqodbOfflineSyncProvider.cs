@@ -14,6 +14,8 @@ using Sqo.Internal;
 using Java.IO;
 #else
 using System.IO;
+using SiaqodbSyncProvider.Utilities;
+using Sqo.Transactions;
 #endif
 namespace SiaqodbSyncProvider
 {
@@ -88,15 +90,70 @@ namespace SiaqodbSyncProvider
         {
 
             List<SiaqodbOfflineEntity> changes = new List<SiaqodbOfflineEntity>();
-
-            foreach (Type t in CacheController.ControllerBehavior.KnownTypes)
+          
+            IList<DirtyEntity> allDirtyItems = siaqodb.LoadAll<DirtyEntity>();
+            ILookup<string, DirtyEntity> lookup = allDirtyItems.ToLookup(a => a.EntityType);
+            foreach (var item in lookup)
             {
-                List<object> objects = _bs._gd(siaqodb, t);//get dirty objects
-                foreach (object obj in objects)
+                IEnumerable<DirtyEntity> entities = lookup[item.Key];
+                Type type = ReflectionHelper.GetTypeByDiscoveringName(entities.First<DirtyEntity>().EntityType);
+                Dictionary<int, Tuple<object, DirtyEntity>> inserts = new Dictionary<int, Tuple<object, DirtyEntity>>();
+                Dictionary<int, Tuple<object, DirtyEntity>> updates = new Dictionary<int, Tuple<object, DirtyEntity>>();
+                Dictionary<int, Tuple<object, DirtyEntity>> deletes = new Dictionary<int, Tuple<object, DirtyEntity>>();
+                if (!this.CacheController.ControllerBehavior.KnownTypes.Contains(type))
                 {
-                    changes.Add((SiaqodbOfflineEntity)obj);
+                    continue;
+                }
+                foreach (DirtyEntity en in entities)
+                {
+                    if (en.DirtyOp == DirtyOperation.Deleted)
+                    {
+                        if (inserts.ContainsKey(en.EntityOID))
+                        {
+
+                            inserts.Remove(en.EntityOID);
+                            continue;
+                        }
+                        else if (updates.ContainsKey(en.EntityOID))
+                        {
+
+                            updates.Remove(en.EntityOID);
+                        }
+                    }
+                    else
+                    {
+                        if (deletes.ContainsKey(en.EntityOID) || inserts.ContainsKey(en.EntityOID) || updates.ContainsKey(en.EntityOID))
+                        {
+
+                            continue;
+                        }
+                    }
+                    object entityFromDB = null;
+                    if (en.DirtyOp == DirtyOperation.Deleted)
+                    {
+                        entityFromDB = (SiaqodbOfflineEntity)JSerializer.Deserialize(type, en.TombstoneObj);
+                    }
+                    else
+                    {
+                        entityFromDB = _bs._lobjby(this.siaqodb, type, en.EntityOID);
+                    }
+                    if (en.DirtyOp == DirtyOperation.Inserted)
+                    {
+                        inserts.Add(en.EntityOID, new Tuple<object, DirtyEntity>(entityFromDB, en));
+                    }
+                    else if (en.DirtyOp == DirtyOperation.Updated)
+                    {
+                        updates.Add(en.EntityOID, new Tuple<object, DirtyEntity>(entityFromDB, en));
+                    }
+                    else if (en.DirtyOp == DirtyOperation.Deleted)
+                    {
+                        deletes.Add(en.EntityOID, new Tuple<object, DirtyEntity>(entityFromDB, en));
+                    }
+                    changes.Add((SiaqodbOfflineEntity)entityFromDB);
                 }
             }
+
+
             return changes;
         }
         public override byte[] GetServerBlob()
@@ -155,7 +212,7 @@ namespace SiaqodbSyncProvider
             }
             this.OnSyncProgress(new SyncProgressEventArgs("Upload finished,mark local entities as uploaded..."));
 
-            siaqodb.StartBulkInsert(CacheController.ControllerBehavior.KnownTypes.ToArray());
+            ITransaction transaction =siaqodb.BeginTransaction();
             try
             {
                 if (null != response.UpdatedItems && 0 != response.UpdatedItems.Count)
@@ -163,7 +220,7 @@ namespace SiaqodbSyncProvider
                     foreach (var item in response.UpdatedItems)
                     {
                         var offlineEntity = (SiaqodbOfflineEntity)item;
-                        this.SaveEntityByPK(offlineEntity);
+                        this.SaveEntityByPK(offlineEntity,transaction);
                     }
                 }
 
@@ -177,7 +234,7 @@ namespace SiaqodbSyncProvider
                         foreach (var conflict in response.Conflicts)
                         {
                             var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
-                            this.SaveEntity(offlineEntity);
+                            this.SaveEntity(offlineEntity,transaction);
 
                         }
                     }
@@ -189,24 +246,26 @@ namespace SiaqodbSyncProvider
                     SiaqodbOfflineEntity en = enI as SiaqodbOfflineEntity;
                     if (en.IsTombstone)
                     {
-                        en.IsDirty = false;
-                        en.IsTombstone = false;
-                        //reset flags first
-                        siaqodb.StoreObjectBase(en);
-
-                        siaqodb.DeleteBase(en);
+                       
+                        siaqodb.DeleteBase(en,transaction);
 
                     }
                     else
                     {
                         en.IsDirty = false;
-                        siaqodb.StoreObjectBase(en);
+                        siaqodb.StoreObjectBase(en,transaction);
                     }
                 }
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
             }
             finally
             {
-                siaqodb.EndBulkInsert(CacheController.ControllerBehavior.KnownTypes.ToArray());
+                
                 siaqodb.Flush();
             }
 
@@ -374,26 +433,32 @@ namespace SiaqodbSyncProvider
         }
         private void SaveDownloadedChanges(byte[] anchor, IEnumerable<SiaqodbOfflineEntity> entities)
         {
-         
-            siaqodb.StartBulkInsert(this.CacheController.ControllerBehavior.KnownTypes.ToArray());
+
+            ITransaction transaction = siaqodb.BeginTransaction();
             try
             {
                 foreach (SiaqodbOfflineEntity en in entities)
                 {
-                    SaveEntity(en);
-                   
+                    SaveEntity(en, transaction);
+
                 }
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
             }
             finally
             {
-                siaqodb.EndBulkInsert(this.CacheController.ControllerBehavior.KnownTypes.ToArray());
+               
                 siaqodb.Flush();
             }
           
             SaveAnchor(anchor);
             
         }
-        internal void SaveEntityByPK(SiaqodbOfflineEntity en)
+        internal void SaveEntityByPK(SiaqodbOfflineEntity en,ITransaction transaction)
         {
             List<string> primaryKeys = new List<string>();
 
@@ -419,30 +484,30 @@ namespace SiaqodbSyncProvider
             {
                 if (en.IsTombstone)
                 {
-                    siaqodb.DeleteObjectByBase(en, primaryKeys.ToArray());
+                    siaqodb.DeleteObjectByBase(en,transaction, primaryKeys.ToArray());
                 }
                 else
                 {
-                    bool updated = siaqodb.UpdateObjectByBase(en, primaryKeys.ToArray());
+                    bool updated = siaqodb.UpdateObjectByBase(en,transaction, primaryKeys.ToArray());
                     
                 }
             }
           
 
         }
-        internal void SaveEntity(SiaqodbOfflineEntity en)
+        internal void SaveEntity(SiaqodbOfflineEntity en,ITransaction transaction)
         {
 
             if (en.IsTombstone)
             {
-                siaqodb.DeleteObjectByBase("_idMetaHash", en);
+                siaqodb.DeleteObjectByBase(en, transaction, "_idMetaHash");
             }
             else
             {
-                bool updated = siaqodb.UpdateObjectByBase("_idMetaHash", en);
+                bool updated = siaqodb.UpdateObjectByBase(en, transaction, "_idMetaHash");
                 if (!updated) //insert
                 {
-                    siaqodb.StoreObjectBase(en);
+                    siaqodb.StoreObjectBase(en,transaction);
                 }
             }
 

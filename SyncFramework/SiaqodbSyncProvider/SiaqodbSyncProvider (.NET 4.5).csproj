@@ -37,6 +37,10 @@
     <DocumentationFile>bin\Release\net45\SiaqodbSyncProvider.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,6 +56,8 @@
     <Compile Include="Events.cs" />
     <Compile Include="SyncProviderLicense.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
+    <Compile Include="Utilities\JSerializer.cs" />
+    <Compile Include="Utilities\ReflectionHelper.cs" />
     <Compile Include="Utilities\TrialLicense.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +73,9 @@
       <Project>{46d6975e-c66b-4924-9cba-6ab1a232c9c3}</Project>
       <Name>SyncCacheController %28.NET 4.0%29</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

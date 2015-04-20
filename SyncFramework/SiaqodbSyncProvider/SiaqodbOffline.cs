@@ -6,6 +6,7 @@ using Sqo;
 using Microsoft.Synchronization.ClientServices;
 using System.ComponentModel;
 using Sqo.Transactions;
+using SiaqodbSyncProvider.Utilities;
 
 namespace SiaqodbSyncProvider
 {
@@ -15,6 +16,8 @@ namespace SiaqodbSyncProvider
         public event EventHandler<SyncCompletedEventArgs> SyncCompleted;
 		readonly object _locker = new object();
         SiaqodbOfflineSyncProvider provider;
+        private static string dirtyEntitiesDB = "DirtyDB";
+        private static string anchorDB = "AnchorDB";
         public SiaqodbOffline(string path, Uri uri) : base(path)
         {
             provider = new SiaqodbOfflineSyncProvider(this, uri);
@@ -50,6 +53,41 @@ namespace SiaqodbSyncProvider
             provider.UseElevatedTrust = true;
         }
 #endif
+        private void CreateDirtyEntity(object obj, DirtyOperation dop, ITransaction transaction)
+        {
+            DirtyEntity dirtyEntity = new DirtyEntity();
+            dirtyEntity.EntityOID = base.GetOID(obj);
+            dirtyEntity.DirtyOp = dop;
+            dirtyEntity.EntityType = ReflectionHelper.GetDiscoveringTypeName(obj.GetType());
+
+            if (transaction != null)
+            {
+                base.StoreObject(dirtyEntity, transaction);
+            }
+            else
+            {
+                base.StoreObject(dirtyEntity);
+            }
+        }
+        private void CreateTombstoneDirtyEntity(SiaqodbOfflineEntity obj, int oid, ITransaction transaction)
+        {
+            DirtyEntity dirtyEntity = new DirtyEntity();
+            dirtyEntity.EntityOID = oid;
+            dirtyEntity.EntityType = ReflectionHelper.GetDiscoveringTypeName(obj.GetType());
+            dirtyEntity.DirtyOp = DirtyOperation.Deleted;
+            obj.IsDirty = true;
+            obj.IsTombstone = true;
+            dirtyEntity.TombstoneObj = JSerializer.Serialize(obj);
+            if (transaction != null)
+            {
+                base.StoreObject(dirtyEntity, transaction);
+            }
+            else
+            {
+                base.StoreObject(dirtyEntity);
+            }
+
+        }
         public SiaqodbOfflineSyncProvider SyncProvider { get { return provider; } set { provider = value; } }
 
         public new void StoreObject(object obj)
@@ -62,8 +100,9 @@ namespace SiaqodbSyncProvider
 	                throw new Exception("Entity should be SiaqodbOfflineEntity type");
 	            }
 	            entity.IsDirty = true;
-	            
+                DirtyOperation dop = entity.OID == 0 ? DirtyOperation.Inserted : DirtyOperation.Updated;
 	            base.StoreObject(obj);
+                CreateDirtyEntity(obj, dop, null);
 			}
 		}
         public new void StoreObject(object obj,ITransaction transaction)
@@ -76,14 +115,21 @@ namespace SiaqodbSyncProvider
 	                throw new Exception("Entity should be SiaqodbOfflineEntity type");
 	            }
 	            entity.IsDirty = true;
-	
+                DirtyOperation dop = entity.OID == 0 ? DirtyOperation.Inserted : DirtyOperation.Updated;
 	            base.StoreObject(obj,transaction);
+                CreateDirtyEntity(obj, dop, transaction);
 			}
         }
+
         internal void StoreObjectBase(ISqoDataObject obj)
         {
 
             base.StoreObject(obj);
+        }
+        internal void StoreObjectBase(ISqoDataObject obj,ITransaction transaction)
+        {
+
+            base.StoreObject(obj,transaction);
         }
         public new void Delete(object obj)
         {
@@ -94,9 +140,7 @@ namespace SiaqodbSyncProvider
 	            {
 	                throw new Exception("Entity should be SqoOfflineEntity type");
 	            }
-	            entity.IsDirty = true;
-	            entity.IsTombstone = true;
-	            base.StoreObject(obj);
+                CreateTombstoneDirtyEntity(entity, entity.OID, null);
 	
 	            base.Delete(obj);
 			}
@@ -111,9 +155,8 @@ namespace SiaqodbSyncProvider
 	            {
 	                throw new Exception("Entity should be SqoOfflineEntity type");
 	            }
-	            entity.IsDirty = true;
-	            entity.IsTombstone = true;
-	            base.StoreObject(obj,transaction);
+                CreateTombstoneDirtyEntity(entity, entity.OID, transaction);
+	
 	            
 	            base.Delete(obj,transaction);
 			}
@@ -122,63 +165,21 @@ namespace SiaqodbSyncProvider
         {
             base.Delete(obj);
         }
-
+        internal void DeleteBase(ISqoDataObject obj,ITransaction transaction)
+        {
+            base.Delete(obj,transaction);
+        }
         public new bool UpdateObjectBy(string fieldName, object obj)
         {
-            lock (_locker)
-            {
-				SiaqodbOfflineEntity entity = obj as SiaqodbOfflineEntity;
-	            if (entity == null)
-		        {
-	                throw new Exception("Entity should be SqoOfflineEntity type");
-	            }
-	            entity.IsDirty = true;
-	            bool updated = base.UpdateObjectBy(fieldName, obj);
-	            if (!updated)
-	            {
-	                entity.IsDirty = false;
-	
-	            }
-	            return updated;
-			}
+            throw new NotSupportedException("This method is not supported in SiaqodbOffline.");
         }
         public new bool UpdateObjectBy(object obj, params string[] fieldNames)
         {
-            lock (_locker)
-            {
-				SiaqodbOfflineEntity entity = obj as SiaqodbOfflineEntity;
-	            if (entity == null)
-	            {
-	                throw new Exception("Entity should be SqoOfflineEntity type");
-	            }
-	            entity.IsDirty = true;
-	            bool updated = base.UpdateObjectBy(obj, fieldNames);
-	            if (!updated)
-	            {
-	                entity.IsDirty = false;
-	
-	            }
-	            return updated;
-			}
+            throw new NotSupportedException("This method is not supported in SiaqodbOffline.");
         }
         public new bool UpdateObjectBy(object obj, ITransaction transaction,params string[] fieldNames)
         {
-            lock (_locker)
-            {
-				SiaqodbOfflineEntity entity = obj as SiaqodbOfflineEntity;
-	            if (entity == null)
-	            {
-	                throw new Exception("Entity should be SqoOfflineEntity type");
-	            }
-	            entity.IsDirty = true;
-	            bool updated = base.UpdateObjectBy(obj,transaction, fieldNames);
-	            if (!updated)
-	            {
-	                entity.IsDirty = false;
-	
-	            }
-	            return updated;
-			}
+            throw new NotSupportedException("This method is not supported in SiaqodbOffline.");
         }
         internal bool UpdateObjectByBase(string fieldName, ISqoDataObject obj)
         {
@@ -188,85 +189,34 @@ namespace SiaqodbSyncProvider
         {
             return base.UpdateObjectBy(obj,fieldNames);
         }
+        internal bool UpdateObjectByBase(ISqoDataObject obj,ITransaction transaction, params string[] fieldNames)
+        {
+            return base.UpdateObjectBy(obj,transaction, fieldNames);
+        }
         public new bool DeleteObjectBy(object obj,params string[] fieldNames)
         {
-            lock (_locker)
-            {
-				SiaqodbOfflineEntity entity = obj as SiaqodbOfflineEntity;
-	            if (entity == null)
-	            {
-	                throw new Exception("Entity should be SqoOfflineEntity type");
-	            }
-	            entity.IsDirty = true;
-	            entity.IsTombstone = true;
-	
-	            base.StoreObject(obj);
-	
-	            bool deleted = base.DeleteObjectBy(obj,fieldNames);
-	            if (!deleted)
-	            {
-	                entity.IsDirty = false;
-	                entity.IsTombstone = false;
-	                base.StoreObject(obj);
-	            }
-	            return deleted;
-			}
+            throw new NotSupportedException("This method is not supported in SiaqodbOffline.");
         }
         public new bool DeleteObjectBy(object obj,ITransaction transaction, params string[] fieldNames)
         {
-            lock (_locker)
-            {
-				SiaqodbOfflineEntity entity = obj as SiaqodbOfflineEntity;
-	            if (entity == null)
-	            {
-	                throw new Exception("Entity should be SqoOfflineEntity type");
-	            }
-	            entity.IsDirty = true;
-	            entity.IsTombstone = true;
-	
-	            base.StoreObject(obj);
-	
-	            bool deleted = base.DeleteObjectBy(obj,transaction, fieldNames);
-	            if (!deleted)
-	            {
-	                entity.IsDirty = false;
-	                entity.IsTombstone = false;
-	                base.StoreObject(obj,transaction);
-	            }
-	            return deleted;
-			}
+            throw new NotSupportedException("This method is not supported in SiaqodbOffline.");
         }
         public new bool DeleteObjectBy(string fieldName, object obj)
         {
-            lock (_locker)
-            {
-				SiaqodbOfflineEntity entity = obj as SiaqodbOfflineEntity;
-	            if (entity == null)
-	            {
-	                throw new Exception("Entity should be SqoOfflineEntity type");
-	            }
-	            entity.IsDirty = true;
-	            entity.IsTombstone = true;
-	
-	            base.StoreObject(obj);
-	
-	            bool deleted = base.DeleteObjectBy(fieldName, obj);
-	            if (!deleted)
-	            {
-	                entity.IsDirty = false;
-	                entity.IsTombstone = false;
-	                base.StoreObject(obj);
-	            }
-	            return deleted;
-			}
+            throw new NotSupportedException("This method is not supported in SiaqodbOffline.");
         }
         internal bool DeleteObjectByBase(string fieldName, ISqoDataObject obj)
         {
             return base.DeleteObjectBy(fieldName, obj);
         }
+       
         internal bool DeleteObjectByBase(ISqoDataObject obj,params string[] fieldNames )
         {
             return base.DeleteObjectBy(obj, fieldNames);
+        }
+        internal bool DeleteObjectByBase(ISqoDataObject obj,ITransaction transaction, params string[] fieldNames)
+        {
+            return base.DeleteObjectBy(obj, transaction, fieldNames);
         }
         public void AddTypeForSync<T>() where T : IOfflineEntity
         {
@@ -343,6 +293,7 @@ namespace SiaqodbSyncProvider
                 this.SyncCompleted(this, args);
             }
         }
+
     }
 
 }

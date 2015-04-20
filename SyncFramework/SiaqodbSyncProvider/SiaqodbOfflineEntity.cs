@@ -98,4 +98,17 @@ namespace SiaqodbSyncProvider
 
         
     }
+     [System.Reflection.Obfuscation(Exclude = true)]
+     enum DirtyOperation { Inserted = 1, Updated = 2, Deleted = 3 }
+     [System.Reflection.Obfuscation(Exclude = true)]
+     class DirtyEntity
+     {
+         public int OID { get; set; }
+         public int EntityOID;
+         [MaxLength(200)]
+         public string EntityType;
+         public DirtyOperation DirtyOp;
+         public byte[] TombstoneObj;
+        
+     }
 }
