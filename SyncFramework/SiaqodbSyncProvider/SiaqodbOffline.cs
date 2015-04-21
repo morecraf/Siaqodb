@@ -16,8 +16,8 @@ namespace SiaqodbSyncProvider
         public event EventHandler<SyncCompletedEventArgs> SyncCompleted;
 		readonly object _locker = new object();
         SiaqodbOfflineSyncProvider provider;
-        private static string dirtyEntitiesDB = "DirtyDB";
-        private static string anchorDB = "AnchorDB";
+       
+        
         public SiaqodbOffline(string path, Uri uri) : base(path)
         {
             provider = new SiaqodbOfflineSyncProvider(this, uri);
@@ -161,11 +161,11 @@ namespace SiaqodbSyncProvider
 	            base.Delete(obj,transaction);
 			}
         }
-        internal void DeleteBase(ISqoDataObject obj)
+        internal void DeleteBase(object obj)
         {
             base.Delete(obj);
         }
-        internal void DeleteBase(ISqoDataObject obj,ITransaction transaction)
+        internal void DeleteBase(object obj,ITransaction transaction)
         {
             base.Delete(obj,transaction);
         }

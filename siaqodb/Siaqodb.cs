@@ -1843,12 +1843,34 @@ namespace Sqo
         {
             using (var transaction = transactionManager.BeginTransaction())
             {
-                SqoTypeInfo ti = this.GetSqoTypeInfo(type);
-                storageEngine.DropType(ti);
-                indexManager.DropIndexes(ti, transactionManager.GetActiveTransaction());
+                this.DropType(type, transaction);
                 transaction.Commit();
-                this.metaCache.Remove(type);
             }
+        }
+        /// <summary>
+        /// Delete all objects of Type provided
+        /// </summary>
+        /// <param name="type">Type of objects to be deleted</param>>
+        public void DropType(Type type,Sqo.Transactions.ITransaction transaction )
+        {
+            if (!opened)
+            {
+                throw new SiaqodbException("Database is closed, call method Open() to open it!");
+            }
+
+            if (transaction == null)
+            {
+                throw new ArgumentNullException("transaction");
+            }
+
+            if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
+            {
+                throw new SiaqodbException("Transaction closed!");
+            }
+            SqoTypeInfo ti = this.GetSqoTypeInfo(type);
+            storageEngine.DropType(ti);
+            indexManager.DropIndexes(ti, transactionManager.GetActiveTransaction());
+            this.metaCache.Remove(type);
         }
 #if ASYNC
         /// <summary>
@@ -2514,6 +2536,53 @@ namespace Sqo
         {
             return storageEngine.GetAllValues(ti, fi, transaction);
         }
+
+        #region Anchor (SyncFRW proivider)
+        internal void SaveAnchor(string key, byte[] value)
+        {
+            bool started;
+            var tr=transactionManager.GetActiveTransaction(out started);
+            try
+            {
+                storageEngine.SaveAnchor(key, value, transactionManager.GetActiveTransaction());
+            }
+            finally
+            {
+                if (started)
+                    tr.Commit();
+            }
+
+        }
+        internal byte[] GetAnchor(string key)
+        {
+            bool started;
+            var tr = transactionManager.GetActiveTransaction(out started);
+            try
+            {
+                return storageEngine.GetAnchor(key, transactionManager.GetActiveTransaction());
+            }
+            finally
+            {
+                if (started)
+                    tr.Commit();
+            }
+        }
+        internal void DropAnchor(string key)
+        {
+            bool started;
+            var tr = transactionManager.GetActiveTransaction(out started);
+            try
+            {
+                storageEngine.DropAnchor(key, transactionManager.GetActiveTransaction());
+            }
+            finally
+            {
+                if (started)
+                    tr.Commit();
+            }
+        }
+        #endregion
+
     }
    
 }

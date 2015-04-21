@@ -1033,5 +1033,41 @@ namespace Sqo
 
         }
 #endif
+        #region Anchor (Sync FRW provider)
+        internal void SaveAnchor(string key, byte[] value, LightningTransaction transaction)
+        {
+            string anchorDB = "AnchorDB";
+            var db = transaction.OpenDatabase(anchorDB, DatabaseOpenFlags.Create);
+            byte[] keyBytes = ByteConverter.StringToByteArray(key);
+            transaction.Put(db, keyBytes, value);
+        }
+        internal byte[] GetAnchor(string key, LightningTransaction transaction)
+        {
+            string anchorDB = "AnchorDB";
+            var db = transaction.OpenDatabase(anchorDB, DatabaseOpenFlags.Create);
+            byte[] keyBytes = ByteConverter.StringToByteArray(key);
+
+            return transaction.Get(db, keyBytes);
+
+
+        }
+        internal void DropAnchor(string key, LightningTransaction transaction)
+        {
+            string anchorDB = "AnchorDB";
+            var db = transaction.OpenDatabase(anchorDB, DatabaseOpenFlags.Create);
+            byte[] keyBytes = ByteConverter.StringToByteArray(key);
+            try
+            {
+                transaction.Delete(db, keyBytes);
+            }
+            catch (LightningException ex)
+            {
+                if(ex.Message.StartsWith("MDB_NOTFOUND"))
+                    return;
+                else throw;
+
+            }
+        }
+        #endregion
     }
 }

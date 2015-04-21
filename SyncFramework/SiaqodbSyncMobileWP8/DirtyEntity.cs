@@ -1,4 +1,5 @@
-﻿using Sqo.Attributes;
+﻿using Sqo;
+using Sqo.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace SiaqodbSyncMobile
 {
     enum DirtyOperation { Inserted = 1, Updated = 2, Deleted = 3 }
-    class DirtyEntity
+    class DirtyEntity:ISqoDataObject
     {
         public int OID { get; set; }
         public int EntityOID;

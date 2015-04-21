@@ -24,7 +24,9 @@ namespace SiaqodbSyncProvider
         
         public  CacheController CacheController{get;set;}
         internal event EventHandler<SyncProgressEventArgs> SyncProgress;
-        private Dictionary<Guid, ICollection<IOfflineEntity>> currentChanges = new Dictionary<Guid, ICollection<IOfflineEntity>>(); 
+        private Dictionary<Guid, ICollection<IOfflineEntity>> currentChanges = new Dictionary<Guid, ICollection<IOfflineEntity>>();
+        private Dictionary<Guid, ICollection<DirtyEntity>> currentDirtyItems = new Dictionary<Guid, ICollection<DirtyEntity>>();
+       
         SiaqodbOffline siaqodb;
         System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static;
            
@@ -33,7 +35,7 @@ namespace SiaqodbSyncProvider
         public SiaqodbOfflineSyncProvider(SiaqodbOffline siaqodb, Uri uri)
         {
      
-
+            
             if (!Sqo.Internal._bs._hsy())
             {
                 throw new Exception("Siaqodb Sync Provider License not valid!");
@@ -72,21 +74,22 @@ namespace SiaqodbSyncProvider
             var changeSet = new ChangeSet();
 
             this.OnSyncProgress(new SyncProgressEventArgs("Getting local changes..."));
-            List<SiaqodbOfflineEntity> changes = this.GetChanges();
-            this.OnSyncProgress(new SyncProgressEventArgs("Uploading:"+changes.Count+" changes..."));
+            var changes = this.GetChanges();
+            this.OnSyncProgress(new SyncProgressEventArgs("Uploading:"+changes.Key.Count+" changes..."));
 
-            changeSet.Data = changes.Select(c => (IOfflineEntity)c).ToList();
+            changeSet.Data = changes.Key.Select(c => (IOfflineEntity)c).ToList();
             changeSet.IsLastBatch = true;
             changeSet.ServerBlob = this.GetServerBlob();
-            if (changeSet.ServerBlob.Length == 0) //means never initialized
+            if (changeSet.ServerBlob == null) //means never initialized
             {
                 changeSet.Data = new List<IOfflineEntity>();
                 changeSet.IsLastBatch = true;
             }
             currentChanges[state] = changeSet.Data;
+            currentDirtyItems[state] = changes.Value;
             return changeSet;
         }
-        private List<SiaqodbOfflineEntity> GetChanges()
+        private KeyValuePair<ICollection<SiaqodbOfflineEntity>,ICollection<DirtyEntity>> GetChanges()
         {
 
             List<SiaqodbOfflineEntity> changes = new List<SiaqodbOfflineEntity>();
@@ -154,50 +157,9 @@ namespace SiaqodbSyncProvider
             }
 
 
-            return changes;
+            return new KeyValuePair<ICollection<SiaqodbOfflineEntity>,ICollection<DirtyEntity>>( changes,allDirtyItems);
         }
-        public override byte[] GetServerBlob()
-        {
-#if SILVERLIGHT
-
-            if (this.UseElevatedTrust)
-            {
-                string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-                FileStream phisicalFile = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                byte[] fullFile = new byte[phisicalFile.Length];
-                phisicalFile.Read(fullFile, 0, fullFile.Length);
-                phisicalFile.Close();
-                return fullFile;
-            }
-            else
-            {
-                IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
-
-                IsolatedStorageFileStream phisicalFile = new IsolatedStorageFileStream(siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc", FileMode.OpenOrCreate, FileAccess.ReadWrite, isf);
-                byte[] fullFile = new byte[phisicalFile.Length];
-
-                phisicalFile.Read(fullFile, 0, fullFile.Length);
-                phisicalFile.Close();
-                return fullFile;
-            }
-#elif MONODROID
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-            RandomAccessFile phisicalFile = new RandomAccessFile(filePath, "rw");
-            byte[] fullFile = new byte[phisicalFile.Length()];
-            phisicalFile.Read(fullFile, 0, fullFile.Length);
-            phisicalFile.Close();
-            return fullFile;
-#else
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_"+CacheController.ControllerBehavior.ScopeName+".anc";
-            FileStream phisicalFile = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            byte[] fullFile = new byte[phisicalFile.Length];
-            phisicalFile.Read(fullFile, 0, fullFile.Length);
-            phisicalFile.Close();
-            return fullFile;
-#endif
-
-
-        }
+       
 
         public override void OnChangeSetUploaded(Guid state, ChangeSetResponse response)
         {
@@ -220,6 +182,8 @@ namespace SiaqodbSyncProvider
                     foreach (var item in response.UpdatedItems)
                     {
                         var offlineEntity = (SiaqodbOfflineEntity)item;
+                        offlineEntity.IsDirty = false;
+                        offlineEntity.IsTombstone = false;
                         this.SaveEntityByPK(offlineEntity,transaction);
                     }
                 }
@@ -234,6 +198,8 @@ namespace SiaqodbSyncProvider
                         foreach (var conflict in response.Conflicts)
                         {
                             var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
+                            offlineEntity.IsDirty = false;
+                            offlineEntity.IsTombstone = false;
                             this.SaveEntity(offlineEntity,transaction);
 
                         }
@@ -244,10 +210,39 @@ namespace SiaqodbSyncProvider
                 foreach (IOfflineEntity enI in changesJustUploaded)
                 {
                     SiaqodbOfflineEntity en = enI as SiaqodbOfflineEntity;
+                    //check if we did not updated above
+                    if (null != response.UpdatedItems && 0 != response.UpdatedItems.Count)
+                    {
+                        bool existsUpdated = false;
+                        foreach (var item in response.UpdatedItems)
+                        {
+                            var offlineEntity = (SiaqodbOfflineEntity)item;
+                            if (EntitiesEqualByPK(offlineEntity, en))
+                            {
+                                existsUpdated = true;
+                            }
+                        }
+                        if (existsUpdated)
+                            continue;
+                    }
+                    if (response.Conflicts != null && response.Conflicts.Count > 0)
+                    {
+                        bool existsUpdated = false;
+                        foreach (var conflict in response.Conflicts)
+                        {
+                            var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
+                            if (EntitiesEqualByPK(offlineEntity, en))
+                            {
+                                existsUpdated = true;
+                            }
+                        }
+                        if (existsUpdated)
+                            continue;
+                    }
                     if (en.IsTombstone)
                     {
-                       
-                        siaqodb.DeleteBase(en,transaction);
+                       //already deleted
+                        //siaqodb.DeleteBase(en,transaction);
 
                     }
                     else
@@ -256,6 +251,12 @@ namespace SiaqodbSyncProvider
                         siaqodb.StoreObjectBase(en,transaction);
                     }
                 }
+                foreach (DirtyEntity dEn in currentDirtyItems[state])
+                {
+                    siaqodb.DeleteBase(dEn, transaction);
+                }
+                this.SaveAnchor(response.ServerBlob);
+
                 transaction.Commit();
             }
             catch (Exception ex)
@@ -269,114 +270,78 @@ namespace SiaqodbSyncProvider
                 siaqodb.Flush();
             }
 
-            this.SaveAnchor(response.ServerBlob);
+           
 
             this.OnSyncProgress(new SyncProgressEventArgs("Downloading changes from server..."));
             currentChanges.Remove(state);
         }
-        
+        private bool EntitiesEqualByPK(SiaqodbOfflineEntity a, SiaqodbOfflineEntity b)
+        {
+            if (a.GetType() == b.GetType())//has same type, eq: Customer
+            {
+                List<PropertyInfo> piPK = new List<PropertyInfo>();
+                PropertyInfo[] pi = a.GetType().GetProperties(flags);
+                foreach (PropertyInfo p in pi)
+                {
+#if SILVERLIGHT
+                    Type ty = typeof(Microsoft.Synchronization.ClientServices.KeyAttribute);
+
+#else
+                 Type ty = typeof(KeyAttribute);
+#endif
+                    object[] pk = p.GetCustomAttributes(ty, false);
+
+                    if (pk.Length > 0)
+                    {
+                        piPK.Add(p);
+
+                    }
+                }
+
+                if (piPK.Count > 0)
+                {
+                    foreach (PropertyInfo pk in piPK)
+                    {
+                        var valA = pk.GetValue(a);
+                        var valB = pk.GetValue(b);
+                        if (valA == null || valB == null)
+                        {
+                            if (valA != valB)
+                                return false;
+                        }
+                        else
+                        {
+                            int vomp = ((IComparable)valA).CompareTo((IComparable)valB);
+                            if (vomp != 0)
+                                return false;
+                        }
+                    }
+                    return true;
+                }
+
+            }
+            return false;
+        }
         public void SaveAnchor(byte[] anchor)
         {
-#if SILVERLIGHT
-            if (this.UseElevatedTrust)
-            {
-                string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-                FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                file.Seek(0, SeekOrigin.Begin);
-                file.Write(anchor, 0, anchor.Length);
-                file.Close();
-            }
-            else
-            {
-                IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
 
-                IsolatedStorageFileStream phisicalFile = new IsolatedStorageFileStream(siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc", FileMode.OpenOrCreate, FileAccess.ReadWrite, isf);
-                phisicalFile.Seek(0, SeekOrigin.Begin);
-                phisicalFile.Write(anchor, 0, anchor.Length);
-                phisicalFile.Close();
-            }
-#elif MONODROID
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-            RandomAccessFile file = new RandomAccessFile(filePath, "rw");
-            file.Seek(0);
-            file.Write(anchor, 0, anchor.Length);
-            file.Close();
-#else
-            string filePath = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-            FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            file.Seek(0, SeekOrigin.Begin);
-            file.Write(anchor, 0, anchor.Length);
-            file.Close();
-#endif
+            string key = "anchor_" + CacheController.ControllerBehavior.ScopeName;
+            _bs._sanc(this.siaqodb, anchor,key);
         }
         public bool DropAnchor()
         {
-#if SILVERLIGHT
-            try
-            {
-                if (this.UseElevatedTrust)
-                {
-                    string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-                    if (File.Exists(fileName))
-                    {
-                        File.Delete(fileName);
-                        return true;
-                    }
-                    return false;
-                }
-                else
-                {
-                    IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
-                    string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-                    if (isf.FileExists(fileName))
-                    {
-                        isf.DeleteFile(fileName);
-                        return true;
-                    }
-                    return false;
-                
-                }
-            }
-            catch (IsolatedStorageException ex)
-            {
-                throw ex;
-            }
-#elif MONODROID
-            try
-            {
-
-                string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-                File file = new File(fileName);
-                if (file.Exists())
-                {
-                    return file.Delete();
-                    
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-#else
-            try
-            {
-
-                string fileName = siaqodb.GetDBPath() + System.IO.Path.DirectorySeparatorChar + "anchor_" + CacheController.ControllerBehavior.ScopeName + ".anc";
-               
-                if (File.Exists(fileName))
-                {
-                    File.Delete(fileName);
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-#endif
+            string key = "anchor_" + CacheController.ControllerBehavior.ScopeName;
+            _bs._danc(this.siaqodb, key);
+            return true;
         }
+        public override byte[] GetServerBlob()
+        {
+
+            string key = "anchor_" + CacheController.ControllerBehavior.ScopeName;
+            return _bs._ganc(this.siaqodb, key);
+        }
+
+        
         public override void SaveChangeSet(ChangeSet changeSet)
         {
             if (null == changeSet)
@@ -395,42 +360,10 @@ namespace SiaqodbSyncProvider
         public void AddType<T>()where T:IOfflineEntity
         {
             this.CacheController.ControllerBehavior.AddType<T>();
-            this.UpgradeTypeIdHash<T>();
+           
         }
         int hash;
-        private void UpgradeTypeIdHash<T>()
-        {
-            hash = typeof(T).FullName.GetHashCode();
-            var tvers = this.siaqodb.Query<SyncProviderTypeVersion>().Where<SyncProviderTypeVersion>(x => x.TypeNameHash == hash).FirstOrDefault();
-            if (tvers == null)
-            {
-                SyncProviderTypeVersion vers = new SyncProviderTypeVersion();
-                vers.Version = 12;
-                vers.TypeNameHash = hash;
-                siaqodb.StoreObject(vers);
-                
-
-                IList<T> objs = siaqodb.LoadAll<T>();
-                foreach (T obj in objs)
-                {
-                    SiaqodbOfflineEntity en = obj as SiaqodbOfflineEntity;
-                    if (en != null)
-                    {
-                        if (en._idMeta != null)
-                        {
-                            if (en._idMetaHash == 0)
-                            {
-                                en._idMetaHash = en._idMeta.GetHashCode();
-                                siaqodb.StoreObject(obj);
-                            }
-                        }
-                    }
-
-                }
-
-            }
-
-        }
+       
         private void SaveDownloadedChanges(byte[] anchor, IEnumerable<SiaqodbOfflineEntity> entities)
         {
 
@@ -442,6 +375,7 @@ namespace SiaqodbSyncProvider
                     SaveEntity(en, transaction);
 
                 }
+                SaveAnchor(anchor);
                 transaction.Commit();
             }
             catch (Exception ex)
@@ -455,7 +389,7 @@ namespace SiaqodbSyncProvider
                 siaqodb.Flush();
             }
           
-            SaveAnchor(anchor);
+          
             
         }
         internal void SaveEntityByPK(SiaqodbOfflineEntity en,ITransaction transaction)
@@ -500,7 +434,15 @@ namespace SiaqodbSyncProvider
 
             if (en.IsTombstone)
             {
-                siaqodb.DeleteObjectByBase(en, transaction, "_idMetaHash");
+                try
+                {
+                    siaqodb.DeleteObjectByBase(en, transaction, "_idMetaHash");
+                }
+                catch (Exception ex)
+                {
+                    if (!ex.Message.StartsWith("MDB_NOTFOUND"))
+                        throw;
+                }
             }
             else
             {
@@ -523,12 +465,21 @@ namespace SiaqodbSyncProvider
         }
         public void Reinitialize()
         {
-            
-            foreach (Type t in CacheController.ControllerBehavior.KnownTypes)
-            {
-                siaqodb.DropType(t);
-            }
-            bool dropped=this.DropAnchor();
+              ITransaction transaction = siaqodb.BeginTransaction();
+              try
+              {
+                  foreach (Type t in CacheController.ControllerBehavior.KnownTypes)
+                  {
+                      siaqodb.DropType(t, transaction);
+                  }
+                  bool dropped = this.DropAnchor();
+                  transaction.Commit();
+              }
+              catch (Exception ex)
+              {
+                  transaction.Rollback();
+                  throw ex;
+              }
         }
         internal void OnSyncProgress(SyncProgressEventArgs args)
         {

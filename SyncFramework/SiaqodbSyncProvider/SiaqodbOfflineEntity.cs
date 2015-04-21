@@ -8,7 +8,7 @@ using System.ComponentModel;
 #if SILVERLIGHT
 //using System.ComponentModel.DataAnnotations;
 #endif
-
+using Newtonsoft.Json;
 namespace SiaqodbSyncProvider
 {
      [System.Reflection.Obfuscation(Exclude = true)]
@@ -17,6 +17,7 @@ namespace SiaqodbSyncProvider
         #region IOfflineEntity Members
 
         private bool isTombstone;
+         [JsonProperty]
         internal bool IsTombstone
         {
             get
@@ -52,7 +53,8 @@ namespace SiaqodbSyncProvider
         }
 #endif
         private string _etag;
-        [Sqo.Attributes.Text] 
+        [Sqo.Attributes.Text]
+        [JsonProperty]
         internal string _idMeta;
          //used only for indexes
          [Index]

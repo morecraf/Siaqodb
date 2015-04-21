@@ -113,5 +113,26 @@ namespace Sqo.Internal
         {
             return Sqo.Utilities.SqoLicense.hasAMSSync;
         }
+              /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _sanc(Siaqodb siaqodb, byte[] b, string k)
+        {
+            siaqodb.SaveAnchor(k, b);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static byte[] _ganc(Siaqodb siaqodb, string k)
+        {
+            return siaqodb.GetAnchor(k);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _danc(Siaqodb siaqodb, string k)
+        {
+            siaqodb.DropAnchor(k);
+        }
     }
 }
