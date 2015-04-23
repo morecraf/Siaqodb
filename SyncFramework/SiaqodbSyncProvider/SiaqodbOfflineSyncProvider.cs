@@ -8,15 +8,13 @@ using System.Linq;
 using System.Reflection;
 using Sqo.Attributes;
 using Sqo.Internal;
-#if MONODROID
-using Java.IO;
-#else
+
 using System.IO;
 using SiaqodbSyncProvider.Utilities;
 using Sqo.Transactions;
 using System.Threading.Tasks;
 
-#endif
+
 using Microsoft.Synchronization.Services.Formatters;
 namespace SiaqodbSyncProvider
 {

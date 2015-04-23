@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\xamarin.ios</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;CLIENT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
@@ -65,6 +65,9 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\siaqodb\packages\Newtonsoft.Json.6.0.8\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -77,12 +80,59 @@
     <Compile Include="SiaqodbOfflineEntity.cs" />
     <Compile Include="SiaqodbOfflineSyncProvider.cs" />
     <Compile Include="SyncProviderLicense.cs" />
+    <Compile Include="SyncCacheController\AsyncWorkManagerException.cs" />
+    <Compile Include="SyncCacheController\CacheControllerAsync.cs" />
+    <Compile Include="SyncCacheController\CacheControllerBehavior.cs" />
+    <Compile Include="SyncCacheController\CacheControllerException.cs" />
+    <Compile Include="SyncCacheController\CacheRefreshStatistics.cs" />
+    <Compile Include="SyncCacheController\CacheRequest.cs" />
+    <Compile Include="SyncCacheController\CacheRequestResult.cs" />
+    <Compile Include="SyncCacheController\CacheRequestType.cs" />
+    <Compile Include="SyncCacheController\ChangeSet.cs" />
+    <Compile Include="SyncCacheController\ChangeSetResponse.cs" />
+    <Compile Include="SyncCacheController\ExceptionUtility.cs" />
+    <Compile Include="SyncCacheController\HttpCacheRequestHandlerAsync.cs" />
+    <Compile Include="SyncCacheController\HttpState.cs" />
+    <Compile Include="SyncCacheController\OfflineSyncProvider.cs" />
+    <Compile Include="SyncCacheController\ProcessCacheRequestCompletedEventArgs.cs" />
+    <Compile Include="SyncCacheController\RefreshCompletedEventArgs.cs" />
+    <Compile Include="SyncCacheController\SerializationFormat.cs" />
+    <Compile Include="SyncCacheController\TypeExtensions.cs" />
+    <Compile Include="SyncCacheController\Common\Conflict.cs" />
+    <Compile Include="SyncCacheController\Common\IOfflineEntity.cs" />
+    <Compile Include="SyncCacheController\Common\OfflineEntityMetadata.cs" />
+    <Compile Include="SyncCacheController\Common\SyncConflict.cs" />
+    <Compile Include="SyncCacheController\Common\SyncConflictResolution.cs" />
+    <Compile Include="SyncCacheController\Common\SyncError.cs" />
+    <Compile Include="SyncCacheController\Formatters\AtomEntryInfoWrapper.cs" />
+    <Compile Include="SyncCacheController\Formatters\AtomHelper.cs" />
+    <Compile Include="SyncCacheController\Formatters\EntryInfoWrapper.cs" />
+    <Compile Include="SyncCacheController\Formatters\FormatterConstants.cs" />
+    <Compile Include="SyncCacheController\Formatters\FormatterUtilities.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonElementTypes.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonEntryInfoWrapper.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonHelper.cs" />
+    <Compile Include="SyncCacheController\Formatters\KeyAttribute.cs" />
+    <Compile Include="SyncCacheController\Formatters\ODataAtomReader.cs" />
+    <Compile Include="SyncCacheController\Formatters\ODataAtomWriter.cs" />
+    <Compile Include="SyncCacheController\Formatters\ODataJsonWriter.cs" />
+    <Compile Include="SyncCacheController\Formatters\OdataJsonReader.cs" />
+    <Compile Include="SyncCacheController\Formatters\ReaderItemType.cs" />
+    <Compile Include="SyncCacheController\Formatters\ReflectionUtility.cs" />
+    <Compile Include="SyncCacheController\Formatters\SyncReader.cs" />
+    <Compile Include="SyncCacheController\Formatters\SyncWriter.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\Enums.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\StringHandle.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\ValueHandle.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\XmlBufferReader.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\XmlConverter.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\XmlJsonReader.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\XmlJsonWriter.cs" />
+    <Compile Include="SyncCacheController\Formatters\JsonXmlReader\XmlNode.cs" />
+    <Compile Include="Utilities\JSerializer.cs" />
+    <Compile Include="Utilities\ReflectionHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SyncCacheController\SyncCacheController %28Xamarin.iOS%29.csproj">
-      <Project>{6EC0573E-CAAB-4B83-8474-99A42B6B16A8}</Project>
-      <Name>SyncCacheController (Xamarin.iOS)</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\siaqodb\Siaqodb %28Xamarin.iOS%29.csproj">
       <Project>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE104}</Project>
       <Name>Siaqodb (Xamarin.iOS)</Name>
@@ -91,5 +141,11 @@
       <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
       <Name>SiaqodbPortable (Xamarin)</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SyncCacheController\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
