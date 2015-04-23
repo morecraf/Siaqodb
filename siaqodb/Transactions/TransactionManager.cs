@@ -18,8 +18,11 @@ namespace Sqo.Transactions
        
         public TransactionManager(string path,long maxSize,int maxDbs)
         {
-            this.env = new LightningEnvironment(path, EnvironmentOpenFlags.NoLock);
-
+			#if MONODROID
+			this.env = new LightningEnvironment(path, EnvironmentOpenFlags.None);
+			#else
+			this.env = new LightningEnvironment(path, EnvironmentOpenFlags.NoLock);
+			#endif
             env.MapSize = maxSize;
             env.MaxDatabases = maxDbs;
 
