@@ -3,9 +3,7 @@ using System.Net;
 using Microsoft.Synchronization.ClientServices;
 using System.Collections.Generic;
 using Sqo;
-#if !CF
-using System.IO.IsolatedStorage;
-#endif
+
 using System.Linq;
 using System.Reflection;
 using Sqo.Attributes;
@@ -16,7 +14,10 @@ using Java.IO;
 using System.IO;
 using SiaqodbSyncProvider.Utilities;
 using Sqo.Transactions;
+using System.Threading.Tasks;
+
 #endif
+using Microsoft.Synchronization.Services.Formatters;
 namespace SiaqodbSyncProvider
 {
     public class SiaqodbOfflineSyncProvider : OfflineSyncProvider
@@ -28,7 +29,7 @@ namespace SiaqodbSyncProvider
         private Dictionary<Guid, ICollection<DirtyEntity>> currentDirtyItems = new Dictionary<Guid, ICollection<DirtyEntity>>();
        
         SiaqodbOffline siaqodb;
-        System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static;
+        BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static;
            
         public event EventHandler<ConflictsEventArgs> ConflictOccur;
 
@@ -58,7 +59,7 @@ namespace SiaqodbSyncProvider
         }
         
         public bool UseElevatedTrust { get; set; }
-        public override void BeginSession()
+        public override async Task BeginSession()
         {
            this.OnSyncProgress(new SyncProgressEventArgs("Synchronization started..."));
         }
@@ -69,7 +70,7 @@ namespace SiaqodbSyncProvider
 			this.OnSyncProgress(new SyncProgressEventArgs("Synchronization finished."));
         }
 
-        public override ChangeSet GetChangeSet(Guid state)
+        public override async Task<ChangeSet> GetChangeSet(Guid state)
         {
             var changeSet = new ChangeSet();
 
@@ -161,7 +162,7 @@ namespace SiaqodbSyncProvider
         }
        
 
-        public override void OnChangeSetUploaded(Guid state, ChangeSetResponse response)
+        public override async Task OnChangeSetUploaded(Guid state, ChangeSetResponse response)
         {
             if (response == null)
             {
@@ -280,7 +281,7 @@ namespace SiaqodbSyncProvider
             if (a.GetType() == b.GetType())//has same type, eq: Customer
             {
                 List<PropertyInfo> piPK = new List<PropertyInfo>();
-                PropertyInfo[] pi = a.GetType().GetProperties(flags);
+                IEnumerable<PropertyInfo> pi = a.GetType().GetProperties();
                 foreach (PropertyInfo p in pi)
                 {
 #if SILVERLIGHT
@@ -289,9 +290,14 @@ namespace SiaqodbSyncProvider
 #else
                  Type ty = typeof(KeyAttribute);
 #endif
-                    object[] pk = p.GetCustomAttributes(ty, false);
+#if WinRT
+                 IEnumerable<Attribute> pk = p.GetCustomAttributes(ty, false);
+#else
+                object[] pk = p.GetCustomAttributes(ty, false);
+#endif
 
-                    if (pk.Length > 0)
+
+                 if (pk != null && pk.ToList().Count > 0)
                     {
                         piPK.Add(p);
 
@@ -342,7 +348,7 @@ namespace SiaqodbSyncProvider
         }
 
         
-        public override void SaveChangeSet(ChangeSet changeSet)
+        public override async Task SaveChangeSet(ChangeSet changeSet)
         {
             if (null == changeSet)
             {
@@ -396,7 +402,7 @@ namespace SiaqodbSyncProvider
         {
             List<string> primaryKeys = new List<string>();
 
-            PropertyInfo[] pi = en.GetType().GetProperties(flags);
+            IEnumerable<PropertyInfo> pi = en.GetType().GetProperties();
             foreach (PropertyInfo p in pi)
             {
 #if SILVERLIGHT
@@ -405,9 +411,12 @@ namespace SiaqodbSyncProvider
 #else
                  Type ty = typeof(KeyAttribute);
 #endif
+#if WinRT
+                IEnumerable<Attribute> pk = p.GetCustomAttributes(ty, false);
+#else
                 object[] pk = p.GetCustomAttributes(ty, false);
-
-                if (pk.Length > 0)
+#endif
+                if ( pk!=null && pk.ToList().Count > 0)
                 {
                     primaryKeys.Add(Sqo.Utilities.ExternalMetaHelper.GetBackingField(p));
 
@@ -488,13 +497,7 @@ namespace SiaqodbSyncProvider
                 this.SyncProgress(this, args);
             }
         }
-        #if !CF
-        public void SetHTTPRequestTimeout(int timeout)
-        {
-
-            CacheController.HTTPRequestTimeout = timeout;
-        }
-#endif
+        
     }
     public class ConflictsEventArgs:EventArgs
     {

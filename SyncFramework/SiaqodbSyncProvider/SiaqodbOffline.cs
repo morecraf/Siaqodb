@@ -7,6 +7,7 @@ using Microsoft.Synchronization.ClientServices;
 using System.ComponentModel;
 using Sqo.Transactions;
 using SiaqodbSyncProvider.Utilities;
+using System.Threading.Tasks;
 
 namespace SiaqodbSyncProvider
 {
@@ -241,29 +242,23 @@ namespace SiaqodbSyncProvider
         }
 #else
 
-        public void Synchronize()
+        public async Task<CacheRefreshStatistics> Synchronize()
         {
             if (this.provider == null)
             {
                 throw new Exception("Provider cannot be null");
             }
-            this.provider.CacheController.RefreshCompleted -= new EventHandler<RefreshCompletedEventArgs>(CacheController_RefreshCompleted);
-            this.provider.CacheController.RefreshCompleted += new EventHandler<RefreshCompletedEventArgs>(CacheController_RefreshCompleted);
-            this.provider.CacheController.RefreshAsync();
             this.provider.SyncProgress -= new EventHandler<SyncProgressEventArgs>(provider_SyncProgress);
             this.provider.SyncProgress += new EventHandler<SyncProgressEventArgs>(provider_SyncProgress);
 			
-
-
-        }
-
-        void CacheController_RefreshCompleted(object sender, RefreshCompletedEventArgs e)
-        {
-            this.Flush();
-			SyncCompletedEventArgs args = new SyncCompletedEventArgs(e.Cancelled, e.Error, e.Statistics);
+            var stat= await this.provider.CacheController.SynchronizeAsync();
+            SyncCompletedEventArgs args = new SyncCompletedEventArgs(stat.Cancelled, stat.Error, stat);
             this.OnSyncCompleted(args);
-			
+            return stat;
+
         }
+
+       
 #endif
 
 

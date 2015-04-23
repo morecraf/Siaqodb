@@ -16,7 +16,11 @@ namespace SiaqodbSyncProvider.Utilities
         }
         public static object Deserialize(Type type, byte[] objectBytes)
         {
-            string jsonStr = Encoding.UTF8.GetString(objectBytes);
+#if WinRT
+            string jsonStr = Encoding.UTF8.GetString(objectBytes,0,objectBytes.Length);
+#else
+             string jsonStr = Encoding.UTF8.GetString(objectBytes);
+#endif
             return JsonConvert.DeserializeObject(jsonStr.TrimEnd('\0'), type);
         }
     }

@@ -2,13 +2,43 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if !WinRT
 using System.Security.Cryptography;
+#else
+using Windows.Storage.Streams;
+using Windows.Security.Cryptography.Core;
+using Windows.Security.Cryptography;
+#endif
 using System.IO;
+
 
 namespace SiaqodbSyncProvider.Utilities
 {
     class Decryptor
     {
+#if WinRT
+        public static string DecryptRJ128(string prm_key, string prm_iv, string prm_text_to_decrypt)
+        {
+            IBuffer encrypted;
+            IBuffer buffer;
+            IBuffer iv = null;
+            byte[] keyBuff = System.Text.Encoding.UTF8.GetBytes(prm_key);
+            byte[] IVBuff = System.Text.Encoding.UTF8.GetBytes(prm_iv);
+            
+            SymmetricKeyAlgorithmProvider algorithm = SymmetricKeyAlgorithmProvider.OpenAlgorithm("AES_CBC_PKCS7"); //This is the only one using two fixed keys and variable block size
+
+            IBuffer keymaterial = CryptographicBuffer.CreateFromByteArray(keyBuff); // as said..I have fixed keys (see above)
+            CryptographicKey key = algorithm.CreateSymmetricKey(keymaterial);
+            
+            byte[] sEncrypted = Convert.FromBase64String(prm_text_to_decrypt);
+            
+            iv = CryptographicBuffer.CreateFromByteArray(IVBuff); // again my IV is fixed
+            buffer = CryptographicBuffer.CreateFromByteArray(sEncrypted);  //Directly converting GUID to byte array
+            encrypted = Windows.Security.Cryptography.Core.CryptographicEngine.Decrypt(key, buffer, iv);
+
+            return CryptographicBuffer.ConvertBinaryToString(BinaryStringEncoding.Utf8,encrypted);
+        }
+#else
         public static string DecryptRJ128(string prm_key, string prm_iv, string prm_text_to_decrypt)
         {
             string sEncryptedString = prm_text_to_decrypt;
@@ -32,5 +62,7 @@ namespace SiaqodbSyncProvider.Utilities
         }
         //http://stackoverflow.com/questions/224453/decrypt-php-encrypted-string-in-c
 
+#endif
     }
+
 }

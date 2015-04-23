@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Sqo;
+using Microsoft.Synchronization.Services.Formatters;
 namespace SiaqodbSyncProvider.Utilities
 {
     class ReflectionHelper
@@ -15,8 +16,8 @@ namespace SiaqodbSyncProvider.Utilities
 
 #if SILVERLIGHT
             string assemblyName = type.Assembly.FullName.Split(',')[0];
-#elif NETFX_CORE
-            string assemblyName = type.GetTypeInfo().Assembly.GetName().Name;
+#elif NETFX_CORE || WinRT
+            string assemblyName = type.AssemblyQualifiedName.Split(',')[0];
 #else
             string assemblyName = type.Assembly.GetName().Name;
 #endif

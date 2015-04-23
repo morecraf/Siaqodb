@@ -66,6 +66,14 @@
     <Compile Include="Formatters\JsonElementTypes.cs" />
     <Compile Include="Formatters\JsonEntryInfoWrapper.cs" />
     <Compile Include="Formatters\JsonHelper.cs" />
+    <Compile Include="Formatters\JsonXmlReader\Enums.cs" />
+    <Compile Include="Formatters\JsonXmlReader\StringHandle.cs" />
+    <Compile Include="Formatters\JsonXmlReader\ValueHandle.cs" />
+    <Compile Include="Formatters\JsonXmlReader\XmlBufferReader.cs" />
+    <Compile Include="Formatters\JsonXmlReader\XmlConverter.cs" />
+    <Compile Include="Formatters\JsonXmlReader\XmlJsonReader.cs" />
+    <Compile Include="Formatters\JsonXmlReader\XmlJsonWriter.cs" />
+    <Compile Include="Formatters\JsonXmlReader\XmlNode.cs" />
     <Compile Include="Formatters\KeyAttribute.cs" />
     <Compile Include="Formatters\ODataAtomReader.cs" />
     <Compile Include="Formatters\ODataAtomWriter.cs" />

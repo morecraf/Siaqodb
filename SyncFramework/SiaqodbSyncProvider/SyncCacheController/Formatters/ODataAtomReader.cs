@@ -16,7 +16,7 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;
-using System.Runtime.Serialization.Json;
+using System.Collections.Generic;
 #if SERVER
 using Microsoft.Synchronization.Services;
 #elif CLIENT
@@ -25,15 +25,16 @@ using Microsoft.Synchronization.ClientServices;
 
 namespace Microsoft.Synchronization.Services.Formatters
 {
-    class ODataJsonReader : SyncReader
+    /// <summary>
+    /// SyncReader implementation for the OData Atompub format
+    /// </summary>
+    class ODataAtomReader : SyncReader
     {
-        bool _traversingResultsNode = false;
-
         /// <summary>
         /// Constructor with no KnownTypes specified
         /// </summary>
         /// <param name="stream">Input reader stream</param>
-        public ODataJsonReader(Stream stream)
+        public ODataAtomReader(Stream stream)
             : this(stream, null)
         { }
 
@@ -42,27 +43,25 @@ namespace Microsoft.Synchronization.Services.Formatters
         /// </summary>
         /// <param name="stream">Input reader stream</param>
         /// <param name="knownTypes">List of types to reflect from</param>
-        public ODataJsonReader(Stream stream, Type[] knownTypes)
+        public ODataAtomReader(Stream stream, Type[] knownTypes)
             : base(stream, knownTypes)
         {
-#if SERVER
-            _reader = JsonReaderWriterFactory.CreateJsonReader(stream, new XmlDictionaryReaderQuotas());
-#elif CLIENT
-            //_reader = JsonReaderWriterFactory.CreateJsonReader(stream, XmlDictionaryReaderQuotas.Max);
-            _reader = new XmlJsonReader(stream, XmlDictionaryReaderQuotas.Max);
-#endif
+            
+            XmlReaderSettings settings=new XmlReaderSettings();
+            settings.CheckCharacters=false;
+            _reader = XmlReader.Create(stream,settings);
         }
 
         /// <summary>
-        /// Validates that the stream contains a valid Json feed.
+        /// Validates that the stream contains a valid feed item.
         /// </summary>
         public override void Start()
         {
             _reader.MoveToContent();
 
-            if (_reader.Name != FormatterConstants.JsonDocumentElementName)
+            if (!AtomHelper.IsAtomElement(_reader, FormatterConstants.AtomPubFeedElementName))
             {
-                throw new InvalidOperationException("Not a valid Json Feed.");
+                throw new InvalidOperationException("Not a valid ATOM feed.");
             }
         }
 
@@ -78,22 +77,22 @@ namespace Microsoft.Synchronization.Services.Formatters
         }
 
         /// <summary>
-        /// Returns the current Json object casted as an IOfflineEntity element
+        /// Returns the current entry element casted as an IOfflineEntity element
         /// </summary>
         /// <returns>Typed entry element</returns>
         public override IOfflineEntity GetItem()
         {
             CheckItemType(ReaderItemType.Entry);
-            
+
             // Get the type name and the list of properties.
-            _currentEntryWrapper = new JsonEntryInfoWrapper((XElement)XElement.ReadFrom(_reader));
+            _currentEntryWrapper = new AtomEntryInfoWrapper((XElement)XElement.ReadFrom(_reader));
 
             _liveEntity = ReflectionUtility.GetObjectForType(_currentEntryWrapper, this._knownTypes);
             return _liveEntity;
         }
 
         /// <summary>
-        /// Returns the value of the hasMoreChanges key in __sync:{} Json object
+        /// Returns the value of the sync:hasMoreChanges element
         /// </summary>
         /// <returns>bool</returns>
         public override bool GetHasMoreChangesValue()
@@ -103,7 +102,7 @@ namespace Microsoft.Synchronization.Services.Formatters
         }
 
         /// <summary>
-        /// Returns the serverBlob key contents from the __sync:{} Json object
+        /// Returns the sync:serverBlob element contents
         /// </summary>
         /// <returns>byte[]</returns>
         public override byte[] GetServerBlob()
@@ -114,7 +113,7 @@ namespace Microsoft.Synchronization.Services.Formatters
         }
 
         /// <summary>
-        /// Traverses through the feed and returns when it arrives at the necessary object.
+        /// Traverses through the feed and returns when it arrives at the necessary element.
         /// </summary>
         /// <returns>bool detecting whether or not there is more elements to be read.</returns>
         public override bool Next()
@@ -129,28 +128,20 @@ namespace Microsoft.Synchronization.Services.Formatters
             {
                 _currentEntryWrapper = null;
                 _liveEntity = null;
-                if (JsonHelper.IsElement(_reader, FormatterConstants.JsonSyncResultsElementName))
-                {
-
-                    if (_traversingResultsNode && _reader.IsStartElement())
-                    {
-                        throw new InvalidOperationException("Json feed has more than one results entry. Invalid stream.");
-                    }
-                    _traversingResultsNode = _reader.IsStartElement();
-                }
-                else if (JsonHelper.IsElement(_reader, "item") && _traversingResultsNode)
+                if (AtomHelper.IsAtomElement(_reader, FormatterConstants.AtomPubEntryElementName) ||
+                    AtomHelper.IsAtomTombstone(_reader, FormatterConstants.AtomDeletedEntryElementName))
                 {
                     _currentType = ReaderItemType.Entry;
                     _currentNodeRead = false;
                     return true;
                 }
-                else if (JsonHelper.IsElement(_reader, FormatterConstants.ServerBlobText))
+                else if (AtomHelper.IsSyncElement(_reader, FormatterConstants.ServerBlobText))
                 {
                     _currentType = ReaderItemType.SyncBlob;
                     _currentNodeRead = false;
                     return true;
                 }
-                else if (JsonHelper.IsElement(_reader, FormatterConstants.MoreChangesAvailableText))
+                else if (AtomHelper.IsSyncElement(_reader, FormatterConstants.MoreChangesAvailableText))
                 {
                     _currentType = ReaderItemType.HasMoreChanges;
                     _currentNodeRead = false;
@@ -159,6 +150,7 @@ namespace Microsoft.Synchronization.Services.Formatters
             } while (_reader.Read());
 
             this._currentType = ReaderItemType.EOF;
+
             return false;
         }
     }
