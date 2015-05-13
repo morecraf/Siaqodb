@@ -206,7 +206,6 @@ namespace Sqo.Core
 
                     if (loadRealType)
                     {
-
                         ai.FInfo = MetaExtractor.FindField(tInfo.Type, ai.Name);
                         MetaExtractor.FindAddConstraints(tInfo, ai);
                         MetaExtractor.FindAddIndexes(tInfo, ai);
@@ -233,7 +232,9 @@ namespace Sqo.Core
                     {
                         if (loadRealType)
                         {
-                            ai.AttributeType = ai.FInfo.FieldType;
+                            if(ai.FInfo != null){
+                                ai.AttributeType = ai.FInfo.FieldType;
+                            }
                         }
                         else
                         {

@@ -521,7 +521,6 @@ namespace Sqo
 
         internal void LoadAllTypes()
         {
-
             var transaction = transactionManager.GetActiveTransaction();
             {
                 var db = transaction.OpenDatabase(sys_dbs, DatabaseOpenFlags.Create);
@@ -541,18 +540,14 @@ namespace Sqo
                                 SqoTypeInfo ti = ObjectSerializer.DeserializeSqoTypeInfoFromBuffer(tiBytes, true);
                                 if (ti != null)
                                 {
-                                    this.CompareSchema(ti);
+                                    this.CompareSchema(ti,transaction);
                                 }
                             }
                             current = cursor.MoveNext();
                         }
                     }
-
                 }
             }
-
-
-
         }
 
 #if ASYNC
@@ -748,12 +743,12 @@ namespace Sqo
         }
         
 #endif
-        private void CompareSchema(SqoTypeInfo ti)
+        private void CompareSchema(SqoTypeInfo ti,LightningTransaction transaction)
         {
             SqoTypeInfo actualType = MetaExtractor.GetSqoTypeInfo(ti.Type);
             if (!MetaExtractor.CompareSqoTypeInfos(actualType, ti))
             {
-                ObjectTable table = this.LoadAll(ti);
+                ObjectTable table = this.LoadAll(ti,transaction);
                 
                 try
                 {
@@ -762,17 +757,14 @@ namespace Sqo
 
                     this.SaveType(actualType);
                     ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(actualType), useElevatedTrust);
-                    serializer.SaveObjectTable(actualType,ti, table,this.rawSerializer);
 
-                    if (this.GetFileByType(actualType) != this.GetFileByType(ti))//< version 3.1 on SL
-                    {
-                        this.DropType(ti);
-                    }
+                    string dbname = this.GetFileByType(ti);
+                    var db = transaction.OpenDatabase(dbname, DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
+                    serializer.SaveObjectTable(actualType,ti, table,this.rawSerializer,db,transaction);
+
                     metaCache.AddType(actualType.Type, actualType);
 
                     this.Flush(actualType);
-                    
-                    
                 }
                 catch
                 {
@@ -780,10 +772,7 @@ namespace Sqo
                     ti.IsOld = true;
                     this.SaveType(ti);
                     metaCache.AddType(ti.Type, ti);
-
-                    
                 }
-
             }
             else
             {

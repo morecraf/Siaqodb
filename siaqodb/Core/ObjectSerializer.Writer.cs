@@ -353,30 +353,26 @@ namespace Sqo.Core
             return new ATuple<int,byte[]>(oid,objBytes);
         }
 
-        internal void SaveObjectTable(SqoTypeInfo actualTypeinfo, SqoTypeInfo oldSqoTypeInfo, ObjectTable table, RawdataSerializer rawSerializer)
+        internal void SaveObjectTable(SqoTypeInfo actualTypeinfo, SqoTypeInfo oldSqoTypeInfo, ObjectTable table, RawdataSerializer rawSerializer,LightningDatabase db,LightningTransaction transaction)
         {
             //TODO LMDB
-            /*
+            
             Dictionary<FieldSqoInfo, FieldSqoInfo> joinedFields = JoinFieldsSqoInfo(actualTypeinfo, oldSqoTypeInfo);
 
             foreach (ObjectRow row in table.Rows)
             {
                 int oid = (int)row["OID"];
-                if (oid < 0)//deleted
-                {
-                    this.MarkObjectAsDelete(-oid, actualTypeinfo);
-                    continue;
-                }
+               
                 byte[] oidBuff = ByteConverter.IntToByteArray(oid);
                 byte[] buffer = new byte[actualTypeinfo.Header.lengthOfRecord];
 
                 int curentIndex = 0;
                 Array.Copy(oidBuff, 0, buffer, curentIndex, oidBuff.Length);
                 curentIndex += oidBuff.Length;
+                var arrayDbName = string.Format("raw.{0}", actualTypeinfo.GetDBName());
                 foreach (FieldSqoInfo ai in actualTypeinfo.Fields)
                 {
                     byte[] by = null;
-
 
                     object fieldVal = null;
                     bool existed = false;
@@ -438,9 +434,7 @@ namespace Sqo.Core
                         }
                         else
                         {
-
-                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null, "",this,ai.IsText,oid,null);
-
+                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, arrayDbName, "", this, ai.IsText, oid, transaction);
                         }
                     }
                     else if (ai.IsText)
@@ -454,13 +448,12 @@ namespace Sqo.Core
                             }
                             else
                             {
-                                by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null,"", this, ai.IsText,oid,null);
+                                by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, arrayDbName, "", this, ai.IsText, oid, transaction);
                             }
                         }
                         else
                         {
-                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, null,"", this, ai.IsText,oid,null);
-
+                            by = rawSerializer.SerializeArray(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version, arrayDbName, "", this, ai.IsText, oid, transaction);
                         }
                     }
                     else if (ai.AttributeTypeId == MetaExtractor.dictionaryID)
@@ -474,26 +467,53 @@ namespace Sqo.Core
                         {
                             IByteTransformer byteTransformer = ByteTransformerFactory.GetByteTransformer(this, rawSerializer, ai, actualTypeinfo, 0);
                             by = byteTransformer.GetBytes(fieldVal,null);
-
                         }
-
-
                     }
                     else
                     {
                         by = ByteConverter.SerializeValueType(fieldVal, ai.AttributeType, ai.Header.Length, ai.Header.RealLength, actualTypeinfo.Header.version);
                     }
                     Array.Copy(by, 0, buffer, ai.Header.PositionInRecord, ai.Header.Length);
-                    //curentIndex += by.Length;
-
-
+                    curentIndex += by.Length;
                 }
-                long position = MetaHelper.GetSeekPosition(actualTypeinfo, oid);
+                transaction.Put(db, oidBuff, buffer);
+            }
+            CleanOldRemovedFields(actualTypeinfo, oldSqoTypeInfo,table,rawSerializer,transaction);
+        }
 
-                file.Write(position, buffer);
+        private void CleanOldRemovedFields(SqoTypeInfo actualTypeinfo, SqoTypeInfo oldSqoTypeInfo,ObjectTable table,RawdataSerializer rawSerializer,LightningTransaction transaction)
+        {
+            List<FieldSqoInfo> oldRemovedFields = RemovedFieldsSqu(actualTypeinfo, oldSqoTypeInfo);
+                var arrayDbName = string.Format("raw.{0}", oldSqoTypeInfo.GetDBName());
+            foreach(var oi in oldRemovedFields){
+                foreach (ObjectRow row in table.Rows)
+                {
+                    int oid = (int)row["OID"];
+                    if (oi.AttributeTypeId == MetaExtractor.complexID || oi.AttributeTypeId == MetaExtractor.documentID)
+                    {
+                         // do nothing for the moment
+                    }
+                    else if (oi.AttributeTypeId == (MetaExtractor.ArrayTypeIDExtra + MetaExtractor.complexID) ||
+                        oi.AttributeTypeId == MetaExtractor.ArrayTypeIDExtra + MetaExtractor.jaggedArrayID || oi.IsText 
+                        || oi.AttributeTypeId == MetaExtractor.dictionaryID)//array text or dictionary
+                    {
+                        rawSerializer.DeleteRawRecord(oid,arrayDbName,oi.Name,transaction);
+                    }
+                }
+            }
+        }
 
-            }*/
-
+        private List<FieldSqoInfo> RemovedFieldsSqu(SqoTypeInfo actualTypeinfo, SqoTypeInfo oldSqoTypeInfo)
+        {
+            List<FieldSqoInfo> fields = new List<FieldSqoInfo>();
+            foreach (FieldSqoInfo fi in oldSqoTypeInfo.Fields)
+            {
+                FieldSqoInfo presentField = MetaHelper.FindField(actualTypeinfo.Fields, fi.Name);
+                if(presentField == null){
+                    fields.Add(fi);
+                }
+            }
+            return fields;
         }
         
 #if ASYNC

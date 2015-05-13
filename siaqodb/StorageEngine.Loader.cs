@@ -85,9 +85,7 @@ namespace Sqo
                             current = cursor.MoveNext();
                         }
                     }
-                    
                 }
-               
             }
             return ol;
         }
@@ -168,7 +166,7 @@ namespace Sqo
             return ol;
         }
 #endif
-        internal ObjectTable LoadAll(SqoTypeInfo ti)
+        internal ObjectTable LoadAll(SqoTypeInfo ti, LightningTransaction transaction)
         {
             ObjectTable obTable = new ObjectTable();
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
@@ -190,15 +188,21 @@ namespace Sqo
 
                 int oid = i + 1;
 
-
                 ObjectRow row = obTable.NewRow();
                 row["OID"] = oid;
-                serializer.ReadObjectRow(row, ti, oid, rawSerializer);
+
+                var db = transaction.OpenDatabase(GetFileByType(ti), DatabaseOpenFlags.Create | DatabaseOpenFlags.IntegerKey);
+                byte[] key = ByteConverter.IntToByteArray(oid);
+
+                byte[] objBytes = transaction.Get(db, key);
+                if (objBytes == null)
+                    return null;
+          
+                serializer.ReadObjectRow(row, ti, objBytes, rawSerializer);
 
                 obTable.Rows.Add(row);
 
             }
-           
             return obTable;
         }
 #if ASYNC
@@ -253,7 +257,6 @@ namespace Sqo
         internal List<int> LoadFilteredOids(Where where)
         {
             List<int> oids = null;
-
 
             //fix Types problem when a field is declared in a base class and used in a derived class
             Type type = where.ParentSqoTypeInfo.Type;

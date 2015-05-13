@@ -11,6 +11,7 @@ using Sqo.Utilities;
 using System.Collections;
 using System.Reflection;
 using Sqo.MetaObjects;
+using LightningDB;
 #if ASYNC
 using System.Threading.Tasks;
 #endif
@@ -21,8 +22,6 @@ namespace Sqo.Core
     {
         public void ReadObject(object obj, byte[] objBytes, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer, LightningDB.LightningTransaction transaction)
         {
-
-
             int fieldPosition = 0;
             byte[] oidBuff = GetFieldBytes(objBytes, fieldPosition, 4);
             int oidFromFile = ByteConverter.ByteArrayToInt(oidBuff);
@@ -387,56 +386,44 @@ namespace Sqo.Core
             return oidOfComplexObj;
         }
 #endif
-       
-        internal void ReadObjectRow(Sqo.Utilities.ObjectRow row, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
+
+        internal void ReadObjectRow(Sqo.Utilities.ObjectRow row, SqoTypeInfo ti,byte[] objBytes, RawdataSerializer rawSerializer)
         {
             //TODO LMDB
-            /*
+            //
+           
+            int fieldPosition = 0;
+            byte[] oidBuff = GetFieldBytes(objBytes, fieldPosition, 4);
+            int oidFromFile = ByteConverter.ByteArrayToInt(oidBuff);
 
-            lock (file)
+            foreach (FieldSqoInfo ai in ti.Fields)
             {
-                // long position = (long)ti.Header.headerSize + (long)((long)(oid - 1) * (long)ti.Header.lengthOfRecord);
-                long position = MetaHelper.GetSeekPosition(ti, oid);
-                int recordLength = ti.Header.lengthOfRecord;
-                byte[] b = new byte[recordLength];
-                if (oidStart == 0 && oidEnd == 0)
+                byte[] field = GetFieldBytes(objBytes, ai.Header.PositionInRecord, ai.Header.Length);
+                if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID || ai.AttributeTypeId == MetaExtractor.documentID)
                 {
-                    file.Read(position, b);
+                    row[ai.Name] = field;
                 }
                 else
                 {
-                    int recordPosition = (oid - oidStart) * recordLength;
-                    Array.Copy(preloadedBytes, recordPosition, b, 0, b.Length);
-                }
-                int fieldPosition = 0;
-                byte[] oidBuff = GetFieldBytes(b, fieldPosition, 4);
-                int oidFromFile = ByteConverter.ByteArrayToInt(oidBuff);
-
-                foreach (FieldSqoInfo ai in ti.Fields)
-                {
-                    byte[] field = GetFieldBytes(b, ai.Header.PositionInRecord, ai.Header.Length);
-                    if (typeof(IList).IsAssignableFrom(ai.AttributeType) || ai.IsText || ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId==MetaExtractor.dictionaryID || ai.AttributeTypeId==MetaExtractor.documentID)
+                    try
                     {
-                        row[ai.Name] = field;
-                    }
-                    else
-                    {
-                        try
-                        {
+                        if(ai.AttributeType != null){
                             row[ai.Name] = ByteConverter.DeserializeValueType(ai.AttributeType, field, true, ti.Header.version);
-                        }
-                        catch (Exception ex)
-                        {
-
-                            SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
-                            row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                        }else{
+                            row[ai.Name] = null;
                         }
                     }
-
+                    catch (Exception ex)
+                    {
+                        SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                        row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                    }
                 }
-            }
 
-            */
+            }
+            //    }
+
+            //  */
         }
 #if ASYNC
         internal async Task ReadObjectRowAsync(Sqo.Utilities.ObjectRow row, SqoTypeInfo ti, int oid, RawdataSerializer rawSerializer)
@@ -676,7 +663,5 @@ namespace Sqo.Core
             Array.Copy(b, fieldPosition, field, 0, fieldSize);
             return field;
         }
-       
-
     }
 }
