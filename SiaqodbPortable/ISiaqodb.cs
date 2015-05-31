@@ -55,9 +55,7 @@ namespace Sqo
         System.Threading.Tasks.Task<int> DeleteObjectByAsync(Type objectType, System.Collections.Generic.Dictionary<string, object> criteria);
         System.Threading.Tasks.Task<int> DeleteObjectByAsync<T>(System.Collections.Generic.Dictionary<string, object> criteria);
         System.Threading.Tasks.Task DropTypeAsync(Type type);
-        System.Threading.Tasks.Task DropTypeAsync(Type type, bool claimFreespace);
         System.Threading.Tasks.Task DropTypeAsync<T>();
-        System.Threading.Tasks.Task EndBulkInsertAsync(params Type[] types);
         System.Threading.Tasks.Task FlushAsync();
         System.Threading.Tasks.Task<System.Collections.Generic.List<MetaType>> GetAllTypesAsync();
         System.Threading.Tasks.Task<IObjectList<T>> LoadAllAsync<T>();
@@ -66,8 +64,7 @@ namespace Sqo
         System.Threading.Tasks.Task<T> LoadObjectByOIDAsync<T>(int oid);
         System.Threading.Tasks.Task<System.Collections.Generic.List<int>> LoadOidsAsync<T>(System.Linq.Expressions.Expression expression);
         System.Threading.Tasks.Task<object> LoadValueAsync(int oid, string fieldName, MetaType mt);
-        System.Threading.Tasks.Task StartBulkInsertAsync(params Type[] types);
-        System.Threading.Tasks.Task StoreObjectAsync(object obj);
+       System.Threading.Tasks.Task StoreObjectAsync(object obj);
         System.Threading.Tasks.Task StoreObjectAsync(object obj, Sqo.Transactions.ITransaction transaction);
         System.Threading.Tasks.Task StoreObjectPartiallyAsync(object obj, params string[] properties);
         System.Threading.Tasks.Task StoreObjectPartiallyAsync(object obj, bool onlyReferences, params string[] properties);

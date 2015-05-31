@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-#if ASYNC
+#if ASYNC_LMDB
 using System.Threading.Tasks;
 #endif
 
@@ -15,8 +15,8 @@ namespace Sqo
         public
 #endif
     class LazyEnumerator<T> : IEnumerator<T>, IEnumerator
-#if ASYNC
-            ,ISqoAsyncEnumerator<T>
+#if ASYNC_LMDB
+, ISqoAsyncEnumerator<T>
 #endif
     {
 
@@ -90,7 +90,7 @@ namespace Sqo
 
         #endregion
 
-#if ASYNC
+#if ASYNC_LMDB
         public async Task<bool> MoveNextAsync()
         {
             if (oids.Count > currentIndex)
@@ -114,7 +114,7 @@ namespace Sqo
         }
 #endif
     }
-#if ASYNC    
+#if ASYNC_LMDB    
         public interface ISqoAsyncEnumerator<T>:IEnumerator<T>
         {
             T Current { get; }

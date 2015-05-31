@@ -15,7 +15,7 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class JaggedTests
     {
-        string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
+        string dbFolder = @"c:\work\temp\unitTests_siaqodbLMDB_ASYNC\";
 		
         [TestMethod]
         public async Task TestStoreSimpleJagged()
@@ -148,121 +148,7 @@ namespace SiaqodbUnitTests
 
 
         }
-        [TestMethod]
-        public async Task TestStoreSimpleJaggedAndShrink()
-        {
-            Siaqodb s_db = new Siaqodb(); await s_db.OpenAsync(dbFolder);
-
-
-            await  s_db.DropTypeAsync<JaggedTy>();
-            for (int i = 0; i < 20; i++)
-            {
-                JaggedTy jg = new JaggedTy();
-                jg.jaggedByte = new byte[2][];
-                jg.jaggedByte[0] = new byte[2];
-                jg.jaggedByte[0][0] = (byte)i;
-                jg.jaggedByte[0][1] = (byte)(i + 1);
-                jg.jaggedByte[1] = new byte[2];
-                jg.jaggedByte[1][0] = (byte)(i + 2);
-                jg.jaggedByte[1][1] = (byte)(i + 3);
-
-                jg.jaggedInt = new int[2][];
-                jg.jaggedInt[0] = new int[2];
-                jg.jaggedInt[0][0] = i;
-                jg.jaggedInt[0][1] = (i + 1);
-                jg.jaggedInt[1] = new int[2];
-                jg.jaggedInt[1][0] = (i + 2);
-                jg.jaggedInt[1][1] = (i + 3);
-
-                jg.jaggedList = new List<List<int>>();
-                List<int> myList = new List<int>();
-                myList.Add(i);
-                myList.Add(i + 1);
-                List<int> myList2 = new List<int>();
-                myList2.Add(i * 10);
-                myList2.Add(i * 100);
-                jg.jaggedList.Add(myList);
-                jg.jaggedList.Add(myList2);
-
-                jg.jaggedListStr = new List<List<string>>();
-                List<string> myListStr = new List<string>();
-                myListStr.Add("ws" + i.ToString());
-                myListStr.Add("second" + i.ToString());
-                jg.jaggedListStr.Add(myListStr);
-
-                SimpleClass simple = new SimpleClass();
-                simple.Name = "ssss";
-                jg.complexJaggedList = new List<List<SimpleClass>>();
-                List<SimpleClass> listSimple = new List<SimpleClass>();
-                listSimple.Add(simple);
-
-                jg.complexJaggedList.Add(listSimple);
-                jg.complexJaggedList.Add(listSimple);
-                await s_db.StoreObjectAsync(jg);
-            }
-            await s_db.FlushAsync();
-            IList<JaggedTy> all = await s_db.LoadAllAsync<JaggedTy>();
-            for (int i = 0; i < 10; i++)
-            {
-                await s_db.DeleteAsync(all[i]);
-            }
-            await s_db.FlushAsync();
-            s_db.Close();
-
-            await SiaqodbUtil.ShrinkAsync(dbFolder, ShrinkType.Normal);
-            await SiaqodbUtil.ShrinkAsync(dbFolder, ShrinkType.ForceClaimSpace);
-
-            s_db = new Siaqodb(); await s_db.OpenAsync(dbFolder);
-
-            all = await s_db.LoadAllAsync<JaggedTy>();
-
-            for (int i = 10; i < 20; i++)
-            {
-                int j = i - 10;
-                Assert.AreEqual((byte)i, all[j].jaggedByte[0][0]);
-                Assert.AreEqual((byte)(i + 1), all[j].jaggedByte[0][1]);
-                Assert.AreEqual((byte)(i + 2), all[j].jaggedByte[1][0]);
-                Assert.AreEqual((byte)(i + 3), all[j].jaggedByte[1][1]);
-
-                Assert.AreEqual(i, all[j].jaggedInt[0][0]);
-                Assert.AreEqual((i + 1), all[j].jaggedInt[0][1]);
-                Assert.AreEqual((i + 2), all[j].jaggedInt[1][0]);
-                Assert.AreEqual((i + 3), all[j].jaggedInt[1][1]);
-
-                Assert.AreEqual(2, all[j].jaggedList[0].Count);
-                Assert.AreEqual(2, all[j].jaggedList.Count);
-                Assert.AreEqual(i, all[j].jaggedList[0][0]);
-                Assert.AreEqual(i + 1, all[j].jaggedList[0][1]);
-                Assert.AreEqual(i * 10, all[j].jaggedList[1][0]);
-                Assert.AreEqual(i * 100, all[j].jaggedList[1][1]);
-
-                Assert.AreEqual(1, all[j].jaggedListStr.Count);
-                Assert.AreEqual(2, all[j].jaggedListStr[0].Count);
-                Assert.AreEqual("ws" + i, all[j].jaggedListStr[0][0]);
-                Assert.AreEqual("second" + i, all[j].jaggedListStr[0][1]);
-                Assert.AreEqual(2, all[j].complexJaggedList.Count);
-                Assert.IsNotNull(all[j].complexJaggedList[0][0]);
-
-            }
-
-            var q = await (from JaggedTy jgd in s_db
-                    where jgd.jaggedInt.Length == 2
-                    select jgd).ToListAsync();
-
-            Assert.AreEqual(10, q.Count);
-
-            List<int> myInList = new List<int>();
-            myInList.Add(10);
-            myInList.Add(11);
-
-            var q2 = await (from JaggedTy jgd in s_db
-                     where jgd.jaggedList.Contains(myInList)
-                     select jgd).ToListAsync();
-
-            Assert.AreEqual(1, q2.ToList().Count);
-
-
-        }
+       
         [TestMethod]
         public async Task TestStoreNMatrix()
         {
@@ -412,82 +298,6 @@ namespace SiaqodbUnitTests
 
         }
        [TestMethod]
-       public async Task TestStoreDictionaryAndShrink()
-       {
-           Siaqodb s_db = new Siaqodb(); await s_db.OpenAsync(dbFolder);
-
-
-           await s_db.DropTypeAsync<WithDict>();
-           await s_db.DropTypeAsync<JaggedTy>();
-           await s_db.DropTypeAsync<NMatrixTy>();
-           for (int i = 0; i < 20; i++)
-           {
-               WithDict dict = new WithDict();
-               dict.DictInt = new Dictionary<int, int>();
-               dict.DictStr = new Dictionary<byte, string>();
-               dict.DictComplex = new Dictionary<JaggedTy, int>();
-               dict.ZuperDict = new Dictionary<uint, NMatrixTy>();
-
-               for (int j = 0; j < 5; j++)
-               {
-                   dict.DictInt[j] = i + j;
-                   dict.ZuperDict[(uint)j] = new NMatrixTy();
-                   dict.DictStr[(byte)j] = "sss" + i.ToString();
-                   JaggedTy jt = new JaggedTy();
-                   dict.DictComplex[jt] = j + i;
-               }
-
-               await s_db.StoreObjectAsync(dict);
-           }
-           await s_db.FlushAsync();
-
-           IList<WithDict> all = await s_db.LoadAllAsync<WithDict>();
-           for (int i = 0; i < 10; i++)
-           {
-               await s_db.DeleteAsync(all[i]);
-           }
-           await s_db.FlushAsync();
-           s_db.Close();
-
-           await SiaqodbUtil.ShrinkAsync(dbFolder, ShrinkType.Normal);
-           await SiaqodbUtil.ShrinkAsync(dbFolder, ShrinkType.ForceClaimSpace);
-
-            s_db = new Siaqodb(); await s_db.OpenAsync(dbFolder);
-
-           all = await s_db.LoadAllAsync<WithDict>();
-
-           for (int i = 10; i < 20; i++)
-           {
-               int j = i - 10;
-               Assert.AreEqual(5, all[j].DictInt.Keys.Count);
-               Assert.AreEqual(5, all[j].DictStr.Keys.Count);
-               Assert.AreEqual(5, all[j].DictComplex.Keys.Count);
-               Assert.AreEqual(5, all[j].ZuperDict.Keys.Count);
-               for (int k = 0; k < 5; k++)
-               {
-                   Assert.AreEqual(i + k, all[j].DictInt[k]);
-                   Assert.AreEqual("sss" + i, all[j].DictStr[(byte)k]);
-                   Assert.IsNotNull(all[j].ZuperDict[(uint)k]);
-               }
-           }
-
-
-           var q = await (from WithDict d in s_db
-                   where d.DictInt.ContainsKey(1)
-                   select d).ToListAsync();
-           Assert.AreEqual(10, q.Count);
-           q = await (from WithDict d in s_db
-               where d.DictInt.ContainsValue(11)
-               select d).ToListAsync();
-           Assert.AreEqual(2, q.Count);
-
-           q = await (from WithDict d in s_db
-               where d.DictInt.ContainsKey(-1)
-               select d).ToListAsync();
-           Assert.AreEqual(0, q.Count);
-
-       }
-        [TestMethod]
         public async Task TestUpdateDictionary()
         {
             Siaqodb s_db = new Siaqodb(); await s_db.OpenAsync(dbFolder);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
-#if ASYNC
+#if ASYNC_LMDB
 using System.Threading.Tasks;
 #endif
 
@@ -18,7 +18,7 @@ namespace Sqo
     {
         protected List<int> oids;
         private Siaqodb siaqodb;
-#if ASYNC
+#if ASYNC_LMDB
         ISqoAsyncEnumerator<T> enumerator;
 #else
             IEnumerator<T> enumerator;
@@ -46,7 +46,7 @@ namespace Sqo
         {
             return this.oids;
         }
-#if ASYNC
+#if ASYNC_LMDB
         public async Task<IList<T>> ToListAsync()
         {
             IObjectList<T> list = new ObjectList<T>();
@@ -133,7 +133,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Count(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<int> SqoCountAsync()
         {
             return SqoQueryExtensionsImpl.CountAsync(this);
@@ -143,7 +143,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Count(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<int> SqoCountAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.CountAsync(this, expression);
@@ -153,7 +153,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.FirstOrDefault(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoFirstOrDefaultAsync()
         {
             return SqoQueryExtensionsImpl.FirstOrDefaultAsync(this);
@@ -163,7 +163,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.FirstOrDefault(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoFirstOrDefaultAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.FirstOrDefaultAsync(this, expression);
@@ -173,7 +173,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.First(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoFirstAsync()
         {
             return SqoQueryExtensionsImpl.FirstAsync(this);
@@ -183,7 +183,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.First(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoFirstAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.FirstAsync(this, expression);
@@ -193,7 +193,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Any(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<bool> SqoAnyAsync()
         {
             return SqoQueryExtensionsImpl.AnyAsync(this);
@@ -203,7 +203,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Any(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<bool> SqoAnyAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.AnyAsync(this, expression);
@@ -213,7 +213,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Last(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoLastAsync()
         {
             return SqoQueryExtensionsImpl.LastAsync(this);
@@ -223,7 +223,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Last(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoLastAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.LastAsync(this, expression);
@@ -233,7 +233,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.LastOrDefault(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoLastOrDefaultAsync()
         {
             return SqoQueryExtensionsImpl.LastOrDefaultAsync(this);
@@ -243,7 +243,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.LastOrDefault(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoLastOrDefaultAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.LastOrDefaultAsync(this, expression);
@@ -253,7 +253,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Single(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoSingleAsync()
         {
             return SqoQueryExtensionsImpl.SingleAsync(this);
@@ -263,7 +263,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Single(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoSingleAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.SingleAsync(this, expression);
@@ -273,7 +273,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.SingleOrDefault(this);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoSingleOrDefaultAsync()
         {
             return SqoQueryExtensionsImpl.SingleOrDefaultAsync(this);
@@ -283,7 +283,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.SingleOrDefault(this, expression);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<T> SqoSingleOrDefaultAsync(Expression<Func<T, bool>> expression)
         {
             return SqoQueryExtensionsImpl.SingleOrDefaultAsync(this, expression);
@@ -293,7 +293,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Take(this, count);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<ISqoQuery<T>> SqoTakeAsync(int count)
         {
             return SqoQueryExtensionsImpl.TakeAsync(this, count);
@@ -303,7 +303,7 @@ namespace Sqo
         {
             return SqoQueryExtensionsImpl.Skip(this, count);
         }
-#if ASYNC
+#if ASYNC_LMDB
         public Task<ISqoQuery<T>> SqoSkipAsync(int count)
         {
             return SqoQueryExtensionsImpl.SkipAsync(this, count);

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sqo.Exceptions;
-#if ASYNC
+using System.Threading.Tasks;
+#if  ASYNC_LMDB
 using System.Threading.Tasks;
 #endif
 
@@ -32,17 +33,19 @@ namespace Sqo.Transactions
             transactionManager.CommitTransaction(this.ID);
 
         }
-#if ASYNC
+#if ASYNC_LMDB
         /// <summary>
         /// Commit transaction to database
         /// </summary>
-        public async Task CommitAsync()
+        public Task CommitAsync()
         {
-            if (this.status == TransactionStatus.Closed)
+
+            return Task.Factory.StartNew(() =>
             {
-                throw new SiaqodbException("Transaction closed");
-            }
-            await TransactionManager.CommitTransactionAsync(this.ID);
+                this.Commit();
+
+            });
+
 
         }
 #endif
@@ -58,17 +61,17 @@ namespace Sqo.Transactions
             }
             transactionManager.RollbackTransaction(this.ID);
         }
-#if ASYNC
+#if ASYNC_LMDB
         /// <summary>
         /// Rollback changes
         /// </summary>
-        public async Task RollbackAsync()
+        public Task RollbackAsync()
         {
-            if (this.status == TransactionStatus.Closed)
+            return Task.Factory.StartNew(() =>
             {
-                throw new SiaqodbException("Transaction closed");
-            }
-            await TransactionManager.RollbackTransactionAsync(this.ID);
+                this.Rollback();
+
+            });
         }
 #endif
 

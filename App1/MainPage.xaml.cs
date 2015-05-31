@@ -39,13 +39,13 @@ namespace App1
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
+            SiaqodbConfigurator.SetLicense(@"o+FD6uiB55Q9vtVfv7yU2fe7rYQ2CXjZFrBh8OrAUjc=");
             Siaqodb nop = new Siaqodb();
             
-            await nop.OpenAsync(ApplicationData.Current.LocalFolder);
+            nop.Open(ApplicationData.Current.LocalFolder.Path);
             //await nop.DropTypeAsync<Customer>();
             DateTime start = DateTime.Now;
-            for (int i = 1; i < 10000; i++)
+            for (int i = 1; i < 100; i++)
             {
                 Customer c = new Customer();
                 c.ID = i;
@@ -53,10 +53,10 @@ namespace App1
                 //c.Vasiel = "momo" + i.ToString();
                 await nop.StoreObjectAsync(c);
             }
-            await nop.FlushAsync();
+           
             string elapsedStore = (DateTime.Now - start).ToString();
             start = DateTime.Now;
-            IObjectList<Customer> listC = nop.LoadAll<Customer>();
+            IObjectList<Customer> listC = await nop.LoadAllAsync<Customer>();
             string elapsedRead= (DateTime.Now - start).ToString();
             nop.Close();
 

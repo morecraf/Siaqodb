@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\universal\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETFX_CORE WinRT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE WinRT ASYNC_LMDB</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateLibraryLayout>false</GenerateLibraryLayout>
@@ -154,6 +154,7 @@
     <Compile Include="Queries\Or.cs" />
     <Compile Include="Queries\Where.cs" />
     <Compile Include="Siaqodb.cs" />
+    <Compile Include="SiaqodbAsync.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
     <Compile Include="SiaqodbUtil.cs" />
     <Compile Include="SqoDataObject.cs" />

@@ -71,6 +71,60 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SiaqodbPortable\Attributes\DocumentAttribute.cs">
+      <Link>Portable\Attributes\DocumentAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Attributes\IgnoreAttribute.cs">
+      <Link>Portable\Attributes\IgnoreAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Attributes\Index.cs">
+      <Link>Portable\Attributes\Index.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Attributes\MaxLengthAttribute.cs">
+      <Link>Portable\Attributes\MaxLengthAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Attributes\TextAttribute.cs">
+      <Link>Portable\Attributes\TextAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Attributes\UniqueConstraint.cs">
+      <Link>Portable\Attributes\UniqueConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Attributes\UseVariable.cs">
+      <Link>Portable\Attributes\UseVariable.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Configurator.cs">
+      <Link>Portable\Configurator.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Encryption\IEncryptor.cs">
+      <Link>Portable\Encryption\IEncryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\Events.cs">
+      <Link>Portable\Events.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\IDocumentSerializer.cs">
+      <Link>Portable\IDocumentSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\IObjectList.cs">
+      <Link>Portable\IObjectList.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\ISiaqodb.cs">
+      <Link>Portable\ISiaqodb.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\ISqoQuery.cs">
+      <Link>Portable\ISqoQuery.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\ITransaction.cs">
+      <Link>Portable\ITransaction.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\MetaField.cs">
+      <Link>Portable\MetaField.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\MetaType.cs">
+      <Link>Portable\MetaType.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbPortable\SqoQueryExtensions.cs">
+      <Link>Portable\SqoQueryExtensions.cs</Link>
+    </Compile>
     <Compile Include="AsyncLocker\AsyncLock.cs" />
     <Compile Include="Cache\Cache.cs" />
     <Compile Include="Cache\CacheCustomFileNames.cs" />
@@ -221,12 +275,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
-      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
-      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

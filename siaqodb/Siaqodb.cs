@@ -26,12 +26,7 @@ namespace Sqo
     /// </summary>
 
     [Obfuscation(Feature = "Apply to member * when event: all", Exclude = false,ApplyToMembers=true)]
-    #if KEVAST
-    internal
-#else
-        public
-#endif
-        class Siaqodb : Sqo.ISiaqodb
+    public partial class Siaqodb : Sqo.ISiaqodb
 	{
 
         readonly object _syncRoot = new object();

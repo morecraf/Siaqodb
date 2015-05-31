@@ -13,11 +13,11 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class ComplexTypesTests
     {
-        string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
+        string dbFolder = @"c:\work\temp\unitTests_siaqodbLMDB_ASYNC\";
         public ComplexTypesTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = false;
-              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
+            Sqo.SiaqodbConfigurator.SetLicense(@"YgExQg+yktbL2Pt+Vqo7Z6S8R4srS8+leQwHnG7zu/8=");
         }
         [TestMethod]
         public async Task TestStore()

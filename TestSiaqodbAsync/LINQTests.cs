@@ -13,7 +13,7 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class LINQTests
     {
-        string dbFolder = @"e:\sqoo\temp\testsAsync_db\";
+        string dbFolder = @"c:\work\temp\unitTests_siaqodbLMDB_ASYNC\";
         public LINQTests()
         {
               Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");

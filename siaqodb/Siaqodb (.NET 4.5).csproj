@@ -41,7 +41,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\net45\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ASYNC_LMDB</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\net45\Siaqodb.xml</DocumentationFile>
@@ -180,6 +180,7 @@
     <Compile Include="Queries\Or.cs" />
     <Compile Include="Queries\Where.cs" />
     <Compile Include="Siaqodb.cs" />
+    <Compile Include="SiaqodbAsync.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
     <Compile Include="SiaqodbUtil.cs" />
     <Compile Include="SqoDataObject.cs" />
