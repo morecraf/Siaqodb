@@ -15,7 +15,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\xamarin.ios</OutputPath>
+    <OutputPath>bin\xamarin.ios_BakCompat</OutputPath>
     <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC_LMDB;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -193,10 +193,93 @@
     <Compile Include="Lightning\Native\NativeLibraryFacades.cs" />
     <Compile Include="Lightning\Native\ValueStructure.cs" />
     <Compile Include="SiaqodbAsync.cs" />
+    <Compile Include="Dotissi\ISqoDataObject.cs" />
+    <Compile Include="Dotissi\LazyObjectList.cs" />
+    <Compile Include="Dotissi\ObjectList.cs" />
+    <Compile Include="Dotissi\Siaqodb.cs" />
+    <Compile Include="Dotissi\SiaqodbUtil.cs" />
+    <Compile Include="Dotissi\SqoDataObject.cs" />
+    <Compile Include="Dotissi\StorageEngine.Loader.cs" />
+    <Compile Include="Dotissi\StorageEngine.Saver.cs" />
+    <Compile Include="Dotissi\StorageEngine.cs" />
+    <Compile Include="Dotissi\AsyncLocker\AsyncLock.cs" />
+    <Compile Include="Dotissi\Cache\Cache.cs" />
+    <Compile Include="Dotissi\Cache\CacheCustomFileNames.cs" />
+    <Compile Include="Dotissi\Cache\CacheDocuments.cs" />
+    <Compile Include="Dotissi\Cache\CacheForIndexes.cs" />
+    <Compile Include="Dotissi\Cache\CacheForManager.cs" />
+    <Compile Include="Dotissi\Cache\CacheOIDs.cs" />
+    <Compile Include="Dotissi\Cache\CircularRefCache.cs" />
+    <Compile Include="Dotissi\Cache\ConditionalWeakTable.cs" />
+    <Compile Include="Dotissi\Cache\MetaCache.cs" />
+    <Compile Include="Dotissi\Core\ByteConverter.cs" />
+    <Compile Include="Dotissi\Core\FileFactory.cs" />
+    <Compile Include="Dotissi\Core\ISqoFile.cs" />
+    <Compile Include="Dotissi\Core\ObjectSerializer.Reader.cs" />
+    <Compile Include="Dotissi\Core\ObjectSerializer.Writer.cs" />
+    <Compile Include="Dotissi\Core\ObjectSerializer.cs" />
+    <Compile Include="Dotissi\Core\RawdataSerializer.cs" />
+    <Compile Include="Dotissi\Core\SerializerFactory.cs" />
+    <Compile Include="Dotissi\Core\SqoFile.cs" />
+    <Compile Include="Dotissi\Core\ByteTransformers\ArrayByteTranformer.cs" />
+    <Compile Include="Dotissi\Core\ByteTransformers\ByteTransformerFactory.cs" />
+    <Compile Include="Dotissi\Core\ByteTransformers\ComplexTypeTransformer.cs" />
+    <Compile Include="Dotissi\Core\ByteTransformers\DictionaryByteTransformer.cs" />
+    <Compile Include="Dotissi\Core\ByteTransformers\FixedArrayByteTransformer.cs" />
+    <Compile Include="Dotissi\Core\ByteTransformers\IByteTransformer.cs" />
+    <Compile Include="Dotissi\Core\ByteTransformers\PrimitiveByteTransformer.cs" />
+    <Compile Include="Dotissi\Exceptions\IndexCorruptedException.cs" />
+    <Compile Include="Dotissi\Indexes\IndexInfo.cs" />
+    <Compile Include="Dotissi\Indexes\BTree\BTree.cs" />
+    <Compile Include="Dotissi\Indexes\BTree\BTreeNode.cs" />
+    <Compile Include="Dotissi\Indexes\BTree\IBTree.cs" />
+    <Compile Include="Dotissi\Indexes\BTree\IndexManager.cs" />
+    <Compile Include="Dotissi\Internal\_bs.cs" />
+    <Compile Include="Dotissi\Linq\Evaluator.cs" />
+    <Compile Include="Dotissi\Linq\ExpressionVisitor.cs" />
+    <Compile Include="Dotissi\Linq\IncludeSqoQuery.cs" />
+    <Compile Include="Dotissi\Linq\JoinTranslator.cs" />
+    <Compile Include="Dotissi\Linq\LazyEnumerator.cs" />
+    <Compile Include="Dotissi\Linq\LazySqoQuery.cs" />
+    <Compile Include="Dotissi\Linq\ProjectionJoin.cs" />
+    <Compile Include="Dotissi\Linq\ProjectionSelect.cs" />
+    <Compile Include="Dotissi\Linq\QueryTranslator.cs" />
+    <Compile Include="Dotissi\Linq\SelectQuery.cs" />
+    <Compile Include="Dotissi\Linq\SqoColumn.cs" />
+    <Compile Include="Dotissi\Linq\SqoOrderedQuery.cs" />
+    <Compile Include="Dotissi\Linq\SqoQuery.cs" />
+    <Compile Include="Dotissi\Linq\SqoQueryExtensionsImpl.cs" />
+    <Compile Include="Dotissi\Meta\FieldSqoInfo.cs" />
+    <Compile Include="Dotissi\Meta\MetaExtractor.cs" />
+    <Compile Include="Dotissi\Meta\ObjectInfo.cs" />
+    <Compile Include="Dotissi\Meta\TypeHeader.cs" />
+    <Compile Include="Dotissi\Meta\TypeInfo.cs" />
+    <Compile Include="Dotissi\MetaObjects\ArrayInfo.cs" />
+    <Compile Include="Dotissi\MetaObjects\DictionaryInfo.cs" />
+    <Compile Include="Dotissi\MetaObjects\DocumentInfo.cs" />
+    <Compile Include="Dotissi\MetaObjects\RawdataInfo.cs" />
+    <Compile Include="Dotissi\MetaObjects\RawdataManager.cs" />
+    <Compile Include="Dotissi\PropertyResolver\SilverlightPropertyResolver.cs" />
+    <Compile Include="Dotissi\Queries\And.cs" />
+    <Compile Include="Dotissi\Queries\ICriteria.cs" />
+    <Compile Include="Dotissi\Queries\Or.cs" />
+    <Compile Include="Dotissi\Queries\Where.cs" />
+    <Compile Include="Dotissi\Transactions\Transaction.cs" />
+    <Compile Include="Dotissi\Transactions\TransactionInternal.cs" />
+    <Compile Include="Dotissi\Transactions\TransactionManager.cs" />
+    <Compile Include="Dotissi\Transactions\TransactionObject.cs" />
+    <Compile Include="Dotissi\Transactions\TransactionsStorage.cs" />
+    <Compile Include="Dotissi\Utilities\ExternalMetaHelper.cs" />
+    <Compile Include="Dotissi\Utilities\ImportExport.cs" />
+    <Compile Include="Dotissi\Utilities\MetaHelper.cs" />
+    <Compile Include="Dotissi\Utilities\ObjectTableHelper.cs" />
+    <Compile Include="Dotissi\WinRTExtensions\TypeExtensions.cs" />
+    <Compile Include="SiaqodbUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AsyncLocker\" />
     <Folder Include="Lightning\" />
+    <Folder Include="Dotissi\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28Xamarin%29.csproj">

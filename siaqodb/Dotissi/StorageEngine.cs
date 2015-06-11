@@ -50,8 +50,8 @@ namespace Dotissi
         bool useElevatedTrust;
 
 #if UNITY3D
-        private EventHandler<LoadingObjectEventArgs> loadingObject;
-        public event EventHandler<LoadingObjectEventArgs> LoadingObject
+		private EventHandler<Sqo.LoadingObjectEventArgs> loadingObject;
+		public event EventHandler<Sqo.LoadingObjectEventArgs> LoadingObject
         {
             add
             {
@@ -69,8 +69,8 @@ namespace Dotissi
             }
 
         }
-        private EventHandler<LoadedObjectEventArgs> loadedObject;
-        public event EventHandler<LoadedObjectEventArgs> LoadedObject
+		private EventHandler<Sqo.LoadedObjectEventArgs> loadedObject;
+		public event EventHandler<Sqo.LoadedObjectEventArgs> LoadedObject
         {
             add
             {
@@ -1249,7 +1249,7 @@ namespace Dotissi
 					}
 					catch (UnauthorizedAccessException ex) //monodroid bug!!!:https://bugzilla.novell.com/show_bug.cgi?id=684172
 					{
-						Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",VerboseLevel.Error);
+				Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",Sqo.VerboseLevel.Error);
 
 						serializer.Open(this.useElevatedTrust);
 						serializer.MakeEmpty();
@@ -1272,7 +1272,7 @@ namespace Dotissi
                     }
                     catch (UnauthorizedAccessException ex) //monodroid bug!!!:https://bugzilla.novell.com/show_bug.cgi?id=684172
                     {
-                        Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",VerboseLevel.Error);
+				Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",Sqo.VerboseLevel.Error);
                   
                         serializer.Open(this.useElevatedTrust);
                         serializer.MakeEmpty();
@@ -1374,7 +1374,7 @@ namespace Dotissi
 				}
 				catch (UnauthorizedAccessException ex) //monodroid bug!!!:https://bugzilla.novell.com/show_bug.cgi?id=684172
 				{
-					Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",VerboseLevel.Error);
+			Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",Sqo.VerboseLevel.Error);
 
 					serializer.Open(this.useElevatedTrust);
 					serializer.MakeEmpty();
@@ -1397,7 +1397,7 @@ namespace Dotissi
                     }
                     catch (UnauthorizedAccessException ex) //monodroid bug!!!:https://bugzilla.novell.com/show_bug.cgi?id=684172
                     {
-                        Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",VerboseLevel.Error);
+			Sqo.SiaqodbConfigurator.LogMessage("File:"+fileName+" cannot be deleted,set size to zero!",Sqo.VerboseLevel.Error);
                   
                         serializer.Open(this.useElevatedTrust);
                         serializer.MakeEmpty();
@@ -1890,11 +1890,11 @@ namespace Dotissi
 
         #region EVENTS
 #if UNITY3D
-        protected virtual void OnLoadingObject(LoadingObjectEventArgs args)
+protected virtual void OnLoadingObject(Sqo.LoadingObjectEventArgs args)
         {
             if (loadingObject != null)
             {
-                if (args.ObjectType != typeof(Sqo.MetaObjects.RawdataInfo) && args.ObjectType != typeof(Sqo.Indexes.IndexInfo2))
+		if (args.ObjectType != typeof(Sqo.MetaObjects.RawdataInfo) && args.ObjectType != typeof(Dotissi.Indexes.IndexInfo2))
                 {
                     loadingObject(this, args);
                 }
@@ -1904,9 +1904,9 @@ namespace Dotissi
         {
             if (loadedObject != null)
             {
-                if (obj.GetType() != typeof(Sqo.MetaObjects.RawdataInfo) && obj.GetType() != typeof(Sqo.Indexes.IndexInfo2))
+		if (obj.GetType() != typeof(Sqo.MetaObjects.RawdataInfo) && obj.GetType() != typeof(Dotissi.Indexes.IndexInfo2))
                 {
-                    LoadedObjectEventArgs args = new LoadedObjectEventArgs(oid, obj);
+			Sqo.LoadedObjectEventArgs args = new Sqo.LoadedObjectEventArgs(oid, obj);
                     loadedObject(this, args);
                 }
             }

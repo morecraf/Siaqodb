@@ -59,8 +59,8 @@ namespace Dotissi
         /// Raised before an object is saved in database
         /// </summary>
 #if UNITY3D
-        private EventHandler<SavingEventsArgs> savingObject;
-        public event EventHandler<SavingEventsArgs> SavingObject
+		private EventHandler<Sqo.SavingEventsArgs> savingObject;
+		public event EventHandler<Sqo.SavingEventsArgs> SavingObject
         {
             add
             {
@@ -582,11 +582,11 @@ namespace Dotissi
         }
 #endif
 #if UNITY3D
-        protected virtual void OnSavingObject(SavingEventsArgs e)
+		protected virtual void OnSavingObject(Sqo.SavingEventsArgs e)
 		{
 			if (savingObject != null)
 			{
-				 if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Sqo.Indexes.IndexInfo2))
+				if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Dotissi.Indexes.IndexInfo2))
                {}
 else
 {
@@ -598,7 +598,7 @@ else
 		{
 			if (savedObject != null)
 			{
- if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Sqo.Indexes.IndexInfo2))
+				if ((e.ObjectType.IsGenericType() && e.ObjectType.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || e.ObjectType == typeof(Dotissi.Indexes.IndexInfo2))
                {}
 else
 {				
