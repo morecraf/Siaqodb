@@ -33,6 +33,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>af91bab0</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,6 +56,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Siaqodb, Version=5.0.0.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Siaqodb.5.0.0.2-unstable\lib\net45\Siaqodb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SiaqodbPortable, Version=4.0.2.27, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Siaqodb.5.0.0.2-unstable\lib\net45\SiaqodbPortable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -106,13 +115,14 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 3.5%29.csproj">
-      <Project>{243748a0-9797-4fa9-a805-d71127eac3da}</Project>
-      <Name>Siaqodb %28.NET 3.5%29</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets" Condition="Exists('..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

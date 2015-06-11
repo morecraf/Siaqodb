@@ -134,7 +134,6 @@ namespace SiaqodbManager
             //dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.SystemColors.ControlDark;
             foreach (MetaField f in metaType.Fields)
             {
-
                 if (typeof(IList).IsAssignableFrom(f.FieldType))
                 {
                     System.Windows.Forms.DataGridViewLinkColumn column = new System.Windows.Forms.DataGridViewLinkColumn();
@@ -290,6 +289,10 @@ namespace SiaqodbManager
 
             List<int> oids = new List<int>();
             int TID=0;
+            if (this.dataGridView1.Rows[rowIndex].Cells[columnIndex].Value == "[null]")
+            {
+                return;
+            }
             if (this.dataGridView1.Rows[rowIndex].Cells[0].Value != null)//is not new row
             {
                 _bs._loidtid(this.siaqodb, (int)this.dataGridView1.Rows[rowIndex].Cells[0].Value, this.metaType, fi.Name, ref oids, ref TID);

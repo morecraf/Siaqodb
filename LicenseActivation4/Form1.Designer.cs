@@ -46,7 +46,7 @@
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(124, 13);
             this.label8.TabIndex = 15;
-            this.label8.Text = "Copyright © Dotissi 2014";
+            this.label8.Text = "Copyright © Dotissi 2015";
             // 
             // label2
             // 

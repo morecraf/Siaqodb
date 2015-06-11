@@ -39,10 +39,12 @@ namespace App1
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            SiaqodbConfigurator.SetLicense(@"o+FD6uiB55Q9vtVfv7yU2fe7rYQ2CXjZFrBh8OrAUjc=");
+            SiaqodbConfigurator.SetLicense(@"4IZR9dJliEpR4ngOmfSywnQvq5ZFzwSJCM4fk2nenkU=");
             Siaqodb nop = new Siaqodb();
             
             nop.Open(ApplicationData.Current.LocalFolder.Path);
+            //Dotissi.Siaqodb siaqodbOld = new Dotissi.Siaqodb();
+           // siaqodbOld.Open(ApplicationData.Current.LocalFolder);
             //await nop.DropTypeAsync<Customer>();
             DateTime start = DateTime.Now;
             for (int i = 1; i < 100; i++)
@@ -51,12 +53,16 @@ namespace App1
                 c.ID = i;
                 c.Name = "ad" + i.ToString();
                 //c.Vasiel = "momo" + i.ToString();
-                await nop.StoreObjectAsync(c);
+                //await nop.StoreObjectAsync(c);
             }
            
             string elapsedStore = (DateTime.Now - start).ToString();
             start = DateTime.Now;
+            
+            SiaqodbUtil.Migrate(nop);
+
             IObjectList<Customer> listC = await nop.LoadAllAsync<Customer>();
+           // IObjectList<Customer> listC2 = await siaqodbOld.LoadAllAsync<Customer>();
             string elapsedRead= (DateTime.Now - start).ToString();
             nop.Close();
 

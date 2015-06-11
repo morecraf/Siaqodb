@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dotissi")]
 [assembly: AssemblyProduct("LicenseActivation")]
-[assembly: AssemblyCopyright("Copyright © Dotissi 2014")]
+[assembly: AssemblyCopyright("Copyright © Dotissi 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

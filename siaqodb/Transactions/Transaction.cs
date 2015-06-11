@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sqo.Exceptions;
-using System.Threading.Tasks;
+
 #if  ASYNC_LMDB
 using System.Threading.Tasks;
 #endif

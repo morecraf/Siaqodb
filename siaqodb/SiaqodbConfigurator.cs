@@ -666,6 +666,20 @@ namespace Sqo
             PropertyMaps = null;
             LazyLoaded = null;
         }
+        private static decimal bufferingChunkPercent = 10;
+
+        internal static decimal BufferingChunkPercent
+        {
+            get { return bufferingChunkPercent; }
+            set
+            {
+                if (value > 100 || value <= 0)
+                {
+                    throw new SiaqodbException("Max percent must be 100");
+                }
+                bufferingChunkPercent = value;
+            }
+        }
     }
     
 }

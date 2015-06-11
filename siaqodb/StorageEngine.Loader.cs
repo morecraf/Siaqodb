@@ -1122,7 +1122,11 @@ namespace Sqo
 #endif
         internal object LoadValue(int oid, string fieldName, SqoTypeInfo ti)
         {
-            return this.LoadValue(oid, fieldName, ti, null);
+            var transaction = transactionManager.GetActiveTransaction();
+            {
+                return this.LoadValue(oid, fieldName, ti, transaction);
+            }
+
         }
         internal object LoadValue(int oid, string fieldName, SqoTypeInfo ti, LightningTransaction transaction)
         {

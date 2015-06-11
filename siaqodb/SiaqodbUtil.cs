@@ -6,30 +6,104 @@ using Sqo.MetaObjects;
 using Sqo.Core;
 using System.IO;
 using System.Linq.Expressions;
+using Sqo.Transactions;
 #if ASYNC
 using System.Threading.Tasks;
 #endif
 
 namespace Sqo
 {
-
-
-    public static class SqoStringExtensions
+    public class SiaqodbUtil
     {
-        /// <summary>
-        ///  Returns a value indicating whether the specified System.String object occurs
-        ///    within this string.A parameter specifies the type of search
-        ///     to use for the specified string.
-        /// </summary>
-        /// <param name="stringObj">Input string</param>
-        /// <param name="value">The string to seek.</param>
-        /// <param name="comparisonType"> One of the enumeration values that specifies the rules for the search.</param>
-        /// <returns>true if the value parameter occurs within this string, or if value is the
-        ///     empty string (""); otherwise, false.</returns>
-        public static bool Contains(this string stringObj, string value, StringComparison comparisonType)
+#if WinRT
+        public static void Migrate(Siaqodb siaqodb)
         {
-            return stringObj.IndexOf(value, comparisonType) != -1;
+            var path = siaqodb.GetDBPath();
+           
+            Windows.Storage.StorageFolder storageFolder = Windows.Storage.StorageFolder.GetFolderFromPathAsync(path).AsTask().Result;
+            IReadOnlyList<Windows.Storage.StorageFile> files = storageFolder.GetFilesAsync().AsTask().Result;
+
+            var oldSqo = new Dotissi.Siaqodb();
+            oldSqo.Open(storageFolder);
+
+            var allTypes = oldSqo.GetAllTypesInfo();
+            foreach (var sqoType in allTypes)
+            {
+                if (sqoType.Type == typeof(Sqo.MetaObjects.RawdataInfo)
+                    || sqoType.TypeName.Contains("Dotissi.Indexes") || sqoType.TypeName.Contains("BTreeNode"))
+                {
+                    continue;
+                }
+                var allOfType = oldSqo.LoadAll(sqoType);
+                ITransaction transaction = null;
+                try
+                {
+                    transaction = siaqodb.BeginTransaction();
+                    foreach (var toStore in allOfType)
+                    {
+                        siaqodb.StoreObject(toStore, transaction);
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    if (transaction != null)
+                    {
+                        transaction.Rollback();
+                    }
+                }
+            }
+            oldSqo.Close();
+
+
         }
-      
+#else
+       public static void Migrate(Siaqodb siaqodb)
+        {
+            var path = siaqodb.GetDBPath();
+            System.IO.DirectoryInfo downloadedMessageInfo = new DirectoryInfo(path);
+            string[] extensions = { "esqr", "sqr", "esqo", "sqo" };
+            if (Directory.GetFiles(path, "*.*")
+                .Count(f => extensions.Contains(f.Split('.').Last())) <= 0)
+            {
+                return;
+            }
+
+
+            var oldSqo = new Dotissi.Siaqodb(path);
+            var allTypes = oldSqo.GetAllTypesInfo();
+            foreach (var sqoType in allTypes)
+            {
+                if (sqoType.Type == typeof(Sqo.MetaObjects.RawdataInfo)
+                    || sqoType.TypeName.Contains("Dotissi.Indexes") || sqoType.TypeName.Contains("BTreeNode"))
+                {
+                    continue;
+                }
+                var allOfType = oldSqo.LoadAll(sqoType);
+                ITransaction transaction = null;
+                try
+                {
+                    transaction = siaqodb.BeginTransaction();
+                    foreach (var toStore in allOfType)
+                    {
+                        siaqodb.StoreObject(toStore, transaction);
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    if (transaction != null)
+                    {
+                        transaction.Rollback();
+                    }
+                }
+            }
+            oldSqo.Close();
+
+
+        }
+#endif
     }
+        
+   
 }

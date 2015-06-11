@@ -332,7 +332,7 @@ namespace Sqo
         /// <param name="path"></param>
         public void Open(string path)
         {
-            this.Open(path,20971520,200);
+            this.Open(path,50*1024*1024,200);
         }
 /// <summary>
         /// Open database 
@@ -1318,7 +1318,10 @@ namespace Sqo
                 }
                 using (var transaction = transactionManager.BeginTransaction())
                 {
-                    return storageEngine.LoadAllOIDs(type.Name);
+                    var oids = storageEngine.LoadAllOIDs(type.Name);
+                    transaction.Commit();
+                    return oids;
+
                 }
             }
 		}
@@ -1423,17 +1426,20 @@ namespace Sqo
                 {
                     throw new SiaqodbException("Database is closed, call method Open() to open it!");
                 }
-                if (!cacheForManager.Contains(mt.Name))
-                {
-                    SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(mt.Name);
-                    cacheForManager.AddType(mt.Name, ti);
-                }
                 using (var transaction = transactionManager.BeginTransaction())
                 {
+                    if (!cacheForManager.Contains(mt.Name))
+                    {
+                        SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(mt.Name);
+                        cacheForManager.AddType(mt.Name, ti);
+                    }
                     SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
-                    return storageEngine.LoadValue(oid, fieldName, tinf);
+                    var value = storageEngine.LoadValue(oid, fieldName, tinf);
+                    transaction.Commit();
+                    return value;
                 }
             }
+
 		}
 #if ASYNC
         /// <summary>
@@ -1923,25 +1929,31 @@ namespace Sqo
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            List<MetaType> list = new List<MetaType>();
-            List<SqoTypeInfo> tiList = storageEngine.LoadAllTypesForObjectManager();
-            foreach (SqoTypeInfo ti in tiList)
-			{
-				MetaType mt= new MetaType();
-				mt.Name = ti.TypeName;
-                mt.TypeID = ti.Header.TID;
-                mt.FileName = ti.FileNameForManager;
-				foreach (FieldSqoInfo fi in ti.Fields)
-				{
-					MetaField mf = new MetaField();
-                    
-					mf.FieldType = fi.AttributeType;
-					mf.Name = fi.Name;
-					mt.Fields.Add(mf);
-				}
-				list.Add(mt);
-			}
-			return list;
+
+            using (var transaction = transactionManager.BeginTransaction())
+            {
+                List<MetaType> list = new List<MetaType>();
+                List<SqoTypeInfo> tiList = storageEngine.LoadAllTypesForObjectManager();
+                foreach (SqoTypeInfo ti in tiList)
+                {
+                    MetaType mt = new MetaType();
+                    mt.Name = ti.TypeName;
+                    mt.TypeID = ti.Header.TID;
+                    mt.FileName = ti.FileNameForManager;
+                    foreach (FieldSqoInfo fi in ti.Fields)
+                    {
+                        MetaField mf = new MetaField();
+
+                        mf.FieldType = fi.AttributeType;
+                        mf.Name = fi.Name;
+                        mt.Fields.Add(mf);
+                    }
+                    list.Add(mt);
+                }
+                transaction.Commit();
+                return list;
+            }
+
 		}
 #if ASYNC
         /// <summary>
@@ -2157,18 +2169,25 @@ namespace Sqo
 #endif
         internal bool UpdateField(int oid,MetaType metaType, string field, object value)
         {
-            if (!opened)
+            using (var transaction = transactionManager.BeginTransaction())
             {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
+
+                if (!opened)
+                {
+                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
+                }
+                if (!cacheForManager.Contains(metaType.Name))
+                {
+                    SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(metaType.Name);
+                    cacheForManager.AddType(metaType.Name, ti);
+                }
+                SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(metaType.Name);
+
+                var result = storageEngine.SaveValue(oid, field, tinf, value, transactionManager.GetActiveTransaction());
+                transaction.Commit();
+                return result;
             }
-            if (!cacheForManager.Contains(metaType.Name))
-            {
-                SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(metaType.Name);
-                cacheForManager.AddType(metaType.Name, ti);
-            }
-            SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(metaType.Name);
-            
-            return storageEngine.SaveValue(oid, field, tinf,value,null);
+
            
         }
         
@@ -2358,14 +2377,19 @@ namespace Sqo
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            if (!cacheForManager.Contains(metaType.Name))
+            using (var transaction = transactionManager.BeginTransaction())
             {
-                SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(metaType.Name);
-                cacheForManager.AddType(metaType.Name, ti);
-            }
-            SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(metaType.Name);
+                if (!cacheForManager.Contains(metaType.Name))
+                {
+                    SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(metaType.Name);
+                    cacheForManager.AddType(metaType.Name, ti);
+                }
+                SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(metaType.Name);
 
-            storageEngine.DeleteObjectByOID(oid, tinf);
+                storageEngine.DeleteObjectByOID(oid, tinf);
+                transaction.Commit();
+            }
+
         }
 
         internal int InsertObjectByMeta(MetaType metaType)
@@ -2374,13 +2398,19 @@ namespace Sqo
             {
                 throw new SiaqodbException("Database is closed, call method Open() to open it!");
             }
-            if (!cacheForManager.Contains(metaType.Name))
+            using (var transaction = transactionManager.BeginTransaction())
             {
-                SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(metaType.Name);
-                cacheForManager.AddType(metaType.Name, ti);
+                if (!cacheForManager.Contains(metaType.Name))
+                {
+                    SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(metaType.Name);
+                    cacheForManager.AddType(metaType.Name, ti);
+                }
+                SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(metaType.Name);
+                var result = storageEngine.InsertObjectByMeta(tinf);
+                transaction.Commit();
+                return result;
             }
-            SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(metaType.Name);
-            return storageEngine.InsertObjectByMeta(tinf);
+
         }
 
         
@@ -2420,63 +2450,73 @@ namespace Sqo
 #endif
         internal void LoadObjectOIDAndTID(int oid, string fieldName, MetaType mt,ref List<int> listOIDs,ref int TID)
         {
-            if (!cacheForManager.Contains(mt.Name))
+            using (var transaction = transactionManager.BeginTransaction())
             {
-                SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(mt.Name);
-                cacheForManager.AddType(mt.Name, ti);
-            }
-            SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
-            FieldSqoInfo fi= MetaHelper.FindField(tinf.Fields, fieldName);
-            if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId==MetaExtractor.documentID)
-            {
-                KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
-                listOIDs.Add(kv.Key);
-                TID = kv.Value;
-            }
-            else if(fi.AttributeTypeId-MetaExtractor.ArrayTypeIDExtra == MetaExtractor.complexID)
-            {
-                List<KeyValuePair<int, int>> list = storageEngine.LoadComplexArray(oid, fi, tinf);
-                if (list.Count > 0)
+                if (!cacheForManager.Contains(mt.Name))
                 {
-                    TID = list[0].Value;
-                    foreach (KeyValuePair<int,int> kv in list)
+                    SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(mt.Name);
+                    cacheForManager.AddType(mt.Name, ti);
+                }
+                SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
+                FieldSqoInfo fi = MetaHelper.FindField(tinf.Fields, fieldName);
+                if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID)
+                {
+                    KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
+                    listOIDs.Add(kv.Key);
+                    TID = kv.Value;
+                }
+                else if (fi.AttributeTypeId - MetaExtractor.ArrayTypeIDExtra == MetaExtractor.complexID)
+                {
+                    List<KeyValuePair<int, int>> list = storageEngine.LoadComplexArray(oid, fi, tinf);
+                    if (list.Count > 0)
                     {
-                        listOIDs.Add(kv.Key);
+                        TID = list[0].Value;
+                        foreach (KeyValuePair<int, int> kv in list)
+                        {
+                            listOIDs.Add(kv.Key);
+                        }
                     }
                 }
+                transaction.Commit();
             }
+
         }
        
 
         internal void LoadTIDofComplex(int oid, string fieldName, MetaType mt, ref int TID, ref bool isArray)
         {
-            if (!cacheForManager.Contains(mt.Name))
+            using (var transaction = transactionManager.BeginTransaction())
             {
-                SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(mt.Name);
-                cacheForManager.AddType(mt.Name, ti);
+                if (!cacheForManager.Contains(mt.Name))
+                {
+                    SqoTypeInfo ti = storageEngine.GetSqoTypeInfo(mt.Name);
+                    cacheForManager.AddType(mt.Name, ti);
+                }
+                SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
+                FieldSqoInfo fi = MetaHelper.FindField(tinf.Fields, fieldName);
+                if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID)
+                {
+                    KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
+                    TID = kv.Value;
+                    isArray = false;
+                }
+                else if (fi.AttributeTypeId - MetaExtractor.ArrayTypeIDExtra == MetaExtractor.complexID)
+                {
+                    isArray = true;
+                    TID = storageEngine.LoadComplexArrayTID(oid, fi, tinf);
+                }
+                else if (fi.AttributeTypeId - MetaExtractor.ArrayTypeIDExtra == MetaExtractor.jaggedArrayID)
+                {
+                    isArray = true;
+                    TID = -32;
+                }
+                else if (fi.AttributeTypeId == MetaExtractor.dictionaryID)
+                {
+                    TID = -31;
+                }
+                transaction.Commit();
             }
-            SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
-            FieldSqoInfo fi = MetaHelper.FindField(tinf.Fields, fieldName);
-            if (fi.AttributeTypeId == MetaExtractor.complexID || fi.AttributeTypeId == MetaExtractor.documentID)
-            {
-                KeyValuePair<int, int> kv = storageEngine.LoadOIDAndTID(oid, fi, tinf);
-                TID = kv.Value;
-                isArray = false;
-            }
-            else if (fi.AttributeTypeId - MetaExtractor.ArrayTypeIDExtra == MetaExtractor.complexID)
-            {
-                isArray = true;
-                TID = storageEngine.LoadComplexArrayTID(oid, fi, tinf);
-            }
-            else if (fi.AttributeTypeId - MetaExtractor.ArrayTypeIDExtra == MetaExtractor.jaggedArrayID)
-            {
-                isArray = true;
-                TID = -32;
-            }
-            else if (fi.AttributeTypeId == MetaExtractor.dictionaryID)
-            {
-                TID = -31;
-            }
+
         }
 
        
@@ -2577,6 +2617,24 @@ namespace Sqo
             }
         }
         #endregion
+
+    }
+    public static class SqoStringExtensions
+    {
+        /// <summary>
+        ///  Returns a value indicating whether the specified System.String object occurs
+        ///    within this string.A parameter specifies the type of search
+        ///     to use for the specified string.
+        /// </summary>
+        /// <param name="stringObj">Input string</param>
+        /// <param name="value">The string to seek.</param>
+        /// <param name="comparisonType"> One of the enumeration values that specifies the rules for the search.</param>
+        /// <returns>true if the value parameter occurs within this string, or if value is the
+        ///     empty string (""); otherwise, false.</returns>
+        public static bool Contains(this string stringObj, string value, StringComparison comparisonType)
+        {
+            return stringObj.IndexOf(value, comparisonType) != -1;
+        }
 
     }
    

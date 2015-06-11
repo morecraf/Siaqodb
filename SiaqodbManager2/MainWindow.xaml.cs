@@ -80,7 +80,7 @@ namespace SiaqodbManager
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                 }
             }
-            Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
+            Sqo.SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
 #if TRIAL
             string folder = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config";
             string trialFile = folder + System.IO.Path.DirectorySeparatorChar + "trial.lic";
@@ -231,7 +231,6 @@ namespace SiaqodbManager
                 menuSave.IsEnabled = false;
                 menuSaveAs.IsEnabled = false;
             }
-            
         }
 
 
@@ -442,7 +441,7 @@ namespace SiaqodbManager
                 foreach (Sqo.MetaType mt in siaqodbList)
                 {
                     
-                    Sqo.Internal._bs._sdbfn(siaqodb, mt, mt.FileName);
+                    //Sqo.Internal._bs._sdbfn(siaqodb, mt, mt.FileName);
                     ImageTreeViewItem nodeType = new ImageTreeViewItem();
                     nodeType.Tag = mt;
                     nodeType.Text = mt.Name;

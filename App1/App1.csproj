@@ -144,6 +144,11 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <SDKReference Include="Microsoft.VCLibs, Version=12.0">
+      <Name>Microsoft Visual C++ 2013 Runtime Package for Windows</Name>
+    </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
       <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
       <Name>SiaqodbPortable %28.NET 4.5%29</Name>
@@ -152,11 +157,6 @@
       <Project>{c2d71970-6fa2-4af5-8633-d1741bc28cb9}</Project>
       <Name>Siaqodb %28UniversalApp%29</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <SDKReference Include="Microsoft.VCLibs, Version=12.0">
-      <Name>Microsoft Visual C++ 2013 Runtime Package for Windows</Name>
-    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

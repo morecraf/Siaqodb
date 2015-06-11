@@ -21,7 +21,8 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task TestBasicQuery()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            Siaqodb nop = new Siaqodb(); 
+            nop.Open(dbFolder);
             await nop.DropTypeAsync<Customer>();
 
             for (int i = 0; i < 10; i++)

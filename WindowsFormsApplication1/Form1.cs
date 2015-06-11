@@ -27,48 +27,38 @@ namespace WindowsFormsApplication1
         private void button1_Click(object sender, EventArgs e)
         {
 
-            SiaqodbConfigurator.SetLicense(@"2/LnUmRDCX30610YCRHuw/21gkt6UNimtliHLvNlcMQ=");
-            Siaqodb siaqodb2 = new Siaqodb(@"c:\work\temp\_lmdbtests\");
-            ITransaction transaction = siaqodb2.BeginTransaction();
+            SiaqodbConfigurator.SetLicense(@"4IZR9dJliEpR4ngOmfSywnQvq5ZFzwSJCM4fk2nenkU=");
+            Dotissi.Siaqodb siaqodb2 = new Dotissi.Siaqodb(@"e:\work\temp\");
+            //siaqodb2.DropType<EventSlot>();
+            for (int i = 0; i < 700; i++)
+            {
+
+                EventSlot evslot = new EventSlot();
+                evslot.ApplicationID = i;
+                evslot.ID = i;
+                evslot.Index = i;
+                evslot.ClientID = i % 100;
+                evslot.SubClientID = i % 100;
+                evslot.CA_ClientID = i % 100;
+                evslot.Comment = "myslot" + i.ToString();
+                siaqodb2.StoreObject(evslot);
+            }
+            siaqodb2.Flush();
+            siaqodb2.Close();
+            int id = 1000;
+            Sqo.Siaqodb siaqodbLMDB = new Sqo.Siaqodb(@"e:\work\temp\");
+            SiaqodbUtil.Migrate(siaqodbLMDB);
+            siaqodb2 = new Dotissi.Siaqodb(@"e:\work\temp\");
+            
             DateTime start22 = DateTime.Now;
-            try
-            {
-                //siaqodb2.DropType<EventSlot>();
-                for (int i = 0; i < 10000; i++)
-                {
-
-                    EventSlot evslot = new EventSlot();
-                    evslot.ApplicationID = i%100;
-                    evslot.ID = i % 100;
-                    evslot.Index = i;
-                    //evslot.Friend = new EventSlot();
-                    //evslot.Friend.ID = i + 1;
-                   // evslot.Friend.StartDate = DateTime.Now;
-                    evslot.Comment = "myslot" + i.ToString();
-
-                    //evslot.TickNested = new Tick();
-                   // evslot.TickNested.MyInt = i + 1;
-                    siaqodb2.StoreObject(evslot, transaction);
-                }
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            siaqodb2.Flush ();
-            //int id = 1000;
-            string elapsed12 = (DateTime.Now - start22).ToString();
-            //string s = "s";
-            start22 = DateTime.Now;
             var eventSlots = (from EventSlot es in siaqodb2
-                             where (es.ID == 9 && es.ApplicationID==9)
-                              // orderby es.StartDate
-                             select es).ToList();
-            string elapsed13 = (DateTime.Now - start22).ToString();
-            start22 = DateTime.Now;
-            var alle3 = siaqodb2.LoadAll<EventSlot>();
-            string elapsed33 = (DateTime.Now - start22).ToString ();
+                              where (es.ClientID == 99 && es.SubClientID == 99 && es.CA_ClientID == 99)
+                              orderby es.StartDate
+                              select es).Skip(20).Take(20).ToList();
+
+            var all33 = siaqodb2.LoadAll<EventSlot>();
+            var all33LMDB = siaqodbLMDB.LoadAll<EventSlot>();
+            string elapsed33 = (DateTime.Now - start22).ToString();
             //Log("Time elapsed before close " + elapsed);
             SiaqodbConfigurator.VerboseLevel = VerboseLevel.Warn;
             SiaqodbConfigurator.LoggingMethod = Logging;
@@ -594,22 +584,32 @@ namespace WindowsFormsApplication1
     {
         public int OID { get; set; }
     }
-    
 
-    public class EventSlot {
-        public int OID{get;set;}
-       [Index]
-        public int ID{get;set;}
-        public int ApplicationID{ get; set;}
-       public int Index{ get; set; }
-       
-        public DateTime StartDate{get;set;}
-   
-        public String Comment{ get; set; }
+
+    public class EventSlot
+    {
+        public int OID { get; set; }
+        [Sqo.Attributes.UniqueConstraint]
+        [Index]
+        public int ID { get; set; }
+        public int ApplicationID { get; set; }
+        public int ClientID { get; set; }
+        public int SubClientID { get; set; }
+        public int CA_ClientID { get; set; }
+        public int Index { get; set; }
+        public int CategoryID { get; set; }
+        public string DField { get; set; }
+        [Index]
+        public DateTime StartDate { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public int TimeIncrement { get; set; }
+        public int MaxNOReservations { get; set; }
+        public bool Locked { get; set; }
+        public bool HasTimeSlotSeries { get; set; }
+        [Text]
+        public String Comment { get; set; }
         //public List<TimeSlot> TimeSlots{get;set;}
-        public bool Modified{ get; set; }
-       public  EventSlot Friend { get; set; }
-       public Tick TickNested { get; set; }
+        public bool Modified { get; set; }
     }  
-
 }

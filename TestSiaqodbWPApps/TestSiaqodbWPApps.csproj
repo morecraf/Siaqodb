@@ -18,6 +18,7 @@
     <AppxBundle>Never</AppxBundle>
     <IsTargetingWindowsPhonePlatform>true</IsTargetingWindowsPhonePlatform>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
+    <NuGetPackageImportStamp>018b23a3</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <AppXPackage>True</AppXPackage>
@@ -94,6 +95,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="packages.config" />
     <None Include="TestSiaqodbWPApps_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -108,17 +110,17 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
-      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
-      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\siaqodb\Siaqodb %28UniversalApp%29.csproj">
-      <Project>{c2d71970-6fa2-4af5-8633-d1741bc28cb9}</Project>
-      <Name>Siaqodb %28UniversalApp%29</Name>
-    </ProjectReference>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <Reference Include="Siaqodb, Version=5.0.0.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Siaqodb.5.0.0.2-unstable\lib\wpa81\Siaqodb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SiaqodbPortable, Version=4.0.2.27, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Siaqodb.5.0.0.2-unstable\lib\wpa81\SiaqodbPortable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
@@ -127,6 +129,13 @@
     <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <Import Project="..\packages\Siaqodb.5.0.0.2-unstable\build\wpa81\Siaqodb.targets" Condition="Exists('..\packages\Siaqodb.5.0.0.2-unstable\build\wpa81\Siaqodb.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Siaqodb.5.0.0.2-unstable\build\wpa81\Siaqodb.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Siaqodb.5.0.0.2-unstable\build\wpa81\Siaqodb.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
