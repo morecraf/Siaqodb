@@ -2475,6 +2475,61 @@ namespace TestSiaqodb
             Assert.AreEqual(DateTimeKind.Unspecified, lis[2].dt.Kind);
            }
         }
+        [TestMethod]
+        public void ReadTransactionable()
+        {
+            using (Siaqodb _database = new Siaqodb(objPath))
+            {
+                ITransaction transaction = _database.BeginTransaction();
+                try
+                {
+                    Customer data = new Customer();
+                    data.ID = 30;
+                    Customer existingData;
+                    if (TryGetDocument(30, out existingData,_database))
+                    {
+                        _database.UpdateObjectBy(data, transaction, "ID");
+                       // Notify(Updated, data);
+                    }
+                    else
+                    {
+                        _database.StoreObject(data, transaction);
+                       // Notify(Added, data);
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception e)
+                {
+                    //Logger.Debug("Failed to store data with id {0}. Rolling back transaction. Details: {1}", id, e.Message);
+                    transaction.Rollback();
+                }
+            }
+        }
+        [TestMethod]
+        public void ReadFirstOrDefault()
+        {
+            using (Siaqodb _database = new Siaqodb(objPath))
+            {
+                //var all=_database.LoadAll<Customer>();
+                var query = _database.Query<Customer>().FirstOrDefault();
+                string s = "";
+            }
+        }
+        public bool TryGetDocument(int id, out Customer data, Siaqodb _database)
+        {
+            var document = from Customer identifiable in _database
+                           where identifiable.ID == id
+                           select identifiable;
+            if (document.SqoAny())
+            {
+               // Debug.Assert(document.Count() == 1, String.Format("Expected 1 instance, but got {0}.", document.Count()));
+
+                data = document.SqoFirst();
+                return true;
+            }
+            data = null;
+            return false;
+        }
         /* TODO LMDB uncomment
          [TestMethod]
         public void TestShrink()

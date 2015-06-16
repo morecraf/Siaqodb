@@ -1075,12 +1075,20 @@ namespace Sqo
         {
             lock (_locker)
             {
-                using (var transaction = transactionManager.BeginTransaction())
+                 bool started;
+                var transaction = transactionManager.GetActiveTransaction(out started);
+                try
                 {
+
                     SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                    var ret= storageEngine.LoadObjectByOID<T>(ti, oid);
-                    transaction.Commit();
+                    var ret = storageEngine.LoadObjectByOID<T>(ti, oid);
                     return ret;
+
+                }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
                 }
             }
         }
@@ -1110,12 +1118,18 @@ namespace Sqo
         {
             lock (_locker)
             {
-                using (var transaction = transactionManager.BeginTransaction())
+                bool started;
+                var transaction = transactionManager.GetActiveTransaction(out started);
+                try
                 {
                     SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
                     T g= (T)storageEngine.LoadObjectByOID(ti, oid, properties);
-                    transaction.Commit();
                     return g;
+                }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
                 }
             }
         }
@@ -1283,7 +1297,9 @@ namespace Sqo
                 using (var transaction = transactionManager.BeginTransaction())
                 {
                     SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                    return storageEngine.LoadAllOIDs(ti);
+                    var alloids= storageEngine.LoadAllOIDs(ti);
+                    transaction.Commit();
+                    return alloids;
                 }
             }
 		}
@@ -1392,7 +1408,9 @@ namespace Sqo
         {
             using (var transaction = transactionManager.BeginTransaction())
             {
-                return this.LoadValue(oid, fieldName, type, transactionManager.GetActiveTransaction());
+                var val= this.LoadValue(oid, fieldName, type, transactionManager.GetActiveTransaction());
+                transaction.Commit();
+                return val;
             }
         }
         internal object LoadValue(int oid, string fieldName, Type type,LightningDB.LightningTransaction transaction)
@@ -1909,7 +1927,9 @@ namespace Sqo
             using (var transaction = transactionManager.BeginTransaction())
             {
                 SqoTypeInfo ti = this.GetSqoTypeInfo(type);
-                return storageEngine.LoadObjectByOID(ti, oid);
+                var obj =storageEngine.LoadObjectByOID(ti, oid);
+                transaction.Commit();
+                return obj;
             }
 		}
 #if ASYNC
@@ -2003,7 +2023,9 @@ namespace Sqo
                 using (var transaction = transactionManager.BeginTransaction())
                 {
                     SqoTypeInfo ti = this.GetSqoTypeInfo<T>();
-                    return storageEngine.Count(ti);
+                    var count= storageEngine.Count(ti);
+                    transaction.Commit();
+                    return count;
                 }
             }
         }
