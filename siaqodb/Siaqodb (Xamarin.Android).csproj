@@ -177,6 +177,7 @@
     <Folder Include="AsyncLocker\" />
     <Folder Include="Lightning\" />
     <Folder Include="lib\" />
+    <Folder Include="lib\x86\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
@@ -187,5 +188,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedNativeLibrary Include="lib\armeabi-v7a\liblmdb.so" />
+    <EmbeddedNativeLibrary Include="lib\x86\liblmdb.so" />
   </ItemGroup>
 </Project>
