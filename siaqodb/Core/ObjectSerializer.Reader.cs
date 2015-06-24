@@ -55,8 +55,9 @@ namespace Sqo.Core
                 {
                     if (ti.Type!=null && ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>))
                         throw new IndexCorruptedException();
-                    SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded, will be set to default.", VerboseLevel.Info);
-                    fieldVal = MetaHelper.GetDefault(ai.AttributeType);
+                   // SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded, will be set to default.", VerboseLevel.Info);
+                    //fieldVal = MetaHelper.GetDefault(ai.AttributeType);
+                    throw ex;
                 }
                 if (ai.AttributeTypeId == MetaExtractor.documentID)
                 { 
@@ -138,8 +139,9 @@ namespace Sqo.Core
                     {
                         throw new IndexCorruptedException();
                     }
-                    SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded, will be set to default.", VerboseLevel.Info);
-                    fieldVal = MetaHelper.GetDefault(ai.AttributeType);
+                   // SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded, will be set to default.", VerboseLevel.Info);
+                    //fieldVal = MetaHelper.GetDefault(ai.AttributeType);
+                    throw ex;
                 }
                 if (ai.AttributeTypeId == MetaExtractor.documentID)
                 {
@@ -296,8 +298,9 @@ namespace Sqo.Core
                 {
                     throw new IndexCorruptedException();
                 }
-                SiaqodbConfigurator.LogMessage("Field's" + fi.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
-                return MetaHelper.GetDefault(fi.AttributeType);
+               // SiaqodbConfigurator.LogMessage("Field's" + fi.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                //return MetaHelper.GetDefault(fi.AttributeType);
+                throw ex;
             }
 
         }
@@ -332,8 +335,9 @@ namespace Sqo.Core
                 {
                     throw new IndexCorruptedException();
                 }
-                SiaqodbConfigurator.LogMessage("Field's" + fi.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
-                return MetaHelper.GetDefault(fi.AttributeType);
+                //SiaqodbConfigurator.LogMessage("Field's" + fi.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+               // return MetaHelper.GetDefault(fi.AttributeType);
+                throw ex;
             }
 
         }
@@ -518,8 +522,9 @@ namespace Sqo.Core
                         catch (Exception ex)
                         {
 
-                            SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
-                            row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                            //SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                            //row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                            throw ex;
                         }
                     }
 
@@ -565,8 +570,9 @@ namespace Sqo.Core
                     catch (Exception ex)
                     {
 
-                        SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
-                        row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                        //SiaqodbConfigurator.LogMessage("Field's" + ai.Name + " value of Type " + ti.TypeName + "cannot be loaded,will be set to default.", VerboseLevel.Info);
+                       // row[ai.Name] = MetaHelper.GetDefault(ai.AttributeType);
+                        throw ex;
                     }
                 }
 

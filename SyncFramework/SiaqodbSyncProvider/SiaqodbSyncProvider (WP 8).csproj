@@ -119,10 +119,12 @@
       <Project>{7E436A50-A897-4599-A162-9FCA1673B3C2}</Project>
       <Name>Siaqodb %28WP 8%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SyncCacheController\SyncCacheController %28WP%29.csproj">
-      <Project>{c4d0c333-d6fa-46d5-a513-ac71e4805789}</Project>
-      <Name>SyncCacheController %28WP%29</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SyncCacheController, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\latest version binaries\Siaqodb4.0\SiaqodbSync\SiaqodbSyncFramework\bin\wp8\SyncCacheController.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
