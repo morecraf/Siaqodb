@@ -160,8 +160,19 @@ namespace SiaqodbSyncProvider
             {
                 if (null != response.UpdatedItems && 0 != response.UpdatedItems.Count)
                 {
+                    List<string> IdsWithError = new List<string>();
+                    foreach (Conflict cf in response.Conflicts)
+                    {
+                        if (cf is SyncError)
+                        {
+                            IdsWithError.Add(cf.LiveEntity.ServiceMetadata.Id);
+                        }
+                    }
+
                     foreach (var item in response.UpdatedItems)
                     {
+                        if (IdsWithError.Contains(item.ServiceMetadata.Id))
+                            continue;
                         var offlineEntity = (SiaqodbOfflineEntity)item;
                         offlineEntity.IsDirty = false;
                         offlineEntity.IsTombstone = false;
@@ -178,6 +189,10 @@ namespace SiaqodbSyncProvider
 
                         foreach (var conflict in response.Conflicts)
                         {
+                            if (conflict is SyncError)
+                            {
+                                continue;
+                            }
                             var offlineEntity = (SiaqodbOfflineEntity)conflict.LiveEntity;
                             offlineEntity.IsDirty = false;
                             offlineEntity.IsTombstone = false;
