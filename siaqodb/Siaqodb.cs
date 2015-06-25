@@ -457,15 +457,35 @@ namespace Sqo
             this.OnLoadingObject(e);
         }
 
+        internal delegate int SimpleDelegate(object obj);
+        internal SimpleDelegate CheckIfSavedDelegate;
+
+        internal delegate void UpdateDelegate(object obj, int oid);
+        internal UpdateDelegate UpdateMigrationOid;
+
         void storageEngine_NeedSaveComplexObject(object sender, Core.ComplexObjectEventArgs e)
         {
             if (e.ComplexObject == null)
             {
                 return;
             }
+
             SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(e.ComplexObject);
+            
             if (ti != null)
             {
+                /* used only on migration to avoid saving an object twice and get an inconsistent schema */
+                if (CheckIfSavedDelegate != null )
+                {
+                    var savedOid = CheckIfSavedDelegate(e.ComplexObject);
+                    if (savedOid != -1)
+                    {
+                        e.SavedOID = savedOid;
+                        e.TID = ti.Header.TID;
+                        //circularRefCache.Add(e.ComplexObject);
+                        return;
+                    }
+                }
 
                 int oid = -1;
                 if (e.ReturnOnlyOid_TID)
@@ -475,6 +495,10 @@ namespace Sqo
                 else if (circularRefCache.Contains(e.ComplexObject))
                 {
                     oid = metaCache.GetOIDOfObject(e.ComplexObject, ti);
+                    if (UpdateMigrationOid != null)
+                    {
+                        UpdateMigrationOid(e.ComplexObject, oid);
+                    }
                 }
                 else
                 {
@@ -490,13 +514,17 @@ namespace Sqo
                     {
                         oid = storageEngine.SaveObject(e.ComplexObject, ti,e.Transaction);
                     }
+                   
                     SavedEventsArgs saved = new SavedEventsArgs(e.ComplexObject.GetType(), e.ComplexObject);
                     saved.Inserted = inserted;
                     this.OnSavedObject(saved);
+                    if (UpdateMigrationOid != null)
+                    {
+                        UpdateMigrationOid(e.ComplexObject, oid);
+                    }
                 }
                 e.SavedOID = oid;
                 e.TID = ti.Header.TID;
-
             }
         }
 #if ASYNC
@@ -789,7 +817,7 @@ namespace Sqo
         /// </summary>
         /// <param name="obj">Object to be stored</param>
         /// <param name="transaction">Transaction object</param>
-		
+
         public void StoreObject(object obj,Transactions.ITransaction transaction)
         {
             lock (_locker)
@@ -799,7 +827,6 @@ namespace Sqo
                 SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj);
                 if (ti != null)
                 {
-
                     circularRefCache.Clear();
 
                     circularRefCache.Add(obj);
@@ -819,8 +846,6 @@ namespace Sqo
                     SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
                     saved.Inserted = inserted;
                     this.OnSavedObject(saved);
-
-
                 }
             }
         }
@@ -2639,7 +2664,6 @@ namespace Sqo
             }
         }
         #endregion
-
     }
     public static class SqoStringExtensions
     {
