@@ -680,10 +680,13 @@ namespace Sqo
         /// <param name="obj">Object to be stored</param>
 		public void StoreObject(object obj)
 		{
-            using (var transaction = transactionManager.BeginTransaction())
+            lock (_locker)
             {
-                this.StoreObject(obj, transaction);
-                transaction.Commit();
+                using (var transaction = transactionManager.BeginTransaction())
+                {
+                    this.StoreObject(obj, transaction);
+                    transaction.Commit();
+                }
             }
 		}
 #if ASYNC
@@ -1642,11 +1645,14 @@ namespace Sqo
         /// <param name="fieldNames">Names of fields that this method will lookup for object to delete it</param>
         public bool DeleteObjectBy(object obj,params string[] fieldNames)
         {
-            using (var transaction = transactionManager.BeginTransaction())
+            lock (_locker)
             {
-                bool deleted= this.DeleteObjectBy(obj, transaction, fieldNames);
-                transaction.Commit();
-                return deleted;
+                using (var transaction = transactionManager.BeginTransaction())
+                {
+                    bool deleted = this.DeleteObjectBy(obj, transaction, fieldNames);
+                    transaction.Commit();
+                    return deleted;
+                }
             }
         }
 #if ASYNC
@@ -1885,10 +1891,13 @@ namespace Sqo
         /// <param name="type">Type of objects to be deleted</param>>
         public void DropType(Type type)
         {
-            using (var transaction = transactionManager.BeginTransaction())
+            lock (_locker)
             {
-                this.DropType(type, transaction);
-                transaction.Commit();
+                using (var transaction = transactionManager.BeginTransaction())
+                {
+                    this.DropType(type, transaction);
+                    transaction.Commit();
+                }
             }
         }
         /// <summary>
@@ -1897,24 +1906,27 @@ namespace Sqo
         /// <param name="type">Type of objects to be deleted</param>>
         public void DropType(Type type,Sqo.Transactions.ITransaction transaction )
         {
-            if (!opened)
+            lock (_locker)
             {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
+                if (!opened)
+                {
+                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
+                }
 
-            if (transaction == null)
-            {
-                throw new ArgumentNullException("transaction");
-            }
+                if (transaction == null)
+                {
+                    throw new ArgumentNullException("transaction");
+                }
 
-            if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
-            {
-                throw new SiaqodbException("Transaction closed!");
+                if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
+                {
+                    throw new SiaqodbException("Transaction closed!");
+                }
+                SqoTypeInfo ti = this.GetSqoTypeInfo(type);
+                storageEngine.DropType(ti);
+                indexManager.DropIndexes(ti, transactionManager.GetActiveTransaction());
+                this.metaCache.Remove(type);
             }
-            SqoTypeInfo ti = this.GetSqoTypeInfo(type);
-            storageEngine.DropType(ti);
-            indexManager.DropIndexes(ti, transactionManager.GetActiveTransaction());
-            this.metaCache.Remove(type);
         }
 #if ASYNC
         /// <summary>
@@ -2112,11 +2124,14 @@ namespace Sqo
         
         public bool UpdateObjectBy(object obj,params string[] fieldNames)
         {
-            using (var transaction = transactionManager.BeginTransaction())
+            lock (_locker)
             {
-                bool updated= this.UpdateObjectBy(obj, transaction, fieldNames);
-                transaction.Commit();
-                return updated;
+                using (var transaction = transactionManager.BeginTransaction())
+                {
+                    bool updated = this.UpdateObjectBy(obj, transaction, fieldNames);
+                    transaction.Commit();
+                    return updated;
+                }
             }
         }
 #if ASYNC

@@ -27,7 +27,7 @@ namespace TestSiaqodb
             SiaqodbConfigurator.EncryptedDatabase = true;
            // SiaqodbConfigurator.VerboseLevel = VerboseLevel.Info;
             SiaqodbConfigurator.LoggingMethod = this.LogWarns;
-            Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTfs6WUuPueit/9FCCI1GiibPxQvd8bEoB9DX1r6UtUUm");
+            Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
 		}
         public void LogWarns(string log, VerboseLevel level)
         {
@@ -2513,6 +2513,67 @@ namespace TestSiaqodb
                 //var all=_database.LoadAll<Customer>();
                 var query = _database.Query<Customer>().FirstOrDefault();
                 string s = "";
+            }
+        }
+        [TestMethod]
+        public void MultiThreading()
+        {
+            using (Siaqodb _database = new Siaqodb(objPath))
+            {
+                Stopwatch stopWa = new Stopwatch();
+                stopWa.Start();
+                System.Threading.Tasks.Task[] tasks = new System.Threading.Tasks.Task[10];
+                for (int i = 0; i < 10; i++)
+                {
+                    tasks[i] = System.Threading.Tasks.Task.Factory.StartNew(() =>
+                        {
+                            Customer c = new Customer();
+                            c.Name = "sssd";
+                            _database.StoreObject(c);
+
+                            var all = _database.LoadAll<Customer>();
+
+                            var q = (from Customer ct in _database
+                                     where ct.Name == "sssd"
+                                     select ct).ToList();
+                        });
+                }
+                System.Threading.Tasks.Task.WaitAll(tasks);
+                stopWa.Stop();
+                Console.WriteLine("done in: {0} seconds", stopWa.Elapsed.TotalSeconds);
+                
+            }
+        }
+         [TestMethod]
+        public void MultiThreadingComplexObj()
+        {
+            using (Siaqodb _database = new Siaqodb(objPath))
+            {
+                Stopwatch stopWa = new Stopwatch();
+                stopWa.Start();
+                System.Threading.Tasks.Task[] tasks = new System.Threading.Tasks.Task[10];
+                for (int i = 0; i < 10; i++)
+                {
+                    tasks[i] = System.Threading.Tasks.Task.Factory.StartNew(() =>
+                    {
+                        Person c = new Person();
+                        c.Name = "sssd";
+                        c.friend = new Person();
+                        c.friend.Name = "aass";
+
+                        _database.StoreObject(c);
+
+                        var all = _database.LoadAll<Person>();
+
+                        var q = (from Person ct in _database
+                                 where ct.Name == "sssd"
+                                 select ct).ToList();
+                    });
+                }
+                System.Threading.Tasks.Task.WaitAll(tasks);
+                stopWa.Stop();
+                Console.WriteLine("done in: {0} seconds", stopWa.Elapsed.TotalSeconds);
+
             }
         }
         public bool TryGetDocument(int id, out Customer data, Siaqodb _database)

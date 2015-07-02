@@ -20,14 +20,13 @@ namespace SiaqodbUnitTests
         string dbFolder = @"c:\work\temp\unitTests_siaqodbLMDB_ASYNC\";
         public BasicTests()
         {
-            Sqo.SiaqodbConfigurator.SetLicense(@"YgExQg+yktbL2Pt+Vqo7Z6S8R4srS8+leQwHnG7zu/8=");
+            Sqo.SiaqodbConfigurator.SetLicense(@"9+3kflAazhBu3bW+lP/eJZR91W03jgYPxZpa9fDHSbk6UNwzo/AjI3hjA161Oqry");
         }
         [TestMethod]
         public async Task TestInsert()
         {
             Siaqodb nop = new Siaqodb();
-            try
-            {
+           
                 await nop.OpenAsync(dbFolder);
                 await nop.DropTypeAsync<Customer>();
                 for (int i = 10; i < 20; i++)
@@ -42,11 +41,8 @@ namespace SiaqodbUnitTests
                 IObjectList<Customer> listC = await nop.LoadAllAsync<Customer>();
                 Assert.AreEqual(listC.Count, 10);
                 nop.Close();
-            }
-            catch (Exception ex)
-            { 
             
-            }
+            
 
         }
         [TestMethod]
@@ -171,6 +167,7 @@ namespace SiaqodbUnitTests
                 Assert.AreEqual(d.Text, dL.Text);
 
             }
+            nop.Close();
 
         }
         [TestMethod]
@@ -200,7 +197,7 @@ namespace SiaqodbUnitTests
             await nop.OpenAsync(dbFolder);
             IObjectList<Customer> listCUpdate = await nop.LoadAllAsync<Customer>();
             Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
-
+            nop.Close();
 
 
         }
@@ -234,7 +231,7 @@ namespace SiaqodbUnitTests
             IObjectList<Customer> listCUpdate = await nop.LoadAllAsync<Customer>();
             Assert.AreEqual("UPDATEWORK", listCUpdate[0].Name);
             Assert.AreEqual(10, listCUpdate.Count);
-
+            nop.Close();
 
 
         }
@@ -264,7 +261,7 @@ namespace SiaqodbUnitTests
             IObjectList<Customer> listCUpdate = await nop.LoadAllAsync<Customer>();
             Assert.AreEqual(1, listCUpdate.Count);
 
-
+            nop.Close();
 
         }
 
@@ -291,7 +288,7 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(0, listC.Count);
             Assert.AreEqual(0, nrSaves);
 
-
+            nop.Close();
         }
         int nrSaves = 0;
         void nop_SavedObject(object sender, SavedEventsArgs e)
@@ -326,7 +323,7 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(10, listC.Count);
             Assert.AreEqual(10, nrSaves);
-
+            nop.Close();
 
         }
         [TestMethod]
@@ -355,7 +352,7 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(8, listDeleted.Count);
             Assert.AreEqual(3, listDeleted[0].OID);
-
+            nop.Close();
         }
         [TestMethod]
         public async Task TestDeleteEvents()
@@ -383,7 +380,7 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(10, listDeleted.Count);
             Assert.AreEqual(1, listDeleted[0].OID);
-
+            nop.Close();
         }
         void nop_DeletingObject(object sender, DeletingEventsArgs e)
         {
@@ -412,6 +409,7 @@ namespace SiaqodbUnitTests
             int count = await nop.CountAsync<Customer>();
             Assert.AreEqual(160, listC.Count);
             Assert.AreEqual(159, count);
+            nop.Close();
         }
         [TestMethod]
         public async Task TestSaveDeletedObject()
@@ -448,10 +446,11 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task TestDeleteUnSavedObject()
         {
+            Siaqodb nop = new Siaqodb();
             bool exTh = false;
             try
             {
-                Siaqodb nop = new Siaqodb();
+               
                 await nop.OpenAsync(dbFolder);
                 await nop.DropTypeAsync<Customer>();
 
@@ -463,6 +462,7 @@ namespace SiaqodbUnitTests
             {
                 exTh = true;
             }
+            nop.Close();
             Assert.IsTrue(exTh);
         }
         [TestMethod]
@@ -470,9 +470,10 @@ namespace SiaqodbUnitTests
         public async Task TestUniqueExceptionInsert()
         {
             bool exTh = false;
+            Siaqodb sq = new Siaqodb();
             try
             {
-                Siaqodb sq = new Siaqodb();
+              
                 await sq.OpenAsync(dbFolder);
                 await sq.DropTypeAsync<ItemUnique>();
 
@@ -496,6 +497,7 @@ namespace SiaqodbUnitTests
             {
                 exTh = true;
             }
+            sq.Close();
             Assert.IsTrue(exTh);
         }
         [TestMethod]
@@ -503,9 +505,10 @@ namespace SiaqodbUnitTests
         public async Task TestUniqueExceptionInsertTransaction()
         {
             bool exTh = false;
+            Siaqodb sq = new Siaqodb();
             try
             {
-                Siaqodb sq = new Siaqodb();
+               
                 await sq.OpenAsync(dbFolder);
                 await sq.DropTypeAsync<ItemUnique>();
 
@@ -531,6 +534,7 @@ namespace SiaqodbUnitTests
             {
                 exTh = true;
             }
+            sq.Close();
             Assert.IsTrue(exTh);
         }
         [TestMethod]
@@ -538,10 +542,11 @@ namespace SiaqodbUnitTests
         public async Task TestUniqueExceptionUpdate()
         {
             bool exTh = false;
+            Siaqodb sq = new Siaqodb();
             try
             {
            
-            Siaqodb sq = new Siaqodb();
+           
             await sq.OpenAsync(dbFolder);
             await sq.DropTypeAsync<ItemUnique>();
 
@@ -569,6 +574,7 @@ namespace SiaqodbUnitTests
             {
                 exTh = true;
             }
+            sq.Close();
             Assert.IsTrue(exTh);
 
         }
@@ -606,6 +612,7 @@ namespace SiaqodbUnitTests
             it.S = "someNew";
             stored = await sq.UpdateObjectByAsync("Age", it);
             Assert.IsFalse(stored);
+            sq.Close();
 
         }
         [TestMethod]
@@ -613,9 +620,10 @@ namespace SiaqodbUnitTests
         public async Task TestUpdateObjectByDuplicates()
         {
             bool exTh = false;
+            Siaqodb sq = new Siaqodb();
             try
             {
-                Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
+                await sq.OpenAsync(dbFolder);
                 await sq.DropTypeAsync<Employee>();
 
                 Employee emp = new Employee();
@@ -637,6 +645,7 @@ namespace SiaqodbUnitTests
             {
                 exTh = true;
             }
+            sq.Close();
             Assert.IsTrue(exTh);
         }
         [TestMethod]
@@ -644,9 +653,10 @@ namespace SiaqodbUnitTests
         public async Task TestUpdateObjectByFieldNotExists()
         {
           bool exTh = false;
+          Siaqodb sq = new Siaqodb();
             try
             {
-            Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
+            await sq.OpenAsync(dbFolder);
             await sq.DropTypeAsync<Employee>();
 
             Employee emp = new Employee();
@@ -661,6 +671,7 @@ namespace SiaqodbUnitTests
             {
                 exTh = true;
             }
+            sq.Close();
             Assert.IsTrue(exTh);
         }
         [TestMethod]
@@ -668,9 +679,10 @@ namespace SiaqodbUnitTests
         public async Task TestUpdateObjectByManyFieldsDuplicates()
         {
             bool exTh = false;
+            Siaqodb sq = new Siaqodb(); 
             try
             {
-            Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
+           await sq.OpenAsync(dbFolder);
             await sq.DropTypeAsync<Employee>();
 
             Employee emp = new Employee();
@@ -695,6 +707,7 @@ namespace SiaqodbUnitTests
             {
                 exTh = true;
             }
+            sq.Close();
             Assert.IsTrue(exTh);
 
         }
@@ -719,42 +732,47 @@ namespace SiaqodbUnitTests
             bool s = await sq.UpdateObjectByAsync(emp, "ID", "CustomerID", "Name");
 
             Assert.IsTrue(s);
+            sq.Close();
 
         }
         [TestMethod]
         public async Task TestDeleteObjectBy()
         {
-            Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
-            await sq.DropTypeAsync<Employee>();
+            using (Siaqodb sq = new Siaqodb())
+            {
 
-            Employee emp = new Employee();
-            emp.ID = 100;
-            emp.CustomerID = 30;
-            emp.Name = "s";
-            await sq.StoreObjectAsync(emp);
+                await sq.OpenAsync(dbFolder);
+                await sq.DropTypeAsync<Employee>();
+
+                Employee emp = new Employee();
+                emp.ID = 100;
+                emp.CustomerID = 30;
+                emp.Name = "s";
+                await sq.StoreObjectAsync(emp);
 
 
-            emp = new Employee();
-            emp.ID = 100;
-            emp.CustomerID = 30;
-            emp.Name = "s";
+                emp = new Employee();
+                emp.ID = 100;
+                emp.CustomerID = 30;
+                emp.Name = "s";
 
-            bool s = await sq.DeleteObjectByAsync(emp, "ID", "CustomerID", "Name");
-            await sq.FlushAsync();
-            Assert.IsTrue(s);
+                bool s = await sq.DeleteObjectByAsync(emp, "ID", "CustomerID", "Name");
+                await sq.FlushAsync();
+                Assert.IsTrue(s);
 
-            emp = new Employee();
-            emp.ID = 100;
-            emp.CustomerID = 30;
-            emp.Name = "s";
-            await sq.StoreObjectAsync(emp);
-            await sq.FlushAsync();
-            emp = new Employee();
-            emp.ID = 100;
+                emp = new Employee();
+                emp.ID = 100;
+                emp.CustomerID = 30;
+                emp.Name = "s";
+                await sq.StoreObjectAsync(emp);
+                await sq.FlushAsync();
+                emp = new Employee();
+                emp.ID = 100;
 
-            s = await sq.DeleteObjectByAsync("ID", emp);
+                s = await sq.DeleteObjectByAsync("ID", emp);
 
-            Assert.IsTrue(s);
+                Assert.IsTrue(s);
+            }
 
 
         }
@@ -763,93 +781,102 @@ namespace SiaqodbUnitTests
         public async Task TestUpdateObjectByManyFieldsConstraints()
         {
             bool exTh = false;
-            try
+            using (Siaqodb sq = new Siaqodb())
             {
-                Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
-                await sq.DropTypeAsync<ItemUnique>();
+                try
+                {
+                    await sq.OpenAsync(dbFolder);
+                    await sq.DropTypeAsync<ItemUnique>();
 
-                ItemUnique emp = new ItemUnique();
-                emp.Age = 100;
-                emp.integ = 10;
-                emp.S = "g";
-                await sq.StoreObjectAsync(emp);
+                    ItemUnique emp = new ItemUnique();
+                    emp.Age = 100;
+                    emp.integ = 10;
+                    emp.S = "g";
+                    await sq.StoreObjectAsync(emp);
 
-                emp = new ItemUnique();
-                emp.Age = 110;
-                emp.integ = 10;
-                emp.S = "gg";
-                await sq.StoreObjectAsync(emp);
+                    emp = new ItemUnique();
+                    emp.Age = 110;
+                    emp.integ = 10;
+                    emp.S = "gg";
+                    await sq.StoreObjectAsync(emp);
 
-                emp = new ItemUnique();
-                emp.Age = 100;
-                emp.integ = 10;
-                emp.S = "gge";
+                    emp = new ItemUnique();
+                    emp.Age = 100;
+                    emp.integ = 10;
+                    emp.S = "gge";
 
 
-                bool s = await sq.UpdateObjectByAsync(emp, "Age", "integ");
-                Assert.IsTrue(s);
+                    bool s = await sq.UpdateObjectByAsync(emp, "Age", "integ");
+                    Assert.IsTrue(s);
 
-                emp = new ItemUnique();
-                emp.Age = 100;
-                emp.integ = 10;
-                emp.S = "gg";
+                    emp = new ItemUnique();
+                    emp.Age = 100;
+                    emp.integ = 10;
+                    emp.S = "gg";
 
-                s = await sq.UpdateObjectByAsync(emp, "Age", "integ");
+                    s = await sq.UpdateObjectByAsync(emp, "Age", "integ");
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    exTh = true;
+                }
+                Assert.IsTrue(exTh);
             }
-            catch (UniqueConstraintException ex)
-            {
-                exTh = true;
-            }
-            Assert.IsTrue(exTh);
         }
 
         [TestMethod]
         public async Task TestEventsVariable()
         {
-            Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
-            //await sq.DropTypeAsync<ClassWithEvents>();
+            using (Siaqodb sq = new Siaqodb())
+            {
+                await sq.OpenAsync(dbFolder);
+                //await sq.DropTypeAsync<ClassWithEvents>();
 
-            ClassWithEvents c = new ClassWithEvents();
-            c.one = 10;
-
-
-            await sq.StoreObjectAsync(c);
-            await sq.FlushAsync();
-            IObjectList<ClassWithEvents> ll = await sq.LoadAllAsync<ClassWithEvents>();
+                ClassWithEvents c = new ClassWithEvents();
+                c.one = 10;
 
 
+                await sq.StoreObjectAsync(c);
+                await sq.FlushAsync();
+                IObjectList<ClassWithEvents> ll = await sq.LoadAllAsync<ClassWithEvents>();
 
+
+            }
 
         }
         [TestMethod]
         public async Task TestIndexFirstInsert()
         {
-            Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
-            await sq.DropTypeAsync<ClassIndexes>();
-            for (int i = 0; i < 100; i++)
+            using (Siaqodb sq = new Siaqodb())
             {
-                ClassIndexes cls = new ClassIndexes();
-                cls.one = i % 10;
-                cls.two = i % 10 + 1;
-                await sq.StoreObjectAsync(cls);
+                await sq.OpenAsync(dbFolder);
+                await sq.DropTypeAsync<ClassIndexes>();
+                for (int i = 0; i < 100; i++)
+                {
+                    ClassIndexes cls = new ClassIndexes();
+                    cls.one = i % 10;
+                    cls.two = i % 10 + 1;
+                    await sq.StoreObjectAsync(cls);
+                }
+                await sq.FlushAsync();
+                var q = await (from ClassIndexes clss in sq
+                               where clss.one == 9
+                               select clss).ToListAsync();
+
+
+                Assert.AreEqual(10, q.Count<ClassIndexes>());
+
             }
-            await sq.FlushAsync();
-            var q = await (from ClassIndexes clss in sq
-                    where clss.one == 9
-                    select clss).ToListAsync();
+            using (Siaqodb sq = new Siaqodb())
+            {
+                await sq.OpenAsync(dbFolder);
+                var q = await (from ClassIndexes clss in sq
+                           where clss.two == 10
+                           select clss).ToListAsync();
 
 
-            Assert.AreEqual(10, q.Count< ClassIndexes>());
-            
-            sq.Close();
-            sq = new Siaqodb();
-            await sq.OpenAsync(dbFolder);
-            q = await (from ClassIndexes clss in sq
-                where clss.two == 10
-                select clss).ToListAsync();
-
-
-            Assert.AreEqual(10, q.Count<ClassIndexes>());
+                Assert.AreEqual(10, q.Count<ClassIndexes>());
+            }
 
 
         }
@@ -898,24 +925,30 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task TestIndexSaveAndClose()
         {
-            Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
-            await sq.DropTypeAsync<ClassIndexes>();
-            for (int i = 0; i < 100; i++)
+            using (Siaqodb sq = new Siaqodb())
             {
-                ClassIndexes cls = new ClassIndexes();
-                cls.one = i % 10;
-                cls.two = i % 10 + 1;
-                await sq.StoreObjectAsync(cls);
+                await sq.OpenAsync(dbFolder);
+                await sq.DropTypeAsync<ClassIndexes>();
+                for (int i = 0; i < 100; i++)
+                {
+                    ClassIndexes cls = new ClassIndexes();
+                    cls.one = i % 10;
+                    cls.two = i % 10 + 1;
+                    await sq.StoreObjectAsync(cls);
+                }
+                await sq.FlushAsync();
+                sq.Close();
             }
-            await sq.FlushAsync();
-            sq.Close();
-            sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
-            var q = await (from ClassIndexes clss in sq
-                    where clss.one == 9
-                    select clss).ToListAsync();
+            using (Siaqodb sq = new Siaqodb())
+            {
+                await sq.OpenAsync(dbFolder);
+                var q = await (from ClassIndexes clss in sq
+                               where clss.one == 9
+                               select clss).ToListAsync();
 
 
-            Assert.AreEqual(10, q.Count<ClassIndexes>());
+                Assert.AreEqual(10, q.Count<ClassIndexes>());
+            }
         }
         [TestMethod]
         public async Task TestIndexAllOperations()
@@ -1933,109 +1966,112 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task TestTransactionLists()
         {
-            Siaqodb sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
-
-
-            await sq.DropTypeAsync<Customer>();
-            await sq.DropTypeAsync<Employee>();
-            await sq.DropTypeAsync<D40WithLists>();
-            ITransaction transact = sq.BeginTransaction();
-
-            for (int i = 0; i < 10; i++)
+            using (Siaqodb sq = new Siaqodb())
             {
-                Customer c = new Customer();
-                c.Name = "GTA" + i.ToString();
-                await sq.StoreObjectAsync(c, transact);
-                Employee e = new Employee();
-                e.Name = "EMP" + i.ToString();
-                await sq.StoreObjectAsync(e, transact);
+                await sq.OpenAsync(dbFolder);
 
-                D40WithLists d = new D40WithLists();
-                d.dt = new List<DateTime>();
-                d.dt.Add(DateTime.Now);
-                await sq.StoreObjectAsync(d, transact);
+
+                await sq.DropTypeAsync<Customer>();
+                await sq.DropTypeAsync<Employee>();
+                await sq.DropTypeAsync<D40WithLists>();
+                ITransaction transact = sq.BeginTransaction();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.Name = "GTA" + i.ToString();
+                    await sq.StoreObjectAsync(c, transact);
+                    Employee e = new Employee();
+                    e.Name = "EMP" + i.ToString();
+                    await sq.StoreObjectAsync(e, transact);
+
+                    D40WithLists d = new D40WithLists();
+                    d.dt = new List<DateTime>();
+                    d.dt.Add(DateTime.Now);
+                    await sq.StoreObjectAsync(d, transact);
+                }
+
+                await transact.CommitAsync();
+
+
+                IList<Customer> list = await sq.LoadAllAsync<Customer>();
+                Assert.AreEqual(10, list.Count);
+
+                IList<Employee> list2 = await sq.LoadAllAsync<Employee>();
+                Assert.AreEqual(10, list2.Count);
+
+                IList<D40WithLists> list3 = await sq.LoadAllAsync<D40WithLists>();
+                Assert.AreEqual(10, list3.Count);
+
+                ITransaction transac2t = sq.BeginTransaction();
+
+                sq.DeleteAsync(list[5], transac2t);
+                sq.DeleteAsync(list2[5], transac2t);
+                sq.DeleteAsync(list3[5], transac2t);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    list[i].Name = "updated";
+                    list2[i].Name = "updatedE";
+                    list3[i].dt[0] = new DateTime(2007, 1, 1);
+                    await sq.StoreObjectAsync(list[i], transac2t);
+                    await sq.StoreObjectAsync(list2[i], transac2t);
+                    await sq.StoreObjectAsync(list3[i], transac2t);
+                    await sq.StoreObjectAsync(new Customer(), transac2t);
+                    await sq.StoreObjectAsync(new Employee(), transac2t);
+                    await sq.StoreObjectAsync(new D40WithLists(), transac2t);
+                }
+
+
+                await transac2t.CommitAsync();
+
+                list = await sq.LoadAllAsync<Customer>();
+                Assert.AreEqual(13, list.Count);
+
+                list2 = await sq.LoadAllAsync<Employee>();
+                Assert.AreEqual(13, list2.Count);
+
+                list3 = await sq.LoadAllAsync<D40WithLists>();
+                Assert.AreEqual(13, list3.Count);
+                Assert.AreEqual(list[0].Name, "updated");
+                Assert.AreEqual(list2[0].Name, "updatedE");
+                Assert.AreEqual(list3[0].dt[0], new DateTime(2007, 1, 1));
+
+                transac2t = sq.BeginTransaction();
+
+                await sq.DeleteAsync(list[5], transac2t);
+                await sq.DeleteAsync(list2[5], transac2t);
+                await sq.DeleteAsync(list3[5], transac2t);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    list[i].Name = "updatedRoll";
+                    list2[i].Name = "updatedERoll";
+                    list3[i].dt[0] = new DateTime(2008, 3, 3);
+                    await sq.StoreObjectAsync(list[i], transac2t);
+                    await sq.StoreObjectAsync(list2[i], transac2t);
+                    await sq.StoreObjectAsync(new Customer(), transac2t);
+                    await sq.StoreObjectAsync(new Employee(), transac2t);
+
+                    await sq.StoreObjectAsync(list3[i], transac2t);
+                }
+
+                await transac2t.RollbackAsync();
+
+                list = await sq.LoadAllAsync<Customer>();
+                Assert.AreEqual(13, list.Count);
+
+                list2 = await sq.LoadAllAsync<Employee>();
+                Assert.AreEqual(13, list2.Count);
+
+                int tttt = 2;
+                list3 = await sq.LoadAllAsync<D40WithLists>();
+                Assert.AreEqual(13, list3.Count);
+
+                Assert.AreEqual(list[0].Name, "updated");
+                Assert.AreEqual(list2[0].Name, "updatedE");
+                Assert.AreEqual(list3[0].dt[0], new DateTime(2007, 1, 1));
             }
-
-            await transact.CommitAsync();
-
-
-            IList<Customer> list = await sq.LoadAllAsync<Customer>();
-            Assert.AreEqual(10, list.Count);
-
-            IList<Employee> list2 = await sq.LoadAllAsync<Employee>();
-            Assert.AreEqual(10, list2.Count);
-
-            IList<D40WithLists> list3 = await sq.LoadAllAsync<D40WithLists>();
-            Assert.AreEqual(10, list3.Count);
-
-            ITransaction transac2t = sq.BeginTransaction();
-
-            sq.DeleteAsync(list[5], transac2t);
-            sq.DeleteAsync(list2[5], transac2t);
-            sq.DeleteAsync(list3[5], transac2t);
-
-            for (int i = 0; i < 4; i++)
-            {
-                list[i].Name = "updated";
-                list2[i].Name = "updatedE";
-                list3[i].dt[0] = new DateTime(2007, 1, 1);
-                await sq.StoreObjectAsync(list[i], transac2t);
-                await sq.StoreObjectAsync(list2[i], transac2t);
-                await sq.StoreObjectAsync(list3[i], transac2t);
-                await sq.StoreObjectAsync(new Customer(), transac2t);
-                await sq.StoreObjectAsync(new Employee(), transac2t);
-                await sq.StoreObjectAsync(new D40WithLists(), transac2t);
-            }
-
-
-            await transac2t.CommitAsync();
-
-            list = await sq.LoadAllAsync<Customer>();
-            Assert.AreEqual(13, list.Count);
-
-            list2 = await sq.LoadAllAsync<Employee>();
-            Assert.AreEqual(13, list2.Count);
-
-            list3 = await sq.LoadAllAsync<D40WithLists>();
-            Assert.AreEqual(13, list3.Count);
-            Assert.AreEqual(list[0].Name, "updated");
-            Assert.AreEqual(list2[0].Name, "updatedE");
-            Assert.AreEqual(list3[0].dt[0], new DateTime(2007, 1, 1));
-
-            transac2t = sq.BeginTransaction();
-
-            await sq.DeleteAsync(list[5], transac2t);
-            await sq.DeleteAsync(list2[5], transac2t);
-            await sq.DeleteAsync(list3[5], transac2t);
-
-            for (int i = 0; i < 4; i++)
-            {
-                list[i].Name = "updatedRoll";
-                list2[i].Name = "updatedERoll";
-                list3[i].dt[0] = new DateTime(2008, 3, 3);
-                await sq.StoreObjectAsync(list[i], transac2t);
-                await sq.StoreObjectAsync(list2[i], transac2t);
-                await sq.StoreObjectAsync(new Customer(), transac2t);
-                await sq.StoreObjectAsync(new Employee(), transac2t);
-
-                await sq.StoreObjectAsync(list3[i], transac2t);
-            }
-
-            await transac2t.RollbackAsync();
-
-            list = await sq.LoadAllAsync<Customer>();
-            Assert.AreEqual(13, list.Count);
-
-            list2 = await sq.LoadAllAsync<Employee>();
-            Assert.AreEqual(13, list2.Count);
-
-            int tttt=2;
-            list3 = await sq.LoadAllAsync<D40WithLists>();
-            Assert.AreEqual(13, list3.Count);
-
-            Assert.AreEqual(list[0].Name, "updated");
-            Assert.AreEqual(list2[0].Name, "updatedE");
-            Assert.AreEqual(list3[0].dt[0], new DateTime(2007, 1, 1));
 
         }
         [TestMethod]

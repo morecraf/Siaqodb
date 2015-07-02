@@ -36,14 +36,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Siaqodb, Version=5.0.0.3, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Siaqodb.5.0.0.2-unstable\lib\net45\Siaqodb.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SiaqodbPortable, Version=4.0.2.27, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Siaqodb.5.0.0.2-unstable\lib\net45\SiaqodbPortable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -76,6 +68,16 @@
     <Content Include="lmdb64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 4.5%29.csproj">
+      <Project>{f5bd2e1f-dcdd-4a1c-8130-236c2d75ff93}</Project>
+      <Name>Siaqodb %28.NET 4.5%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
