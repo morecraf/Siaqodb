@@ -102,7 +102,7 @@ namespace SiaqodbManager
         {
             try
             {
-                Process.Start(AppDomain.CurrentDomain.BaseDirectory+"\\demo\\SiaqodbManager.mp4");
+                Process.Start(AppDomain.CurrentDomain.BaseDirectory+"..\\demo\\SiaqodbManager.mp4");
             }
             catch (Exception ex)
             {
