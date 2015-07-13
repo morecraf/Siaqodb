@@ -187,12 +187,9 @@ namespace Sqo.Core
         {
 
 #if SILVERLIGHT || CF || WinRT
-
             string str = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-
 #else
             string str = Encoding.UTF8.GetString(bytes);
-
 #endif
             return str;
         }

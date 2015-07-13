@@ -519,10 +519,10 @@ namespace LightningDB.Native
 #endif
 	class FallbackLibraryFacade : INativeLibraryFacade
     {
-		#if XIOS
-		public const string LibraryName = "__Internal";    
-		#else 
-		public const string LibraryName = "lmdb";
+		#if XIOS 
+		    public const string LibraryName = "__Internal";    
+        #else
+            public const string LibraryName = "lmdb";
 		#endif
 
         #region Native functions

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{91980E14-6FB0-4AE1-B381-5D00B9B9F7B3}"
 	ProjectSection(SolutionItems) = preProject
@@ -95,6 +95,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb (.NET 4.5) - BakCompat", "siaqodb\Siaqodb (.NET 4.5) - BakCompat.csproj", "{3A35AF4D-3D31-42D0-AAE7-A088C7073C0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siaqodb (UniversalApp) - BakCompat", "siaqodb\Siaqodb (UniversalApp) - BakCompat.csproj", "{CE98A01E-F4D6-465B-973B-542E0BD23D76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTest", "MigrationTest\MigrationTest.csproj", "{7C5CEAB6-C434-498B-A20F-139BF82AE843}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -740,6 +742,20 @@ Global
 		{CE98A01E-F4D6-465B-973B-542E0BD23D76}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CE98A01E-F4D6-465B-973B-542E0BD23D76}.Release|x64.ActiveCfg = Release|Any CPU
 		{CE98A01E-F4D6-465B-973B-542E0BD23D76}.Release|x86.ActiveCfg = Release|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Release|ARM.ActiveCfg = Release|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Release|x64.ActiveCfg = Release|Any CPU
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -781,5 +797,6 @@ Global
 		{88F7D088-25E3-426C-9ABD-2F149E4D4E8B} = {C34B8B90-F727-43D5-AC70-BEFB5922FB66}
 		{3A35AF4D-3D31-42D0-AAE7-A088C7073C0A} = {C34B8B90-F727-43D5-AC70-BEFB5922FB66}
 		{CE98A01E-F4D6-465B-973B-542E0BD23D76} = {C34B8B90-F727-43D5-AC70-BEFB5922FB66}
+		{7C5CEAB6-C434-498B-A20F-139BF82AE843} = {226FD0A4-BF4F-454C-92AF-E41817844F9D}
 	EndGlobalSection
 EndGlobal

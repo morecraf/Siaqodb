@@ -353,7 +353,6 @@ namespace SiaqodbManager
                 {
                     dataGridView1.Rows[rowIndex].Cells[columnIndex].ErrorText = ex.Message;
                 }
-
             }
         }
         void dataGridView1_UserAddedRow(object sender, System.Windows.Forms.DataGridViewRowEventArgs e)
@@ -377,7 +376,6 @@ namespace SiaqodbManager
                 }
                 else
                 {
-
                     int oid = (int)e.Row.Cells[0].Value;
                     Sqo.Internal._bs._do(siaqodb, oid, metaType);
                     oids.Remove(oid);

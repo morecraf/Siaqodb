@@ -332,7 +332,7 @@ namespace Sqo
         /// <param name="path"></param>
         public void Open(string path)
         {
-            this.Open(path,50*1024*1024,200);
+            this.Open(path,50*1024*1024L,200);
         }
 /// <summary>
         /// Open database 
@@ -360,7 +360,7 @@ namespace Sqo
 #endif
             storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
             storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
-#if UNITY3D || CF || MONODROID
+#if UNITY3D || CF || MONODROID 
 #else
             storageEngine.IndexesSaveAsyncFinished += new EventHandler<IndexesSaveAsyncFinishedArgs>(storageEngine_IndexesSaveAsyncFinished);
 #endif
@@ -461,7 +461,7 @@ namespace Sqo
         internal SimpleDelegate CheckIfSavedDelegate;
 
         internal delegate void UpdateDelegate(object obj, int oid);
-        internal UpdateDelegate UpdateMigrationOid;
+        internal UpdateDelegate  UpdateMigrationOid;
 
         void storageEngine_NeedSaveComplexObject(object sender, Core.ComplexObjectEventArgs e)
         {
@@ -2618,6 +2618,7 @@ namespace Sqo
         {
             return storageEngine.GetAllValues(ti, fi, transaction);
         }
+
 
         #region Anchor (SyncFRW proivider)
         internal void SaveAnchor(string key, byte[] value)

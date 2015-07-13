@@ -99,6 +99,7 @@ namespace Sqo.Internal
         {
             return siaqodb.LoadObjectByOID(type, oid);
         }
+       
         /// <summary>
         /// Do NOT use it!, it is used only internally
         /// </summary>

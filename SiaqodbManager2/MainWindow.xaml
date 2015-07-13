@@ -1,7 +1,11 @@
 ﻿<Window x:Class="SiaqodbManager.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SiaqodbManager 5.0" Height="700" Width="900" xmlns:my="clr-namespace:AvalonDock;assembly=AvalonDock" Loaded="Window_Loaded" Icon="siaqodb.ico">
+        Title="SiaqodbManager 5.0" Height="700" Width="900" 
+        xmlns:my="clr-namespace:AvalonDock;assembly=AvalonDock"
+        xmlns:view_model="clr-namespace:SiaqodbManager.ViewModel" 
+        xmlns:local="clr-namespace:SiaqodbManager"
+        Loaded="Window_Loaded" Icon="siaqodb.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="28"/>
@@ -23,18 +27,18 @@
                     </MenuItem.Icon>
 
                 </MenuItem>
-                <MenuItem Header="Save" Name="menuSave" Click="menuSave_Click" InputGestureText="Ctrl+S">
+                <MenuItem Header="Save" Name="menuSave" IsEnabled="{Binding SaveEnabled,Mode=TwoWay}" Click="menuSave_Click" InputGestureText="Ctrl+S">
                     <MenuItem.Icon>
                         <Image Source="Resources/save.png" Height="20"/>
                     </MenuItem.Icon>
 
                 </MenuItem>
-                <MenuItem Header="Save as..." Name="menuSaveAs" Click="menuSaveAs_Click" />
+                <MenuItem Header="Save as..." Name="menuSaveAs" IsEnabled="{Binding SaveEnabled,Mode=TwoWay}" Click="menuSaveAs_Click" />
                 <Separator />
                 <MenuItem Header="Exit" Name="menuExit" Click="menuExit_Click" />
             </MenuItem>
             <MenuItem Header="Query">
-                <MenuItem   Header="Execute" Name="menuExecute" Click="menuExecute_Click" InputGestureText="F5"  >
+                <MenuItem   Header="Execute" Name="menuExecute" IsEnabled="{Binding ExecuteEnabled,Mode=TwoWay}" Click="menuExecute_Click" InputGestureText="F5"  >
                     
                     <MenuItem.Icon>
                         <Image Source="Resources/run.png" Height="20"/>
@@ -50,7 +54,7 @@
             </MenuItem>
         </Menu>
         <ToolBar Height="55"  Grid.Row="1" >
-            <Button Name="btnDBInfo" Click="btnDBInfo_Click"  Height="50" ToolTip="Current database info">
+            <Button Name="btnDBInfo" Click="btnDBInfo_Click" IsEnabled="{Binding InfoEnabled,Mode=TwoWay}"  Height="50" ToolTip="Current database info">
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/info3.png" Height="29" RenderTransformOrigin="0.655,0.5"></Image>
                     <TextBlock Text="DB info "></TextBlock>
@@ -69,13 +73,13 @@
                     <TextBlock Text="Open linq file"></TextBlock>
                 </StackPanel>
             </Button>
-            <Button   Name="btnSave" Click="btnSave_Click" Height="50" ToolTip="Save" >
+            <Button   Name="btnSave" Click="btnSave_Click" Height="50" IsEnabled="{Binding SaveEnabled,Mode=TwoWay}" ToolTip="Save" >
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/save.png" Height="29"></Image>
                     <TextBlock Text="Save linq file"></TextBlock>
                 </StackPanel>
             </Button>
-            <Button Name="btnExecute" Click="btnExecute_Click" Height="50" ToolTip="Run linq">
+            <Button Name="btnExecute" IsEnabled="{Binding ExecuteEnabled,Mode=TwoWay}" Click="btnExecute_Click" Height="50" ToolTip="Run linq">
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/run.png" Height="29"></Image>
                     <TextBlock Text="Run linq "></TextBlock>
@@ -93,9 +97,9 @@
                 </StackPanel>
 
             </Button>
-            <ComboBox Name="cmbDBPath"  Width="230" IsEditable="True" Height="22" />
-            <Button  Name="btnConnect" Click="btnConnect_Click" Height="30">
-
+            <ComboBox Name="cmbDBPath"  Width="230" SelectedItem="{Binding SelectedPath,Mode=TwoWay}" IsEditable="True" Height="22" ItemsSource="{Binding List,Mode=TwoWay}" />
+            <Button  Name="btnConnect" Command="{Binding ConnectCommand}"  Height="30">
+                <!--Click="btnConnect_Click"-->
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/connect.png" Height="23" ToolTip="Connect to selected database"></Image>
 
@@ -109,10 +113,34 @@
                 <my:DockablePane my:ResizingPanel.ResizeWidth="270" Name="dockablePane1" >
                     <my:DockableContent Height="50" Name="dockableContent1" Width="100" Title="Database explorer">
 
-                        <TreeView  Name="treeView1" MouseDoubleClick="treeView1_MouseDoubleClick"></TreeView>
+                        <TreeView Name="treeView1" ItemsSource="{Binding TypesList}"  MouseDoubleClick="treeView1_MouseDoubleClick">
+                            <TreeView.Resources >
+                                <HierarchicalDataTemplate
+                                        DataType="{x:Type view_model:MetaTypeViewModel}"
+                                       ItemsSource="{Binding Fields}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Width="16" Height="16" 
+                                            Margin="3,0" Source="Resources/pubclass.gif" />
+                                        <TextBlock Text="{Binding Name,Mode=TwoWay}" />
+                                    </StackPanel>
+                                </HierarchicalDataTemplate>
+                                <DataTemplate DataType="{x:Type view_model:MetaFieldViewModel}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Width="16" Height="16" 
+                                            Margin="3,0" Source="Resources/pubfield.gif" />
+                                        <TextBlock Text="{Binding Name}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
                     </my:DockableContent>
                 </my:DockablePane>
-                <my:DocumentPane  Name="documentPane1"   >
+                <local:ObjectsDocument DataContext="{Binding ObjectsTable}"  Visibility="{Binding TargetNullValue=Collapsed}">
+                    <DataGrid DataContext="{Binding Objects.DefaultView}"  ItemsSource="{Binding}"  AutoGenerateColumns="True">
+    
+                        </DataGrid>
+                    </local:ObjectsDocument>
+                        <my:DocumentPane  Name="documentPane1"   >
                
                 </my:DocumentPane>
             </my:ResizingPanel>

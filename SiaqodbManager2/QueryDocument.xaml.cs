@@ -263,10 +263,5 @@ namespace SiaqodbManager
             this.textEditor1.Text = s;
             this.file = file;
         }
-
-
-
-
-
     }
 }
