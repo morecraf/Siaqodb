@@ -159,7 +159,6 @@ namespace SiaqodbManager
             this.OnNewLINQ(sender, e);
         }
        
-
         private void menuExit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
@@ -179,7 +178,6 @@ namespace SiaqodbManager
                     query.Title = fname;
                 }
             }
-
         }
 
         private void menuSave_Click(object sender, RoutedEventArgs e)
@@ -243,7 +241,6 @@ namespace SiaqodbManager
         {
             this.menuExecute_Click(sender, e);
         }
-      
 
         private void menuReferences_Click(object sender, RoutedEventArgs e)
         {
@@ -270,7 +267,6 @@ namespace SiaqodbManager
             ThemeFactory.ResetTheme();
         }
 
-      
         private void menuAbout_Click(object sender, RoutedEventArgs e)
         {
             About ab = new About();
@@ -328,7 +324,7 @@ namespace SiaqodbManager
             LoadObjects();
         }
 
-        
+   
 
         private void treeView1_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -338,7 +334,15 @@ namespace SiaqodbManager
         {
             var metaType = treeView1.SelectedItem as MetaTypeViewModel;
             if(metaType != null){
+                ObjectsDocument uco = new ObjectsDocument();
+             //   uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
+
+                uco.Title = metaType.Name;
+                SetDefaultSettings(uco);
+                uco.Show(this.dockingManager1);
+                uco.Activate();
                 viewModel.OnObjectLoad(metaType);
+                uco.DataContext = viewModel.ObjectsTable;
             }
             //if (item != null)
             //{
@@ -364,7 +368,7 @@ namespace SiaqodbManager
         void uco_OpenObjects(object sender, MetaEventArgs e)
         {
             ObjectsDocument uco = new ObjectsDocument();
-            uco.Initialize(e.mType, siaqodb, siaqodbList,e.oids);
+       //     uco.Initialize(e.mType, siaqodb, siaqodbList,e.oids);
             uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
             uco.Title = e.mType.Name;
             SetDefaultSettings(uco);

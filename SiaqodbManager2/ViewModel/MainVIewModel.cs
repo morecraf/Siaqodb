@@ -15,6 +15,7 @@ namespace SiaqodbManager.ViewModel
     {
         private bool infoEnabled;
         private bool saveEnabled;
+        private bool startEnabled;
         private ConnectionItem selectedPath;
         private bool executeEnabled;
         private ObjectViewModel objectsTable;
@@ -217,6 +218,19 @@ namespace SiaqodbManager.ViewModel
             set
             {
                 infoEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool StartEnabled
+        {
+            get
+            {
+                return startEnabled;
+            }
+            set
+            {
+                startEnabled = true;
                 OnPropertyChanged();
             }
         }

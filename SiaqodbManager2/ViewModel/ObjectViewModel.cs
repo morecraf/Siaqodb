@@ -11,10 +11,11 @@ namespace SiaqodbManager.ViewModel
 {
     class ObjectViewModel: INotifyPropertyChanged
     {
-        private MetaTypeViewModel SelectedType;
+        private MetaTypeViewModel selectedType;
         private System.Collections.ObjectModel.ObservableCollection<MetaTypeViewModel> TypesList;
         private Sqo.Siaqodb siaqodb;
         private DataTable objects;
+        private string cell;
 
        public DataTable Objects {
             get {
@@ -27,8 +28,7 @@ namespace SiaqodbManager.ViewModel
             }
         }
 
-
-
+        
 
         public ObjectViewModel(MetaTypeViewModel SelectedType, System.Collections.ObjectModel.ObservableCollection<MetaTypeViewModel> TypesList, Sqo.Siaqodb siaqodb)
         {
@@ -62,7 +62,30 @@ namespace SiaqodbManager.ViewModel
                 rowIndex++;
                 Objects.Rows.Add(row);
             }
+            
+            Objects.TableNewRow += OnTableNewRow;
+            Objects.RowChanging += OnRowChange;
+
             OnPropertyChanged("Objects");
+        }
+
+        private void OnRowChange(object sender, DataRowChangeEventArgs e)
+        {
+            if(e.Action == DataRowAction.Add){
+                var row = e.Row;
+                int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
+                this.oids.Add(oid);
+                row.BeginEdit();
+                row.ItemArray[0] = oid;
+                row.EndEdit();
+                row.AcceptChanges();
+                Objects.Rows.Add(row);
+            }
+        }
+
+        private void OnTableNewRow(object sender, DataTableNewRowEventArgs e)
+        {
+         
         }
 
         private void UpdateCell(MetaTypeViewModel SelectedType, Sqo.Siaqodb siaqodb, int rowIndex, DataRow row, int columnIndex, MetaFieldViewModel field)
@@ -128,6 +151,20 @@ namespace SiaqodbManager.ViewModel
         }
     
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public MetaTypeViewModel SelectedType
+        {
+            get
+            {
+                return selectedType;
+            }
+            set
+            {
+                selectedType = value;
+                OnPropertyChanged();
+            }
+        }
+
         private List<int> oids;
 
         //EVENT HANDLER
