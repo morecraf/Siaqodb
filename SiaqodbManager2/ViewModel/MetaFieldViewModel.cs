@@ -8,7 +8,7 @@ using System.Text;
 
 namespace SiaqodbManager.ViewModel
 {
-    class MetaFieldViewModel : INotifyPropertyChanged
+    public class MetaFieldViewModel : INotifyPropertyChanged
     {
         private string name;
 

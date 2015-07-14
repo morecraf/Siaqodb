@@ -9,7 +9,7 @@ using System.Text;
 
 namespace SiaqodbManager.ViewModel
 {
-    class MetaTypeViewModel : INotifyPropertyChanged
+    public class MetaTypeViewModel : INotifyPropertyChanged
     {
         private string name;
         public MetaType MetaType { get; set; }

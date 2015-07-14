@@ -125,6 +125,7 @@ namespace SiaqodbManager.ViewModel
                 ConnectCommand = new MyCommand<object>(OnConnect);
 
                 TypesList = new ObservableCollection<MetaTypeViewModel>();
+                Sqo.SiaqodbConfigurator.EncryptedDatabase = true;
             }
         }
 
@@ -286,5 +287,18 @@ namespace SiaqodbManager.ViewModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+
+        public Siaqodb Siaqodb
+        {
+            get
+            {
+                return siaqodb;
+            }
+            set
+            {
+                siaqodb = value;
+                OnPropertyChanged();
+            }
+        }
     }
 }

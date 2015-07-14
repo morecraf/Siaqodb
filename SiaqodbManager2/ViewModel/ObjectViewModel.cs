@@ -9,7 +9,7 @@ using System.Text;
 
 namespace SiaqodbManager.ViewModel
 {
-    class ObjectViewModel: INotifyPropertyChanged
+    public class ObjectViewModel: INotifyPropertyChanged
     {
         private MetaTypeViewModel selectedType;
         private System.Collections.ObjectModel.ObservableCollection<MetaTypeViewModel> TypesList;
@@ -62,30 +62,64 @@ namespace SiaqodbManager.ViewModel
                 rowIndex++;
                 Objects.Rows.Add(row);
             }
-            
+
             Objects.TableNewRow += OnTableNewRow;
             Objects.RowChanging += OnRowChange;
+            Objects.RowDeleting += OnDeleteRow;
 
             OnPropertyChanged("Objects");
         }
 
+        private void OnDeleteRow(object sender, DataRowChangeEventArgs e)
+        {
+            //if (e.Row.Cells[0].Value is int)
+            //{
+            //    if (MessageBox.Show("Are you sure to delete this object?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            //    {
+            //        e.Cancel = true;
+            //    }
+            //    else
+            //    {
+            var oid = Convert.ToInt32(e.Row.ItemArray[0]);
+            Sqo.Internal._bs._do(siaqodb, oid, SelectedType.MetaType);
+            oids.Remove(oid);
+
+            //    }
+            //}
+            //else//is new
+            //{
+            //    int oid = oids[oids.Count - 1];
+            //    Sqo.Internal._bs._do(siaqodb, oid, metaType);
+            //    oids.Remove(oid);
+            //}
+        }
+
         private void OnRowChange(object sender, DataRowChangeEventArgs e)
         {
-            if(e.Action == DataRowAction.Add){
-                var row = e.Row;
+            if (e.Action == DataRowAction.Add)
+            {
+                var row = Objects.Rows[objects.Rows.Count];
                 int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
                 this.oids.Add(oid);
-                row.BeginEdit();
-                row.ItemArray[0] = oid;
-                row.EndEdit();
-                row.AcceptChanges();
-                Objects.Rows.Add(row);
+                //row.ItemArray[0] = oid;
+                //row.BeginEdit();
+                //row["OID"] = oid;
+                //Objects.Rows.Add(row);
+                //row.EndEdit();
+                //row.AcceptChanges();
             }
         }
 
         private void OnTableNewRow(object sender, DataTableNewRowEventArgs e)
         {
-         
+            // OnPropertyChanged("Objects");
+            //var row = e.Row;
+            //int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
+            //this.oids.Add(oid);
+            //row.BeginEdit();
+            //row["OID"] = oid;
+            //row.EndEdit();
+            //row.AcceptChanges();
         }
 
         private void UpdateCell(MetaTypeViewModel SelectedType, Sqo.Siaqodb siaqodb, int rowIndex, DataRow row, int columnIndex, MetaFieldViewModel field)
@@ -172,6 +206,11 @@ namespace SiaqodbManager.ViewModel
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        internal void CellChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }

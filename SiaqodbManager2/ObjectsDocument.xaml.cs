@@ -82,136 +82,128 @@ namespace SiaqodbManager
         List<Sqo.MetaType> typesList;
         internal event EventHandler<MetaEventArgs> OpenObjects;
         Dictionary<int, MetaType> columnsTypes = new Dictionary<int, MetaType>();
-        //internal void Initialize(MetaType metaType, Siaqodb siaqodb, List<Sqo.MetaType> typesList)
-        //{
-        //    Initialize(metaType, siaqodb, typesList, null);
-        //}
-        //internal void Initialize(MetaType metaType, Siaqodb siaqodb, List<Sqo.MetaType> typesList,List<int> oidsFiltered)
-        //{
-        //    dataGridView1 = new System.Windows.Forms.DataGridView();
-        //    System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+        internal void Initialize(MetaType metaType, Siaqodb siaqodb, List<Sqo.MetaType> typesList)
+        {
+            Initialize(metaType, siaqodb, typesList, null);
+        }
+        internal void Initialize(MetaType metaType, Siaqodb siaqodb, List<Sqo.MetaType> typesList,List<int> oidsFiltered)
+        {
+            dataGridView1 = new System.Windows.Forms.DataGridView();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
 
-        //    this.dataGridView1.AllowUserToAddRows = true;
-        //    this.dataGridView1.AllowUserToDeleteRows = true;
-        //    dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-        //    this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-        //    this.dataGridView1.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-        //    this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        //    this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-        //    this.dataGridView1.Location = new System.Drawing.Point(0, 0);
-        //    this.dataGridView1.Name = "dataGridView1";
-        //    this.dataGridView1.Size = new System.Drawing.Size(648, 516);
-        //    this.dataGridView1.TabIndex = 0;
-        //    this.dataGridView1.VirtualMode = true;
+            this.dataGridView1.AllowUserToAddRows = true;
+            this.dataGridView1.AllowUserToDeleteRows = true;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView1.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(648, 516);
+            this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.VirtualMode = true;
             
-        //    this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
-        //    this.dataGridView1.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView1_CellValueNeeded);
-        //    this.dataGridView1.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView1_CellValuePushed);
-        //    this.dataGridView1.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(dataGridView1_UserDeletingRow);
-        //    this.dataGridView1.UserDeletedRow += new System.Windows.Forms.DataGridViewRowEventHandler(dataGridView1_UserDeletedRow);
-        //    this.dataGridView1.UserAddedRow += new System.Windows.Forms.DataGridViewRowEventHandler(dataGridView1_UserAddedRow);
-        //    this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellContentClick);
-        //    this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellDoubleClick);
-        //    this.dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
-        //    myhost.Child = dataGridView1;
-        //    this.typesList = typesList;
-        //    this.metaType = metaType;
-        //    this.siaqodb = siaqodb;
-        //    if (oidsFiltered == null)
-        //    {
-        //        oids = siaqodb.LoadAllOIDs(metaType);
-        //    }
-        //    else
-        //    {
-        //        oids = oidsFiltered;
-        //    }
-        //    if (oids == null)
-        //    {
-        //        MessageBox.Show("FileName of this Type has not default name of siaqodb database file!");
-        //    }
-        //    dataGridView1.Columns.Clear();
-        //    dataGridView1.Columns.Add("OID", "OID");
-        //    //dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.SystemColors.ControlDark;
-        //    foreach (MetaField f in metaType.Fields)
-        //    {
-        //        if (typeof(IList).IsAssignableFrom(f.FieldType))
-        //        {
-        //            System.Windows.Forms.DataGridViewLinkColumn column = new System.Windows.Forms.DataGridViewLinkColumn();
-        //            column.Name = f.Name;
-        //            column.HeaderText = f.Name;
-        //            column.ValueType = f.FieldType;
-        //            dataGridView1.Columns.Add(column);
-        //        }
-        //        else if (f.FieldType == null)//complex type
-        //        {
-        //            System.Windows.Forms.DataGridViewLinkColumn column = new System.Windows.Forms.DataGridViewLinkColumn();
-        //            column.Name = f.Name;
-        //            column.HeaderText = f.Name;
-        //            column.ValueType = typeof(string);
-        //            dataGridView1.Columns.Add(column);
-        //        }
-        //        else
-        //        {
-        //            dataGridView1.Columns.Add(f.Name, f.Name);
-        //        }
-        //    }
+            this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
+            this.dataGridView1.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView1_CellValueNeeded);
+            this.dataGridView1.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dataGridView1_CellValuePushed);
+            this.dataGridView1.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(dataGridView1_UserDeletingRow);
+            this.dataGridView1.UserDeletedRow += new System.Windows.Forms.DataGridViewRowEventHandler(dataGridView1_UserDeletedRow);
+            this.dataGridView1.UserAddedRow += new System.Windows.Forms.DataGridViewRowEventHandler(dataGridView1_UserAddedRow);
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellContentClick);
+            this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellDoubleClick);
+            this.dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
+            myhost.Child = dataGridView1;
+            this.typesList = typesList;
+            this.metaType = metaType;
+            this.siaqodb = siaqodb;
+            if (oidsFiltered == null)
+            {
+                oids = siaqodb.LoadAllOIDs(metaType);
+            }
+            else
+            {
+                oids = oidsFiltered;
+            }
+            if (oids == null)
+            {
+                MessageBox.Show("FileName of this Type has not default name of siaqodb database file!");
+            }
+            dataGridView1.Columns.Clear();
+            dataGridView1.Columns.Add("OID", "OID");
+            //dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.SystemColors.ControlDark;
+            foreach (MetaField f in metaType.Fields)
+            {
+                if (typeof(IList).IsAssignableFrom(f.FieldType))
+                {
+                    System.Windows.Forms.DataGridViewLinkColumn column = new System.Windows.Forms.DataGridViewLinkColumn();
+                    column.Name = f.Name;
+                    column.HeaderText = f.Name;
+                    column.ValueType = f.FieldType;
+                    dataGridView1.Columns.Add(column);
+                }
+                else if (f.FieldType == null)//complex type
+                {
+                    System.Windows.Forms.DataGridViewLinkColumn column = new System.Windows.Forms.DataGridViewLinkColumn();
+                    column.Name = f.Name;
+                    column.HeaderText = f.Name;
+                    column.ValueType = typeof(string);
+                    dataGridView1.Columns.Add(column);
+                }
+                else
+                {
+                    dataGridView1.Columns.Add(f.Name, f.Name);
+                }
+            }
 
-        //    if (oids != null)
-        //    {
-        //        dataGridView1.RowCount = oids.Count + 1;
-        //    }
-        //    if (oids != null)
-        //    {
-        //        //this.lblNrRows.Text = oids.Count + " rows";
-        //    }
-        //}
+            if (oids != null)
+            {
+                dataGridView1.RowCount = oids.Count + 1;
+            }
+            if (oids != null)
+            {
+                //this.lblNrRows.Text = oids.Count + " rows";
+            }
+        }
         int currentSortedColumn = -1;
         System.Windows.Forms.SortOrder currentSortOrder;
-
-        private void grid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        void dataGridView1_ColumnHeaderMouseClick(object sender, System.Windows.Forms.DataGridViewCellMouseEventArgs e)
         {
-            var grid = sender as DataGrid;
-            var cellValue = grid.AlternationCount;
+            if (e.ColumnIndex > 0)
+            {
+                MetaField fi = metaType.Fields[e.ColumnIndex - 1];
+                if (fi.FieldType == null || typeof(IList).IsAssignableFrom(fi.FieldType))//complex type
+                {
+                    return;
+                }
+            }
+            if (currentSortedColumn != -1)
+            {
+                dataGridView1.Columns[currentSortedColumn].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.None;
+                dataGridView1.Columns[currentSortedColumn].HeaderCell.Style.BackColor = System.Drawing.SystemColors.Control;
+            }
+            if (e.ColumnIndex == currentSortedColumn)
+            {
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Descending;
+                    currentSortOrder = System.Windows.Forms.SortOrder.Descending;
+                }
+                else
+                {
+                    dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                    currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
+            }
+            dataGridView1.Columns[e.ColumnIndex].HeaderCell.Style.BackColor = System.Drawing.SystemColors.ControlDark;
+            currentSortedColumn = e.ColumnIndex;
+            this.SortByColumn();
         }
-        //void grid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        //{
-        //    var grid = sender as DataGridCell;
-        //    var cellValue = grid.Content;
-            //if (e.ColumnIndex > 0)
-            //{
-            //    MetaField fi = metaType.Fields[e.ColumnIndex - 1];
-            //    if (fi.FieldType == null || typeof(IList).IsAssignableFrom(fi.FieldType))//complex type
-            //    {
-            //        return;
-            //    }
-            //}
-            //if (currentSortedColumn != -1)
-            //{
-            //    dataGridView1.Columns[currentSortedColumn].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.None;
-            //    dataGridView1.Columns[currentSortedColumn].HeaderCell.Style.BackColor = System.Drawing.SystemColors.Control;
-            //}
-            //if (e.ColumnIndex == currentSortedColumn)
-            //{
-            //    if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
-            //    {
-            //        dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Descending;
-            //        currentSortOrder = System.Windows.Forms.SortOrder.Descending;
-            //    }
-            //    else
-            //    {
-            //        dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
-            //        currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
-            //    }
-            //}
-            //else
-            //{
-            //    dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
-            //    currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
-            //}
-            //dataGridView1.Columns[e.ColumnIndex].HeaderCell.Style.BackColor = System.Drawing.SystemColors.ControlDark;
-            //currentSortedColumn = e.ColumnIndex;
-            //this.SortByColumn();
-  //      }
 
         private void SortByColumn()
         {
@@ -346,6 +338,7 @@ namespace SiaqodbManager
 
                 try
                 {
+
                     Sqo.Internal._bs._uf(siaqodb, oids[rowIndex], metaType, metaType.Fields[columnIndex - 1].Name, ar);
                     dataGridView1.Rows[rowIndex].Cells[columnIndex].ErrorText = string.Empty;
                 }

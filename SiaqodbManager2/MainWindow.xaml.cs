@@ -64,8 +64,6 @@ namespace SiaqodbManager
             cb3.Executed += new ExecutedRoutedEventHandler(openCommand_Executed);
             this.CommandBindings.Add(cb3);
 
-          
-            
         }
 
        
@@ -336,13 +334,13 @@ namespace SiaqodbManager
             if(metaType != null){
                 ObjectsDocument uco = new ObjectsDocument();
              //   uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
-
+                uco.Initialize(metaType.MetaType, viewModel.Siaqodb, siaqodbList);
                 uco.Title = metaType.Name;
                 SetDefaultSettings(uco);
                 uco.Show(this.dockingManager1);
                 uco.Activate();
-                viewModel.OnObjectLoad(metaType);
-                uco.DataContext = viewModel.ObjectsTable;
+            //    viewModel.OnObjectLoad(metaType);
+            //    uco.DataContext = viewModel.ObjectsTable;
             }
             //if (item != null)
             //{
