@@ -37,6 +37,12 @@ namespace Sqo.Utilities
                             }
                             
 #else
+                        if (row[column] != null && fi.FInfo.FieldType.IsNullableEnum())
+                        {
+                            Type enumType = Nullable.GetUnderlyingType(fi.FInfo.FieldType);
+                            row[column] = Enum.ToObject(enumType, row[column]);
+
+                        }
                         fi.FInfo.SetValue(currentObj, row[column]);
 #endif
 

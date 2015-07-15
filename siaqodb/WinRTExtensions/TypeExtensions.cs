@@ -118,6 +118,11 @@ namespace Sqo
         {
             return type.IsEnum;
         }
+        public static bool IsNullableEnum(this Type type)
+        {
+            Type u = Nullable.GetUnderlyingType(type);
+            return (u != null) && u.IsEnum();
+        }
         public static bool IsClass(this Type type)
         {
             return type.IsClass;

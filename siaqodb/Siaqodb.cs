@@ -1287,7 +1287,7 @@ namespace Sqo
                 finally
                 {
                     if (started)
-                        transaction.Rollback();
+                        transaction.Commit();
                 }
             }
         }

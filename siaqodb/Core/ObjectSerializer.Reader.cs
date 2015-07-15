@@ -71,6 +71,12 @@ namespace Sqo.Core
 
 
 #else
+                if (fieldVal != null && ai.FInfo.FieldType.IsNullableEnum())
+                {
+                    Type enumType = Nullable.GetUnderlyingType(ai.FInfo.FieldType);
+                    fieldVal = Enum.ToObject(enumType, fieldVal);
+
+                }
                 ai.FInfo.SetValue(obj, fieldVal);
 #endif
             }
