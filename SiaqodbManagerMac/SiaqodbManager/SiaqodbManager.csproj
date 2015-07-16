@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{3CA47CE3-E3E1-4491-B5A3-9750BE2B5CCA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SiaqodbManager</RootNamespace>
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
+    <AssemblyName>SiaqodbManager</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <UseSGen>false</UseSGen>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <CodeSigningKey>Mac Developer</CodeSigningKey>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <LinkMode>Full</LinkMode>
+    <UseSGen>false</UseSGen>
+    <IncludeMonoRuntime>true</IncludeMonoRuntime>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <CodeSigningKey>Developer ID Application</CodeSigningKey>
+    <EnableCodeSigning>true</EnableCodeSigning>
+    <CreatePackage>true</CreatePackage>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\AppStore</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <LinkMode>Full</LinkMode>
+    <UseSGen>false</UseSGen>
+    <IncludeMonoRuntime>true</IncludeMonoRuntime>
+    <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
+    <CreatePackage>true</CreatePackage>
+    <CodeSigningKey>3rd Party Mac Developer Application</CodeSigningKey>
+    <EnableCodeSigning>true</EnableCodeSigning>
+    <EnablePackageSigning>true</EnablePackageSigning>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoMac" />
+    <Reference Include="SiaqodbPortable">
+      <HintPath>libs\SiaqodbPortable.dll</HintPath>
+    </Reference>
+    <Reference Include="Siaqodb">
+      <HintPath>libs\siaqodb.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="VIewModel\" />
+    <Folder Include="Model\" />
+    <Folder Include="DataSourcesAdapters\" />
+    <Folder Include="Util\" />
+    <Folder Include="Delgates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MainWindow.cs" />
+    <Compile Include="MainWindowController.cs" />
+    <Compile Include="MainWindow.designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="AppDelegate.designer.cs">
+      <DependentUpon>AppDelegate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataSourcesAdapters\TypesDataSource.cs" />
+    <Compile Include="DataSourcesAdapters\MainViewModelAdapter.cs" />
+    <Compile Include="DataSourcesAdapters\AbstractViewModelAdapter.cs" />
+    <Compile Include="Util\BindingUtil.cs" />
+    <Compile Include="DataSourcesAdapters\MetaTypeViewModelAdapter.cs" />
+    <Compile Include="DataSourcesAdapters\MetaFieldViewModelAdapter.cs" />
+    <Compile Include="DataSourcesAdapters\ObjectsDataSource.cs" />
+    <Compile Include="Delgates\TypesDelegate.cs" />
+    <Compile Include="DataSourcesAdapters\ObjectViewModelAdapter.cs" />
+    <Compile Include="Delgates\ObjectsDelegate.cs" />
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\MainVIewModel.cs">
+      <Link>VIewModel\MainVIewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\MetaFieldViewModel.cs">
+      <Link>VIewModel\MetaFieldViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\MetaTypeViewModel.cs">
+      <Link>VIewModel\MetaTypeViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\MyCommand.cs">
+      <Link>VIewModel\MyCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\ObjectViewModel.cs">
+      <Link>VIewModel\ObjectViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\MetaItems.cs">
+      <Link>Model\MetaItems.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="MainWindow.xib" />
+    <InterfaceDefinition Include="MainMenu.xib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <NativeReference Include="libs\liblmdb.dylib">
+      <IsCxx>False</IsCxx>
+      <Kind>Dynamic</Kind>
+    </NativeReference>
+  </ItemGroup>
+</Project>

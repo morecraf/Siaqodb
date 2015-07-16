@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace SiaqodbManager.ViewModel
 {
-    class MainViewModel : INotifyPropertyChanged
+	public class MainViewModel : INotifyPropertyChanged
     {
         private bool infoEnabled;
         private bool saveEnabled;
         private bool startEnabled;
-        private ConnectionItem selectedPath;
+		private ConnectionItem selectedPath;
         private bool executeEnabled;
-        private ObjectViewModel objectsTable;
+		//private ObjectViewModel objectsTable;
         private Sqo.Siaqodb siaqodb;
 
 
@@ -127,6 +127,9 @@ namespace SiaqodbManager.ViewModel
                 TypesList = new ObservableCollection<MetaTypeViewModel>();
                 Sqo.SiaqodbConfigurator.EncryptedDatabase = true;
             }
+			selectedPath = new ConnectionItem {
+				Item =""
+			};
         }
 
         private void OnConnect(object obj)
@@ -141,7 +144,7 @@ namespace SiaqodbManager.ViewModel
 
                     siaqodbConfig.StoreObject(SelectedPath);
                     siaqodbConfig.Close();
-                    EncryptionSettings.SetEncryptionSettings();//set back settings
+					//EncryptionSettings.SetEncryptionSettings();//set back settings
                 }
                 siaqodb = Sqo.Internal._bs._b(SelectedPath.Item);
 
@@ -186,6 +189,7 @@ namespace SiaqodbManager.ViewModel
                     //}
 
                // }
+
                 InfoEnabled = true;
             }
             else
@@ -196,7 +200,7 @@ namespace SiaqodbManager.ViewModel
 
         internal void OnObjectLoad(MetaTypeViewModel SelectedType)
         {
-            ObjectsTable = new ObjectViewModel(SelectedType,TypesList,siaqodb);
+			//  ObjectsTable = new ObjectViewModel(SelectedType,TypesList,siaqodb);
             SaveEnabled = false;
             ExecuteEnabled = false;
             
@@ -264,18 +268,24 @@ namespace SiaqodbManager.ViewModel
 
         public ObservableCollection<ConnectionItem> List { get; set; }
         public ObservableCollection<MetaTypeViewModel> TypesList { get; set; }
-        public ObjectViewModel ObjectsTable
-        {
-            get
-            {
-                return objectsTable;
-            }
-            set
-            {
-                objectsTable = value;
-                OnPropertyChanged();
-            }
-        }
+
+		public ObjectViewModel CreateObjectesView (MetaTypeViewModel viewModel)
+		{
+			return new ObjectViewModel (viewModel,TypesList,siaqodb);
+		}
+
+//        public ObjectViewModel ObjectsTable
+//        {
+//            get
+//            {
+//                return objectsTable;
+//            }
+//            set
+//            {
+//                objectsTable = value;
+//                OnPropertyChanged();
+//            }
+//        }
 
         //EVENT HANDLER
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
