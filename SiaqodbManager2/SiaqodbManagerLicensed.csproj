@@ -98,10 +98,15 @@
       <DependentUpon>DatabaseInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Entities\TypeMetaDetail.cs" />
+    <Compile Include="Helpers\PasswordControl.cs" />
+    <Compile Include="MacWinInterface\IDialogService.cs" />
+    <Compile Include="MacWinInterface\IMessageBox.cs" />
+    <Compile Include="MacWinInterface\IPasswordContainer.cs" />
     <Compile Include="SetTrialLicense.xaml.cs">
       <DependentUpon>SetTrialLicense.xaml</DependentUpon>
     </Compile>
     <Compile Include="TrialLicense.cs" />
+    <Compile Include="ViewModel\EncryptionViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MetaFieldViewModel.cs" />
     <Compile Include="ViewModel\MetaTypeViewModel.cs" />

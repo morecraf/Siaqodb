@@ -17,6 +17,7 @@ using Sqo;
 using Sqo.Exceptions;
 using System.Collections;
 using Sqo.Internal;
+using SiaqodbManager.ViewModel;
 
 namespace SiaqodbManager
 {
@@ -25,11 +26,11 @@ namespace SiaqodbManager
     /// </summary>
     public partial class ObjectsDocument : DocumentContent
     {
-        public ObjectsDocument()
+        private ObjectViewModel viewModel;
+        public ObjectsDocument(ObjectViewModel viewModel)
         {
             InitializeComponent();
-
-            DataContext = this;
+            this.viewModel = viewModel;
         }
 
         #region TextContent
@@ -370,7 +371,7 @@ namespace SiaqodbManager
         {
             if (e.Row.Cells[0].Value is int)
             {
-                if (MessageBox.Show("Are you sure to delete this object?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                if (MessageBox.Show("Are you sure you want to delete this object?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 {
                     e.Cancel = true;
                 }
@@ -485,8 +486,7 @@ namespace SiaqodbManager
             }
             try
             {
-
-                Sqo.Internal._bs._uf(siaqodb, oids[e.RowIndex], metaType, metaType.Fields[e.ColumnIndex - 1].Name, e.Value);
+                viewModel.UpdateValue(metaType.Fields[e.ColumnIndex - 1].Name,e.RowIndex,e.Value);
                 dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].ErrorText = string.Empty;
             }
             catch (SiaqodbException ex)

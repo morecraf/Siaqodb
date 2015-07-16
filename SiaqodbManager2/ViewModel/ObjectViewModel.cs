@@ -233,5 +233,11 @@ namespace SiaqodbManager.ViewModel
         {
             
         }
+
+        internal void UpdateValue(string columnName, int rowIndex, object value)
+        {
+            var metaType = SelectedType.MetaType;
+            Sqo.Internal._bs._uf(siaqodb, oids[rowIndex], metaType, columnName, value);
+        }
     }
 }
