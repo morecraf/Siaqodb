@@ -139,7 +139,7 @@ namespace SiaqodbManager.ViewModel
                 if (!List.Contains(SelectedPath))
                 {
                     List.Add(SelectedPath);
-                    SiaqodbConfigurator.EncryptedDatabase = false;
+					// SiaqodbConfigurator.EncryptedDatabase = false;
                     Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory);
 
                     siaqodbConfig.StoreObject(SelectedPath);

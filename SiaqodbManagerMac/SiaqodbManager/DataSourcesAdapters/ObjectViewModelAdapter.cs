@@ -3,6 +3,7 @@ using SiaqodbManager.DataSourcesAdapters;
 using SiaqodbManager.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
+using MonoMac.Foundation;
 
 namespace SiaqodbManager
 {
@@ -20,15 +21,27 @@ namespace SiaqodbManager
 			return viewModel.NrOFObjects;
 		}
 
-		public List<string> Columns {
+		public Dictionary<string,Tuple<int,MetaFieldViewModel>> Columns {
 			get{
-				return viewModel.ColumnIndexes.Keys.ToList();
+				return viewModel.ColumnIndexes;
 			}
+		}
+
+		public void RemoveRow (int rowIndex)
+		{
+			throw new NotImplementedException ();
 		}
 
 		public object GetValue (string columnName, int rowIndex)
 		{
 			return viewModel.GetValue (columnName,rowIndex);
+		}
+
+		public void UpdateValue(string columnName,int rowIndex,NSObject macValue){
+			if(Columns.ContainsKey(columnName)){
+				var value = SiaqoMacUtil.FromNSObject (macValue,Columns[columnName].Item2);
+				viewModel.UpdateValue (columnName,rowIndex,value);
+			}
 		}
 	}
 }

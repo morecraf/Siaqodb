@@ -31,28 +31,10 @@ namespace SiaqodbManager
 			headerCell.Selectable = false;
 		}
 
-//		public void AddResultSet (Result result)
-//		{
-//			for (int i = 0; i < result.Count; i++) {
-//				string fullTitle = result.GetFullTitle (i);
-//				string section = string.IsNullOrWhiteSpace (fullTitle) ? "Other" : fullTitle.Split (':')[0];
-//				SortedList<string, Tuple<Result, int>> sectionContent;
-//				var newItem = Tuple.Create (result, i);
-//				var url = result.GetUrl (i);
-//
-//				if (!sections.TryGetValue (section, out sectionContent))
-//					sections[section] = new SortedList<string, Tuple<Result, int>> () { { url, newItem } };
-//				else
-//					sectionContent[url] = newItem;
-//			}
-//			// Flatten everything back to a list
-//			data.Clear ();
-//			foreach (var kvp in sections) {
-//				data.Add (new ResultDataEntry { SectionName = kvp.Key });
-//				foreach (var item in kvp.Value)
-//					data.Add (new ResultDataEntry { ResultSet = item.Value.Item1, Index = item.Value.Item2 });
-//			}
-//		}
+		public void AddResultSet (int rowIndex)
+		{
+			viewModel.RemoveRow (rowIndex);
+		}
 
 //		public void ClearResultSet ()
 //		{
@@ -76,25 +58,11 @@ namespace SiaqodbManager
 
 		public override void SetObjectValue (NSTableView tableView, NSObject theObject, NSTableColumn tableColumn, int row)
 		{
-			var valueKey = (string)(NSString)tableColumn.Identifier;
-			//var dataRow = _app.villains[rowIndex];
+			var valueKey = (string)(NSString)tableColumn.HeaderCell.Identifier;
 
-
-
-//			switch((string)valueKey)
-//			{
-//			case "name":
-//				dataRow.Name = (string)(NSString)theObject;
-//				break;
-//			case "mugshot":
-//				dataRow.Mugshot = (NSImage)theObject;
-//				break;
-//			case "lastSeenDate":
-//				dataRow.LastSeenDate = (NSDate)theObject;
-//				break;
-//			}
-
-			//_app.UpdateDetailViews();
+			if(valueKey != null){
+				viewModel.UpdateValue (valueKey,row,theObject);
+			}
 		}
 
 
@@ -107,9 +75,7 @@ namespace SiaqodbManager
 			}
 			return new NSString("0");
 		}
-
-		// Keep the search term in memory so that heavy search can check if its result are still fresh enough
-		public string LatestSearchTerm { get; set; }
+			
 	}
 }
 

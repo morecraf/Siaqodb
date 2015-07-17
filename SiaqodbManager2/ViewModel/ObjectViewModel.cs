@@ -26,24 +26,24 @@ namespace SiaqodbManager.ViewModel
 			oids = siaqodb.LoadAllOIDs(SelectedType.MetaType);
 
 			ColumnIndexes = new Dictionary<string, Tuple<int, MetaFieldViewModel>> ();
-			ColumnIndexes ["OID"] = new Tuple<int, MetaFieldViewModel>(0,selectedType.Fields[0]);
+			var oidType = new MetaFieldViewModel
+			{
+				Name ="OID",
+				FieldType = typeof(System.Int32),
+				ActualName="OID"
+			};
+			ColumnIndexes ["OID"] = new Tuple<int, MetaFieldViewModel>(0,oidType);
 //			Objects = new DataTable();
 //			Objects.Columns.Add("OID");
 
-			var index = 0;
+			var index = 1;
 			foreach (var field in SelectedType.Fields)
 			{
 				var tuple = new Tuple<int,MetaFieldViewModel> (index++,field);
-				ColumnIndexes[field.Name]=tuple;
+				ColumnIndexes[field.ActualName]=tuple;
 			}
 
 //			var rowIndex = 0;
-//			var oidType = new MetaFieldViewModel
-//			{
-//				Name ="OID",
-//				FieldType = typeof(System.Int32),
-//				ActualName="OID"
-//			};
 //			foreach(var oid in siaqodb.LoadAllOIDs(SelectedType.MetaType)){
 //				var row = Objects.NewRow();
 //				UpdateCell(SelectedType, siaqodb, rowIndex, row, 0, oidType);

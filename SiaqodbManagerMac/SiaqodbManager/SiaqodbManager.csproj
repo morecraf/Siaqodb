@@ -79,6 +79,7 @@
     <Folder Include="DataSourcesAdapters\" />
     <Folder Include="Util\" />
     <Folder Include="Delgates\" />
+    <Folder Include="Controls\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -119,10 +120,18 @@
     <Compile Include="..\..\SiaqodbManager2\MetaItems.cs">
       <Link>Model\MetaItems.cs</Link>
     </Compile>
+    <Compile Include="EncryptionWindow.cs" />
+    <Compile Include="EncryptionWindowController.cs" />
+    <Compile Include="EncryptionWindow.designer.cs">
+      <DependentUpon>EncryptionWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Util\SiaqoMacUtil.cs" />
+    <Compile Include="Controls\ObjectsViewCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
     <InterfaceDefinition Include="MainMenu.xib" />
+    <InterfaceDefinition Include="EncryptionWindow.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

@@ -27,14 +27,12 @@ namespace SiaqodbManager
 		public MainWindowController (NSCoder coder) : base (coder)
 		{
 			Initialize ();
-			Instance = this;
 		}
 		
 		// Call to load from the XIB/NIB file
 		public MainWindowController () : base ("MainWindow")
 		{
 			Initialize ();
-			Instance = this;
 		}
 
 
@@ -51,6 +49,7 @@ namespace SiaqodbManager
 		public static MainWindowController Instance{ get; set;}
 
 		public static PropertyChangedEventHandler BindHandler{ get { return Instance.PropretyChangeHandler;} }
+
 
 		public void PropretyChangeHandler (object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
@@ -75,6 +74,7 @@ namespace SiaqodbManager
 		public  override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
+			EncryptionWindowController.SetEncryptionSettings ();
 			mainViewModel = new MainViewModelAdapter (new MainViewModel());
 
 			BindButton (mainViewModel,"ConnectCommand",ConnectButton);
@@ -86,46 +86,24 @@ namespace SiaqodbManager
 
 		public void CreateObjectsTable (MetaTypeViewModelAdapter metaType)
 		{
-
 			var tabViewItem = new NSTabViewItem ();
-
-			var tableScrollView = new NSScrollView ();
 			var tableView = new NSTableView ();
+			var tableController = new NSArrayController ();
 
+			//table managing section
 			var objectAdapter = mainViewModel.CreateObjectsView (metaType);
+			ObjectsViewCreator.AddColumnsAndData (tableView,objectAdapter);
+			var tableContainer = ObjectsViewCreator.TableActionsLayout (tableView,tableController);
+			ObjectsViewCreator.CostumizeTable (tableView);
 
-			AddColumns (tableView,objectAdapter);
-
-			tableView.DataSource = new ObjectsDataSource (objectAdapter);
-
-			tableScrollView.AutoresizingMask = NSViewResizingMask.HeightSizable 
-									| NSViewResizingMask.WidthSizable 
-									| NSViewResizingMask.MaxYMargin 
-									| NSViewResizingMask.MaxXMargin;
-			//table view options
-			tableView.GridStyleMask = NSTableViewGridStyle.SolidHorizontalLine 
-									|NSTableViewGridStyle.SolidVerticalLine;
-
-			//add all views to their containers
-			tableScrollView.ContentView.DocumentView = tableView;
-			
 			tabViewItem.Label = metaType.Name;
+			tabViewItem.View.AddSubview(tableContainer);
+
 			TabView.Add(tabViewItem);
-			tabViewItem.View.AddSubview(tableScrollView);
 			TabView.Select (tabViewItem);
 		}
 
-		void AddColumns (NSTableView tableView, ObjectViewModelAdapter objectAdapter)
-		{
-			tableView.HeaderView.NeedsDisplay = true;
-			foreach(var columnName in objectAdapter.Columns){
-				var tableColumn = new NSTableColumn ();
-				tableColumn.HeaderCell.StringValue = columnName;
-				tableColumn.HeaderCell.Identifier = columnName;
-				tableColumn.Editable = true;
-				tableView.AddColumn (tableColumn);
-			}
-		}
+	
 
 		//strongly typed window accessor
 		public new MainWindow Window {
