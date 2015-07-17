@@ -330,7 +330,6 @@ namespace SiaqodbManager
 
                 Array ar = (Array)val;
                 eaw.SetArrayValue(ar);
-                
             }
             bool? dialog=eaw.ShowDialog();
             if (dialog.HasValue && dialog.Value)
@@ -358,8 +357,7 @@ namespace SiaqodbManager
         }
         void dataGridView1_UserAddedRow(object sender, System.Windows.Forms.DataGridViewRowEventArgs e)
         {
-            int oid = Sqo.Internal._bs._io(siaqodb, metaType);
-            this.oids.Add(oid);
+            viewModel.AddRow();
         }
 
         void dataGridView1_UserDeletedRow(object sender, System.Windows.Forms.DataGridViewRowEventArgs e)
@@ -396,9 +394,20 @@ namespace SiaqodbManager
             }
             else
             {
-                if (metaType.Fields.Count > e.ColumnIndex)
+                if (metaType.Fields.Count >= e.ColumnIndex)
                 {
-                    var fi = metaType.Fields[e.ColumnIndex];
+                    MetaField fi;
+                    if(e.ColumnIndex == 0){
+                        fi = new MetaField
+                        {
+                            Name = "OID",
+                            FieldType = typeof(Int32)
+                        };
+                    }
+                    else
+                    {
+                        fi = metaType.Fields[e.ColumnIndex - 1];
+                    }
                     e.Value = viewModel.GetValue(fi.Name,e.RowIndex);
                 }
             }
