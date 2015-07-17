@@ -377,10 +377,8 @@ namespace SiaqodbManager
                 }
                 else
                 {
-                    int oid = (int)e.Row.Cells[0].Value;
-                    Sqo.Internal._bs._do(siaqodb, oid, metaType);
-                    oids.Remove(oid);
-
+                    var index = e.Row.Index;
+                    viewModel.RemoveRow(index);
                 }
             }
             else//is new
@@ -398,65 +396,10 @@ namespace SiaqodbManager
             }
             else
             {
-                if (e.RowIndex > oids.Count - 1)
+                if (metaType.Fields.Count > e.ColumnIndex)
                 {
-
-                }
-                else
-                {
-                    if (e.ColumnIndex == 0)
-                    {
-                        e.Value = oids[e.RowIndex];
-                    }
-                    else
-                    {
-                        MetaField fi=metaType.Fields[e.ColumnIndex - 1];
-                        if (fi.FieldType == null)//complex type
-                        {
-                            
-                            int TID=0;
-                            bool isArray = false;
-                            _bs._ltid(this.siaqodb, (int)this.dataGridView1.Rows[e.RowIndex].Cells[0].Value, this.metaType, fi.Name, ref TID,ref isArray);
-                            if( TID<=0)
-                            {
-                                if (TID == -31)
-                                {
-                                    e.Value = "[Dictionary<,>]";
-                                }
-                                else if (TID == -32)
-                                {
-
-                                    e.Value = "[Jagged Array]";
-                                }
-                                else
-                                {
-                                    e.Value = "[null]";
-                                }
-                            }
-                            else
-                            {
-                                MetaType mtOfComplex = FindMeta(TID);
-                                if (isArray)
-                                {
-                                    string[] name = mtOfComplex.Name.Split(',');
-                                    e.Value = name[0] + " []";
-                                }
-                                else
-                                {
-                                    string[] name = mtOfComplex.Name.Split(',');
-                                    e.Value = name[0];
-                                }
-                            }
-                        }
-                        else
-                        {
-                            e.Value = siaqodb.LoadValue(oids[e.RowIndex], metaType.Fields[e.ColumnIndex - 1].Name, metaType);
-                        }
-                        if (e.Value == null)
-                        { 
-                            e.Value="[null]";
-                        }
-                    }
+                    var fi = metaType.Fields[e.ColumnIndex];
+                    e.Value = viewModel.GetValue(fi.Name,e.RowIndex);
                 }
             }
         }

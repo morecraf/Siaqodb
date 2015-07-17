@@ -82,6 +82,8 @@ namespace SiaqodbManager.ViewModel
 		{
             object value;
 			var columnIndex = 0;
+
+
 			if(ColumnIndexes.ContainsKey(columnName)){
 				columnIndex = ColumnIndexes[columnName].Item1;
 			}
@@ -238,6 +240,13 @@ namespace SiaqodbManager.ViewModel
         {
             var metaType = SelectedType.MetaType;
             Sqo.Internal._bs._uf(siaqodb, oids[rowIndex], metaType, columnName, value);
+        }
+
+        internal void RemoveRow(int index)
+        {
+            int oid = (int)oids[index];
+            Sqo.Internal._bs._do(siaqodb, oid, SelectedType.MetaType);
+            oids.RemoveAt(index);
         }
     }
 }
