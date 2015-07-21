@@ -790,6 +790,10 @@ namespace Sqo
                             byte[] key = ByteConverter.IntToByteArray(objInfo.Oid);
 
                             byte[] objBytes = transaction.Get(db, key);
+                            if (objBytes == null)//object is deleted
+                            {
+                                throw new OptimisticConcurrencyException("Another version of object with OID=" + objInfo.Oid.ToString() + " of Type:" + ti.TypeName + " is saved in database, refresh your object before save!");
+                            }
                             tickCount = (ulong)serializer.ReadFieldValue(ti, objInfo.Oid, objBytes, fi, transaction);
 
                             if (objInfo.TickCount != 0)

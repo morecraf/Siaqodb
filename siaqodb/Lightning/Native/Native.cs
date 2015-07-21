@@ -141,4 +141,70 @@ namespace LightningDB.Native
 
         #endregion Helpers
     }
+    [StructLayout(LayoutKind.Sequential)]
+    struct MDBStat
+    {
+        /// <summary>
+        /// Size of a database page. This is currently the same for all databases.
+        /// </summary>
+        public uint ms_psize;
+
+        /// <summary>
+        /// Depth (height) of the B-tree
+        /// </summary>
+        public uint ms_depth;
+
+        /// <summary>
+        /// Number of internal (non-leaf) pages
+        /// </summary>
+        public IntPtr ms_branch_pages;
+
+        /// <summary>
+        /// Number of leaf pages
+        /// </summary>
+        public IntPtr ms_leaf_pages;
+
+        /// <summary>
+        /// Number of overflow pages
+        /// </summary>
+        public IntPtr ms_overflow_pages;
+
+        /// <summary>
+        /// Number of data items
+        /// </summary>
+        public IntPtr ms_entries;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    struct MDBEnvInfo
+    {
+        /// <summary>
+        /// Address of map, if fixed
+        /// </summary>
+        public IntPtr me_mapaddr;
+
+        /// <summary>
+        /// Size of the data memory map
+        /// </summary>
+        public IntPtr me_mapsize;
+
+        /// <summary>
+        /// ID of the last used page
+        /// </summary>
+        public IntPtr me_last_pgno;
+
+        /// <summary>
+        /// ID of the last committed transaction
+        /// </summary>
+        public IntPtr me_last_txnid;
+
+        /// <summary>
+        /// max reader slots in the environment
+        /// </summary>
+        public uint me_maxreaders;
+
+        /// <summary>
+        /// max reader slots used in the environment
+        /// </summary>
+        public uint me_numreaders;
+    }
 }

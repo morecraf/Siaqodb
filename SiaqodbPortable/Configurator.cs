@@ -14,12 +14,15 @@ namespace Sqo
         internal  Dictionary<Type, List<string>> Indexes;
         internal  Dictionary<Type, List<string>> Constraints;
         internal  Dictionary<Type, List<string>> Ignored;
+        internal Dictionary<Type, List<string>> Texts;
+        internal Dictionary<Type, List<string>> Documents;
+        internal Dictionary<Type, List<string>> LazyLoadedFields;
         internal  Dictionary<Type, Dictionary<string, int>> MaxLengths;
         internal  Dictionary<Type, Dictionary<string, string>> PropertyMaps;
-        internal  Dictionary<Type, List<string>> Texts;
+        
         internal  Dictionary<Type, bool> LazyLoaded;
         internal  Dictionary<Type, string> DatabaseFileNames;
-        internal Dictionary<Type, List<string>> Documents;
+       
         internal  bool RaiseLoadEvents;
         internal  DateTimeKind? DateTimeKindToSerialize;
         internal  bool OptimisticConcurrencyEnabled = true;
@@ -142,6 +145,19 @@ namespace Sqo
                 Documents.Add(type, new List<string>());
             }
             Documents[type].Add(field);
+        }
+        public void AddLazyLoadField(string field, Type type)
+        {
+
+            if (LazyLoadedFields == null)
+            {
+                LazyLoadedFields = new Dictionary<Type, List<string>>();
+            }
+            if (!LazyLoadedFields.ContainsKey(type))
+            {
+                LazyLoadedFields.Add(type, new List<string>());
+            }
+            LazyLoadedFields[type].Add(field);
         }
         /// <summary>
         /// Set the name of backing field for a property in case engine cannto discover it, this also can be set by attribute: Sqo.Attributes.UseVariable

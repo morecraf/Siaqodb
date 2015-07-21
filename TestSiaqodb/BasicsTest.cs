@@ -29,7 +29,7 @@ namespace TestSiaqodb
             SiaqodbConfigurator.LoggingMethod = this.LogWarns;
             Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
 		}
-        public void LogWarns(string log, VerboseLevel level)
+        public void LogWarns(string log, VerboseLevel level)    
         {
             Debug.WriteLine(log);
         }
@@ -76,8 +76,9 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void TestInsert()
 		{
-            using (Siaqodb nop = new Siaqodb(objPath))
+            using (Siaqodb nop = new Siaqodb(objPath, 50 * 1024 * 1024, 100))
             {
+               
                 nop.DropType<Customer>();
 
                 for (int i = 10; i < 20; i++)
@@ -89,6 +90,8 @@ namespace TestSiaqodb
                     nop.StoreObject(c);
                 }
                 nop.Flush();
+               Siaqodb.Stat dbinfo = nop.DbInfo;
+
                 IObjectList<Customer> listC = nop.LoadAll<Customer>();
                 Assert.AreEqual(listC.Count, 10);
                 
@@ -2576,6 +2579,39 @@ namespace TestSiaqodb
 
             }
         }
+         [TestMethod]
+         public void TestLazyLoad()
+         {
+             using (Siaqodb _database = new Siaqodb(objPath))
+             {
+                 for (int i = 0; i < 10; i++)
+                 {
+                     ClsWithLazyLoadFields cls = new ClsWithLazyLoadFields();
+                     cls.MyName = "mmm"+i;
+                     cls.MyPerson = new Person();
+                     cls.MyPerson.Name = "firstPers"+i;
+                     cls.MyPerson.friend = new Person();
+                     cls.MyPerson.friend.Name = "friend" + i;
+
+                     _database.StoreObject(cls);
+                 }
+                 var q = (from ClsWithLazyLoadFields c in _database
+                          where c.MyName.StartsWith("mmm")
+                          select c).ToList();
+                 foreach (var item in q)
+                     Assert.IsNull(item.MyPerson);
+
+                 var q2 = (from ClsWithLazyLoadFields c in _database
+                          where c.MyName.StartsWith("mmm")
+                          select c).Include("MyPerson").ToList();
+                 foreach (var item in q2)
+                 {
+                     Assert.IsNotNull(item.MyPerson);
+                     Assert.IsNotNull(item.MyPerson.friend);
+                     Assert.IsNull(item.MyPerson.friend.friend);
+                 }
+             }
+         }
         public bool TryGetDocument(int id, out Customer data, Siaqodb _database)
         {
             var document = from Customer identifiable in _database
@@ -2591,6 +2627,7 @@ namespace TestSiaqodb
             data = null;
             return false;
         }
+
         /* TODO LMDB uncomment
          [TestMethod]
         public void TestShrink()
@@ -3356,7 +3393,14 @@ namespace TestSiaqodb
     {
         
         public string Name;
+
         public Person friend;
 
+    }
+    public class ClsWithLazyLoadFields
+    {
+        [LazyLoad]
+        public Person MyPerson { get; set; }
+        public string MyName { get; set; }
     }
 }

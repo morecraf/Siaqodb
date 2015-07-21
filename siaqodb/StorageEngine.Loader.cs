@@ -975,7 +975,22 @@ namespace Sqo
                     }
                 }
             }
+            else if (e.ParentType != null)
+            {
+
+                SqoTypeInfo tiParent = this.metaCache.GetSqoTypeInfo(e.ParentType);
+
+                if (tiParent.LazyLoadFields.Count > 0 && MetaHelper.FindField(tiParent.LazyLoadFields, e.FieldName) != null)
+                {
+                    if (!this.ExistsInIncludesCache(e.ParentType, e.FieldName))
+                    {
+                        e.ComplexObject = null;
+                        return;
+                    }
+                }
+            }
             SqoTypeInfo ti = this.metaCache.GetSqoTypeInfoByTID(e.TID);
+           
             object cacheObj = this.circularRefCache.GetObject(e.SavedOID, ti);
             if (cacheObj != null)
             {

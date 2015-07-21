@@ -25,7 +25,7 @@ namespace Sqo.Transactions
 			#endif
             env.MapSize = maxSize;
             env.MaxDatabases = maxDbs;
-
+            
             env.Open();
         }
 #if UNITY3D
@@ -130,8 +130,18 @@ namespace Sqo.Transactions
         }
 
 
-
-
+        public long EnvUsedSize()
+        {
+            return env.UsedSize;
+        }
+        public long EnvMaxSize()
+        {
+            return env.MapSize;
+        }
+        public int EnvMaxDatabases()
+        {
+            return env.MaxDatabases;
+        }
         public void Dispose()
         {
             this.env.Dispose();

@@ -17,7 +17,7 @@ namespace SiaqodbUnitTests
         public ComplexTypesTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = false;
-            Sqo.SiaqodbConfigurator.SetLicense(@"YgExQg+yktbL2Pt+Vqo7Z6S8R4srS8+leQwHnG7zu/8=");
+            Sqo.SiaqodbConfigurator.SetLicense(@"9+3kflAazhBu3bW+lP/eJZR91W03jgYPxZpa9fDHSbk6UNwzo/AjI3hjA161Oqry");
         }
         [TestMethod]
         public async Task TestStore()

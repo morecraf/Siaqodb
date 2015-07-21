@@ -62,7 +62,27 @@ namespace LightningDB
             var defaultConverters = new DefaultConverters();
             defaultConverters.RegisterDefault(this);
         }
+        private MDBStat GetStat()
+        {
+            EnsureOpened();
 
+            var stat = new MDBStat();
+            NativeMethods.Execute(lib => lib.mdb_env_stat(_handle, out stat));
+
+            return stat;
+        }
+        public uint PageSize { get { return GetStat().ms_psize; } }
+
+        public long UsedSize
+        {
+            get
+            {
+                var envInfo = new MDBEnvInfo();
+                NativeMethods.Execute(lib => lib.mdb_env_info(_handle, out envInfo));
+
+                return envInfo.me_last_pgno.ToInt64() * PageSize;
+            }
+        }
         /// <summary>
         /// Triggered when the environment is going to close.
         /// </summary>

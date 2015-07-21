@@ -18,16 +18,20 @@ namespace Sqo
         internal static Dictionary<Type, List<string>> Indexes;
         internal static Dictionary<Type, List<string>> Constraints;
         internal static Dictionary<Type, List<string>> Ignored;
+        internal static Dictionary<Type, List<string>> LazyLoadedFields;
+        internal static Dictionary<Type, List<string>> Texts;
+        internal static Dictionary<Type, List<string>> Documents;
+
         internal static Dictionary<Type, Dictionary<string,int>> MaxLengths;
         internal static Dictionary<Type, Dictionary<string, string>> PropertyMaps;
-        internal static Dictionary<Type, List<string>> Texts;
         internal static Dictionary<Type, bool> LazyLoaded;
-        internal static Dictionary<Type, List<string>> Documents;
+        
         internal static bool RaiseLoadEvents;
         internal static DateTimeKind? DateTimeKindToSerialize;
         internal static bool OptimisticConcurrencyEnabled=true;
         internal static Configurator defaultConfigurator;
         internal static KeyValuePair<int,DateTime> CurrentVersion = new KeyValuePair<int,DateTime>(50,new DateTime(2015,7,2));
+       
         /// <summary>
         /// Add an index for a field or automatic property of a certain Type,an Index can be added also by using Attribute: Sqo.Attributes.Index;
         /// both ways of adding index are similar
@@ -42,37 +46,7 @@ namespace Sqo
                 Indexes = new Dictionary<Type, List<string>>();
                 
             }
-            if (!Indexes.ContainsKey(type))
-            {
-                Indexes.Add(type, new List<string>());
-            }
-            List<FieldInfo> fi = new List<FieldInfo>();
-            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
-            MetaExtractor.FindFields(fi, automaticProperties, type);
-            bool found = false;
-            foreach (FieldInfo f in fi)
-            {
-                if (f.Name == field)
-                {
-                    found = true;
-                    Indexes[type].Add(f.Name);
-
-                    break;
-                }
-                else if (automaticProperties.ContainsKey(f))
-                {
-                    if (field == automaticProperties[f].Name)
-                    {
-                        found = true;
-                        Indexes[type].Add(f.Name);
-                        break;
-                    }
-                }
-            }
-            if (!found)
-            {
-                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
-            }
+            AddSettingToField(field, type, Indexes);
 
         }
         /// <summary>
@@ -93,6 +67,30 @@ namespace Sqo
             {
                 Constraints.Add(type, new List<string>());
             }
+            AddSettingToField(field, type, Constraints);
+        }
+        /// <summary>
+        /// Mark a field as LazyLoad, LazyLoad field can be marked also by using Attribute: Sqo.Attributes.LazyLoad
+        /// </summary>
+        /// <param name="field">Field name or automatic property name</param>
+        /// <param name="type">Type that declare the field</param>
+        public static void AddLazyLoadField(string field, Type type)
+        {
+
+            if (LazyLoadedFields == null)
+            {
+                LazyLoadedFields = new Dictionary<Type, List<string>>();
+            }
+            AddSettingToField(field, type, LazyLoadedFields);
+
+        }
+        private static void AddSettingToField(string field, Type type, Dictionary<Type, List<string>>  settings)
+        {
+
+            if (!settings.ContainsKey(type))
+            {
+                settings.Add(type, new List<string>());
+            }
             List<FieldInfo> fi = new List<FieldInfo>();
             Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
             MetaExtractor.FindFields(fi, automaticProperties, type);
@@ -102,7 +100,7 @@ namespace Sqo
                 if (f.Name == field)
                 {
                     found = true;
-                    Constraints[type].Add(f.Name);
+                    settings[type].Add(f.Name);
 
                     break;
                 }
@@ -111,7 +109,7 @@ namespace Sqo
                     if (field == automaticProperties[f].Name)
                     {
                         found = true;
-                        Constraints[type].Add(f.Name);
+                        settings[type].Add(f.Name);
                         break;
                     }
                 }
@@ -182,39 +180,8 @@ namespace Sqo
             if (Ignored == null)
             {
                 Ignored = new Dictionary<Type, List<string>>();
-                Ignored[type] = new List<string>();
             }
-            if (!Ignored.ContainsKey(type))
-            {
-                Ignored.Add(type, new List<string>());
-            }
-            List<FieldInfo> fi = new List<FieldInfo>();
-            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
-            MetaExtractor.FindFields(fi, automaticProperties, type);
-            bool found = false;
-            foreach (FieldInfo f in fi)
-            {
-                if (f.Name == field)
-                {
-                    found = true;
-                    Ignored[type].Add(f.Name);
-
-                    break;
-                }
-                else if (automaticProperties.ContainsKey(f))
-                {
-                    if (field == automaticProperties[f].Name)
-                    {
-                        found = true;
-                        Ignored[type].Add(f.Name);
-                        break;
-                    }
-                }
-            }
-            if (!found)
-            {
-                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
-            }
+            AddSettingToField(field, type, Ignored);
         
         }
         /// <summary>
@@ -229,38 +196,7 @@ namespace Sqo
                 Texts = new Dictionary<Type, List<string>>();
 
             }
-            if (!Texts.ContainsKey(type))
-            {
-                Texts.Add(type, new List<string>());
-            }
-            List<FieldInfo> fi = new List<FieldInfo>();
-            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
-            MetaExtractor.FindFields(fi, automaticProperties, type);
-            bool found = false;
-            foreach (FieldInfo f in fi)
-            {
-                if (f.Name == field)
-                {
-                    found = true;
-                    Texts[type].Add(f.Name);
-
-                    break;
-                }
-                else if (automaticProperties.ContainsKey(f))
-                {
-                    if (field == automaticProperties[f].Name)
-                    {
-                        found = true;
-                        Texts[type].Add(f.Name);
-                        break;
-                    }
-                }
-            }
-            if (!found)
-            {
-                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
-            }
-
+            AddSettingToField(field, type, Texts);
         }
         /// <summary>
         /// Mark a field or automatic property of a certain Type to be serialized as a Document ,it can be added also by using Attribute: Sqo.Attributes.Document;
@@ -276,37 +212,7 @@ namespace Sqo
                 Documents = new Dictionary<Type, List<string>>();
 
             }
-            if (!Documents.ContainsKey(type))
-            {
-                Documents.Add(type, new List<string>());
-            }
-            List<FieldInfo> fi = new List<FieldInfo>();
-            Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
-            MetaExtractor.FindFields(fi, automaticProperties, type);
-            bool found = false;
-            foreach (FieldInfo f in fi)
-            {
-                if (f.Name == field)
-                {
-                    found = true;
-                    Documents[type].Add(f.Name);
-
-                    break;
-                }
-                else if (automaticProperties.ContainsKey(f))
-                {
-                    if (field == automaticProperties[f].Name)
-                    {
-                        found = true;
-                        Documents[type].Add(f.Name);
-                        break;
-                    }
-                }
-            }
-            if (!found)
-            {
-                throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
-            }
+            AddSettingToField(field, type, Documents);
 
         }
         /// <summary>
@@ -591,6 +497,16 @@ namespace Sqo
                     }
                 }
             }
+            if (config.LazyLoadedFields != null)
+            {
+                foreach (var item in config.LazyLoadedFields.Keys)
+                {
+                    foreach (string field in config.LazyLoadedFields[item])
+                    {
+                        AddLazyLoadField(field, item);
+                    }
+                }
+            }
             if (config.PropertyMaps != null)
             {
                 foreach (var item in config.PropertyMaps.Keys)
@@ -665,6 +581,7 @@ namespace Sqo
             Texts = null;
             PropertyMaps = null;
             LazyLoaded = null;
+            LazyLoadedFields = null;
         }
         private static decimal bufferingChunkPercent = 10;
 

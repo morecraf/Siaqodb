@@ -18,7 +18,7 @@ namespace TestSiaqodb
 		public LINQTest()
 		{
             SiaqodbConfigurator.EncryptedDatabase = true;
-              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
+            Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
 		}
 
 		private TestContext testContextInstance;
@@ -66,7 +66,7 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void TestBasicQuery()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 
 			for (int i = 0; i < 10; i++)
@@ -81,12 +81,13 @@ namespace TestSiaqodb
             var query = from Customer c in nop
                         select c;
 			Assert.AreEqual(query.ToList<Customer>().Count,10);
+            }
 		}
 		
 		[TestMethod]
 		public void TestBasicWhere()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial=new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -115,11 +116,12 @@ namespace TestSiaqodb
 			Assert.AreEqual(listInitial[5].Name,query.ToList<Customer>()[0].Name);
 			Assert.AreEqual(listInitial[5].ID, query.ToList<Customer>()[0].ID);
 			Assert.AreEqual(listInitial[5].OID, query.ToList<Customer>()[0].OID);
+            }
 		}
 		[TestMethod]
 		public void TestBasicWhereByOID()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -154,12 +156,13 @@ namespace TestSiaqodb
 			Assert.AreEqual(listInitial[4].Name, query.ToList<Customer>()[0].Name);
 			Assert.AreEqual(listInitial[4].ID, query.ToList<Customer>()[0].ID);
 			Assert.AreEqual(listInitial[4].OID, query.ToList<Customer>()[0].OID);
+            }
 		}
 
 		[TestMethod]
 		public void TestBasicWhereOperators()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -192,13 +195,14 @@ namespace TestSiaqodb
 					 where c.ID != 3
 					 select c;
 			 Assert.AreEqual(query.ToList<Customer>().Count, 9);
+            }
 
 
 		}
 		[TestMethod]
 		public void TestBasicWhereStringComparison()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -246,6 +250,7 @@ namespace TestSiaqodb
 					where c.Name.EndsWith("TEST")
 					select c;
 			Assert.AreEqual(5, query.ToList<Customer>().Count);
+            }
 
 
 		}
@@ -253,7 +258,7 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void WhereLocalVariable()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -278,6 +283,7 @@ namespace TestSiaqodb
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
 			Assert.AreEqual(3, query.ToList<Customer>()[0].ID);
+            }
 		}
 		public int TestMet(int t)
 		{
@@ -294,7 +300,7 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void WhereLocalMethod()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -326,11 +332,12 @@ namespace TestSiaqodb
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
 			Assert.AreEqual(4, query.ToList<Customer>()[0].OID);
+            }
 		}
         [TestMethod]
         public void WhereLocalMethodOverObject()
         {
-            Siaqodb nop = new Siaqodb(objPath);
+            using(Siaqodb nop = new Siaqodb(objPath)){
             nop.DropType<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -363,12 +370,13 @@ namespace TestSiaqodb
 
             Assert.AreEqual(query.ToList<Customer>().Count, 1);
             Assert.AreEqual(3, query.ToList<Customer>()[0].ID);
+            }
             
         }
 		[TestMethod]
 		public void WhereAnd()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -400,12 +408,13 @@ namespace TestSiaqodb
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
 			Assert.AreEqual(3, query.ToList<Customer>()[0].ID);
+            }
 
 		}
 		[TestMethod]
 		public void SimpleSelect()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -434,13 +443,13 @@ namespace TestSiaqodb
 			}
 			Assert.AreEqual(1,s);
 
-			
+			}
 
 		}
 		[TestMethod]
 		public void WhereOR()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -471,13 +480,14 @@ namespace TestSiaqodb
 					select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 7);
+            }
 			
 
 		}
 		[TestMethod]
 		public void SelectSimple()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -510,13 +520,13 @@ namespace TestSiaqodb
 			
 
 
-			
+			}
 
 		}
 		[TestMethod]
 		public void SelectSimpleWithDiffType()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -548,14 +558,14 @@ namespace TestSiaqodb
 			Assert.AreEqual(k, 10);
 			
 
-
+            }
 			
 
 		}
 		[TestMethod]
 		public void TestUnoptimizedWhere()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -586,7 +596,7 @@ namespace TestSiaqodb
 			}	
 			//Assert.AreEqual(k, 1);
 
-
+            }
 
 
 
@@ -594,7 +604,7 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void TestToString()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -624,11 +634,12 @@ namespace TestSiaqodb
 				Assert.AreEqual(listInitial[1].Name, s.Name);
 				Assert.AreEqual(listInitial[1].ID, s.ID);
 			}	
+            }
 		}
 		[TestMethod]
 		public void TestSelfMethod()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -652,12 +663,13 @@ namespace TestSiaqodb
 						select c;
 
 			Assert.AreEqual(query.ToList<Customer>().Count, 1);
+            }
 
 		}
 		[TestMethod]
 		public void SelectNonExistingType()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Something>();
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
@@ -683,7 +695,7 @@ namespace TestSiaqodb
 			
 			Assert.AreEqual(0,query.ToList().Count);
 
-
+            }
 
 
 
@@ -691,7 +703,7 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void SelectWhere()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -722,7 +734,7 @@ namespace TestSiaqodb
 			}
 			Assert.AreEqual( 3,k);
 
-
+            }
 
 
 
@@ -730,7 +742,7 @@ namespace TestSiaqodb
 		[TestMethod]
 		public void SelectWhereUsingProperty()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 0; i < 10; i++)
@@ -799,12 +811,13 @@ namespace TestSiaqodb
 				else
 					Assert.Fail(ex.Message);
 			}
+            }
 
 		}
         [TestMethod]
         public void SelectWhereUsingAutomaticProperties()
         {
-            Siaqodb nop = new Siaqodb(objPath);
+            using(Siaqodb nop = new Siaqodb(objPath)){
             nop.DropType<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -847,12 +860,13 @@ namespace TestSiaqodb
                 k++;
             }
             Assert.AreEqual(10, k);
+            }
 
         }
         [TestMethod]
         public void SelectWhereUnaryOperator()
         {
-            Siaqodb nop = new Siaqodb(objPath);
+            using(Siaqodb nop = new Siaqodb(objPath)){
             nop.DropType<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -880,13 +894,14 @@ namespace TestSiaqodb
            int k = 0;
             
             Assert.AreEqual(4, query.Count);
+            }
 
         }
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
         public void SelectWhereMinus()
         {
-            Siaqodb nop = new Siaqodb(objPath);
+            using(Siaqodb nop = new Siaqodb(objPath)){
             nop.DropType<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -914,12 +929,13 @@ namespace TestSiaqodb
             int k = 0;
 
             Assert.AreEqual(3, query.Count);
+            }
 
         }
         [TestMethod]
         public void SelectWhereBooleanAlone()
         {
-            Siaqodb nop = new Siaqodb(objPath);
+            using(Siaqodb nop = new Siaqodb(objPath)){
             nop.DropType<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -955,12 +971,13 @@ namespace TestSiaqodb
            
 
             Assert.AreEqual(4, query1.Count);
+            }
 
         }
 		[TestMethod]
 		public void OrderByBasic()
 		{
-			Siaqodb nop = new Siaqodb(objPath);
+			using(Siaqodb nop = new Siaqodb(objPath)){
 			nop.DropType<Customer>();
 			List<Customer> listInitial = new List<Customer>();
 			for (int i = 10; i > 0; i--)
@@ -994,44 +1011,46 @@ namespace TestSiaqodb
 				k++;
 			}
 			//Assert.AreEqual(3, k);
+            }
 
 		}
         [TestMethod]
         public void SelectWhereUsingEnum()
         {
-            Siaqodb nop = new Siaqodb(objPath);
-            nop.DropType<CustomerLite>();
-            List<CustomerLite> listInitial = new List<CustomerLite>();
-            for (int i = 0; i < 10; i++)
+            using (Siaqodb nop = new Siaqodb(objPath))
             {
-                CustomerLite c = new CustomerLite();
-                c.Name = i.ToString();
-                c.Age = i;
-                if (i % 3 == 0)
+                nop.DropType<CustomerLite>();
+                List<CustomerLite> listInitial = new List<CustomerLite>();
+                for (int i = 0; i < 10; i++)
                 {
-                    c.TEnum = TestEnum.Doi;
+                    CustomerLite c = new CustomerLite();
+                    c.Name = i.ToString();
+                    c.Age = i;
+                    if (i % 3 == 0)
+                    {
+                        c.TEnum = TestEnum.Doi;
+                    }
+                    else
+                    {
+                        c.TEnum = TestEnum.Trei;
+                    }
+                    listInitial.Add(c);
+                    nop.StoreObject(c);
                 }
-                else
+                nop.Flush();
+                var query = from CustomerLite c in nop
+                            where c.Age < 3
+                            select new { c.Name, c.TEnum };
+
+                int k = 0;
+                foreach (var s in query)
                 {
-                    c.TEnum = TestEnum.Trei;
+                    Assert.AreEqual(listInitial[k].Name, s.Name);
+                    Assert.AreEqual(listInitial[k].TEnum, s.TEnum);
+                    k++;
                 }
-                listInitial.Add(c);
-                nop.StoreObject(c);
+                Assert.AreEqual(3, k);
             }
-            nop.Flush();
-            var query = from CustomerLite c in nop
-                        where c.Age < 3
-                        select new { c.Name, c.TEnum };
-
-            int k = 0;
-            foreach (var s in query)
-            {
-                Assert.AreEqual(listInitial[k].Name, s.Name);
-                Assert.AreEqual(listInitial[k].TEnum, s.TEnum);
-                k++;
-            }
-            Assert.AreEqual(3, k);
-
 
 
 

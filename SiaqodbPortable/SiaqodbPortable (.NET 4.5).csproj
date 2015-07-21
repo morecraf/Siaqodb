@@ -49,6 +49,7 @@
     <Compile Include="Attributes\DocumentAttribute.cs" />
     <Compile Include="Attributes\IgnoreAttribute.cs" />
     <Compile Include="Attributes\Index.cs" />
+    <Compile Include="Attributes\LazyLoadAttribute.cs" />
     <Compile Include="Attributes\MaxLengthAttribute.cs" />
     <Compile Include="Attributes\TextAttribute.cs" />
     <Compile Include="Attributes\UniqueConstraint.cs" />

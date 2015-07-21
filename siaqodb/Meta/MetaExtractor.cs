@@ -258,7 +258,7 @@ namespace Sqo.Meta
 
                 FindAddConstraints(ti, ai);
                 FindAddIndexes(ti, ai);
-
+                FindAddLazyLoaded(ti, ai);
             }
 
             ti.Header.lengthOfRecord = lengthOfRecord;
@@ -505,6 +505,46 @@ namespace Sqo.Meta
                 }
             }
         }
+        public static void FindAddLazyLoaded(SqoTypeInfo ti, FieldSqoInfo fi)
+        {
+            bool found = false;
+            if (fi.FInfo != null)//if is null can be from OLD schema version and now field is missing
+            {
+                object[] customAttStr = fi.FInfo.GetCustomAttributes(typeof(LazyLoadAttribute), false);
+                if (customAttStr.Length > 0)
+                {
+                    ti.LazyLoadFields.Add(fi);
+                    found = true;
+                }
+                else
+                {
+                    PropertyInfo pi = MetaHelper.GetAutomaticProperty(fi.FInfo);
+                    if (pi != null)
+                    {
+                        customAttStr = pi.GetCustomAttributes(typeof(LazyLoadAttribute), false);
+                        if (customAttStr.Length > 0)
+                        {
+                            ti.LazyLoadFields.Add(fi);
+                            found = true;
+                        }
+                    }
+                }
+                if (!found)//look in configuration
+                {
+                    if (SiaqodbConfigurator.LazyLoadedFields != null)
+                    {
+                        if (SiaqodbConfigurator.LazyLoadedFields.ContainsKey(ti.Type))
+                        {
+                            if (SiaqodbConfigurator.LazyLoadedFields[ti.Type].Contains(fi.Name))
+                            {
+                                ti.LazyLoadFields.Add(fi);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public static bool IsTextType(int typeId)
         {
             return typeId == MetaExtractor.textID;
@@ -860,6 +900,7 @@ namespace Sqo.Meta
 
             return null;
         }
+
 		
 		 
 	}

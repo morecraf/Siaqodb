@@ -91,6 +91,7 @@ namespace Sqo.Meta
         }
         public List<FieldSqoInfo> UniqueFields = new List<FieldSqoInfo>();
         public List<FieldSqoInfo> IndexedFields = new List<FieldSqoInfo>();
+        public List<FieldSqoInfo> LazyLoadFields = new List<FieldSqoInfo>();
 
 		public bool IsOld;
         string fileNameForManager;

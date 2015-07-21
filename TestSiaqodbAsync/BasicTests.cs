@@ -921,6 +921,7 @@ namespace SiaqodbUnitTests
 
 
             Assert.AreEqual(11, q.Count<ClassIndexes>());
+            sq.Close();
         }
         [TestMethod]
         public async Task TestIndexSaveAndClose()
@@ -990,6 +991,7 @@ namespace SiaqodbUnitTests
 
 
             Assert.AreEqual(70, q.Count<ClassIndexes>());
+            sq.Close();
         }
         [TestMethod]
         public async Task TestIndexUpdateObjectBy()
@@ -1006,6 +1008,7 @@ namespace SiaqodbUnitTests
                 await sq.StoreObjectAsync(cls);
             }
             await sq.FlushAsync();
+            sq.Close();
             sq = new Siaqodb(); await sq.OpenAsync(dbFolder);
             var q = await (from ClassIndexes clss in sq
                     where clss.two == 4
@@ -1039,7 +1042,7 @@ namespace SiaqodbUnitTests
                 where clss.two == 6
                 select clss).ToListAsync();
             Assert.AreEqual(11, q.Count<ClassIndexes>());
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -1093,6 +1096,7 @@ namespace SiaqodbUnitTests
                 select clss).ToListAsync();
 
             Assert.AreEqual(7, q.Count<ClassIndexes>());
+            sq.Close();
         }
         [TestMethod]
         public async Task TestIndexAllFieldTypes()
@@ -1258,6 +1262,7 @@ namespace SiaqodbUnitTests
                       select di).ToListAsync();
 
             Assert.AreEqual(10, q19.ToList().Count);
+            sq.Close();
         }
         [TestMethod]
         public async Task TestAttributesOnProps()
@@ -1297,6 +1302,7 @@ namespace SiaqodbUnitTests
                 except = true;
             }
             Assert.AreEqual(true, except);
+            sq.Close();
 
         }
         [TestMethod]
@@ -1337,6 +1343,7 @@ namespace SiaqodbUnitTests
                 except = true;
             }
             Assert.AreEqual(true, except);
+            sq.Close();
 
         }
         [TestMethod]
@@ -1425,7 +1432,7 @@ namespace SiaqodbUnitTests
                        select clss).ToListAsync();
 
             Assert.AreEqual(10, q.ToList<RealPOCO>().Count);
-
+            sq.Close();
         }
         //TODO
         [TestMethod]
@@ -1616,7 +1623,7 @@ namespace SiaqodbUnitTests
             list = await sq.LoadAllAsync<Customer>();
             Assert.AreEqual(10, list.Count);
 
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -1662,7 +1669,7 @@ namespace SiaqodbUnitTests
             {
                 Assert.AreEqual("updated", c.Name);
             }
-
+            sq.Close();
         }
         [TestMethod]
         public async Task TestTransactionDelete()
@@ -1704,6 +1711,7 @@ namespace SiaqodbUnitTests
                 Assert.AreEqual(8, list.Count);
 
             }
+            sq.Close();
 
         }
         [TestMethod]
@@ -1746,7 +1754,7 @@ namespace SiaqodbUnitTests
             await tr.RollbackAsync();
             list = await sq.LoadAllAsync<Employee>();
             Assert.AreEqual(list[0].Name, "ANOTHER");
-
+            sq.Close();
 
         }
         [TestMethod]
@@ -1813,7 +1821,7 @@ namespace SiaqodbUnitTests
             list = await sq.LoadAllAsync<Employee>();
             Assert.AreEqual(list.Count, 2);
 
-
+            sq.Close();
         }
         [TestMethod]
         public async Task TestTransactionCrash()
@@ -1864,6 +1872,8 @@ namespace SiaqodbUnitTests
 
 
             await transac2t.CommitAsync();//here do debug and stop after a few commits to be able to simulate crash recovery
+
+            sq.Close();
         }
         //TODO
         [TestMethod]
@@ -2111,7 +2121,7 @@ namespace SiaqodbUnitTests
             {
                 Assert.IsTrue(hu.Name.StartsWith("bb"));
             }
-
+            sq.Close();
         }
         [TestMethod]
         public async Task TestListsAllTypes()
@@ -2184,6 +2194,7 @@ namespace SiaqodbUnitTests
                        select dll).ToListAsync();
 
             Assert.AreEqual(10, q21.Count);
+            sq.Close();
         }
         [TestMethod]
         public async Task TestOpen2Databases()
@@ -2228,6 +2239,7 @@ namespace SiaqodbUnitTests
             }
             await sq.FlushAsync();
             IList<POCO> all = await sq.LoadAllAsync<POCO>();
+            sq.Close();
 
         }
 
@@ -2274,6 +2286,7 @@ namespace SiaqodbUnitTests
                 }
 
             }
+            sq.Close();
         }
         [TestMethod]
         public async Task TestDateTimeKind()
@@ -2310,7 +2323,7 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(DateTimeKind.Unspecified, lis[0].dt.Kind);
             Assert.AreEqual(DateTimeKind.Unspecified, lis[1].dt.Kind);
             Assert.AreEqual(DateTimeKind.Unspecified, lis[2].dt.Kind);
-
+            sq.Close();
         }
        
     }

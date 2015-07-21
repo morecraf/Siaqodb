@@ -489,5 +489,21 @@ namespace LightningDB.Native
         ///     EINVAL - an invalid parameter was specified.
         /// </returns>
         int mdb_cursor_del(IntPtr cursor, CursorDeleteOption flags); //OK
+
+        /// <summary>
+        /// Return information about the LMDB environment.
+        /// </summary>
+        /// <param name="env">An environment handle returned by mdb_env_create()</param>
+        /// <param name="stat">The address of an MDB_envinfo structure where the information will be copied</param>
+        /// <returns></returns>
+        int mdb_env_info(IntPtr env, out MDBEnvInfo stat);
+
+        /// <summary>
+        /// Return statistics about the LMDB environment.
+        /// </summary>
+        /// <param name="env">An environment handle returned by mdb_env_create()</param>
+        /// <param name="stat">The address of an MDB_stat structure where the statistics will be copied</param>
+        /// <returns></returns>
+        int mdb_env_stat(IntPtr env, out MDBStat stat);
     }
 }

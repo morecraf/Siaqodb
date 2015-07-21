@@ -225,7 +225,7 @@ namespace Sqo
             
         }
         
-        //TODO: add here WarningMessages and add for example Unoptimized queries
+        
         /// <summary>
         /// Create a new instance of Siaqodb and open the database
         /// </summary>
@@ -236,7 +236,25 @@ namespace Sqo
             
             this.Open(path);
         }
-
+        /// <summary>
+        /// Create a new instance of Siaqodb and open the database with a maximum size defined 
+        /// </summary>
+        /// <param name="path">Physical folder name where objects are stored</param>
+        /// <param name="maxDatabaseSize">max database size in bytes (default 50 MB )</param>
+        public Siaqodb(string path, long maxDatabaseSize)
+        {
+            this.Open(path, maxDatabaseSize, 50);
+        }
+        /// <summary>
+        /// Create a new instance of Siaqodb and open the database with a maximum size defined and provided number of sub-databases
+        /// </summary>
+        /// <param name="path">Physical folder name where objects are stored</param>
+        /// <param name="maxDatabaseSize">max database size in bytes (default 50 MB )</param>
+        /// <param name="maxSubDatabases">max number of subdatabases(default 50); two subdatabases are created per Type; every index will use a separate subdatabase</param>
+        public Siaqodb(string path, long maxDatabaseSize, int maxSubDatabases)
+        {
+            this.Open(path, maxDatabaseSize, maxSubDatabases);
+        }
 #if SL4
        /// <summary>
         ///Create a new instance of Siaqodb, open database for OOB mode
@@ -332,14 +350,14 @@ namespace Sqo
         /// <param name="path"></param>
         public void Open(string path)
         {
-            this.Open(path,50*1024*1024,200);
+            this.Open(path,50*1024*1024,50);
         }
 /// <summary>
         /// Open database 
 /// </summary>
 /// <param name="path">database folder</param>
-/// <param name="maxDatabaseSize">max database size in bytes (20 MB is default)</param>
-/// <param name="maxSubDatabases">max number of subdatabases(200 is default)</param>
+        /// <param name="maxDatabaseSize">max database size in bytes (default 50 MB )</param>
+        /// <param name="maxSubDatabases">max number of subdatabases(default 50); two subdatabases are created per Type; every index will use a separate subdatabase</param>
         public void Open(string path, long maxDatabaseSize, int maxSubDatabases)
         {
 
@@ -2633,6 +2651,24 @@ namespace Sqo
         {
             return storageEngine.GetAllValues(ti, fi, transaction);
         }
+        public Stat DbInfo
+        {
+
+            get
+            {
+                if (!this.opened)
+                {
+                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
+                }
+                return new Stat
+                {
+                    UsedSize = transactionManager.EnvUsedSize(),
+                    MaxSize=transactionManager.EnvMaxSize(),
+                    MaxSubDatabases=transactionManager.EnvMaxDatabases(),
+                    Path=this.GetDBPath()
+                };
+            }
+        }
 
         #region Anchor (SyncFRW proivider)
         internal void SaveAnchor(string key, byte[] value)
@@ -2679,6 +2715,40 @@ namespace Sqo
             }
         }
         #endregion
+
+        public class Stat
+        {
+           /// <summary>
+           /// Database used size (in bytes)
+           /// </summary>
+            public long UsedSize { get; internal set; }
+            
+            /// <summary>
+            /// Max database size ( in bytes)
+            /// </summary>
+            public long MaxSize { get; internal set; }
+            /// <summary>
+            /// Max sub databases, Siaqodb use 2 sub-databases per Type and an additional sub-database for each index
+            /// </summary>
+            public int MaxSubDatabases { get; internal set; }
+            /// <summary>
+            /// Full db folder path
+            /// </summary>
+            public string Path { get; internal set; }
+            /// <summary>
+            /// Free space (in bytes)
+            /// </summary>
+            public long FreeSpace { get { return MaxSize - UsedSize; } }
+            public override string ToString()
+            {
+                double free=this.MaxSize - UsedSize ;
+                double mbfree = free> 0 ? free / ((double)1024*1024) : 0;
+                mbfree=Math.Round(mbfree,2);
+                double total=this.MaxSize/((double)1024*1024);
+                total = Math.Round(total, 2);
+                return string.Format(@"Database:{0}\data.mdb has {1} MB free space out of {2} MB", this.Path,mbfree,total);
+            }
+        }
     }
     public static class SqoStringExtensions
     {

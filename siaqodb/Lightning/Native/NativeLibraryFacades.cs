@@ -103,6 +103,11 @@ namespace LightningDB.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_cursor_del(IntPtr cursor, CursorDeleteOption flags);
 
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int mdb_env_info(IntPtr env, out MDBEnvInfo stat);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int mdb_env_stat(IntPtr env, out MDBStat stat);
         #endregion
 
         int INativeLibraryFacade.mdb_env_create(out IntPtr env)
@@ -266,6 +271,15 @@ namespace LightningDB.Native
         {
             return Native32BitLibraryFacade.mdb_cursor_del(cursor, flags);
         }
+        int INativeLibraryFacade.mdb_env_info(IntPtr env, out MDBEnvInfo stat)
+        {
+            return Native32BitLibraryFacade.mdb_env_info(env, out stat);
+        }
+
+        int INativeLibraryFacade.mdb_env_stat(IntPtr env, out MDBStat stat)
+        {
+            return Native32BitLibraryFacade.mdb_env_stat(env, out stat);
+        }
 	}
 
 	class Native64BitLibraryFacade : INativeLibraryFacade
@@ -363,6 +377,12 @@ namespace LightningDB.Native
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_cursor_del(IntPtr cursor, CursorDeleteOption flags);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int mdb_env_info(IntPtr env, out MDBEnvInfo stat);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int mdb_env_stat(IntPtr env, out MDBStat stat);
 
         #endregion
 
@@ -515,6 +535,15 @@ namespace LightningDB.Native
         {
             return Native64BitLibraryFacade.mdb_cursor_del(cursor, flags);
         }
+        int INativeLibraryFacade.mdb_env_info(IntPtr env, out MDBEnvInfo stat)
+        {
+            return Native64BitLibraryFacade.mdb_env_info(env, out stat);
+        }
+
+        int INativeLibraryFacade.mdb_env_stat(IntPtr env, out MDBStat stat)
+        {
+            return Native64BitLibraryFacade.mdb_env_stat(env, out stat);
+        }
 	}
 #endif
 	class FallbackLibraryFacade : INativeLibraryFacade
@@ -616,6 +645,11 @@ namespace LightningDB.Native
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_cursor_del(IntPtr cursor, CursorDeleteOption flags);
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int mdb_env_info(IntPtr env, out MDBEnvInfo stat);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int mdb_env_stat(IntPtr env, out MDBStat stat);
 
         #endregion
 
@@ -783,6 +817,15 @@ namespace LightningDB.Native
         int INativeLibraryFacade.mdb_cursor_del(IntPtr cursor, CursorDeleteOption flags)
         {
             return FallbackLibraryFacade.mdb_cursor_del(cursor, flags);
+        }
+        int INativeLibraryFacade.mdb_env_info(IntPtr env, out MDBEnvInfo stat)
+        {
+            return FallbackLibraryFacade.mdb_env_info(env, out stat);
+        }
+
+        int INativeLibraryFacade.mdb_env_stat(IntPtr env, out MDBStat stat)
+        {
+            return FallbackLibraryFacade.mdb_env_stat(env, out stat);
         }
 	}
 	

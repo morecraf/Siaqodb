@@ -75,6 +75,9 @@
     <Compile Include="..\SiaqodbPortable\Attributes\Index.cs">
       <Link>Portable\Attributes\Index.cs</Link>
     </Compile>
+    <Compile Include="..\SiaqodbPortable\Attributes\LazyLoadAttribute.cs">
+      <Link>Portable\Attributes\LazyLoadAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\SiaqodbPortable\Attributes\MaxLengthAttribute.cs">
       <Link>Portable\Attributes\MaxLengthAttribute.cs</Link>
     </Compile>

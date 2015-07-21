@@ -209,6 +209,7 @@ namespace Sqo.Core
                         ai.FInfo = MetaExtractor.FindField(tInfo.Type, ai.Name);
                         MetaExtractor.FindAddConstraints(tInfo, ai);
                         MetaExtractor.FindAddIndexes(tInfo, ai);
+                        MetaExtractor.FindAddLazyLoaded(tInfo, ai);
 
                     }
                     if (ai.AttributeTypeId == MetaExtractor.complexID || ai.AttributeTypeId == MetaExtractor.dictionaryID || ai.AttributeTypeId==MetaExtractor.documentID)

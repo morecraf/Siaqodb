@@ -109,6 +109,11 @@ namespace Sqo
         {
             return type.GetTypeInfo().IsEnum;
         }
+        public static bool IsNullableEnum(this Type type)
+        {
+            Type u = Nullable.GetUnderlyingType(type);
+            return (u != null) && u.IsEnum();
+        }
 #else
         public static bool IsGenericType(this Type type)
         {

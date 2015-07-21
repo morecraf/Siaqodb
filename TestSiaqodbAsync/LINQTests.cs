@@ -16,33 +16,36 @@ namespace SiaqodbUnitTests
         string dbFolder = @"c:\work\temp\unitTests_siaqodbLMDB_ASYNC\";
         public LINQTests()
         {
-              Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTSgbmx5WI47jJrL1WHN2o/gg5hnL45waY5nSxqWiFmnG");
+            Sqo.SiaqodbConfigurator.SetLicense(@"9+3kflAazhBu3bW+lP/eJZR91W03jgYPxZpa9fDHSbk6UNwzo/AjI3hjA161Oqry");
         }	
         [TestMethod]
         public async Task TestBasicQuery()
         {
-            Siaqodb nop = new Siaqodb(); 
-            nop.Open(dbFolder);
-            await nop.DropTypeAsync<Customer>();
-
-            for (int i = 0; i < 10; i++)
+            using (Siaqodb nop = new Siaqodb())
             {
-                Customer c = new Customer();
-                c.ID = i;
-                c.Name = "ADH" + i.ToString();
+                nop.Open(dbFolder);
+                await nop.DropTypeAsync<Customer>();
 
-                await nop.StoreObjectAsync(c);
+                for (int i = 0; i < 10; i++)
+                {
+                    Customer c = new Customer();
+                    c.ID = i;
+                    c.Name = "ADH" + i.ToString();
+
+                    await nop.StoreObjectAsync(c);
+                }
+                await nop.FlushAsync();
+                var query = await (from Customer c in nop
+                                   select c).ToListAsync();
+                Assert.AreEqual(query.Count, 10);
+                nop.Close();
             }
-            await nop.FlushAsync();
-            var query = await (from Customer c in nop
-                         select c).ToListAsync();
-            Assert.AreEqual(query.Count, 10);
         }
 
         [TestMethod]
         public async Task TestBasicWhere()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -71,11 +74,13 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(listInitial[5].Name, query[0].Name);
             Assert.AreEqual(listInitial[5].ID, query[0].ID);
             Assert.AreEqual(listInitial[5].OID, query[0].OID);
+            nop.Close();
+            }
         }
         [TestMethod]
         public async Task TestBasicWhereByOID()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -110,12 +115,13 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(listInitial[4].Name, query[0].Name);
             Assert.AreEqual(listInitial[4].ID, query[0].ID);
             Assert.AreEqual(listInitial[4].OID, query[0].OID);
+            }
         }
 
         [TestMethod]
         public async Task TestBasicWhereOperators()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -148,13 +154,14 @@ namespace SiaqodbUnitTests
                     where c.ID != 3
                     select c).ToListAsync();
             Assert.AreEqual(query.Count, 9);
+            }
 
 
         }
         [TestMethod]
         public async Task TestBasicWhereStringComparison()
         {
-            Siaqodb siaqodb = new Siaqodb(); await siaqodb.OpenAsync(dbFolder);
+            using(Siaqodb siaqodb = new Siaqodb()){ await siaqodb.OpenAsync(dbFolder);
             await siaqodb.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -206,13 +213,13 @@ namespace SiaqodbUnitTests
                     select c).ToListAsync();
             Assert.AreEqual(5, query.Count);
 
-
+            }
         }
         int id = 3;
         [TestMethod]
         public async Task WhereLocalVariable()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -237,6 +244,7 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(query.Count, 1);
             Assert.AreEqual(3, query[0].ID);
+            }
         }
         public int TestMet(int t)
         {
@@ -253,7 +261,7 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task WhereLocalMethod()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -285,11 +293,12 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(query.Count, 1);
             Assert.AreEqual(4, query[0].OID);
+            }
         }
         [TestMethod]
         public async Task WhereLocalMethodOverObject()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -322,12 +331,13 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(query.Count, 1);
             Assert.AreEqual(3, query[0].ID);
+            }
 
         }
         [TestMethod]
         public async Task WhereAnd()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -359,12 +369,13 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(query.Count, 1);
             Assert.AreEqual(3, query[0].ID);
+            }
 
         }
         [TestMethod]
         public async Task SimpleSelect()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -393,13 +404,13 @@ namespace SiaqodbUnitTests
             }
             Assert.AreEqual(1, s);
 
-
+            }
 
         }
         [TestMethod]
         public async Task WhereOR()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -430,13 +441,13 @@ namespace SiaqodbUnitTests
                     select c).ToListAsync();
 
             Assert.AreEqual(query.Count, 7);
-
+            }
 
         }
         [TestMethod]
         public async Task SelectSimple()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -468,14 +479,14 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(k, 10);
 
 
-
+            }
 
 
         }
         [TestMethod]
         public async Task SelectSimpleWithDiffType()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -507,14 +518,14 @@ namespace SiaqodbUnitTests
             Assert.AreEqual(k, 10);
 
 
-
+            }
 
 
         }
         [TestMethod]
         public async Task TestUnoptimizedWhere()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -546,14 +557,14 @@ namespace SiaqodbUnitTests
             //Assert.AreEqual(k, 1);
 
 
-
+            }
 
 
         }
         [TestMethod]
         public async Task TestToString()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -583,11 +594,12 @@ namespace SiaqodbUnitTests
                 Assert.AreEqual(listInitial[1].Name, s.Name);
                 Assert.AreEqual(listInitial[1].ID, s.ID);
             }
+            }
         }
         [TestMethod]
         public async Task TestSelfMethod()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -612,11 +624,12 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(query.Count, 1);
 
+            }
         }
         [TestMethod]
         public async Task SelectNonExistingType()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Something>();
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
@@ -642,7 +655,7 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(0, query.ToList().Count);
 
-
+            }
 
 
 
@@ -650,7 +663,7 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task SelectWhere()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -682,7 +695,7 @@ namespace SiaqodbUnitTests
             }
             Assert.AreEqual(3, k);
 
-
+            }
 
 
 
@@ -690,7 +703,7 @@ namespace SiaqodbUnitTests
         [TestMethod]
         public async Task SelectWhereUsingProperty()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -759,12 +772,12 @@ namespace SiaqodbUnitTests
                 else
                     Assert.Fail(ex.Message);
             }
-
+            }
         }
         [TestMethod]
         public async Task SelectWhereUsingAutomaticProperties()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -807,12 +820,12 @@ namespace SiaqodbUnitTests
                 k++;
             }
             Assert.AreEqual(10, k);
-
+            }
         }
         [TestMethod]
         public async Task SelectWhereUnaryOperator()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -840,7 +853,7 @@ namespace SiaqodbUnitTests
             int k = 0;
 
             Assert.AreEqual(4, query.Count);
-
+            }
         }
         [TestMethod]
          public async Task SelectWhereMinus()
@@ -848,7 +861,7 @@ namespace SiaqodbUnitTests
             bool exTh = false;
             try
             {
-                Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+                using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
                 await nop.DropTypeAsync<CustomerLite>();
                 List<CustomerLite> listInitial = new List<CustomerLite>();
                 for (int i = 0; i < 10; i++)
@@ -876,17 +889,19 @@ namespace SiaqodbUnitTests
                 int k = 0;
 
                 Assert.AreEqual(3, query.Count);
+                }
             }
             catch (NotSupportedException ex)
             {
                 exTh = true;
             }
             Assert.IsTrue(exTh);
+        
         }
         [TestMethod]
         public async Task SelectWhereBooleanAlone()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -922,12 +937,13 @@ namespace SiaqodbUnitTests
 
 
             Assert.AreEqual(4, query1.Count);
+            }
 
         }
         [TestMethod]
         public async Task OrderByBasic()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             int j=0;
@@ -1010,12 +1026,13 @@ namespace SiaqodbUnitTests
                 k++;
             }
             //Assert.AreEqual(3, k);
+            }
 
         }
         [TestMethod]
         public async Task SelectWhereUsingEnum()
         {
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<CustomerLite>();
             List<CustomerLite> listInitial = new List<CustomerLite>();
             for (int i = 0; i < 10; i++)
@@ -1047,7 +1064,7 @@ namespace SiaqodbUnitTests
                 k++;
             }
             Assert.AreEqual(3, k);
-
+            }
 
 
 
@@ -1057,7 +1074,7 @@ namespace SiaqodbUnitTests
         public async Task SkipTake()
         {
 
-            Siaqodb nop = new Siaqodb(); await nop.OpenAsync(dbFolder);
+            using(Siaqodb nop = new Siaqodb()){ await nop.OpenAsync(dbFolder);
             await nop.DropTypeAsync<Customer>();
             List<Customer> listInitial = new List<Customer>();
             for (int i = 0; i < 10; i++)
@@ -1083,8 +1100,8 @@ namespace SiaqodbUnitTests
 
             Assert.AreEqual(query.Count, 2);
             Assert.AreEqual(query[0].ID, 7);
-            Assert.AreEqual(query[1].ID, 8);
-
+            Assert.AreEqual(query[1].ID, 6);
+            }
 
 
 
