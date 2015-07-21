@@ -40,14 +40,14 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\iPhone\DebugLicensed</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC</DefineConstants>
+    <OutputPath>bin\xamarin.ios</OutputPath>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC_LMDB;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>
     <ConsolePause>False</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AssemblyName>SiaqodbAsyncXiOS</AssemblyName>
+    <AssemblyName>Siaqodb</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>

@@ -2,23 +2,38 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Sqo;
 using Sqo.Transactions;
+#if __MOBILE__
+using NUnit.Framework;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#endif
 namespace TestSiaqodb
 {
     /// <summary>
     /// Summary description for JaggedTests
     /// </summary>
-    [TestClass]
+	#if __MOBILE__
+	[TestFixture]
+	#else
+	[TestClass]
+
+	#endif
     public class JaggedTests
     {
-        string objPath = @"c:\work\temp\unitTests_siaqodbLMDB\";
+		string objPath;
         public JaggedTests()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;
             Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
+			#if __MOBILE__
+			objPath=Environment.GetFolderPath (Environment.SpecialFolder.Personal);
+			#else
+			objPath=@"c:\work\temp\unitTests_siaqodbLMDB\";
+			#endif
         }
 
         private TestContext testContextInstance;
@@ -61,14 +76,24 @@ namespace TestSiaqodb
         //
         #endregion
 
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestMethod1()
         {
             //
             // TODO: Add test logic here
             //
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStoreSimpleJagged()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -199,7 +224,12 @@ namespace TestSiaqodb
 
         }
       
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStoreNMatrix()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -270,7 +300,12 @@ namespace TestSiaqodb
             }
         }
        
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStoreDictionary()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -344,7 +379,12 @@ namespace TestSiaqodb
             Assert.AreEqual(0, q.ToList().Count);
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestUpdateDictionary()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -430,7 +470,12 @@ namespace TestSiaqodb
             Assert.AreEqual(0, q.ToList().Count);
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStoreDictionaryTransactional()
         {
             Siaqodb s_db = new Siaqodb(objPath);

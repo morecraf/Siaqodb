@@ -2,7 +2,6 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sqo;
 using Sqo.Attributes;
 using Sqo.Exceptions;
@@ -11,16 +10,41 @@ using System.IO;
 using Sqo.Transactions;
 using System.Collections;
 using System.Diagnostics;
+#if __MOBILE__
+using NUnit.Framework;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endif
+
 
 namespace TestSiaqodb
 {
+	#if TEST_PERF
+	public class MyEntity
+	{
+		[SQLite.AutoIncrement, SQLite.PrimaryKey]
+		public int OID { get; set; }
+		public int IntValue { get; set; }
+		public string StringValue { get; set; }
+		public DateTime DateTimeValue { get; set; }
+		public Guid GuidValue { get; set; }
+		public double DoubleValue { get; set; }
+	}
+	#endif
 	/// <summary>
 	/// Summary description for UnitTest1
 	/// </summary>
+	#if __MOBILE__
+	[TestFixture]
+	#else
 	[TestClass]
+
+	#endif
+
 	public class BasicsTest
 	{
-        string objPath = @"c:\work\temp\unitTests_siaqodbLMDB\";
+		string objPath;
 		
 		public BasicsTest()
 		{
@@ -28,6 +52,11 @@ namespace TestSiaqodb
            // SiaqodbConfigurator.VerboseLevel = VerboseLevel.Info;
             SiaqodbConfigurator.LoggingMethod = this.LogWarns;
             Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
+			#if __MOBILE__
+			objPath=Environment.GetFolderPath (Environment.SpecialFolder.Personal);
+			#else
+			objPath=@"c:\work\temp\unitTests_siaqodbLMDB\";
+			#endif
 		}
         public void LogWarns(string log, VerboseLevel level)    
         {
@@ -73,7 +102,120 @@ namespace TestSiaqodb
 		//
 		#endregion
 
+
+		#if TEST_PERF
+		public static int ENTITY_COUNT=100;
+
+		#if __MOBILE__
+		[Test]
+
+		#else
 		[TestMethod]
+
+		#endif
+
+	
+		public void _TestPerformance()
+		{
+
+			Insert ();
+			Read ();
+		}
+		public  void Read()
+		{
+			using (Siaqodb siaqodb = new Siaqodb())
+			{
+				siaqodb.Open(objPath, 100 * 1024*1024, 20);
+				Console.WriteLine("ReadAllSiaqodb...");
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
+				var all = siaqodb.LoadAll<MyEntity>();
+
+				stopwatch.Stop();
+				Console.WriteLine("ReadAllSiaqodb took:" + stopwatch.Elapsed);
+
+			}
+
+			using (var dbsql = new SQLite.SQLiteConnection(objPath+@"/db.sqlite"))
+			{
+				Console.WriteLine("ReadAllSQLite...");
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
+				var all = dbsql.Query<MyEntity>("select * from MyEntity");
+
+				stopwatch.Stop();
+				Console.WriteLine("ReadAllSQLite took:" + stopwatch.Elapsed);
+			}
+		}
+
+		public  void Insert()
+		{
+			var entities = GetEntities().ToArray();
+			using (Siaqodb siaqodb = new Siaqodb())
+			{
+				siaqodb.Open(objPath, 100 * 1024*1024, 20);
+
+				Console.WriteLine("InsertSiaqodb...");
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
+				for (int i = 0; i < ENTITY_COUNT; i++)
+				{
+					siaqodb.StoreObject(entities[i]);
+				}
+
+				stopwatch.Stop();
+				Console.WriteLine("InsertSiaqodb took:" + stopwatch.Elapsed);
+
+			}
+
+			using (var dbsql = new SQLite.SQLiteConnection(objPath+@"/db.sqlite"))
+			{
+				dbsql.CreateTable<MyEntity>();
+				Console.WriteLine("InsertSQLite...");
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
+				for (int i = 0; i < ENTITY_COUNT; i++)
+				{
+					dbsql.Insert(entities[i]);
+				}
+
+				stopwatch.Stop();
+				Console.WriteLine("InsertSQLite took:" + stopwatch.Elapsed);
+			}
+		}
+		public  IEnumerable<MyEntity> GetEntities()
+		{
+			var random = new Random(DateTime.Now.Millisecond);
+
+			for (int i = 0; i < ENTITY_COUNT; i++)
+			{
+
+				yield return new MyEntity
+				{
+					IntValue = random.Next(),
+					DoubleValue = random.NextDouble(),
+					StringValue = Guid.NewGuid().ToString(),
+					DateTimeValue = new DateTime(random.Next(1999, 2015), random.Next(1, 12), random.Next(1, 28)),
+					GuidValue = Guid.NewGuid()
+				};
+			}
+		}
+		#endif
+
+
+		#if __MOBILE__
+		[Test]
+
+		#else
+		[TestMethod]
+
+		#endif
+
+
 		public void TestInsert()
 		{
             using (Siaqodb nop = new Siaqodb(objPath, 50 * 1024 * 1024, 100))
@@ -99,7 +241,12 @@ namespace TestSiaqodb
 			
 			
 		}
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStringWithoutAttribute()
         {
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -122,7 +269,12 @@ namespace TestSiaqodb
             }
 
         }
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		[ExpectedException(typeof(Sqo.Exceptions.TypeChangedException))]
 		public void TestSchemaChanged()
 		{
@@ -147,7 +299,12 @@ namespace TestSiaqodb
             }
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestMassInsert()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -166,7 +323,12 @@ namespace TestSiaqodb
                 Console.WriteLine(t);
             }
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestInsertAllTypeOfFields()
 		{
 
@@ -271,7 +433,12 @@ namespace TestSiaqodb
             }
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestUpdate()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -301,7 +468,12 @@ namespace TestSiaqodb
             }
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestUpdateCheckNrRecords()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -333,7 +505,12 @@ namespace TestSiaqodb
             }
 			
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestInsertAfterDrop()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -362,7 +539,12 @@ namespace TestSiaqodb
             }
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestSavingEvent()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -387,7 +569,12 @@ namespace TestSiaqodb
 
             }
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestSavedEvent()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -411,7 +598,12 @@ namespace TestSiaqodb
             }
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestDelete()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -439,7 +631,12 @@ namespace TestSiaqodb
                 Assert.AreEqual(3, listDeleted[0].OID);
             }
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestDeleteEvents()
 		{
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -469,7 +666,8 @@ namespace TestSiaqodb
 
 		}
         //removed for safety reason
-        //[TestMethod]
+        //#if __MOBILE__
+		[
         //public void TestDeleteByOID()
         //{
         //    Siaqodb nop = new Siaqodb(objPath);
@@ -512,7 +710,12 @@ namespace TestSiaqodb
 			e.Cancel = true;
 			
 		}
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestCount()
         {
             using (Siaqodb nop = new Siaqodb(objPath))
@@ -535,7 +738,12 @@ namespace TestSiaqodb
                 Assert.AreEqual(159, count);
             }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(SiaqodbException))]
         public void TestSaveDeletedObject()
         {
@@ -560,7 +768,12 @@ namespace TestSiaqodb
 
           
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(SiaqodbException))]
         public void TestDeleteUnSavedObject()
         {
@@ -575,7 +788,12 @@ namespace TestSiaqodb
             }
         }
         //LMDB add back when ready
-       /* [TestMethod]
+       /* #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestXMLExportImport()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -607,7 +825,12 @@ namespace TestSiaqodb
             }
           }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestXMLExportImportCompleteType()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -681,7 +904,12 @@ namespace TestSiaqodb
             }
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestXMLExportImportCompleteTypeNullable()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -710,7 +938,12 @@ namespace TestSiaqodb
            }
             
         }*/
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUniqueExceptionInsert()
         {
@@ -735,7 +968,12 @@ namespace TestSiaqodb
            }
             
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUniqueExceptionInsertTransaction()
         {
@@ -762,7 +1000,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUniqueExceptionUpdate()
         {
@@ -791,7 +1034,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestUpdateObjectBy()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -826,7 +1074,12 @@ namespace TestSiaqodb
             Assert.IsFalse(stored);
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(SiaqodbException))]
         public void TestUpdateObjectByDuplicates()
         {
@@ -849,7 +1102,12 @@ namespace TestSiaqodb
 
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(SiaqodbException))]
         public void TestUpdateObjectByFieldNotExists()
         {
@@ -865,7 +1123,12 @@ namespace TestSiaqodb
 
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(SiaqodbException))]
         public void TestUpdateObjectByManyFieldsDuplicates()
         {
@@ -892,7 +1155,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestUpdateObjectByManyFields()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -915,7 +1183,12 @@ namespace TestSiaqodb
             Assert.IsTrue(s);
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestDeleteObjectBy()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -952,7 +1225,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(UniqueConstraintException))]
         public void TestUpdateObjectByManyFieldsConstraints()
         {
@@ -989,7 +1267,12 @@ namespace TestSiaqodb
            }
         }
 
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestEventsVariable()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1006,7 +1289,12 @@ namespace TestSiaqodb
 
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexFirstInsert()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1038,7 +1326,12 @@ namespace TestSiaqodb
           }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexUpdate()
         {
             using (Siaqodb sq = new Siaqodb(objPath))
@@ -1083,7 +1376,12 @@ namespace TestSiaqodb
                 Assert.AreEqual(11, q.Count<ClassIndexes>());
             }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexSaveAndClose()
         {
             using (Siaqodb sq = new Siaqodb(objPath))
@@ -1108,7 +1406,12 @@ namespace TestSiaqodb
                 Assert.AreEqual(10, q.Count<ClassIndexes>());
             }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexAllOperations()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1150,7 +1453,12 @@ namespace TestSiaqodb
             Assert.AreEqual(70, q.Count<ClassIndexes>());
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexUpdateObjectBy()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1200,7 +1508,12 @@ namespace TestSiaqodb
 
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexDelete()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1253,7 +1566,12 @@ namespace TestSiaqodb
             Assert.AreEqual(7, q.Count<ClassIndexes>());
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexAllFieldTypes()
         {
             DateTime dt = new DateTime(2010, 1, 1);
@@ -1417,7 +1735,12 @@ namespace TestSiaqodb
             Assert.AreEqual(10, q19.ToList().Count);
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestAttributesOnProps()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1458,7 +1781,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestPOCO()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1499,7 +1827,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestRealPOCO()
         {
             SiaqodbConfigurator.AddIndex("ID", typeof(RealPOCO));
@@ -1590,7 +1923,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestOptimisticConcurency()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1713,7 +2051,12 @@ namespace TestSiaqodb
 
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestTransactionInsert()
         { 
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1775,7 +2118,12 @@ namespace TestSiaqodb
            }
             
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestTransactionUpdateInsert()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1810,7 +2158,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestTransactionDelete()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1849,7 +2202,12 @@ namespace TestSiaqodb
            }
             
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestUpdateObjectByManyFieldsTransaction()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1892,7 +2250,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestDeleteObjectByTransactions()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -1956,7 +2319,12 @@ namespace TestSiaqodb
            }
             
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestTransactionCrash()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -2007,7 +2375,12 @@ namespace TestSiaqodb
             transac2t.Commit();//here do debug and stop after a few commits to be able to simulate crash recovery
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestTransactionManyTypes()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -2105,7 +2478,12 @@ namespace TestSiaqodb
            }
 
         }
-         [TestMethod]
+         #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestTransactionLists()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -2213,7 +2591,12 @@ namespace TestSiaqodb
            }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexStringStartWith()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -2250,7 +2633,12 @@ namespace TestSiaqodb
             }
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestListsAllTypes()
         {
             DateTime dt = new DateTime(2010, 1, 1);
@@ -2353,7 +2741,12 @@ namespace TestSiaqodb
             }
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestOpen2Databases()
         {
             Siaqodb s1 = new Siaqodb(@"F:\demo\s1\");
@@ -2378,7 +2771,12 @@ namespace TestSiaqodb
             s1.Close();
             s2.Close();
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestLoadingEvents()
         {
             //SiaqodbConfigurator.SetRaiseLoadEvents(true);
@@ -2409,7 +2807,12 @@ namespace TestSiaqodb
             
         }
 
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestNestedSelfObject()
         {
             //SiaqodbConfigurator.SetRaiseLoadEvents(true);
@@ -2443,7 +2846,12 @@ namespace TestSiaqodb
             }
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestDateTimeKind()
         {
             SiaqodbConfigurator.SpecifyStoredDateTimeKind(DateTimeKind.Utc);
@@ -2478,7 +2886,12 @@ namespace TestSiaqodb
             Assert.AreEqual(DateTimeKind.Unspecified, lis[2].dt.Kind);
            }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void ReadTransactionable()
         {
             using (Siaqodb _database = new Siaqodb(objPath))
@@ -2508,7 +2921,12 @@ namespace TestSiaqodb
                 }
             }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void ReadFirstOrDefault()
         {
             using (Siaqodb _database = new Siaqodb(objPath))
@@ -2518,7 +2936,12 @@ namespace TestSiaqodb
                 string s = "";
             }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void MultiThreading()
         {
             using (Siaqodb _database = new Siaqodb(objPath))
@@ -2547,7 +2970,12 @@ namespace TestSiaqodb
                 
             }
         }
-         [TestMethod]
+         #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void MultiThreadingComplexObj()
         {
             using (Siaqodb _database = new Siaqodb(objPath))
@@ -2579,7 +3007,12 @@ namespace TestSiaqodb
 
             }
         }
-         [TestMethod]
+         #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
          public void TestLazyLoad()
          {
              using (Siaqodb _database = new Siaqodb(objPath))
@@ -2629,7 +3062,12 @@ namespace TestSiaqodb
         }
 
         /* TODO LMDB uncomment
-         [TestMethod]
+         #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestShrink()
         {
             DateTime dt = new DateTime(2010, 1, 1);
@@ -2748,7 +3186,12 @@ namespace TestSiaqodb
         
         }
        
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestIndexShrink()
         {
           using(  Siaqodb sq = new Siaqodb(objPath)) {
@@ -2921,7 +3364,12 @@ namespace TestSiaqodb
            }
         }
 
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestInsertBufferChunk()
         {
             SiaqodbConfigurator.BufferingChunkPercent = 2;

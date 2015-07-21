@@ -2,23 +2,38 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sqo;
 
+using Sqo;
+#if __MOBILE__
+using NUnit.Framework;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endif
 namespace TestSiaqodb
 {
 	/// <summary>
 	/// Summary description for LINQTest
 	/// </summary>
+	#if __MOBILE__
+	[TestFixture]
+	#else
 	[TestClass]
+
+	#endif
 	public class LINQTest
 	{
-        string objPath = @"c:\work\temp\unitTests_siaqodbLMDB\";
+		string objPath;
 		
 		public LINQTest()
 		{
             SiaqodbConfigurator.EncryptedDatabase = true;
             Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
+			#if __MOBILE__
+			objPath=Environment.GetFolderPath (Environment.SpecialFolder.Personal);
+			#else
+			objPath=@"c:\work\temp\unitTests_siaqodbLMDB\";
+			#endif
 		}
 
 		private TestContext testContextInstance;
@@ -63,7 +78,12 @@ namespace TestSiaqodb
 
         //TODO: add Enum in where also JOIN etc
 
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestBasicQuery()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -84,7 +104,12 @@ namespace TestSiaqodb
             }
 		}
 		
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestBasicWhere()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -118,7 +143,12 @@ namespace TestSiaqodb
 			Assert.AreEqual(listInitial[5].OID, query.ToList<Customer>()[0].OID);
             }
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestBasicWhereByOID()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -159,7 +189,12 @@ namespace TestSiaqodb
             }
 		}
 
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestBasicWhereOperators()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -199,7 +234,12 @@ namespace TestSiaqodb
 
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestBasicWhereStringComparison()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -255,7 +295,12 @@ namespace TestSiaqodb
 
 		}
 		int id=3;
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void WhereLocalVariable()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -297,7 +342,12 @@ namespace TestSiaqodb
         {
             return t.ID;
         }
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void WhereLocalMethod()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -334,7 +384,12 @@ namespace TestSiaqodb
 			Assert.AreEqual(4, query.ToList<Customer>()[0].OID);
             }
 		}
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void WhereLocalMethodOverObject()
         {
             using(Siaqodb nop = new Siaqodb(objPath)){
@@ -373,7 +428,12 @@ namespace TestSiaqodb
             }
             
         }
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void WhereAnd()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -411,7 +471,12 @@ namespace TestSiaqodb
             }
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void SimpleSelect()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -446,7 +511,12 @@ namespace TestSiaqodb
 			}
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void WhereOR()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -484,7 +554,12 @@ namespace TestSiaqodb
 			
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void SelectSimple()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -523,7 +598,12 @@ namespace TestSiaqodb
 			}
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void SelectSimpleWithDiffType()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -562,7 +642,12 @@ namespace TestSiaqodb
 			
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestUnoptimizedWhere()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -601,7 +686,12 @@ namespace TestSiaqodb
 
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestToString()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -636,7 +726,12 @@ namespace TestSiaqodb
 			}	
             }
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void TestSelfMethod()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -666,7 +761,12 @@ namespace TestSiaqodb
             }
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void SelectNonExistingType()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -700,7 +800,12 @@ namespace TestSiaqodb
 
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void SelectWhere()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -739,7 +844,12 @@ namespace TestSiaqodb
 
 
 		}
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void SelectWhereUsingProperty()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -814,7 +924,12 @@ namespace TestSiaqodb
             }
 
 		}
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void SelectWhereUsingAutomaticProperties()
         {
             using(Siaqodb nop = new Siaqodb(objPath)){
@@ -863,7 +978,12 @@ namespace TestSiaqodb
             }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void SelectWhereUnaryOperator()
         {
             using(Siaqodb nop = new Siaqodb(objPath)){
@@ -897,7 +1017,12 @@ namespace TestSiaqodb
             }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         [ExpectedException(typeof(NotSupportedException))]
         public void SelectWhereMinus()
         {
@@ -932,7 +1057,12 @@ namespace TestSiaqodb
             }
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void SelectWhereBooleanAlone()
         {
             using(Siaqodb nop = new Siaqodb(objPath)){
@@ -974,7 +1104,12 @@ namespace TestSiaqodb
             }
 
         }
+		#if __MOBILE__
+		[Test]
+		#else
 		[TestMethod]
+
+		#endif
 		public void OrderByBasic()
 		{
 			using(Siaqodb nop = new Siaqodb(objPath)){
@@ -1014,7 +1149,12 @@ namespace TestSiaqodb
             }
 
 		}
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void SelectWhereUsingEnum()
         {
             using (Siaqodb nop = new Siaqodb(objPath))

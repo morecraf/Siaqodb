@@ -28,7 +28,6 @@
     <DocumentationFile>bin\Debug\net45\SiaqodbPortable.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -63,6 +62,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IDocumentSerializer.cs" />
+    <Compile Include="Attributes\LazyLoadAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

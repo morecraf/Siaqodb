@@ -2,23 +2,42 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sqo;
 using Sqo.Transactions;
 using System.Collections;
+#if __MOBILE__
+using NUnit.Framework;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#endif
 namespace TestSiaqodb.M.S
 {
-    [TestClass]
+	#if __MOBILE__
+	[TestFixture]
+	#else
+	[TestClass]
+
+	#endif
     public class ComplexTypesTest
     {
-        string objPath = @"c:\work\temp\unitTests_siaqodbLMDB\";
+		string objPath ;
         public ComplexTypesTest()
         {
             SiaqodbConfigurator.EncryptedDatabase = true;
             Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
+			#if __MOBILE__
+			objPath=Environment.GetFolderPath (Environment.SpecialFolder.Personal);
+			#else
+			objPath=@"c:\work\temp\unitTests_siaqodbLMDB\";
+			#endif
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStore()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -69,7 +88,12 @@ namespace TestSiaqodb.M.S
             Assert.AreEqual(200, allA2[1].BVar.Ci.cId);
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestRead()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -108,7 +132,12 @@ namespace TestSiaqodb.M.S
 
             
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestTransaction()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -177,7 +206,12 @@ namespace TestSiaqodb.M.S
 
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestInclude()
         {
             SiaqodbConfigurator.LoadRelatedObjects<A>(false);
@@ -235,7 +269,12 @@ namespace TestSiaqodb.M.S
                 SiaqodbConfigurator.LoadRelatedObjects<B>(true);
             }
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestComplexLists()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -277,7 +316,12 @@ namespace TestSiaqodb.M.S
             Assert.AreEqual(10, q2.Count);
             
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestWhereComplexObjectCompare()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -303,7 +347,12 @@ namespace TestSiaqodb.M.S
 
            
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestDeleteNestedObject()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -353,7 +402,12 @@ namespace TestSiaqodb.M.S
             Assert.AreEqual(10, lsA1.Count);
 
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestListOfLists()
         {
 
@@ -377,7 +431,12 @@ namespace TestSiaqodb.M.S
             Assert.AreEqual(10, list.Count);
             Assert.AreEqual(2, list[1].TheList[0].List.Count);
         }
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStorePartialNull()
         {
             Siaqodb s_db = new Siaqodb(objPath);
@@ -402,7 +461,12 @@ namespace TestSiaqodb.M.S
             Assert.IsNull(lsA1[0].BVar.Ci);
         }
        
-        [TestMethod]
+        #if __MOBILE__
+		[Test]
+		#else
+		[TestMethod]
+
+		#endif
         public void TestStorePartialOnIndexed()
         {
             SiaqodbConfigurator.AddIndex("cId", typeof(C));
