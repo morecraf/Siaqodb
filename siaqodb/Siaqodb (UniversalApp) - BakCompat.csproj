@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>binBCompat\Debug\universal\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETFX_CORE WinRT ASYNC_LMDB</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE WinRT ASYNC_LMDB LIC_UNIV</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateLibraryLayout>false</GenerateLibraryLayout>

@@ -118,29 +118,38 @@ namespace Sqo.Utilities
         private static bool MatchLicType(string licType)
         {
 
-#if WP7
-       if (licType.Contains("ALL") || licType.Contains("BOTH") || licType.Contains("WP"))
+#if LIC_U3D_ANDROID
+            if (licType.Contains("ALL") || licType.Contains("U3D_ANDROID") || licType=="U3D")
                 return true;
-#elif SL4
-       if (licType.Contains("ALL") || licType.Contains("BOTH") || licType.Contains("SL") || licType.Contains("SILV"))
+#elif LIC_U3D_IOS
+            if (licType.Contains("ALL") || licType.Contains("U3D_IOS") || licType.Contains("U3D_MAC") || licType == "U3D")
                 return true;
-#elif XIOS
-       if (licType.Contains("ALL") || licType.Contains("MT"))
+#elif LIC_U3D_WIN
+            if (licType.Contains("ALL") || licType.Contains("U3D_WIN") || licType == "U3D")
                 return true;
-#elif MONODROID
-       if (licType.Contains("ALL") || licType.Contains("MD"))
+#elif LIC_U3D_UNIV
+            if (licType.Contains("ALL") || licType.Contains("U3D_UNIV") || licType == "U3D")
                 return true;
-#elif UNITY3D
-       if (licType.Contains("ALL") || licType.Contains("U3D"))
+#elif LIC_WIN
+       if (licType.Contains("ALL") || licType.Contains("NET"))
                 return true;
-#elif WinRT
-       if (licType.Contains("ALL") || licType.Contains("WinRT"))
+#elif LIC_UNIV
+            if (licType.Contains("ALL") || licType.Contains("WinRT") || licType.Contains("WP") || licType.Contains("UNIV"))
+                return true;
+#elif LIC_IOS
+            if (licType.Contains("ALL") || licType.Contains("MT"))
+                return true;
+#elif LIC_ANDROID
+            if (licType.Contains("ALL") || licType.Contains("MD"))
+                return true;
+#elif LIC_MAC
+            if (licType.Contains("ALL") || licType.Contains("MAC"))
                 return true;
 #elif CF
        if (licType.Contains( "ALL") || licType.Contains("WM"))
                 return true;
 #else
-            if (licType.Contains("ALL") || licType.Contains("BOTH") || licType.Contains("NET"))
+            if (licType.Contains("ALL"))
                 return true;
 #endif
             return false;

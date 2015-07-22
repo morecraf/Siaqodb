@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F670D4CC-E963-48E1-9611-0D7FEFA8382F}</ProjectGuid>
+    <ProjectGuid>{DB0C8F32-86C4-43E7-9B76-85D1A462BA6B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sqo</RootNamespace>
@@ -35,6 +35,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
@@ -43,27 +44,26 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>binBCompat\Debug\net35\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LIC_WIN</DefineConstants>
+    <OutputPath>bin\Debug\Unity3D\ios\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY3D;LIC_U3D_IOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>binBCompat\Debug\net35\Siaqodb.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Unity3D\ios\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Licensed\Release\.NET3.5\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>bin\Licensed\Release\Unity3D\</OutputPath>
+    <DefineConstants>TRACE;UNITY3D;STORE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Licensed\Release\.NET3.5\Siaqodb.xml</DocumentationFile>
+    <DocumentationFile>bin\Licensed\Release\Unity3D\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SiaqodbPortable\Attributes\DocumentAttribute.cs">
@@ -136,113 +136,26 @@
     <Compile Include="Core\ByteTransformers\ByteTransformerFactory.cs" />
     <Compile Include="Core\ByteTransformers\ComplexTypeTransformer.cs" />
     <Compile Include="Core\ByteTransformers\DictionaryByteTransformer.cs" />
-    <Compile Include="Core\ByteTransformers\PrimitiveByteTransformer.cs" />
     <Compile Include="Core\ByteTransformers\IByteTransformer.cs" />
+    <Compile Include="Core\ByteTransformers\PrimitiveByteTransformer.cs" />
     <Compile Include="Core\ObjectSerializer.Reader.cs" />
     <Compile Include="Core\ObjectSerializer.Writer.cs" />
     <Compile Include="Core\RawdataSerializer.cs" />
     <Compile Include="Core\ObjectSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
-    <Compile Include="Dotissi\AsyncLocker\AsyncLock.cs" />
-    <Compile Include="Dotissi\Cache\Cache.cs" />
-    <Compile Include="Dotissi\Cache\CacheCustomFileNames.cs" />
-    <Compile Include="Dotissi\Cache\CacheDocuments.cs" />
-    <Compile Include="Dotissi\Cache\CacheForIndexes.cs" />
-    <Compile Include="Dotissi\Cache\CacheForManager.cs" />
-    <Compile Include="Dotissi\Cache\CacheOIDs.cs" />
-    <Compile Include="Dotissi\Cache\CircularRefCache.cs" />
-    <Compile Include="Dotissi\Cache\ConditionalWeakTable.cs" />
-    <Compile Include="Dotissi\Cache\MetaCache.cs" />
-    <Compile Include="Dotissi\Core\ByteConverter.cs" />
-    <Compile Include="Dotissi\Core\ByteTransformers\ArrayByteTranformer.cs" />
-    <Compile Include="Dotissi\Core\ByteTransformers\ByteTransformerFactory.cs" />
-    <Compile Include="Dotissi\Core\ByteTransformers\ComplexTypeTransformer.cs" />
-    <Compile Include="Dotissi\Core\ByteTransformers\DictionaryByteTransformer.cs" />
-    <Compile Include="Dotissi\Core\ByteTransformers\FixedArrayByteTransformer.cs" />
-    <Compile Include="Dotissi\Core\ByteTransformers\IByteTransformer.cs" />
-    <Compile Include="Dotissi\Core\ByteTransformers\PrimitiveByteTransformer.cs" />
-    <Compile Include="Dotissi\Core\FileFactory.cs" />
-    <Compile Include="Dotissi\Core\ISqoFile.cs" />
-    <Compile Include="Dotissi\Core\ObjectSerializer.cs" />
-    <Compile Include="Dotissi\Core\ObjectSerializer.Reader.cs" />
-    <Compile Include="Dotissi\Core\ObjectSerializer.Writer.cs" />
-    <Compile Include="Dotissi\Core\RawdataSerializer.cs" />
-    <Compile Include="Dotissi\Core\SerializerFactory.cs" />
-    <Compile Include="Dotissi\Core\SqoFile.cs" />
-    <Compile Include="Dotissi\Core\SqoISFile.cs" />
-    <Compile Include="Dotissi\Core\SqoISFile2.cs" />
-    <Compile Include="Dotissi\Core\SqoMDFile.cs" />
-    <Compile Include="Dotissi\Exceptions\IndexCorruptedException.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\Conversion.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\ExpressionCompiler.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\ExpressionInterpreter.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\ExpressionTransformer.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\ExpressionVisitor.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\Extensions.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\Math.cs" />
-    <Compile Include="Dotissi\ExpressionCompiler\Runner.cs" />
-    <Compile Include="Dotissi\Indexes\BTree\BTree.cs" />
-    <Compile Include="Dotissi\Indexes\BTree\BTreeNode.cs" />
-    <Compile Include="Dotissi\Indexes\BTree\IBTree.cs" />
-    <Compile Include="Dotissi\Indexes\BTree\IndexManager.cs" />
-    <Compile Include="Dotissi\Indexes\IndexInfo.cs" />
-    <Compile Include="Dotissi\Internal\_bs.cs" />
-    <Compile Include="Dotissi\ISqoDataObject.cs" />
-    <Compile Include="Dotissi\LazyObjectList.cs" />
-    <Compile Include="Dotissi\Linq\Evaluator.cs" />
-    <Compile Include="Dotissi\Linq\ExpressionVisitor.cs" />
-    <Compile Include="Dotissi\Linq\IncludeSqoQuery.cs" />
-    <Compile Include="Dotissi\Linq\JoinTranslator.cs" />
-    <Compile Include="Dotissi\Linq\LazyEnumerator.cs" />
-    <Compile Include="Dotissi\Linq\LazySqoQuery.cs" />
-    <Compile Include="Dotissi\Linq\ProjectionJoin.cs" />
-    <Compile Include="Dotissi\Linq\ProjectionSelect.cs" />
-    <Compile Include="Dotissi\Linq\QueryTranslator.cs" />
-    <Compile Include="Dotissi\Linq\SelectQuery.cs" />
-    <Compile Include="Dotissi\Linq\SqoColumn.cs" />
-    <Compile Include="Dotissi\Linq\SqoOrderedQuery.cs" />
-    <Compile Include="Dotissi\Linq\SqoQuery.cs" />
-    <Compile Include="Dotissi\Linq\SqoQueryExtensionsImpl.cs" />
-    <Compile Include="Dotissi\MetaObjects\ArrayInfo.cs" />
-    <Compile Include="Dotissi\MetaObjects\DictionaryInfo.cs" />
-    <Compile Include="Dotissi\MetaObjects\DocumentInfo.cs" />
-    <Compile Include="Dotissi\MetaObjects\RawdataInfo.cs" />
-    <Compile Include="Dotissi\MetaObjects\RawdataManager.cs" />
-    <Compile Include="Dotissi\Meta\FieldSqoInfo.cs" />
-    <Compile Include="Dotissi\Meta\MetaExtractor.cs" />
-    <Compile Include="Dotissi\Meta\ObjectInfo.cs" />
-    <Compile Include="Dotissi\Meta\TypeHeader.cs" />
-    <Compile Include="Dotissi\Meta\TypeInfo.cs" />
-    <Compile Include="Dotissi\ObjectList.cs" />
-    <Compile Include="Dotissi\PropertyResolver\PropertyResolver.cs" />
-    <Compile Include="Dotissi\PropertyResolver\SilverlightPropertyResolver.cs" />
-    <Compile Include="Dotissi\Queries\And.cs" />
-    <Compile Include="Dotissi\Queries\ICriteria.cs" />
-    <Compile Include="Dotissi\Queries\Or.cs" />
-    <Compile Include="Dotissi\Queries\Where.cs" />
-    <Compile Include="Dotissi\Siaqodb.cs" />
-    <Compile Include="Dotissi\SiaqodbUtil.cs" />
-    <Compile Include="Dotissi\SqoDataObject.cs" />
-    <Compile Include="Dotissi\StorageEngine.cs" />
-    <Compile Include="Dotissi\StorageEngine.Loader.cs" />
-    <Compile Include="Dotissi\StorageEngine.Saver.cs" />
-    <Compile Include="Dotissi\Transactions\Transaction.cs" />
-    <Compile Include="Dotissi\Transactions\TransactionInternal.cs" />
-    <Compile Include="Dotissi\Transactions\TransactionManager.cs" />
-    <Compile Include="Dotissi\Transactions\TransactionObject.cs" />
-    <Compile Include="Dotissi\Transactions\TransactionsStorage.cs" />
-    <Compile Include="Dotissi\Utilities\EqualityComparer.cs" />
-    <Compile Include="Dotissi\Utilities\ExternalMetaHelper.cs" />
-    <Compile Include="Dotissi\Utilities\ImportExport.cs" />
-    <Compile Include="Dotissi\Utilities\MetaHelper.cs" />
-    <Compile Include="Dotissi\Utilities\ObjectTableHelper.cs" />
-    <Compile Include="Dotissi\Utilities\Path.cs" />
-    <Compile Include="Dotissi\WinRTExtensions\TypeExtensions.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
     <Compile Include="Exceptions\OptimisticConcurrencyException.cs" />
     <Compile Include="Exceptions\UniqueConstraintException.cs" />
+    <Compile Include="ExpressionCompiler\Conversion.cs" />
+    <Compile Include="ExpressionCompiler\ExpressionCompiler.cs" />
+    <Compile Include="ExpressionCompiler\ExpressionInterpreter.cs" />
+    <Compile Include="ExpressionCompiler\ExpressionTransformer.cs" />
+    <Compile Include="ExpressionCompiler\ExpressionVisitor.cs" />
+    <Compile Include="ExpressionCompiler\Extensions.cs" />
+    <Compile Include="ExpressionCompiler\Math.cs" />
+    <Compile Include="ExpressionCompiler\Runner.cs" />
     <Compile Include="Indexes\BTree\BTree.cs" />
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
@@ -297,10 +210,8 @@
     <Compile Include="MetaObjects\DictionaryInfo.cs" />
     <Compile Include="MetaObjects\DocumentInfo.cs" />
     <Compile Include="Obfuscation\ObfuscationAttributes.cs" />
-    <Compile Include="PropertyResolver\MethodBasedRocks.cs" />
-    <Compile Include="PropertyResolver\PropertyResolver.cs" />
+    <Compile Include="PropertyResolver\SilverlightPropertyResolver.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
-    <Compile Include="SiaqodbUtil.cs" />
     <Compile Include="SqoDataObject.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\SiaqodbException.cs" />
@@ -328,17 +239,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StorageEngine.Loader.cs" />
     <Compile Include="StorageEngine.Saver.cs" />
+    <Compile Include="Utilities\ATuple.cs" />
+    <Compile Include="Utilities\Convertor.cs" />
+    <Compile Include="Utilities\EqualityComparer.cs" />
     <Compile Include="Utilities\SqoLicense.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
+    <None Include="siaqodb.pfx" />
     <Compile Include="Queries\And.cs" />
     <Compile Include="Queries\Where.cs" />
     <Compile Include="StorageEngine.cs" />
     <Compile Include="Transactions\Transaction.cs" />
     <Compile Include="Transactions\TransactionInternal.cs" />
     <Compile Include="Transactions\TransactionManager.cs" />
-    <Compile Include="Utilities\ATuple.cs" />
-    <Compile Include="Utilities\Convertor.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
     <Compile Include="Utilities\ExternalMetaHelper.cs" />
     <Compile Include="Utilities\MetaHelper.cs" />
@@ -363,9 +276,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="siaqodb.pfx" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

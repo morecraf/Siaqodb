@@ -667,7 +667,7 @@ namespace TestSiaqodb
 		}
         //removed for safety reason
         //#if __MOBILE__
-		[
+		
         //public void TestDeleteByOID()
         //{
         //    Siaqodb nop = new Siaqodb(objPath);

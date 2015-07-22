@@ -548,7 +548,7 @@ namespace LightningDB.Native
 #endif
 	class FallbackLibraryFacade : INativeLibraryFacade
     {
-		#if XIOS
+		#if XIOS || UNITY3D || MONOMAC
 		public const string LibraryName = "__Internal";    
 		#else 
 		public const string LibraryName = "lmdb";
