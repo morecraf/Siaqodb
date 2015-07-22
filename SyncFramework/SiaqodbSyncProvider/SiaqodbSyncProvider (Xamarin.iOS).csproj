@@ -73,7 +73,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
-    <Compile Include="Utilities\TrialLicense.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="ObfuscationAttribute.cs" />
     <Compile Include="SiaqodbOffline.cs" />

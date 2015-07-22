@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\xamarin.android</OutputPath>
-    <DefineConstants>TRACE;DEBUG;MONODROID;ASYNC_LMDB;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;MONODROID;ASYNC_LMDB;LIC_ANDROID;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>

@@ -58,7 +58,6 @@
     <Compile Include="SiaqodbOfflineSyncProvider.cs" />
     <Compile Include="SyncProviderLicense.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
-    <Compile Include="Utilities\TrialLicense.cs" />
     <Compile Include="SyncCacheController\AsyncWorkManagerException.cs" />
     <Compile Include="SyncCacheController\CacheControllerAsync.cs" />
     <Compile Include="SyncCacheController\CacheControllerBehavior.cs" />

@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\xamarin.ios</OutputPath>
-    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC_LMDB;</DefineConstants>
+    <DefineConstants>DEBUG;UNITY3D;XIOS;ASYNC_LMDB;LIC_IOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>True</MtouchDebug>

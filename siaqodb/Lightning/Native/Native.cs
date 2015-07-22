@@ -15,7 +15,7 @@ namespace LightningDB.Native
 
         static NativeMethods()
         {
-#if UNITY3D || MONODROID || WinRT
+			#if UNITY3D || MONODROID || WinRT || MONOMAC
             _libraryFacade=new FallbackLibraryFacade();
 #else
 

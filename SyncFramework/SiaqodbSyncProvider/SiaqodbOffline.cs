@@ -54,7 +54,7 @@ namespace SiaqodbSyncProvider
             provider.UseElevatedTrust = true;
         }
 #endif
-        private void CreateDirtyEntity(object obj, DirtyOperation dop, ITransaction transaction)
+		private void CreateDirtyEntity(object obj, DirtyOperation dop, Sqo.Transactions.ITransaction transaction)
         {
             DirtyEntity dirtyEntity = new DirtyEntity();
             dirtyEntity.EntityOID = base.GetOID(obj);
