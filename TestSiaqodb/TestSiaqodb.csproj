@@ -33,7 +33,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>af91bab0</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>964edea7</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,6 +56,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Siaqodb, Version=5.0.0.7, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Siaqodb.5.0.0.6\lib\net45\Siaqodb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SiaqodbPortable, Version=4.0.2.27, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Siaqodb.5.0.0.6\lib\net45\SiaqodbPortable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -107,23 +115,13 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
-      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
-      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\siaqodb\Siaqodb %28.NET 4.5%29.csproj">
-      <Project>{f5bd2e1f-dcdd-4a1c-8130-236c2d75ff93}</Project>
-      <Name>Siaqodb %28.NET 4.5%29</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets" Condition="Exists('..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets')" />
+  <Import Project="..\packages\Siaqodb.5.0.0.6\build\net45\Siaqodb.targets" Condition="Exists('..\packages\Siaqodb.5.0.0.6\build\net45\Siaqodb.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Siaqodb.5.0.0.2-unstable\build\net45\Siaqodb.targets'))" />
+    <Error Condition="!Exists('..\packages\Siaqodb.5.0.0.6\build\net45\Siaqodb.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Siaqodb.5.0.0.6\build\net45\Siaqodb.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

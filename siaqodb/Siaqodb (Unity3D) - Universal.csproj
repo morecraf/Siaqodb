@@ -30,10 +30,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NETFX_CORE WinRT ASYNC</DefineConstants>
+    <OutputPath>bin\Release\Unity3D\univ\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WinRT;LIC_U3D_UNIV</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Unity3D\univ\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />

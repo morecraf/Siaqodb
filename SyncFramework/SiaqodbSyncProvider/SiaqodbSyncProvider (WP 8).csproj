@@ -107,7 +107,6 @@
     <Compile Include="SiaqodbOfflineEntity.cs" />
     <Compile Include="SiaqodbOfflineSyncProvider.cs" />
     <Compile Include="SyncProviderLicense.cs" />
-    <Compile Include="Utilities\TrialLicense.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
   </ItemGroup>
   <ItemGroup>

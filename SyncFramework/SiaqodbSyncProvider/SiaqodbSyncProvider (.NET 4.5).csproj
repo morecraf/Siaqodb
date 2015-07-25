@@ -110,7 +110,6 @@
     <Compile Include="Utilities\Decryptor.cs" />
     <Compile Include="Utilities\JSerializer.cs" />
     <Compile Include="Utilities\ReflectionHelper.cs" />
-    <Compile Include="Utilities\TrialLicense.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">

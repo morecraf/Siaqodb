@@ -122,7 +122,10 @@ namespace Sqo.Utilities
             if (licType.Contains("ALL") || licType.Contains("U3D_ANDROID") || licType=="U3D")
                 return true;
 #elif LIC_U3D_IOS
-            if (licType.Contains("ALL") || licType.Contains("U3D_IOS") || licType.Contains("U3D_MAC") || licType == "U3D")
+            if (licType.Contains("ALL") || licType.Contains("U3D_IOS")  || licType == "U3D")
+                return true;
+#elif LIC_U3D_MAC
+            if (licType.Contains("ALL")  || licType.Contains("U3D_MAC")  || licType == "U3D")
                 return true;
 #elif LIC_U3D_WIN
             if (licType.Contains("ALL") || licType.Contains("U3D_WIN") || licType == "U3D")
@@ -131,7 +134,7 @@ namespace Sqo.Utilities
             if (licType.Contains("ALL") || licType.Contains("U3D_UNIV") || licType == "U3D")
                 return true;
 #elif LIC_WIN
-       if (licType.Contains("ALL") || licType.Contains("NET"))
+            if (licType.Contains("ALL") || licType.Contains("NET"))
                 return true;
 #elif LIC_UNIV
             if (licType.Contains("ALL") || licType.Contains("WinRT") || licType.Contains("WP") || licType.Contains("UNIV"))

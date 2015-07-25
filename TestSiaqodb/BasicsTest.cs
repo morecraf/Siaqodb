@@ -3017,6 +3017,8 @@ namespace TestSiaqodb
          {
              using (Siaqodb _database = new Siaqodb(objPath))
              {
+                 _database.DropType<ClsWithLazyLoadFields>();
+
                  for (int i = 0; i < 10; i++)
                  {
                      ClsWithLazyLoadFields cls = new ClsWithLazyLoadFields();

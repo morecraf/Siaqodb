@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{19368999-DD20-4534-8377-3D58063F8CFD}</ProjectGuid>
+    <ProjectGuid>{AFF8BF44-5257-405E-A614-CB3168ED3B06}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sqo</RootNamespace>
@@ -44,11 +44,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\Unity3D\win\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;UNITY3D;</DefineConstants>
+    <OutputPath>bin\Debug\Unity3D\mac\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;LIC_U3D_MAC;MONOMAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Unity3D\win\Siaqodb.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Unity3D\mac\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -210,6 +210,8 @@
     <Compile Include="MetaObjects\DictionaryInfo.cs" />
     <Compile Include="MetaObjects\DocumentInfo.cs" />
     <Compile Include="Obfuscation\ObfuscationAttributes.cs" />
+    <Compile Include="PropertyResolver\MethodBasedRocks.cs" />
+    <Compile Include="PropertyResolver\PropertyResolver.cs" />
     <Compile Include="PropertyResolver\SilverlightPropertyResolver.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
     <Compile Include="SqoDataObject.cs" />
