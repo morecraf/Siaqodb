@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using LightningDB.Converters;
 using LightningDB.Native;
 
 namespace LightningDB
@@ -58,9 +57,7 @@ namespace LightningDB
             _openedDatabases = new Dictionary<string, LightningDatabase>();
             _databasesForReuse = new HashSet<uint>();
 
-            ConverterStore = new ConverterStore();
-            var defaultConverters = new DefaultConverters();
-            defaultConverters.RegisterDefault(this);
+          
         }
         private MDBStat GetStat()
         {
@@ -175,7 +172,7 @@ namespace LightningDB
         /// <summary>
         /// Converters to use when converting database keys and values.
         /// </summary>
-        public ConverterStore ConverterStore { get; private set; }
+       // public ConverterStore ConverterStore { get; private set; }
 
         /// <summary>
         /// Open the environment.
