@@ -39,6 +39,7 @@ namespace SiaqodbManager.ViewModel
         }
         public string ActualName { get; set; }
 
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         //EVENT HANDLER

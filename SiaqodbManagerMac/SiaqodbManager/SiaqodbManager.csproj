@@ -127,6 +127,7 @@
     </Compile>
     <Compile Include="Util\SiaqoMacUtil.cs" />
     <Compile Include="Controls\ObjectsViewCreator.cs" />
+    <Compile Include="Controls\CustomTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />

@@ -19,6 +19,7 @@ namespace SiaqodbManager.DataSourcesAdapters
 				viewModel.Name = value;
 			}
 		}
+
 	}
 }
 

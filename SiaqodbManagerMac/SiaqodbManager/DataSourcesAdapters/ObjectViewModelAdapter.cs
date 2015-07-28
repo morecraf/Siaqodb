@@ -29,7 +29,12 @@ namespace SiaqodbManager
 
 		public void RemoveRow (int rowIndex)
 		{
-			throw new NotImplementedException ();
+			viewModel.RemoveRow (rowIndex);
+		}
+
+		public void AddNewRow ()
+		{
+			viewModel.AddRow ();
 		}
 
 		public object GetValue (string columnName, int rowIndex)

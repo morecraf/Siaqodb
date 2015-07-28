@@ -31,15 +31,15 @@ namespace SiaqodbManager
 			headerCell.Selectable = false;
 		}
 
-		public void AddResultSet (int rowIndex)
+		public void AddNewRow ()
+		{
+			viewModel.AddNewRow ();
+		}
+
+		public void RemoveRow (int rowIndex)
 		{
 			viewModel.RemoveRow (rowIndex);
 		}
-
-//		public void ClearResultSet ()
-//		{
-//			sections.Clear ();
-//		}
 
 		public override int GetRowCount (NSTableView tableView)
 		{
@@ -76,6 +76,10 @@ namespace SiaqodbManager
 			return new NSString("0");
 		}
 			
+		public Type GetTypeOfColumn (string identifier)
+		{
+			return viewModel.Columns[identifier].Item2.FieldType;
+		}
 	}
 }
 

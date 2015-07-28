@@ -13,6 +13,12 @@ namespace SiaqodbManager
 	partial class MainWindowController
 	{
 		[Outlet]
+		MonoMac.AppKit.NSButton AddButton { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSButton CloseTabButton { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSButton ConnectButton { get; set; }
 
 		[Outlet]
@@ -22,6 +28,12 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSTextField PathInput { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSButton RemoveButton { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSView TableActionButtons { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSTabView TabView { get; set; }
 
 		[Outlet]
@@ -29,14 +41,14 @@ namespace SiaqodbManager
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (CloseTabButton != null) {
+				CloseTabButton.Dispose ();
+				CloseTabButton = null;
+			}
+
 			if (ConnectButton != null) {
 				ConnectButton.Dispose ();
 				ConnectButton = null;
-			}
-
-			if (TabView != null) {
-				TabView.Dispose ();
-				TabView = null;
 			}
 
 			if (MainWindow != null) {
@@ -49,9 +61,29 @@ namespace SiaqodbManager
 				PathInput = null;
 			}
 
+			if (TabView != null) {
+				TabView.Dispose ();
+				TabView = null;
+			}
+
 			if (TypesView != null) {
 				TypesView.Dispose ();
 				TypesView = null;
+			}
+
+			if (RemoveButton != null) {
+				RemoveButton.Dispose ();
+				RemoveButton = null;
+			}
+
+			if (AddButton != null) {
+				AddButton.Dispose ();
+				AddButton = null;
+			}
+
+			if (TableActionButtons != null) {
+				TableActionButtons.Dispose ();
+				TableActionButtons = null;
 			}
 		}
 	}

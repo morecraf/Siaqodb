@@ -13,30 +13,23 @@ namespace SiaqodbManager
 		public static object FromNSObject (NSObject macValue, MetaFieldViewModel metaField)
 		{
 			object value = null;
+			var stringValue = (macValue as NSString).ToString();
 			if(metaField.FieldType == typeof(Int32)){
-				var number = macValue as NSString;
-				value = Convert.ToInt32(number.ToString());
+				value = Convert.ToInt32(stringValue);
 			}else if(metaField.FieldType == typeof(Int16)){
-				var number = macValue as NSNumber;
-				value = number.Int16Value;
+				value = Convert.ToInt16(stringValue);
 			}else if(metaField.FieldType == typeof(Int64)){
-				var number = macValue as NSNumber;
-				value = number.Int64Value;
+				value = Convert.ToInt64(stringValue);
 			}else if(metaField.FieldType == typeof(Double)){
-				var number = macValue as NSNumber;
-				value = number.DoubleValue;
+				value = Convert.ToDouble(stringValue);
 			}else if(metaField.FieldType == typeof(UInt16)){
-				var number = macValue as NSNumber;
-				value = number.UInt16Value;
+				value = Convert.ToUInt16(stringValue);
 			}else if(metaField.FieldType == typeof(UInt32)){
-				var number = macValue as NSNumber;
-				value = number.UInt32Value;
+				value = Convert.ToUInt32(stringValue);
 			}else if(metaField.FieldType == typeof(UInt64)){
-				var number = macValue as NSNumber;
-				value = number.UInt64Value;
+				value = Convert.ToUInt64(stringValue);
 			}else if(metaField.FieldType == typeof(float)){
-				var number = macValue as NSNumber;
-				value = number.FloatValue;
+				value = Convert.ToDouble(stringValue);
 			}
 			return value;
 		}

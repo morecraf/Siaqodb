@@ -251,7 +251,7 @@ namespace SiaqodbManager.ViewModel
 
         internal void AddRow()
         {
-            int oid = Sqo.Internal._bs._io(siaqodb, metaType);
+			int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
             this.oids.Add(oid);
         }
     }
