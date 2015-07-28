@@ -83,11 +83,8 @@ namespace SiaqodbManager
         List<Sqo.MetaType> typesList;
         internal event EventHandler<MetaEventArgs> OpenObjects;
         Dictionary<int, MetaType> columnsTypes = new Dictionary<int, MetaType>();
+
         internal void Initialize(MetaType metaType, Siaqodb siaqodb, List<Sqo.MetaType> typesList)
-        {
-            Initialize(metaType, siaqodb, typesList, null);
-        }
-        internal void Initialize(MetaType metaType, Siaqodb siaqodb, List<Sqo.MetaType> typesList,List<int> oidsFiltered)
         {
             dataGridView1 = new System.Windows.Forms.DataGridView();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -118,18 +115,7 @@ namespace SiaqodbManager
             this.typesList = typesList;
             this.metaType = metaType;
             this.siaqodb = siaqodb;
-            if (oidsFiltered == null)
-            {
-                oids = siaqodb.LoadAllOIDs(metaType);
-            }
-            else
-            {
-                oids = oidsFiltered;
-            }
-            if (oids == null)
-            {
-                MessageBox.Show("FileName of this Type has not default name of siaqodb database file!");
-            }
+         
             dataGridView1.Columns.Clear();
             dataGridView1.Columns.Add("OID", "OID");
             //dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.SystemColors.ControlDark;
@@ -156,15 +142,7 @@ namespace SiaqodbManager
                     dataGridView1.Columns.Add(f.Name, f.Name);
                 }
             }
-
-            if (oids != null)
-            {
-                dataGridView1.RowCount = oids.Count + 1;
-            }
-            if (oids != null)
-            {
-                //this.lblNrRows.Text = oids.Count + " rows";
-            }
+            dataGridView1.RowCount = viewModel.NrOFObjects + 1;
         }
         int currentSortedColumn = -1;
         System.Windows.Forms.SortOrder currentSortOrder;
@@ -240,13 +218,7 @@ namespace SiaqodbManager
             }
             dataGridView1.Refresh();
         }
-        protected void OnOpenObjects(MetaEventArgs args)
-        {
-            if (this.OpenObjects != null)
-            {
-                this.OpenObjects(this, args);
-            }
-        }
+  
         void dataGridView1_CellDoubleClick(object sender, System.Windows.Forms.DataGridViewCellEventArgs e)
         {
             if (e.RowIndex > 0 )
@@ -255,7 +227,8 @@ namespace SiaqodbManager
                 {
                     if (this.dataGridView1.Columns[e.ColumnIndex].ValueType == typeof(string))
                     {
-                        this.EditComplexObject(e.RowIndex, e.ColumnIndex);
+                        var columnName = dataGridView1.Columns[e.ColumnIndex].HeaderText;
+                        viewModel.EditComplexObject(e.RowIndex, e.ColumnIndex,columnName);
                     }
                     else
                     {
@@ -274,7 +247,8 @@ namespace SiaqodbManager
                 {
                     if (this.dataGridView1.Columns[e.ColumnIndex].ValueType == typeof(string))
                     {
-                        this.EditComplexObject(e.RowIndex, e.ColumnIndex);
+                        var columnName = dataGridView1.Columns[e.ColumnIndex].HeaderText;
+                        viewModel.EditComplexObject(e.RowIndex,e.ColumnIndex, columnName);
                     }
                     else
                     {
@@ -284,32 +258,6 @@ namespace SiaqodbManager
             }
         }
 
-        private void EditComplexObject(int rowIndex, int columnIndex)
-        {
-            MetaField fi = metaType.Fields[columnIndex - 1];
-
-            List<int> oids = new List<int>();
-            int TID=0;
-            if (this.dataGridView1.Rows[rowIndex].Cells[columnIndex].Value == "[null]")
-            {
-                return;
-            }
-            if (this.dataGridView1.Rows[rowIndex].Cells[0].Value != null)//is not new row
-            {
-                _bs._loidtid(this.siaqodb, (int)this.dataGridView1.Rows[rowIndex].Cells[0].Value, this.metaType, fi.Name, ref oids, ref TID);
-                if (oids.Count == 0 || TID <= 0)
-                {
-
-                }
-                else
-                {
-
-                    MetaType mtOfComplex = FindMeta(TID);
-
-                    this.OnOpenObjects(new MetaEventArgs(mtOfComplex, oids));
-                }
-            }
-        }
         private MetaType FindMeta(int TID)
         {
             return typesList.First<MetaType>(tii => tii.TypeID == TID);

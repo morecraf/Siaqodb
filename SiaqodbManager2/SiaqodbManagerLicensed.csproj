@@ -94,9 +94,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\BindableTextEditor.cs" />
     <Compile Include="DatabaseInfo.xaml.cs">
       <DependentUpon>DatabaseInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DialogService\SaveDialogService.cs" />
     <Compile Include="Entities\TypeMetaDetail.cs" />
     <Compile Include="MacWinInterface\IDialogService.cs" />
     <Compile Include="MacWinInterface\IMessageBox.cs" />
@@ -110,6 +112,7 @@
     <Compile Include="ViewModel\MetaTypeViewModel.cs" />
     <Compile Include="ViewModel\MyCommand.cs" />
     <Compile Include="ViewModel\ObjectViewModel.cs" />
+    <Compile Include="ViewModel\QueryViewModel.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

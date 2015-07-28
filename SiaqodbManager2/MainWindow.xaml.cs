@@ -70,12 +70,6 @@ namespace SiaqodbManager
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //DefaultDocument uq = new DefaultDocument();
-            //uq.Title = "Start";
-            //SetDefaultSettings(uq);
-            //uq.Show(this.dockingManager1);
-            //uq.Activate();
-
             dockingManager1.ActiveDocumentChanged += new EventHandler(dockingManager1_ActiveDocumentChanged);
             dockingManager1.DocumentClosed += new EventHandler(dockingManager1_DocumentClosed);
             dockingManager1.DocumentClosing += new EventHandler<System.ComponentModel.CancelEventArgs>(dockingManager1_DocumentClosing);
@@ -139,7 +133,8 @@ namespace SiaqodbManager
 
         private void OnNewLINQ(object sender, RoutedEventArgs e)
         {
-            QueryDocument uq = new QueryDocument();
+            var queryViewModel = viewModel.CreateQueryModel();
+            QueryDocument uq = new QueryDocument(queryViewModel);
             uq.Title = "New Query";
             uq.Initialize(this.cmbDBPath.Text);
             SetDefaultSettings(uq);
@@ -207,7 +202,8 @@ namespace SiaqodbManager
                 using (StreamReader sr = new StreamReader(opf.FileName))
                 {
                     string s = sr.ReadToEnd();
-                    QueryDocument uq = new QueryDocument();
+                    var queryViewModel = viewModel.CreateQueryModel();
+                    QueryDocument uq = new QueryDocument(queryViewModel);
                     uq.Title = opf.FileName;
                     uq.Initialize(this.cmbDBPath.Text);
                     this.SetDefaultSettings(uq);
@@ -318,7 +314,6 @@ namespace SiaqodbManager
 
         void mitem_Click(object sender, RoutedEventArgs e)
         {
-      //      dataGrid.DataContext = viewModel.ObjectsTable.Objects;
             LoadObjects();
         }
 
@@ -332,9 +327,9 @@ namespace SiaqodbManager
         {
             var metaType = treeView1.SelectedItem as MetaTypeViewModel;
             if(metaType != null){
-                var objectsModel = viewModel.CreateObjectesView(metaType);
+                var objectsModel = viewModel.CreateObjectsModel(metaType);
+                objectsModel.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
                 ObjectsDocument uco = new ObjectsDocument(objectsModel);
-             //   uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
                 uco.Initialize(metaType.MetaType, viewModel.Siaqodb, siaqodbList);
                 uco.Title = metaType.Name;
                 SetDefaultSettings(uco);
@@ -350,7 +345,6 @@ namespace SiaqodbManager
             //    {
             //        ObjectsDocument uco = new ObjectsDocument();
             //        uco.Initialize(mt, siaqodb,siaqodbList);
-            //        uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
             //        uco.Title = mt.Name;
             //        SetDefaultSettings(uco);
             //        uco.Show(this.dockingManager1);
@@ -366,19 +360,19 @@ namespace SiaqodbManager
 
         void uco_OpenObjects(object sender, MetaEventArgs e)
         {
-            var objectsModel = viewModel.CreateObjectesView(new MetaTypeViewModel(e.mType));
+            var objectsModel = viewModel.CreateObjectsModel(new MetaTypeViewModel(e.mType),e.oids);
+            objectsModel.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
             ObjectsDocument uco = new ObjectsDocument(objectsModel);
-       //     uco.Initialize(e.mType, siaqodb, siaqodbList,e.oids);
-            uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
+            uco.Initialize(e.mType, siaqodb, siaqodbList);
             uco.Title = e.mType.Name;
             SetDefaultSettings(uco);
             uco.Show(this.dockingManager1);
             uco.Activate();
-            btnExecute.IsEnabled = false;
-            menuExecute.IsEnabled = false;
-            btnSave.IsEnabled = false;
-            menuSave.IsEnabled = false;
-            menuSaveAs.IsEnabled = false;
+            //btnExecute.IsEnabled = false;
+            //menuExecute.IsEnabled = false;
+            //btnSave.IsEnabled = false;
+            //menuSave.IsEnabled = false;
+            //menuSaveAs.IsEnabled = false;
         }
         private void SetDefaultSettings(DocumentContent doc)
         {
