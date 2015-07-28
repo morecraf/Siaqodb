@@ -40,7 +40,7 @@ namespace Sqo
                 throw new InvalidOperationException("Cannot enumerate more than once");
             }
             List<T> list = new List<T>();
-            while (await e.MoveNextAsync())
+            while (e.MoveNext())
             {
                 list.Add(e.Current);
             }

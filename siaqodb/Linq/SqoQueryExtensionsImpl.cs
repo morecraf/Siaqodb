@@ -61,7 +61,7 @@ namespace Sqo
         }
 		public static ISqoQuery<TRet> Select<TSource, TRet>(ISqoQuery<TSource> self, Expression<Func<TSource, TRet>> selector)
 		{
-#if ASYNC_LMDB
+#if ASYNC_LMDB66
             Func<TSource, TRet> fn = selector.Compile();
 
 
