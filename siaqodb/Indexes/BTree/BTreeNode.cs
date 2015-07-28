@@ -1037,7 +1037,11 @@ namespace Sqo.Indexes
                 {
                     dumpedKeys.AddRange(Children[i].DumpKeys());
                 }
-                dumpedKeys.Add(Keys[i]);
+                if (this.Values[i].Length > 0)
+                {
+                    dumpedKeys.Add(Keys[i]);
+                }
+                
             }
             if (NumKeysUsed > 0)
             {

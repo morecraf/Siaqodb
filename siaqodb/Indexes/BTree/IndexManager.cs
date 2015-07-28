@@ -352,6 +352,8 @@ namespace Sqo.Indexes
        
        public IBTree GetIndex(string field, SqoTypeInfo tinfo)
        {
+           if (cacheIndexes == null)
+               return null;
            return this.cacheIndexes.GetIndex(tinfo, field);
        }
         

@@ -2479,11 +2479,11 @@ savedObject(this, e);
             Sqo.Indexes.IBTree index = this.GetIndex(fieldNameAsInDB, typeof(T));
             if (index != null)
             {
-                Sqo.Indexes.IBTree<TIndex> indexT=(Sqo.Indexes.IBTree<TIndex>)index;
+                Sqo.Indexes.IBTree<TIndex> indexT = (Sqo.Indexes.IBTree<TIndex>)index;
                 return indexT.DumpKeys();
             }
 
-            throw new SiaqodbException("Index not exists for field:" + fieldName);
+            else return new List<TIndex>();
             
         }
         /// <summary>
