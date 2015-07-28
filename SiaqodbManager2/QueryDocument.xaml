@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ad="clr-namespace:AvalonDock;assembly=AvalonDock"
+             xmlns:my="clr-namespace:SiaqodbManager.Controls"
              mc:Ignorable="d" d:DesignHeight="404" d:DesignWidth="854" xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit">
     <Grid>
         <Grid.RowDefinitions>
@@ -12,7 +13,7 @@
            
         </Grid.RowDefinitions>
        
-        <avalonedit:TextEditor HorizontalAlignment="Stretch"  Name="textEditor1" VerticalAlignment="Stretch"   Grid.Row="0"/>
+        <my:BindableTextEditor HorizontalAlignment="Stretch" Text="{Binding Linq,Mode=TwoWay}"  x:Name="textEditor1" VerticalAlignment="Stretch" Grid.Row="0"/>
         <GridSplitter Height="5" Background="Gray"
                 VerticalAlignment="Top" HorizontalAlignment="Stretch"  Grid.Row="1"  />
        

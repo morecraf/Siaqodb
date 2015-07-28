@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Collections;
 using System.Runtime.Serialization.Formatters.Binary;
+using SiaqodbManager.ViewModel;
 
 namespace SiaqodbManager
 {
@@ -26,12 +27,12 @@ namespace SiaqodbManager
     /// </summary>
     public partial class QueryDocument : DocumentContent
     {
-        public QueryDocument()
+        public QueryDocument(QueryViewModel queryViewModel)
         {
             InitializeComponent();
-
-            DataContext = this;
+            DataContext = queryViewModel;
         }
+
 
         #region TextContent
 
@@ -81,7 +82,6 @@ namespace SiaqodbManager
         public void Initialize(string path)
         {
             //string appPath = System.IO.Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
-            textEditor1.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
 
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -103,156 +103,21 @@ namespace SiaqodbManager
             
         }
         private string file;
+        private ViewModel.QueryViewModel queryViewModel;
         public void Save()
         {
-            if (this.file == null)
-            {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.DefaultExt = ".linq";
-                sfd.Filter = "(*.linq)|*.linq|All Files(*.*)|*.*";
-                DialogResult dg = sfd.ShowDialog(this.GetIWin32Window());
-                if (dg == DialogResult.OK)
-                {
-
-                    using (StreamWriter sw = new StreamWriter(sfd.FileName))
-                    {
-                        sw.Write(this.textEditor1.Text);
-                        this.file = sfd.FileName;
-                    }
-                }
-            }
-            else
-            {
-                using (StreamWriter sw = new StreamWriter(this.file))
-                {
-                    sw.Write(this.textEditor1.Text);
-                }
-            }
+            queryViewModel.Save(path);
         }
         public void SaveAs()
         {
-
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.DefaultExt = ".linq";
-            sfd.Filter = "(*.linq)|*.linq|All Files(*.*)|*.*";
-            DialogResult dg = sfd.ShowDialog(this.GetIWin32Window());
-            if (dg == DialogResult.OK)
-            {
-
-                using (StreamWriter sw = new StreamWriter(sfd.FileName))
-                {
-                    sw.Write(this.textEditor1.Text);
-                    this.file = sfd.FileName;
-                }
-            }
-
+            queryViewModel.SaveAs();
         }
         public void Execute(string path)
         {
-            if (this.path != path)
-            {
-                if (!System.IO.Directory.Exists(path))
-                {
-                    textBox1.Text = "Invalid folder! choose a valid database folder";
-                    tabControl1.SelectedIndex = 1;
-                    return;
-                }
-
-                this.path = path;
-            }
-
-            textBox1.Text = "";
-            
-            Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
-            
-            Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + "\\config");
-            Sqo.IObjectList<NamespaceItem> namespaces = siaqodbConfig.LoadAll<NamespaceItem>();
-            Sqo.IObjectList<ReferenceItem> references = siaqodbConfig.LoadAll<ReferenceItem>();
-            siaqodbConfig.Close();
-            
-            EncryptionSettings.SetEncryptionSettings();//set back settings
-
-            string ifEncrypted = @" Sqo.SiaqodbConfigurator.SetLicense(@"" qU3TtvA4T4L30VSlCCGUTbooYKG1XXCnjJ+jaPPrPLaD7PdPw9HujjxmkZ467OqZ"");";
-            if (EncryptionSettings.IsEncryptedChecked)
-            {
-                ifEncrypted += @" Sqo.SiaqodbConfigurator.EncryptedDatabase=true;
-                                 Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm." + EncryptionSettings.Algorithm + @"); 
-
-                                ";
-                if (!string.IsNullOrEmpty(EncryptionSettings.Pwd))
-                {
-                    ifEncrypted += @" SiaqodbConfigurator.SetEncryptionPassword(""" + EncryptionSettings.Pwd + @""");";
-
-                }
-            }
-#if TRIAL
-            ifEncrypted += @" SiaqodbConfigurator.SetTrialLicense("""+TrialLicense.LicenseKey+@""");";
-#endif
-            string metBody = ifEncrypted + @" Siaqodb siaqodb = Sqo.Internal._bs._ofm(@""" + this.path + @""",""SiaqodbManager,SiaqodbManager2"");
-			
-							object list= (" + this.textEditor1.Text + @").ToList();
-                            siaqodb.Close();
-                            return list;
-							 ";
-            var c = new CodeDom();
-            //c.AddReference(@"System.Core.dll");
-            //c.AddReference(@"siaqodb.dll");
-            //c.AddReference(@"System.Windows.Forms.dll");
-
-
-            foreach (ReferenceItem refi in references)
-            {
-                c.AddReference(refi.Item);
-            }
-            System.CodeDom.CodeNamespace n = c.AddNamespace("LINQQuery");
-            foreach (NamespaceItem nitem in namespaces)
-            {
-                n.Imports(nitem.Item);
-            }
-            n.Imports("System.Collections.Generic")
-            .Imports("System.Linq")
-            .Imports("Sqo")
-
-
-
-            .AddClass(
-              c.Class("RunQuery")
-                .AddMethod(c.Method("object", "FilterByLINQ", "", metBody)));
-
-            Assembly assembly = c.Compile( WriteErrors);
-          
-            if (assembly != null)
-            {
-                Type t = assembly.GetType("LINQQuery.RunQuery");
-                MethodInfo method = t.GetMethod("FilterByLINQ");
-
-                try
-                {
-                    var retVal = method.Invoke(null, null);
-                   
-                    IList w = ((IList)retVal);
-
-                    this.dataGridView1.DataSource = w;
-                    this.dataGridView1.AutoGenerateColumns = true;
-                    this.tabControl1.SelectedIndex = 0;
-                    //this.lblNrRows.Text = ar.Count + " rows";
-                }
-                catch (Exception ex)
-                {
-                    WriteErrors(ex.ToString());
-                    this.tabControl1.SelectedIndex = 1;
-                }
-            }
-            else
-            {
-                this.tabControl1.SelectedIndex = 1;
-            }
-
+            queryViewModel.Execute(path);
+           
         }
-        private void WriteErrors(string errorLine)
-        {
-            this.textBox1.Text += errorLine + "\r\n";
-        }
+      
         public string GetFile()
         {
             return file;
@@ -260,7 +125,7 @@ namespace SiaqodbManager
 
         internal void SetText(string s, string file)
         {
-            this.textEditor1.Text = s;
+     //       this.textEditor1.Text = s;
             this.file = file;
         }
     }

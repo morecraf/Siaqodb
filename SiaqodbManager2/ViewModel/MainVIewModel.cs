@@ -269,7 +269,7 @@ namespace SiaqodbManager.ViewModel
         public ObservableCollection<ConnectionItem> List { get; set; }
         public ObservableCollection<MetaTypeViewModel> TypesList { get; set; }
 
-		public ObjectViewModel CreateObjectesView (MetaTypeViewModel viewModel)
+		public ObjectViewModel CreateObjectsModel (MetaTypeViewModel viewModel)
 		{
 			return new ObjectViewModel (viewModel,TypesList,siaqodb);
 		}
@@ -309,6 +309,11 @@ namespace SiaqodbManager.ViewModel
                 siaqodb = value;
                 OnPropertyChanged();
             }
+        }
+
+        internal QueryViewModel CreateQueryModel()
+        {
+            throw new NotImplementedException();
         }
     }
 }

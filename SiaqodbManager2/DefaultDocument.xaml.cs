@@ -28,7 +28,6 @@ namespace SiaqodbManager
         public DefaultDocument()
         {
             InitializeComponent();
-
             DataContext = this;
         }
 
