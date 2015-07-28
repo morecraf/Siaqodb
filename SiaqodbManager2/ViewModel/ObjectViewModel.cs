@@ -1,4 +1,5 @@
 ﻿using Sqo;
+using Sqo.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,13 +18,23 @@ namespace SiaqodbManager.ViewModel
        
         private string cell;
 
-		public ObjectViewModel(MetaTypeViewModel SelectedType, IEnumerable<MetaTypeViewModel> TypesList, Sqo.Siaqodb siaqodb)
+        public ObjectViewModel(MetaTypeViewModel SelectedType, IEnumerable<MetaTypeViewModel> TypesList, Sqo.Siaqodb siaqodb):this(SelectedType,TypesList,siaqodb,null)
+        {
+           
+        }
+		public ObjectViewModel(MetaTypeViewModel SelectedType, IEnumerable<MetaTypeViewModel> TypesList, Sqo.Siaqodb siaqodb,List<int> oidsToShow)
 		{
 			// TODO: Complete member initialization
 			this.SelectedType = SelectedType;
 			this.TypesList = TypesList;
 			this.siaqodb = siaqodb;
-			oids = siaqodb.LoadAllOIDs(SelectedType.MetaType);
+            if(oidsToShow == null || oidsToShow.Count ==0){
+			    oids = siaqodb.LoadAllOIDs(SelectedType.MetaType);
+            }
+            else
+            {
+                oids = oidsToShow;
+            }
 
 			ColumnIndexes = new Dictionary<string, Tuple<int, MetaFieldViewModel>> ();
 			var oidType = new MetaFieldViewModel
@@ -33,8 +44,6 @@ namespace SiaqodbManager.ViewModel
 				ActualName="OID"
 			};
 			ColumnIndexes ["OID"] = new Tuple<int, MetaFieldViewModel>(0,oidType);
-//			Objects = new DataTable();
-//			Objects.Columns.Add("OID");
 
 			var index = 1;
 			foreach (var field in SelectedType.Fields)
@@ -254,5 +263,40 @@ namespace SiaqodbManager.ViewModel
             int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
             this.oids.Add(oid);
         }
+
+        internal void EditComplexObject(int rowIndex,int columnIndex, string columnName)
+        {
+            MetaField fi = SelectedType.MetaType.Fields[columnIndex-1];
+
+            List<int> selectedOids = new List<int>();
+            int TID=0;
+            var value = GetValue(columnName,rowIndex);
+            if (value == "[null]")
+            {
+                return;
+            }
+            if (oids[0] != null)//is not new row
+            {
+                _bs._loidtid(this.siaqodb, Convert.ToInt32(oids[0]), SelectedType.MetaType, fi.Name, ref selectedOids, ref TID);
+                if (selectedOids.Count == 0 || TID <= 0)
+                {
+
+                }
+                else
+                {
+                    MetaType mtOfComplex = FindMeta(TID);
+                    OnOpenObjects(new MetaEventArgs(mtOfComplex, selectedOids));
+                }
+            }
+        }
+        protected void OnOpenObjects(MetaEventArgs args)
+        {
+            if (this.OpenObjects != null)
+            {
+                this.OpenObjects(this, args);
+            }
+        }
+
+        public EventHandler<MetaEventArgs> OpenObjects;
     }
 }

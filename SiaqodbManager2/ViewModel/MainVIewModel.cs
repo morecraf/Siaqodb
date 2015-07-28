@@ -203,7 +203,6 @@ namespace SiaqodbManager.ViewModel
 			//  ObjectsTable = new ObjectViewModel(SelectedType,TypesList,siaqodb);
             SaveEnabled = false;
             ExecuteEnabled = false;
-            
         }
 
         public MyCommand<object> ConnectCommand {get;set;}
@@ -269,9 +268,13 @@ namespace SiaqodbManager.ViewModel
         public ObservableCollection<ConnectionItem> List { get; set; }
         public ObservableCollection<MetaTypeViewModel> TypesList { get; set; }
 
-		public ObjectViewModel CreateObjectsModel (MetaTypeViewModel viewModel)
+        public ObjectViewModel CreateObjectsModel(MetaTypeViewModel viewModel)  
+        {
+            return CreateObjectsModel(viewModel, null);
+        }
+		public ObjectViewModel CreateObjectsModel (MetaTypeViewModel viewModel,List<int> oids)
 		{
-			return new ObjectViewModel (viewModel,TypesList,siaqodb);
+            return new ObjectViewModel(viewModel, TypesList, siaqodb, oids);
 		}
 
 //        public ObjectViewModel ObjectsTable

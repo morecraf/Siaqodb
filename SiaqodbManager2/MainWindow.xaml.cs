@@ -328,8 +328,8 @@ namespace SiaqodbManager
             var metaType = treeView1.SelectedItem as MetaTypeViewModel;
             if(metaType != null){
                 var objectsModel = viewModel.CreateObjectsModel(metaType);
+                objectsModel.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
                 ObjectsDocument uco = new ObjectsDocument(objectsModel);
-                uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
                 uco.Initialize(metaType.MetaType, viewModel.Siaqodb, siaqodbList);
                 uco.Title = metaType.Name;
                 SetDefaultSettings(uco);
@@ -360,10 +360,10 @@ namespace SiaqodbManager
 
         void uco_OpenObjects(object sender, MetaEventArgs e)
         {
-            var objectsModel = viewModel.CreateObjectsModel(new MetaTypeViewModel(e.mType));
+            var objectsModel = viewModel.CreateObjectsModel(new MetaTypeViewModel(e.mType),e.oids);
+            objectsModel.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
             ObjectsDocument uco = new ObjectsDocument(objectsModel);
-       //     uco.Initialize(e.mType, siaqodb, siaqodbList,e.oids);
-            uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
+            uco.Initialize(e.mType, siaqodb, siaqodbList);
             uco.Title = e.mType.Name;
             SetDefaultSettings(uco);
             uco.Show(this.dockingManager1);
