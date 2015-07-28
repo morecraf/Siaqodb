@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SiaqodbManager.Entities
 {
-    class MetaEventArgs:EventArgs
+    public class MetaEventArgs:EventArgs
     {
         public MetaType mType;
         public List<int> oids;

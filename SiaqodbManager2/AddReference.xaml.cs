@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Windows.Forms;
 using System.Reflection;
+using SiaqodbManager.ViewModel;
 
 namespace SiaqodbManager
 {
@@ -98,7 +99,7 @@ namespace SiaqodbManager
                 finally
                 {
                     siaqodb.Close();
-                    EncryptionSettings.SetEncryptionSettings();//set back settings
+                   // EncryptionSettings.SetEncryptionSettings();
                 }
             }
 
@@ -135,7 +136,7 @@ namespace SiaqodbManager
                 finally
                 {
                     siaqodb.Close();
-                    EncryptionSettings.SetEncryptionSettings();//set back settings
+                    EncryptionViewModel.Instance.SetEncryptionSettings();//set back settings
                 }
 
             }

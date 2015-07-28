@@ -95,9 +95,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\BindableTextEditor.cs" />
+    <Compile Include="Controls\PasswordControl.cs" />
     <Compile Include="DatabaseInfo.xaml.cs">
       <DependentUpon>DatabaseInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DialogService\MessageDialog.cs" />
     <Compile Include="DialogService\SaveDialogService.cs" />
     <Compile Include="Entities\MetaEventArgs.cs" />
     <Compile Include="Entities\TypeMetaDetail.cs" />
@@ -108,6 +110,7 @@
       <DependentUpon>SetTrialLicense.xaml</DependentUpon>
     </Compile>
     <Compile Include="TrialLicense.cs" />
+    <Compile Include="ViewModel\EncryptionViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MetaFieldViewModel.cs" />
     <Compile Include="ViewModel\MetaTypeViewModel.cs" />

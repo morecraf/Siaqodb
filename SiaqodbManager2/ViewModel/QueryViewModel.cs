@@ -113,19 +113,18 @@ namespace SiaqodbManager.ViewModel
             Sqo.IObjectList<ReferenceItem> references = siaqodbConfig.LoadAll<ReferenceItem>();
             siaqodbConfig.Close();
 
-            EncryptionSettings.SetEncryptionSettings();//set back settings
+            EncryptionViewModel.Instance.SetEncryptionSettings();//set back settings
 
             string ifEncrypted = @" Sqo.SiaqodbConfigurator.SetLicense(@"" qU3TtvA4T4L30VSlCCGUTbooYKG1XXCnjJ+jaPPrPLaD7PdPw9HujjxmkZ467OqZ"");";
-            if (EncryptionSettings.IsEncryptedChecked)
+            if (EncryptionViewModel.Instance.IsEncryptedChecked)
             {
                 ifEncrypted += @" Sqo.SiaqodbConfigurator.EncryptedDatabase=true;
-                                 Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm." + EncryptionSettings.Algorithm + @"); 
+                                 Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm." + EncryptionViewModel.Instance.Algorithm + @"); 
 
                                 ";
-                if (!string.IsNullOrEmpty(EncryptionSettings.Pwd))
+                if (!string.IsNullOrEmpty(EncryptionViewModel.Instance.Pwd))
                 {
-                    ifEncrypted += @" SiaqodbConfigurator.SetEncryptionPassword(""" + EncryptionSettings.Pwd + @""");";
-
+                    ifEncrypted += @" SiaqodbConfigurator.SetEncryptionPassword(""" + EncryptionViewModel.Instance.Pwd + @""");";
                 }
             }
 #if TRIAL

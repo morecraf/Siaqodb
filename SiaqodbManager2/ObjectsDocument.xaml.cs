@@ -18,6 +18,7 @@ using Sqo.Exceptions;
 using System.Collections;
 using Sqo.Internal;
 using SiaqodbManager.ViewModel;
+using SiaqodbManager.Entities;
 
 namespace SiaqodbManager
 {

@@ -1,4 +1,5 @@
-﻿using Sqo;
+﻿using SiaqodbManager.Entities;
+using Sqo;
 using Sqo.Internal;
 using System;
 using System.Collections.Generic;

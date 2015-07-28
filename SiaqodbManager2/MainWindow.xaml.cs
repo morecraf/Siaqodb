@@ -371,7 +371,7 @@ namespace SiaqodbManager
             uco.Activate();
             //btnExecute.IsEnabled = false;
             //menuExecute.IsEnabled = false;
-            //btnSave.IsEnabled = false;
+            //btnSave.IsEnabled = false; 
             //menuSave.IsEnabled = false;
             //menuSaveAs.IsEnabled = false;
         }
@@ -384,8 +384,8 @@ namespace SiaqodbManager
 
         private void menuEncryption_Click(object sender, RoutedEventArgs e)
         {
-            EncryptionSettings es = new EncryptionSettings();
-            bool? res= es.ShowDialog();
+            EncryptionSettings es = new EncryptionSettings(EncryptionViewModel.Instance);
+            bool? res = es.ShowDialog();
             if (res.HasValue )
             {
                 if (res.Value)
