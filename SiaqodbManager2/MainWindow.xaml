@@ -112,7 +112,7 @@
 
         <my:DockingManager  Name="dockingManager1"  Grid.Row="3" Margin="10,0,-10,0" >
             <my:ResizingPanel  Orientation="Horizontal" >
-                <my:DockablePane my:ResizingPanel.ResizeWidth="270" Name="dockablePane1" Margin="0,0,12,0" >
+                <my:DockablePane my:ResizingPanel.ResizeWidth="270" Name="dockablePane1" Margin="0,0,21,0" >
                     <my:DockableContent Height="50" Name="dockableContent1" Width="100" Title="Database explorer">
 
                         <TreeView Name="treeView1" ItemsSource="{Binding TypesList}"  MouseDoubleClick="treeView1_MouseDoubleClick">
@@ -137,16 +137,12 @@
                         </TreeView>
                     </my:DockableContent>
                 </my:DockablePane>
-                <my:DocumentPane  Name="documentPane1" Margin="-18,0,10,0">
+                <my:DocumentPane  Name="documentPane1" Margin="-22,0,10,0">
                     <local:DefaultDocument Visibility="{Binding StartEnabled,TargetNullValue=Collapsed}" Title="Start">
                         
                     </local:DefaultDocument>
                 </my:DocumentPane>
-                <my:DocumentPane  Margin="-18,0,10,0">
-                    <local:DefaultDocument   Visibility="{Binding StartEnabled,TargetNullValue=Collapsed}" Title="Start">
-
-                    </local:DefaultDocument>
-                </my:DocumentPane>
+            
             </my:ResizingPanel>
         </my:DockingManager>
         

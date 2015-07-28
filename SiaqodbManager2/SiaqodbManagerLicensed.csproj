@@ -99,6 +99,7 @@
       <DependentUpon>DatabaseInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="DialogService\SaveDialogService.cs" />
+    <Compile Include="Entities\MetaEventArgs.cs" />
     <Compile Include="Entities\TypeMetaDetail.cs" />
     <Compile Include="MacWinInterface\IDialogService.cs" />
     <Compile Include="MacWinInterface\IMessageBox.cs" />

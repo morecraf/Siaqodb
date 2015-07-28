@@ -18,6 +18,7 @@ using System.IO;
 using SiaqodbManager.Helpers;
 using System.Diagnostics;
 using SiaqodbManager.ViewModel;
+using SiaqodbManager.Entities;
 namespace SiaqodbManager
 {
     /// <summary>
