@@ -19,6 +19,7 @@ using SiaqodbManager.Helpers;
 using System.Diagnostics;
 using SiaqodbManager.ViewModel;
 using SiaqodbManager.Entities;
+using SiaqodbManager.DialogService;
 namespace SiaqodbManager
 {
     /// <summary>
@@ -134,7 +135,7 @@ namespace SiaqodbManager
 
         private void OnNewLINQ(object sender, RoutedEventArgs e)
         {
-            var queryViewModel = viewModel.CreateQueryModel();
+            var queryViewModel = viewModel.CreateQueryModel(new SaveLinqDialogService());
             QueryDocument uq = new QueryDocument(queryViewModel);
             uq.Title = "New Query";
             uq.Initialize(this.cmbDBPath.Text);
@@ -203,7 +204,7 @@ namespace SiaqodbManager
                 using (StreamReader sr = new StreamReader(opf.FileName))
                 {
                     string s = sr.ReadToEnd();
-                    var queryViewModel = viewModel.CreateQueryModel();
+                    var queryViewModel = viewModel.CreateQueryModel(new SaveLinqDialogService());
                     QueryDocument uq = new QueryDocument(queryViewModel);
                     uq.Title = opf.FileName;
                     uq.Initialize(this.cmbDBPath.Text);

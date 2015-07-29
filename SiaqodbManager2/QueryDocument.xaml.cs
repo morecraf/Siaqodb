@@ -31,6 +31,7 @@ namespace SiaqodbManager
         {
             InitializeComponent();
             DataContext = queryViewModel;
+            this.queryViewModel = queryViewModel;
         }
 
 
@@ -115,7 +116,6 @@ namespace SiaqodbManager
         public void Execute(string path)
         {
             queryViewModel.Execute(path);
-           
         }
       
         public string GetFile()

@@ -1,4 +1,5 @@
-﻿using Sqo;
+﻿using SiaqodbManager.DialogService;
+using Sqo;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -314,9 +315,9 @@ namespace SiaqodbManager.ViewModel
             }
         }
 
-        internal QueryViewModel CreateQueryModel()
+        internal QueryViewModel CreateQueryModel(SaveLinqDialogService saveLinqService)
         {
-            throw new NotImplementedException();
+            return new QueryViewModel(saveLinqService);
         }
     }
 }
