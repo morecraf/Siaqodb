@@ -82,6 +82,13 @@ namespace SiaqodbManager
 			NSApplication.SharedApplication.RunModalForWindow(controller.Window);
 		}
 
+		partial void OnReferences (NSObject sender)
+		{
+			var controller = new ReferenceWindowController ();
+			NSApplication.SharedApplication.RunModalForWindow(controller.Window);
+		}
+
+
 		//BIND THE LOGIN PANEL
 		public  override void AwakeFromNib ()
 		{
@@ -156,11 +163,19 @@ namespace SiaqodbManager
 		void OnLinqTab (object sender, EventArgs e)
 		{
 			var tabViewItem = new NSTabViewItem ();
+			var queryView = new NSView ();
 
 			var documentView = new DocumentTextView ();
-			var queryView = mainViewModel.CreateQueryView (new SaveFileService());
-			documentView.Bind ("attributedString",queryView,"Linq",BindingUtil.ContinuouslyUpdatesValue);
+			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService());
+			documentView.Bind ("attributedString",queryViewModel,"Linq",BindingUtil.ContinuouslyUpdatesValue);
 
+			BindButton (queryViewModel,"ExecuteCommand",ExecuteButton);
+
+			var tableView = new NSTableView ();
+			tableView.DataSource = new ObjectsDataSource ();
+
+			queryView.AddSubview (documentView);
+			queryView.AddSubview (tableView);
 			tabViewItem.View.AddSubview (documentView);
 
 			tabViewItem.Label = "New linq doc";

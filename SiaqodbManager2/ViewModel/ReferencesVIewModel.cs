@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace SiaqodbManager.ViewModel
 {
-    class ReferencesViewModel: INotifyPropertyChanged
+	public class ReferencesViewModel: INotifyPropertyChanged
     {
-        private string namespaceText;
+		private string namespaceText = "";
         IDialogService fileDialog;
 
         internal List<ReferenceItem> assemblies = new List<ReferenceItem>();
@@ -148,13 +148,18 @@ namespace SiaqodbManager.ViewModel
             {
                 Item = reference
             });
+			OnPropertyChanged ("References");
         }
         public void OnRemoveRef(object obj)
         {
             if (SelectedRef != null)
             {
-                References.Remove(SelectedRef);
+				var reference = References.FirstOrDefault (r=> r.Item.Equals(selectedRef.Item));
+				if(reference != null){
+					References.Remove (reference);
+				}
             }
+			OnPropertyChanged ("References");
         }
 
         public void OnAddStandard(object obj)
@@ -163,10 +168,10 @@ namespace SiaqodbManager.ViewModel
             References.Add(new ReferenceItem { Item = "System.Core.dll" });
             References.Add(new ReferenceItem { Item ="System.Windows.Forms.dll"});
             References.Add(new ReferenceItem { Item = "siaqodb.dll" });
+			OnPropertyChanged ("References");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private DialogService.ReferenceFileService referenceFileService;
 
         //EVENT HANDLER
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -174,7 +179,5 @@ namespace SiaqodbManager.ViewModel
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
-
-
     }
 }

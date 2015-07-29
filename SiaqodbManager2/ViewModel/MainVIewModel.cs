@@ -1,5 +1,4 @@
-﻿using SiaqodbManager.DialogService;
-using Sqo;
+﻿using Sqo;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using SiaqodbManager.MacWinInterface;
 
 namespace SiaqodbManager.ViewModel
 {
@@ -315,7 +315,7 @@ namespace SiaqodbManager.ViewModel
             }
         }
 
-        internal QueryViewModel CreateQueryModel(SaveLinqDialogService saveLinqService)
+		internal QueryViewModel CreateQueryModel(IDialogService saveLinqService)
         {
             return new QueryViewModel(saveLinqService,this);
         }

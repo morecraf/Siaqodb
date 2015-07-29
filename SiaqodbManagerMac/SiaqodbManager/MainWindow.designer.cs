@@ -22,6 +22,9 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSButton ConnectButton { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSButton ExecuteButton { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSButton LinqButton { get; set; }
 
 		[Outlet]
@@ -44,6 +47,9 @@ namespace SiaqodbManager
 
 		[Action ("OnEncryption:")]
 		partial void OnEncryption (MonoMac.Foundation.NSObject sender);
+
+		[Action ("OnReferences:")]
+		partial void OnReferences (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
@@ -62,6 +68,11 @@ namespace SiaqodbManager
 				ConnectButton = null;
 			}
 
+			if (LinqButton != null) {
+				LinqButton.Dispose ();
+				LinqButton = null;
+			}
+
 			if (MainWindow != null) {
 				MainWindow.Dispose ();
 				MainWindow = null;
@@ -72,14 +83,14 @@ namespace SiaqodbManager
 				PathInput = null;
 			}
 
-			if (LinqButton != null) {
-				LinqButton.Dispose ();
-				LinqButton = null;
-			}
-
 			if (RemoveButton != null) {
 				RemoveButton.Dispose ();
 				RemoveButton = null;
+			}
+
+			if (ExecuteButton != null) {
+				ExecuteButton.Dispose ();
+				ExecuteButton = null;
 			}
 
 			if (TableActionButtons != null) {

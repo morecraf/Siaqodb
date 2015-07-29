@@ -165,6 +165,14 @@
     <Compile Include="ReferenceWindow.designer.cs">
       <DependentUpon>ReferenceWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\ReferencesVIewModel.cs">
+      <Link>VIewModel\ReferencesVIewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\Entities\LinqEventArgs.cs">
+      <Link>Model\LinqEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="DataSourcesAdapters\ReferencesViewModelAdapter.cs" />
+    <Compile Include="CustomWindow\ReferenceFileService.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />

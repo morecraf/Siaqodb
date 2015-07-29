@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+using SiaqodbManager.DataSourcesAdapters;
+using SiaqodbManager.ViewModel;
+using MonoMac.ObjCRuntime;
+using SiaqodbManager.CustomWindow;
 
 namespace SiaqodbManager
 {
@@ -42,6 +46,39 @@ namespace SiaqodbManager
 			get {
 				return (ReferenceWindow)base.Window;
 			}
+		}
+
+		ReferencesViewModelAdapter referenceViewModel;
+
+		partial void OnCancel (NSObject sender)
+		{
+			Close();
+		}
+
+		void BindButton (NSButton button,NSObject target,string selector)
+		{
+			button.Target = target;
+			button.Action = new Selector (selector);
+		}
+
+		public override void AwakeFromNib ()
+		{
+			referenceViewModel = new ReferencesViewModelAdapter (new ReferencesViewModel(new ReferenceFileService()));
+
+			ReferencesArray.Bind ("contentArray",referenceViewModel,"References",null);
+
+			BindButton (AddDefaultButton,referenceViewModel,"AddDefaultCommand");
+			BindButton (AddButton,referenceViewModel,"AddCommand");
+			BindButton (RemoveButton,referenceViewModel,"RemoveCommand");
+			BindButton (OkButton,referenceViewModel,"LoadReferencesCommand");
+
+			ReferencesArray.AddObserver (referenceViewModel, new NSString ("selectionIndexes"), NSKeyValueObservingOptions.New, IntPtr.Zero);
+		}
+
+		public override void Close ()
+		{
+			base.Close ();
+			NSApplication.SharedApplication.AbortModal ();
 		}
 	}
 }
