@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Collections;
 using System.Runtime.Serialization.Formatters.Binary;
 using SiaqodbManager.ViewModel;
+using SiaqodbManager.Entities;
 
 namespace SiaqodbManager
 {
@@ -32,8 +33,15 @@ namespace SiaqodbManager
             InitializeComponent();
             DataContext = queryViewModel;
             this.queryViewModel = queryViewModel;
+            queryViewModel.LinqExecuted += LinqExecuted;
         }
-
+        private void LinqExecuted(object sender, LinqEventArgs e)
+        {
+            this.dataGridView1.DataSource = e.DataSource;
+            this.dataGridView1.AutoGenerateColumns = true;
+         //   this.tabControl1.SelectedIndex = 0;
+        //    this.lblNrRows.Text = ar.Count + " rows";
+        }
 
         #region TextContent
 

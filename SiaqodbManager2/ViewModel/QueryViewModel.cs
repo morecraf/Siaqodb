@@ -1,4 +1,5 @@
-﻿using SiaqodbManager.MacWinInterface;
+﻿using SiaqodbManager.Entities;
+using SiaqodbManager.MacWinInterface;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -137,9 +138,9 @@ namespace SiaqodbManager.ViewModel
                             return list;
 							 ";
             var c = new CodeDom();
-            //c.AddReference(@"System.Core.dll");
-            //c.AddReference(@"siaqodb.dll");
-            //c.AddReference(@"System.Windows.Forms.dll");
+            c.AddReference(@"System.Core.dll");
+            c.AddReference(@"siaqodb.dll");
+            c.AddReference(@"System.Windows.Forms.dll");
 
 
             foreach (ReferenceItem refi in references)
@@ -174,10 +175,7 @@ namespace SiaqodbManager.ViewModel
 
                     IList w = ((IList)retVal);
 
-                //    this.dataGridView1.DataSource = w;
-                  //  this.dataGridView1.AutoGenerateColumns = true;
-                   // this.tabControl1.SelectedIndex = 0;
-                    //this.lblNrRows.Text = ar.Count + " rows";
+                    OnLinqExecuted(w);
                 }
                 catch (Exception ex)
                 {
@@ -191,6 +189,19 @@ namespace SiaqodbManager.ViewModel
             }
 
         }
+
+        private void OnLinqExecuted(IList dataSource)
+        {
+            if (LinqExecuted != null)
+            {
+                LinqExecuted(this, new LinqEventArgs
+                {
+                    DataSource = dataSource
+                });
+            }
+        }
+        public EventHandler<LinqEventArgs> LinqExecuted;
+
         private void WriteErrors(string errorLine)
         {
             //Error text

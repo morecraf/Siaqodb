@@ -221,6 +221,8 @@ namespace SiaqodbManager
                 }
             }
         }
+
+       
         void openCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.menuOpen_Click(sender, e);

@@ -100,7 +100,9 @@
       <DependentUpon>DatabaseInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="DialogService\MessageDialog.cs" />
+    <Compile Include="DialogService\ReferenceFileService.cs" />
     <Compile Include="DialogService\SaveDialogService.cs" />
+    <Compile Include="Entities\LinqEventArgs.cs" />
     <Compile Include="Entities\MetaEventArgs.cs" />
     <Compile Include="Entities\TypeMetaDetail.cs" />
     <Compile Include="MacWinInterface\IDialogService.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="ViewModel\MyCommand.cs" />
     <Compile Include="ViewModel\ObjectViewModel.cs" />
     <Compile Include="ViewModel\QueryViewModel.cs" />
+    <Compile Include="ViewModel\ReferencesVIewModel.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
