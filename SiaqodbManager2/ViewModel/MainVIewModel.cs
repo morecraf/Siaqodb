@@ -317,7 +317,7 @@ namespace SiaqodbManager.ViewModel
 
         internal QueryViewModel CreateQueryModel(SaveLinqDialogService saveLinqService)
         {
-            return new QueryViewModel(saveLinqService);
+            return new QueryViewModel(saveLinqService,this);
         }
     }
 }

@@ -16,12 +16,14 @@ namespace SiaqodbManager.ViewModel
     public class QueryViewModel:INotifyPropertyChanged
     {
         private IDialogService saveFileDialog;
-        private string linq;
+        private string linq = "";
         private string file;
 
-        public QueryViewModel(IDialogService saveFile)
+
+        public QueryViewModel(IDialogService saveLinqService, MainViewModel mainViewModel)
         {
-            this.saveFileDialog = saveFile;
+            this.saveFileDialog = saveLinqService;
+            this.Parent = mainViewModel;
         }
 
         internal void Save(string file)
@@ -91,21 +93,17 @@ namespace SiaqodbManager.ViewModel
             }
         }
 
-        internal void Execute(string path)
+        internal void Execute()
         {
-            //if (this.path != path)
-            //{
-            //    if (!System.IO.Directory.Exists(path))
-            //    {
-                    //  textBox1.Text = "Invalid folder! choose a valid database folder";
-                    //  tabControl1.SelectedIndex = 1;
-            //        return;
-            //    }
 
-            //    this.path = path;
-            //}
+            if (!System.IO.Directory.Exists(Path))
+            {
+                //textBox1.Text = "Invalid folder! choose a valid database folder";
+                //tabControl1.SelectedIndex = 1;
+                return;
+            }
 
-          //  textBox1.Text = "";
+            //textBox1.Text = "";
 
             Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
 
@@ -131,7 +129,7 @@ namespace SiaqodbManager.ViewModel
 #if TRIAL
             ifEncrypted += @" SiaqodbConfigurator.SetTrialLicense("""+TrialLicense.LicenseKey+@""");";
 #endif
-            string metBody = ifEncrypted + @" Siaqodb siaqodb = Sqo.Internal._bs._ofm(@""" + path + @""",""SiaqodbManager,SiaqodbManager2"");
+            string metBody = ifEncrypted + @" Siaqodb siaqodb = Sqo.Internal._bs._ofm(@""" + Path + @""",""SiaqodbManager,SiaqodbManager2"");
 			
 							object list= (" + Linq + @").ToList();
                             siaqodb.Close();
@@ -201,11 +199,21 @@ namespace SiaqodbManager.ViewModel
             }
         }
         public EventHandler<LinqEventArgs> LinqExecuted;
+        private DialogService.SaveLinqDialogService saveLinqService;
+        private MainViewModel Parent;
 
         private void WriteErrors(string errorLine)
         {
             //Error text
           //  this.textBox1.Text += errorLine + "\r\n";
+        }
+
+        public string Path
+        {
+            get
+            {
+                return Parent.SelectedPath.Item;
+            }
         }
     }
 }

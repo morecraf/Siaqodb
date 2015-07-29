@@ -232,7 +232,7 @@ namespace SiaqodbManager
             QueryDocument query = dockingManager1.ActiveDocument as QueryDocument;
             if (query != null)
             {
-                query.Execute(this.cmbDBPath.Text);
+                query.Execute();
             }
         }
         void execCommand_Executed(object sender, ExecutedRoutedEventArgs e)

@@ -121,9 +121,9 @@ namespace SiaqodbManager
         {
             queryViewModel.SaveAs();
         }
-        public void Execute(string path)
+        public void Execute()
         {
-            queryViewModel.Execute(path);
+            queryViewModel.Execute();
         }
       
         public string GetFile()
