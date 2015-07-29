@@ -4,12 +4,24 @@ using SiaqodbManager.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 using MonoMac.Foundation;
+using SiaqodbManager.Entities;
 
 namespace SiaqodbManager
 {
 	public class ObjectViewModelAdapter:AbstractViewModelAdapter
 	{
 		ObjectViewModel viewModel;
+
+		public EventHandler<MetaEventArgs> OpenObjects {
+			get{
+				return viewModel.OpenObjects;
+			}
+			set{
+				viewModel.OpenObjects = value;
+			}
+		}
+
+
 
 		public ObjectViewModelAdapter (ObjectViewModel viewModel):base(viewModel)
 		{
@@ -35,6 +47,10 @@ namespace SiaqodbManager
 		public void AddNewRow ()
 		{
 			viewModel.AddRow ();
+		}
+
+		public void EditComplexObject(int rowIndex,int columnIndex,string columnName){
+			viewModel.EditComplexObject (rowIndex,columnIndex,columnName);
 		}
 
 		public object GetValue (string columnName, int rowIndex)

@@ -16,14 +16,22 @@ namespace SiaqodbManager.ViewModel
     public class QueryViewModel:INotifyPropertyChanged
     {
         private IDialogService saveFileDialog;
+<<<<<<< HEAD
         private string linq = "";
+=======
+		private string linq="";
+>>>>>>> origin/PortSiaqoManager
         private string file;
 
 
         public QueryViewModel(IDialogService saveLinqService, MainViewModel mainViewModel)
         {
+<<<<<<< HEAD
             this.saveFileDialog = saveLinqService;
             this.Parent = mainViewModel;
+=======
+			this.saveFileDialog = saveFile;
+>>>>>>> origin/PortSiaqoManager
         }
 
         internal void Save(string file)
@@ -153,8 +161,6 @@ namespace SiaqodbManager.ViewModel
             n.Imports("System.Collections.Generic")
             .Imports("System.Linq")
             .Imports("Sqo")
-
-
 
             .AddClass(
               c.Class("RunQuery")

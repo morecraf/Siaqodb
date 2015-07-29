@@ -5,6 +5,9 @@ using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using Sqo;
+using SiaqodbManager.DataSourcesAdapters;
+using SiaqodbManager.ViewModel;
+using SiaqodbManager.Util;
 
 namespace SiaqodbManager
 {
@@ -37,28 +40,42 @@ namespace SiaqodbManager
 		}
 
 		#endregion
-
-		public static void SetEncryptionSettings()
-		{
-			SiaqodbConfigurator.EncryptedDatabase = true;
-			if (SiaqodbConfigurator.EncryptedDatabase)
-			{
-				SiaqodbConfigurator.SetEncryptor(BuildInAlgorithm.AES);
-
-				if (!string.IsNullOrEmpty(""))
-				{
-					SiaqodbConfigurator.SetEncryptionPassword("");
-
-				}
-
-			}
-		}
+		EncryptionViewModelAdapter viewModel;
 
 		//strongly typed window accessor
 		public new EncryptionWindow Window {
 			get {
 				return (EncryptionWindow)base.Window;
 			}
+		}
+
+		partial void OnOk (NSObject sender)
+		{ 
+			var pasCont = new PasswordContainer(PasswordText.StringValue);
+			viewModel.EncryptCommand(pasCont);
+			this.Close();
+		}
+
+		partial void OnCancel(NSObject sender){
+			this.Close();
+		}
+
+		public override void AwakeFromNib ()
+		{
+			viewModel = new EncryptionViewModelAdapter (EncryptionViewModel.Instance);
+
+			AlgorithmCombo.Bind ("value",viewModel,"Algorithm",BindingUtil.ContinuouslyUpdatesValue);
+
+			EncryptionCheck.Bind ("value",viewModel,"IsEncryptionChecked",BindingUtil.ContinuouslyUpdatesValue);
+
+			AlgorithmCombo.Bind ("enabled",viewModel,"IsEncryptionChecked",null);
+			PasswordText.Bind ("enabled",viewModel,"IsEncryptionChecked",null);
+		}
+
+		public override void Close ()
+		{
+			base.Close ();
+			NSApplication.SharedApplication.AbortModal ();
 		}
 	}
 }

@@ -9,6 +9,9 @@ using SiaqodbManager.ViewModel;
 using SiaqodbManager.DataSourcesAdapters;
 using MonoMac.ObjCRuntime;
 using SiaqodbManager.Util;
+using SiaqodbManager.Entities;
+using SiaqodbManager.Controls;
+using SiaqodbManager.CustomWindow;
 
 namespace SiaqodbManager
 {
@@ -73,12 +76,17 @@ namespace SiaqodbManager
 			NSObject.FromObject (sender).DidChangeValue (e.PropertyName);
 		}
 
+		partial void OnEncryption (NSObject sender)
+		{
+			var controller = new EncryptionWindowController ();
+			NSApplication.SharedApplication.RunModalForWindow(controller.Window);
+		}
 
 		//BIND THE LOGIN PANEL
 		public  override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
-			EncryptionWindowController.SetEncryptionSettings ();
+			EncryptionViewModel.Instance.SetEncryptionSettings ();
 			mainViewModel = new MainViewModelAdapter (new MainViewModel());
 
 			BindButton (mainViewModel,"ConnectCommand",ConnectButton);
@@ -88,6 +96,7 @@ namespace SiaqodbManager
 			AddButton.Activated += OnAddRow;
 			RemoveButton.Activated += OnRemoveRow;
 			CloseTabButton.Activated += OnCloseTab;
+			LinqButton.Activated += OnLinqTab;
 
 			//types tree view
 			TypesView.Delegate = new TypesDelegate (this);
@@ -95,28 +104,32 @@ namespace SiaqodbManager
 
 		public void CreateObjectsTable (MetaTypeViewModelAdapter metaType)
 		{
+			CreateObjectsTable (metaType,null);
+		}
+
+		void CreateObjectsTable (MetaTypeViewModelAdapter metaType,List<int> oids)
+		{
 			var tabViewItem = new NSTabViewItem ();
 			var tableView = new CustomTable ();
-			tableView.Delegate = new ObjectsDelegate (this);
-
-
 			//table managing section
-			var objectAdapter = mainViewModel.CreateObjectsView (metaType);
-			ObjectsViewCreator.AddColumnsAndData (tableView,objectAdapter);
-
+			var objectAdapter = mainViewModel.CreateObjectsView (metaType, oids);
+			tableView.Delegate = new ObjectsDelegate (objectAdapter);
+			objectAdapter.OpenObjects += OpenObjects;
+			ObjectsViewCreator.AddColumnsAndData (tableView, objectAdapter);
 			var tableContainer = ObjectsViewCreator.TableActionsLayout (tableView);
 			ObjectsViewCreator.CostumizeTable (tableView);
-
 			tabViewItem.Label = metaType.Name;
-			tabViewItem.View.AddSubview(tableContainer);
-
-			TablesDictionry[metaType.Name] = tableView;
-
-			TabView.Add(tabViewItem);
+			tabViewItem.View.AddSubview (tableContainer);
+			TablesDictionry [metaType.Name] = tableView;
+			TabView.Add (tabViewItem);
 			TabView.Select (tabViewItem);
 		}
 
-	
+		public void OpenObjects (object sender,MetaEventArgs e)
+		{
+			CreateObjectsTable (new MetaTypeViewModelAdapter(new MetaTypeViewModel(e.mType)),e.oids);
+		}
+
 
 		//strongly typed window accessor
 		public new MainWindow Window {
@@ -138,6 +151,21 @@ namespace SiaqodbManager
 		{
 			var tab = TabView.Selected;
 			TabView.Remove (tab);
+		}
+
+		void OnLinqTab (object sender, EventArgs e)
+		{
+			var tabViewItem = new NSTabViewItem ();
+
+			var documentView = new DocumentTextView ();
+			var queryView = mainViewModel.CreateQueryView (new SaveFileService());
+			documentView.Bind ("attributedString",queryView,"Linq",BindingUtil.ContinuouslyUpdatesValue);
+
+			tabViewItem.View.AddSubview (documentView);
+
+			tabViewItem.Label = "New linq doc";
+			TabView.Add (tabViewItem);
+			TabView.Select (tabViewItem);
 		}
 
 		void OnTabSelectionChanged (object sender, NSTabViewItemEventArgs e)
