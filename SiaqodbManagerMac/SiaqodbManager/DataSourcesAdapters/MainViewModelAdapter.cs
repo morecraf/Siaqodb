@@ -3,6 +3,7 @@ using SiaqodbManager.ViewModel;
 using MonoMac.Foundation;
 using System.Collections.Generic;
 using System.Linq;
+using SiaqodbManager.MacWinInterface;
 
 namespace SiaqodbManager.DataSourcesAdapters
 {
@@ -40,11 +41,16 @@ namespace SiaqodbManager.DataSourcesAdapters
 			}
 		}
 
-		public ObjectViewModelAdapter CreateObjectsView (MetaTypeViewModelAdapter metaType)
+		public ObjectViewModelAdapter CreateObjectsView (MetaTypeViewModelAdapter metaType,List<int> oids)
 		{
-			var objectsViewModel = viewModel.CreateObjectesView (metaType.viewModel);
+			var objectsViewModel = viewModel.CreateObjectsModel (metaType.viewModel,oids);
 			var objectAdapter = new ObjectViewModelAdapter (objectsViewModel);
 			return objectAdapter;
+		}
+
+		public QueryViewModelAdapter CreateQueryView (IDialogService saveDialog)
+		{
+			return new QueryViewModelAdapter (new QueryViewModel(saveDialog));
 		}
 
 		[Export("ConnectCommand")]

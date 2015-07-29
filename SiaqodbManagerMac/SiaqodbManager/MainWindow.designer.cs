@@ -22,6 +22,9 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSButton ConnectButton { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSButton LinqButton { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSView MainWindow { get; set; }
 
 		[Outlet]
@@ -38,9 +41,17 @@ namespace SiaqodbManager
 
 		[Outlet]
 		MonoMac.AppKit.NSOutlineView TypesView { get; set; }
+
+		[Action ("OnEncryption:")]
+		partial void OnEncryption (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (AddButton != null) {
+				AddButton.Dispose ();
+				AddButton = null;
+			}
+
 			if (CloseTabButton != null) {
 				CloseTabButton.Dispose ();
 				CloseTabButton = null;
@@ -61,6 +72,21 @@ namespace SiaqodbManager
 				PathInput = null;
 			}
 
+			if (LinqButton != null) {
+				LinqButton.Dispose ();
+				LinqButton = null;
+			}
+
+			if (RemoveButton != null) {
+				RemoveButton.Dispose ();
+				RemoveButton = null;
+			}
+
+			if (TableActionButtons != null) {
+				TableActionButtons.Dispose ();
+				TableActionButtons = null;
+			}
+
 			if (TabView != null) {
 				TabView.Dispose ();
 				TabView = null;
@@ -69,21 +95,6 @@ namespace SiaqodbManager
 			if (TypesView != null) {
 				TypesView.Dispose ();
 				TypesView = null;
-			}
-
-			if (RemoveButton != null) {
-				RemoveButton.Dispose ();
-				RemoveButton = null;
-			}
-
-			if (AddButton != null) {
-				AddButton.Dispose ();
-				AddButton = null;
-			}
-
-			if (TableActionButtons != null) {
-				TableActionButtons.Dispose ();
-				TableActionButtons = null;
 			}
 		}
 	}

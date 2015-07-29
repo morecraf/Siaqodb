@@ -80,6 +80,9 @@
     <Folder Include="Util\" />
     <Folder Include="Delgates\" />
     <Folder Include="Controls\" />
+    <Folder Include="MacWinInterface\" />
+    <Folder Include="CodeDom\" />
+    <Folder Include="CustomWindow\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -128,11 +131,46 @@
     <Compile Include="Util\SiaqoMacUtil.cs" />
     <Compile Include="Controls\ObjectsViewCreator.cs" />
     <Compile Include="Controls\CustomTable.cs" />
+    <Compile Include="..\..\SiaqodbManager2\Entities\MetaEventArgs.cs">
+      <Link>Model\MetaEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\QueryViewModel.cs">
+      <Link>VIewModel\QueryViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\MacWinInterface\IDialogService.cs">
+      <Link>MacWinInterface\IDialogService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\CodeDom\CodeDom.cs">
+      <Link>CodeDom\CodeDom.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\CodeDom\CodeDomeExtensions.cs">
+      <Link>CodeDom\CodeDomeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\ViewModel\EncryptionViewModel.cs">
+      <Link>VIewModel\EncryptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\MacWinInterface\IMessageBox.cs">
+      <Link>MacWinInterface\IMessageBox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SiaqodbManager2\MacWinInterface\IPasswordContainer.cs">
+      <Link>MacWinInterface\IPasswordContainer.cs</Link>
+    </Compile>
+    <Compile Include="DataSourcesAdapters\EncryptionViewModelAdapter.cs" />
+    <Compile Include="Model\PasswordContainer.cs" />
+    <Compile Include="Controls\DocumentTextView.cs" />
+    <Compile Include="DataSourcesAdapters\QueryViewModelAdapter.cs" />
+    <Compile Include="CustomWindow\SaveFileService.cs" />
+    <Compile Include="ReferenceWindow.cs" />
+    <Compile Include="ReferenceWindowController.cs" />
+    <Compile Include="ReferenceWindow.designer.cs">
+      <DependentUpon>ReferenceWindow.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
     <InterfaceDefinition Include="MainMenu.xib" />
     <InterfaceDefinition Include="EncryptionWindow.xib" />
+    <InterfaceDefinition Include="ReferenceWindow.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

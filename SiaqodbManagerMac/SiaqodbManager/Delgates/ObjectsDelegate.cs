@@ -3,22 +3,26 @@ using MonoMac.AppKit;
 using MonoMac.Foundation;
 using System.Drawing;
 
+
 namespace SiaqodbManager
 {
 	public class ObjectsDelegate:NSTableViewDelegate
 	{
-		private MainWindowController mainView;
+		private ObjectViewModelAdapter viewModel;
 
-		public ObjectsDelegate (MainWindowController mainWindowController)
+		public ObjectsDelegate (ObjectViewModelAdapter viewModel)
 		{
-			mainWindowController = mainView;
+			this.viewModel = viewModel;
 		}
 
 		public override void SelectionDidChange (NSNotification notification)
 		{
 			var table = notification.Object as CustomTable;
-			if(table.CurrentCell != null){
-				mainView.CreateObjectsTable ();
+			if(table.CurrentCell != null && table.CurrentColumn != null){
+
+				var column =  table.CurrentColumn;
+				var columnIndex = GetColumnIndex (table,column);
+				viewModel.EditComplexObject (table.SelectedRow,columnIndex,column.HeaderCell.Identifier);
 			}
 		}
 			
