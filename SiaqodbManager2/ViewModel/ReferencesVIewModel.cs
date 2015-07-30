@@ -115,8 +115,7 @@ namespace SiaqodbManager.ViewModel
                         {
                             try
                             {
-                                File.Copy(refItem.Item, AppDomain.CurrentDomain.BaseDirectory + "\\" + System.IO.Path.GetFileName(refItem.Item), true);
-
+								File.Copy(refItem.Item, AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + System.IO.Path.GetFileName(refItem.Item), true);
 
                             }
                             catch

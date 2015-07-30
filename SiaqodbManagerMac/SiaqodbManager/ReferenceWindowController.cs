@@ -8,6 +8,7 @@ using SiaqodbManager.DataSourcesAdapters;
 using SiaqodbManager.ViewModel;
 using MonoMac.ObjCRuntime;
 using SiaqodbManager.CustomWindow;
+using SiaqodbManager.Util;
 
 namespace SiaqodbManager
 {
@@ -66,6 +67,7 @@ namespace SiaqodbManager
 			referenceViewModel = new ReferencesViewModelAdapter (new ReferencesViewModel(new ReferenceFileService()));
 
 			ReferencesArray.Bind ("contentArray",referenceViewModel,"References",null);
+			Namespaces.Bind ("value",referenceViewModel,"Namespaces",BindingUtil.ContinuouslyUpdatesValue);
 
 			BindButton (AddDefaultButton,referenceViewModel,"AddDefaultCommand");
 			BindButton (AddButton,referenceViewModel,"AddCommand");

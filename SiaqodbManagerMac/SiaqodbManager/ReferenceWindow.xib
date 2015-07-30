@@ -8,6 +8,7 @@
             <connections>
                 <outlet property="AddButton" destination="PM0-aF-OQd" id="NT4-zH-UmS"/>
                 <outlet property="AddDefaultButton" destination="fP6-Hk-Obi" id="z2Y-8k-wSv"/>
+                <outlet property="Namespaces" destination="wvR-1R-5Mg" id="VlM-gh-wch"/>
                 <outlet property="OKButton" destination="6Mb-Dq-QW0" id="pCI-BX-OOa"/>
                 <outlet property="OkButton" destination="6Mb-Dq-QW0" id="vmb-JD-mvI"/>
                 <outlet property="ReferencesArray" destination="5Gr-eW-dKU" id="b6s-kj-HFY"/>
@@ -27,17 +28,17 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView id="73q-f3-lkH">
-                        <rect key="frame" x="0.0" y="-10" width="606" height="393"/>
+                        <rect key="frame" x="-3" y="27" width="617" height="362"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="References" identifier="1" id="Vnr-X1-Js4">
                                 <view key="view" id="l5G-P4-UGd">
-                                    <rect key="frame" x="10" y="33" width="586" height="347"/>
+                                    <rect key="frame" x="10" y="33" width="597" height="316"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" id="PM0-aF-OQd">
-                                            <rect key="frame" x="-1" y="62" width="82" height="32"/>
+                                            <rect key="frame" x="0.0" y="16" width="82" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="mLJ-vv-Lon">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -45,7 +46,7 @@
                                             </buttonCell>
                                         </button>
                                         <button verticalHuggingPriority="750" id="7X1-DJ-OM1">
-                                            <rect key="frame" x="75" y="62" width="82" height="32"/>
+                                            <rect key="frame" x="76" y="16" width="82" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CjR-x2-jMJ">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -53,14 +54,14 @@
                                             </buttonCell>
                                         </button>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="VI4-k0-Dj5">
-                                            <rect key="frame" x="5" y="98" width="584" height="246"/>
+                                            <rect key="frame" x="5" y="53" width="584" height="261"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="fWP-g6-Or0">
-                                                <rect key="frame" x="1" y="17" width="582" height="228"/>
+                                                <rect key="frame" x="1" y="17" width="582" height="243"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="wM5-UJ-JQg" id="kPV-ol-89o">
-                                                        <rect key="frame" x="0.0" y="0.0" width="582" height="228"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="582" height="243"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -101,37 +102,15 @@
                                             </tableHeaderView>
                                         </scrollView>
                                         <button verticalHuggingPriority="750" id="fP6-Hk-Obi">
-                                            <rect key="frame" x="407" y="62" width="183" height="32"/>
+                                            <rect key="frame" x="408" y="16" width="183" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Add default references" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fAo-g8-2iR">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="6Mb-Dq-QW0">
-                                            <rect key="frame" x="412" y="10" width="96" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Ok" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PIU-Bh-tvj">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="U6m-LI-tLu">
-                                            <rect key="frame" x="508" y="10" width="87" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9Ub-Kv-ENz">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                                <string key="keyEquivalent" base64-UTF8="YES">
-Gw
-</string>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="OnCancel:" target="-2" id="nwF-zv-6Ts"/>
-                                            </connections>
-                                        </button>
                                         <box autoresizesSubviews="NO" verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="Ubr-Aj-OVm">
-                                            <rect key="frame" x="0.0" y="50" width="586" height="5"/>
+                                            <rect key="frame" x="2" y="5" width="586" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -142,12 +121,54 @@ Gw
                             </tabViewItem>
                             <tabViewItem label="Namespaces" identifier="2" id="RXU-cw-96a">
                                 <view key="view" id="PIX-Sp-9fU">
-                                    <rect key="frame" x="10" y="33" width="586" height="347"/>
+                                    <rect key="frame" x="10" y="33" width="597" height="316"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kmY-Gj-byU">
+                                            <rect key="frame" x="3" y="301" width="436" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Add a namespace per line" id="G7J-0h-q2r">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="wvR-1R-5Mg">
+                                            <rect key="frame" x="5" y="6" width="588" height="287"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="ujz-BV-C8N">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
                                 </view>
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
+                    <button verticalHuggingPriority="750" id="6Mb-Dq-QW0">
+                        <rect key="frame" x="419" y="5" width="96" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Ok" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PIU-Bh-tvj">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
+                    <button verticalHuggingPriority="750" id="U6m-LI-tLu">
+                        <rect key="frame" x="515" y="5" width="87" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9Ub-Kv-ENz">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="OnCancel:" target="-2" id="nwF-zv-6Ts"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
         </window>

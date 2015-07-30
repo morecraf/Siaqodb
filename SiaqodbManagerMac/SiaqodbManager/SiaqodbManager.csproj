@@ -71,6 +71,9 @@
     <Reference Include="Siaqodb">
       <HintPath>libs\siaqodb.dll</HintPath>
     </Reference>
+    <Reference Include="Model">
+      <HintPath>bin\Debug\Model.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -173,6 +176,8 @@
     </Compile>
     <Compile Include="DataSourcesAdapters\ReferencesViewModelAdapter.cs" />
     <Compile Include="CustomWindow\ReferenceFileService.cs" />
+    <Compile Include="DataSourcesAdapters\LinqDataSource.cs" />
+    <Compile Include="Controls\LinqTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />

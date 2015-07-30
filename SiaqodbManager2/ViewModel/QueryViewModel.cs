@@ -10,29 +10,26 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using MonoMac.AppKit;
 
 namespace SiaqodbManager.ViewModel
 {
     public class QueryViewModel:INotifyPropertyChanged
     {
         private IDialogService saveFileDialog;
-<<<<<<< HEAD
-        private string linq = "";
-=======
-		private string linq="";
->>>>>>> origin/PortSiaqoManager
+
+		private string linq = "from Customer c in siaqodb select c";
+
         private string file;
 
 
         public QueryViewModel(IDialogService saveLinqService, MainViewModel mainViewModel)
         {
-<<<<<<< HEAD
+
             this.saveFileDialog = saveLinqService;
             this.Parent = mainViewModel;
-=======
-			this.saveFileDialog = saveFile;
->>>>>>> origin/PortSiaqoManager
-        }
+
+		}
 
         internal void Save(string file)
         {
@@ -115,7 +112,7 @@ namespace SiaqodbManager.ViewModel
 
             Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
 
-            Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + "\\config");
+			Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar +"config");
             Sqo.IObjectList<NamespaceItem> namespaces = siaqodbConfig.LoadAll<NamespaceItem>();
             Sqo.IObjectList<ReferenceItem> references = siaqodbConfig.LoadAll<ReferenceItem>();
             siaqodbConfig.Close();
@@ -144,9 +141,9 @@ namespace SiaqodbManager.ViewModel
                             return list;
 							 ";
             var c = new CodeDom();
-            c.AddReference(@"System.Core.dll");
-            c.AddReference(@"siaqodb.dll");
-            c.AddReference(@"System.Windows.Forms.dll");
+			c.AddReference(@"System.Core.dll"); 
+			c.AddReference(@"System.dll");
+			//c.AddReference(@"System.Windows.Forms.dll");
 
 
             foreach (ReferenceItem refi in references)
@@ -158,9 +155,9 @@ namespace SiaqodbManager.ViewModel
             {
                 n.Imports(nitem.Item);
             }
-            n.Imports("System.Collections.Generic")
-            .Imports("System.Linq")
-            .Imports("Sqo")
+			n.Imports ("System.Collections.Generic")
+            .Imports ("System.Linq")
+            .Imports ("Sqo")
 
             .AddClass(
               c.Class("RunQuery")
@@ -205,11 +202,19 @@ namespace SiaqodbManager.ViewModel
             }
         }
         public EventHandler<LinqEventArgs> LinqExecuted;
-        private DialogService.SaveLinqDialogService saveLinqService;
         private MainViewModel Parent;
 
         private void WriteErrors(string errorLine)
         {
+			var alert = new NSAlert {
+				MessageText = errorLine,
+				AlertStyle = NSAlertStyle.Informational
+			};
+
+			alert.AddButton ("OK");
+			alert.AddButton ("Cancel");
+
+			var returnValue = alert.RunModal();
             //Error text
           //  this.textBox1.Text += errorLine + "\r\n";
         }

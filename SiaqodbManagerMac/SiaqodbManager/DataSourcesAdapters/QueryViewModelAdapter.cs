@@ -2,6 +2,7 @@
 using SiaqodbManager.DataSourcesAdapters;
 using SiaqodbManager.ViewModel;
 using MonoMac.Foundation;
+using SiaqodbManager.Entities;
 
 namespace SiaqodbManager
 {
@@ -33,6 +34,15 @@ namespace SiaqodbManager
 		public void ExecuteCommand(NSObject obj)
 		{
 			viewModel.Execute ();
+		}
+
+		public EventHandler<LinqEventArgs> LinqExecuted {
+		   get{
+				return viewModel.LinqExecuted;
+			}
+			set{
+				viewModel.LinqExecuted = value;
+			}
 		}
 	}
 }

@@ -21,6 +21,16 @@ namespace SiaqodbManager.DataSourcesAdapters
 				return viewModel.References.Select (r => r.Item).ToArray();
 			}
 		}
+		[Export("Namespaces")]
+		public string Namespaces{
+			get{
+				return viewModel.Namespaces;
+			}
+			set{
+				viewModel.Namespaces = value;
+			}
+		}
+
 
 		[Export("AddDefaultCommand")]
 		public void AddDefaultCommand(NSObject obj){

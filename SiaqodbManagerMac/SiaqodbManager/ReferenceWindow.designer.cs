@@ -19,6 +19,9 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSButton AddDefaultButton { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSTextField Namespaces { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSButton OkButton { get; set; }
 
 		[Outlet]
@@ -38,16 +41,6 @@ namespace SiaqodbManager
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (OkButton != null) {
-				OkButton.Dispose ();
-				OkButton = null;
-			}
-
-			if (ReferencesArray != null) {
-				ReferencesArray.Dispose ();
-				ReferencesArray = null;
-			}
-
 			if (AddButton != null) {
 				AddButton.Dispose ();
 				AddButton = null;
@@ -58,9 +51,24 @@ namespace SiaqodbManager
 				AddDefaultButton = null;
 			}
 
+			if (Namespaces != null) {
+				Namespaces.Dispose ();
+				Namespaces = null;
+			}
+
+			if (OkButton != null) {
+				OkButton.Dispose ();
+				OkButton = null;
+			}
+
 			if (OKButton != null) {
 				OKButton.Dispose ();
 				OKButton = null;
+			}
+
+			if (ReferencesArray != null) {
+				ReferencesArray.Dispose ();
+				ReferencesArray = null;
 			}
 
 			if (RemoveButton != null) {

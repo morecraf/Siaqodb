@@ -96,7 +96,7 @@
                     </textField>
                     <customView id="98">
                         <rect key="frame" x="339" y="79" width="751" height="469"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                         <subviews>
                             <tabView id="77">
                                 <rect key="frame" x="0.0" y="18" width="731" height="443"/>

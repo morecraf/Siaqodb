@@ -164,6 +164,10 @@ namespace SiaqodbManager
 		{
 			var tabViewItem = new NSTabViewItem ();
 			var queryView = new NSView ();
+			queryView.AutoresizingMask = NSViewResizingMask.MaxXMargin|
+				NSViewResizingMask.MaxYMargin|
+				NSViewResizingMask.HeightSizable|
+				NSViewResizingMask.WidthSizable;
 
 			var documentView = new DocumentTextView ();
 			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService());
@@ -171,12 +175,29 @@ namespace SiaqodbManager
 
 			BindButton (queryViewModel,"ExecuteCommand",ExecuteButton);
 
-			var tableView = new NSTableView ();
-			tableView.DataSource = new ObjectsDataSource ();
+			var scrolView = new NSScrollView ();
+			documentView.SetFrameOrigin (new System.Drawing.PointF(300,300));
+
+			scrolView.SetFrameSize (new System.Drawing.SizeF(200,200));
+			scrolView.SetFrameOrigin (new System.Drawing.PointF(100,100));
+			//scrolView.AutoresizingMask =
+//				NSViewResizingMask.MaxXMargin|
+				//			NSViewResizingMask.HeightSizable|
+				//				NSViewResizingMask.WidthSizable;
+			var tableView = new LinqTable (queryViewModel);
+			scrolView.ContentView.DocumentView = tableView;
+
+			var column = new NSTableColumn ();
+			column.HeaderCell.Identifier = "incercare";
+			column.HeaderCell.Title = "incercare";
+			tableView.AddColumn (column);
+			tableView.HeaderView.NeedsDisplay = true;
 
 			queryView.AddSubview (documentView);
-			queryView.AddSubview (tableView);
-			tabViewItem.View.AddSubview (documentView);
+			queryView.AddSubview (scrolView);
+			//	tableView.SizeToFit ();
+			tabViewItem.View.AddSubview (queryView);
+			//MainWindow.AddSubview (tableView);
 
 			tabViewItem.Label = "New linq doc";
 			TabView.Add (tabViewItem);
@@ -191,6 +212,11 @@ namespace SiaqodbManager
 			}else{
 				TableActionButtons.Hidden = true;
 			}
+		}
+
+		void LinqExecuted (object sender, LinqEventArgs e)
+		{
+
 		}
 
 		void OnRemoveRow (object sender, EventArgs e)

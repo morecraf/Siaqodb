@@ -74,7 +74,6 @@ namespace SiaqodbManager
         {
             get
             {
-                
                 CodeCompileUnit compileUnit = new CodeCompileUnit();
 
                 foreach (var ns in listNamespaces)

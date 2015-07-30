@@ -50,7 +50,7 @@ namespace SiaqodbManager.DataSourcesAdapters
 
 		public QueryViewModelAdapter CreateQueryView (IDialogService saveDialog)
 		{
-			return new QueryViewModelAdapter (new QueryViewModel(saveDialog));
+			return new QueryViewModelAdapter (new QueryViewModel(saveDialog,viewModel));
 		}
 
 		[Export("ConnectCommand")]
