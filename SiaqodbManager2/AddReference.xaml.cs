@@ -26,7 +26,14 @@ namespace SiaqodbManager
         public AddReference()
         {
             InitializeComponent();
-            DataContext = new ReferencesViewModel(new ReferenceFileService());
+            var viewModel = new ReferencesViewModel(new ReferenceFileService());
+            DataContext = viewModel;
+            viewModel.ClosingRequest += CloseWindow;
+        }
+
+        private void CloseWindow(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

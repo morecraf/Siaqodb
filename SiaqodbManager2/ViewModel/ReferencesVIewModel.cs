@@ -134,6 +134,7 @@ namespace SiaqodbManager.ViewModel
                 finally
                 {
                     siaqodb.Close();
+                    OnClosingRequest();
                     // EncryptionSettings.SetEncryptionSettings();
                 }
             }
@@ -169,6 +170,14 @@ namespace SiaqodbManager.ViewModel
             References.Add(new ReferenceItem { Item = "siaqodb.dll" });
 			OnPropertyChanged ("References");
         }
+
+        public void OnClosingRequest(){
+            if(ClosingRequest != null){
+                ClosingRequest(this,new EventArgs());
+            }
+        }
+
+        public event EventHandler<EventArgs> ClosingRequest;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
