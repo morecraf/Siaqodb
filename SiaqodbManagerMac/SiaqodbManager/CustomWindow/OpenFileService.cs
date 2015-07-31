@@ -4,10 +4,12 @@ using MonoMac.AppKit;
 
 namespace SiaqodbManager.CustomWindow
 {
-	public class ReferenceFileService:IDialogService
+	public class OpenFileService:IDialogService
 	{
-		public ReferenceFileService ()
+		private string extension;
+		public OpenFileService (string extension)
 		{
+			this.extension = extension;
 		}
 
 		#region IDialogService implementation
@@ -18,7 +20,7 @@ namespace SiaqodbManager.CustomWindow
 			referencePanel.ReleasedWhenClosed = true;
 			referencePanel.Prompt = "Add reference";
 			referencePanel.CanCreateDirectories = true;
-			referencePanel.AllowedFileTypes = new [] {"dll"};
+			referencePanel.AllowedFileTypes = new [] {extension};
 
 			var result = referencePanel.RunModal();
 			if (result == 1)

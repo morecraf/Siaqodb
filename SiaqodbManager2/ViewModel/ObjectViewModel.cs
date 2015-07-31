@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using SiaqodbManager.Entities;
 using MonoMac.AppKit;
+using Sqo.Exceptions;
 
 namespace SiaqodbManager.ViewModel
 {
@@ -16,23 +17,23 @@ namespace SiaqodbManager.ViewModel
     {
         private MetaTypeViewModel selectedType;
 		private IEnumerable<MetaTypeViewModel> TypesList;
-        private Sqo.Siaqodb siaqodb;
+ 
 		public Dictionary<string,Tuple<int,MetaFieldViewModel>> ColumnIndexes;
        
         private string cell;
 
-        public ObjectViewModel(MetaTypeViewModel SelectedType, IEnumerable<MetaTypeViewModel> TypesList, Sqo.Siaqodb siaqodb):this(SelectedType,TypesList,siaqodb,null)
+		public ObjectViewModel(MetaTypeViewModel SelectedType, IEnumerable<MetaTypeViewModel> TypesList):this(SelectedType,TypesList,null)
         {
-           
+
         }
-		public ObjectViewModel(MetaTypeViewModel SelectedType, IEnumerable<MetaTypeViewModel> TypesList, Sqo.Siaqodb siaqodb,List<int> oidsToShow)
+		public ObjectViewModel(MetaTypeViewModel SelectedType, IEnumerable<MetaTypeViewModel> TypesList,List<int> oidsToShow)
 		{
 			// TODO: Complete member initialization
 			this.SelectedType = SelectedType;
 			this.TypesList = TypesList;
-			this.siaqodb = siaqodb;
+
             if(oidsToShow == null || oidsToShow.Count ==0){
-			    oids = siaqodb.LoadAllOIDs(SelectedType.MetaType);
+				oids = SiaqodbRepo.Instance.LoadAllOIDs(SelectedType.MetaType);
             }
             else
             {
@@ -109,7 +110,7 @@ namespace SiaqodbManager.ViewModel
 	                {
 	                    int TID = 0;
 	                    bool isArray = false;
-						Sqo.Internal._bs._ltid(siaqodb, Convert.ToInt32(oids[rowIndex]), SelectedType.MetaType, field.ActualName, ref TID, ref isArray);
+						Sqo.Internal._bs._ltid(SiaqodbRepo.Instance, Convert.ToInt32(oids[rowIndex]), SelectedType.MetaType, field.ActualName, ref TID, ref isArray);
 	                    if (TID <= 0)
 	                    {
 	                        if (TID == -31)
@@ -143,7 +144,7 @@ namespace SiaqodbManager.ViewModel
 	                }
 	                else
 	                {
-	                    value = siaqodb.LoadValue(oids[rowIndex], field.ActualName, SelectedType.MetaType);
+						value = SiaqodbRepo.Instance.LoadValue(oids[rowIndex], field.ActualName, SelectedType.MetaType);
 	                }
 	                if (value == null)
 	                {
@@ -151,8 +152,8 @@ namespace SiaqodbManager.ViewModel
 	                }
 	            }
 				return value;
-			}catch(Exception ex){
-				siaqodb.Close ();
+			}catch(SiaqodbException ex){
+				SiaqodbRepo.Dispose ();
 				throw ex;
 			}
 		}
@@ -255,7 +256,7 @@ namespace SiaqodbManager.ViewModel
         internal void UpdateValue(string columnName, int rowIndex, object value)
         {
             var metaType = SelectedType.MetaType;
-            Sqo.Internal._bs._uf(siaqodb, oids[rowIndex], metaType, columnName, value);
+			Sqo.Internal._bs._uf(SiaqodbRepo.Instance, oids[rowIndex], metaType, columnName, value);
 			var alert = new NSAlert {
 				MessageText = value.ToString(),
 				AlertStyle = NSAlertStyle.Informational
@@ -272,10 +273,10 @@ namespace SiaqodbManager.ViewModel
         {
 			try{
 	            int oid = (int)oids[index];
-	            Sqo.Internal._bs._do(siaqodb, oid, SelectedType.MetaType);
+				Sqo.Internal._bs._do(SiaqodbRepo.Instance, oid, SelectedType.MetaType);
 	            oids.RemoveAt(index);
 			}catch(Exception ex){
-				siaqodb.Close ();
+				SiaqodbRepo.Dispose ();
 				throw ex;
 			}
         }
@@ -284,10 +285,10 @@ namespace SiaqodbManager.ViewModel
         {
 			try
 			{
-	            int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
+				int oid = Sqo.Internal._bs._io(SiaqodbRepo.Instance, SelectedType.MetaType);
 	            this.oids.Add(oid);
 			}catch(Exception ex){
-				siaqodb.Close ();
+				SiaqodbRepo.Dispose ();
 				throw ex;
 			}
         }
@@ -306,7 +307,7 @@ namespace SiaqodbManager.ViewModel
 	            }
 	            if (oids[0] != null)//is not new row
 	            {
-	                _bs._loidtid(this.siaqodb, Convert.ToInt32(oids[0]), SelectedType.MetaType, fi.Name, ref selectedOids, ref TID);
+					_bs._loidtid(SiaqodbRepo.Instance, Convert.ToInt32(oids[0]), SelectedType.MetaType, fi.Name, ref selectedOids, ref TID);
 	                if (selectedOids.Count == 0 || TID <= 0)
 	                {
 
@@ -318,7 +319,7 @@ namespace SiaqodbManager.ViewModel
 	                }
 	            }
 			}catch(Exception ex){
-				siaqodb.Close ();
+				SiaqodbRepo.Dispose ();
 				throw ex;
 			}
         }

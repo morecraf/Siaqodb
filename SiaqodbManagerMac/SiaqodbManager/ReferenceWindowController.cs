@@ -64,7 +64,7 @@ namespace SiaqodbManager
 
 		public override void AwakeFromNib ()
 		{
-			referenceViewModel = new ReferencesViewModelAdapter (new ReferencesViewModel(new ReferenceFileService()));
+			referenceViewModel = new ReferencesViewModelAdapter (new ReferencesViewModel(new OpenFileService("dll")));
 
 			ReferencesArray.Bind ("contentArray",referenceViewModel,"References",null);
 			Namespaces.Bind ("value",referenceViewModel,"Namespaces",BindingUtil.ContinuouslyUpdatesValue);

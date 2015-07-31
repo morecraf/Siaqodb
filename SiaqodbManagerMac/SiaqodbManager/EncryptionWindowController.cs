@@ -15,6 +15,8 @@ namespace SiaqodbManager
 	{
 		#region Constructors
 
+
+
 		// Called when created from unmanaged code
 		public EncryptionWindowController (IntPtr handle) : base (handle)
 		{

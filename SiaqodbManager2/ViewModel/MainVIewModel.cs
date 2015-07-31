@@ -20,11 +20,11 @@ namespace SiaqodbManager.ViewModel
 		private ConnectionItem selectedPath;
         private bool executeEnabled;
 		//private ObjectViewModel objectsTable;
-        private Sqo.Siaqodb siaqodb;
 
 
         public MainViewModel()
         {
+			EncryptionViewModel.Instance.Parent = this;
             if (!System.IO.Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config"))
             {
                 try
@@ -147,9 +147,9 @@ namespace SiaqodbManager.ViewModel
                     siaqodbConfig.Close();
 					//EncryptionSettings.SetEncryptionSettings();//set back settings
                 }
-                siaqodb = Sqo.Internal._bs._b(SelectedPath.Item);
+				SiaqodbRepo.Open (selectedPath.Item);
 
-                var allMetaTypes = siaqodb.GetAllTypes().Select(m=>new MetaTypeViewModel(m));
+				var allMetaTypes = SiaqodbRepo.Instance.GetAllTypes().Select(m=>new MetaTypeViewModel(m));
                 TypesList = new ObservableCollection<MetaTypeViewModel>(allMetaTypes);
                 OnPropertyChanged("TypesList");
                 //treeView1.Items.Clear();
@@ -275,7 +275,7 @@ namespace SiaqodbManager.ViewModel
         }
 		public ObjectViewModel CreateObjectsModel (MetaTypeViewModel viewModel,List<int> oids)
 		{
-            return new ObjectViewModel(viewModel, TypesList, siaqodb, oids);
+            return new ObjectViewModel(viewModel, TypesList, oids);
 		}
 
 //        public ObjectViewModel ObjectsTable
@@ -302,18 +302,7 @@ namespace SiaqodbManager.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
 
-        public Siaqodb Siaqodb
-        {
-            get
-            {
-                return siaqodb;
-            }
-            set
-            {
-                siaqodb = value;
-                OnPropertyChanged();
-            }
-        }
+   
 
 		internal QueryViewModel CreateQueryModel(IDialogService saveLinqService)
         {
@@ -329,7 +318,7 @@ namespace SiaqodbManager.ViewModel
 
         public void Dispose()
         {
-            siaqodb.Close();
+			SiaqodbRepo.Dispose();
         }
     }
 }

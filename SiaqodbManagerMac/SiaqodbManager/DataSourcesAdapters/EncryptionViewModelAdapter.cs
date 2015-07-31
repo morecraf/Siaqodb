@@ -1,6 +1,7 @@
 ﻿using System;
 using MonoMac.Foundation;
 using SiaqodbManager.ViewModel;
+using SiaqodbManager.CostumWindow;
 
 namespace SiaqodbManager.DataSourcesAdapters
 {
@@ -11,6 +12,7 @@ namespace SiaqodbManager.DataSourcesAdapters
 		public EncryptionViewModelAdapter (EncryptionViewModel viewModel):base(viewModel)
 		{
 			this.viewModel = viewModel;
+			viewModel.ConfirmationBox = new MessageBox (); 
 		}
 
 		[Export("Algorithm")]
@@ -36,8 +38,6 @@ namespace SiaqodbManager.DataSourcesAdapters
 		public void EncryptCommand(object obj){
 			viewModel.EncryptCommand.Execute (obj);
 		}
-
-
 	}
 }
 

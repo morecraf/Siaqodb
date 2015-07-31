@@ -31,10 +31,16 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSView MainWindow { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSButton OpenLinqFile { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSTextField PathInput { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSButton RemoveButton { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSButton SaveLinqFile { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSView TableActionButtons { get; set; }
@@ -68,6 +74,11 @@ namespace SiaqodbManager
 				ConnectButton = null;
 			}
 
+			if (ExecuteButton != null) {
+				ExecuteButton.Dispose ();
+				ExecuteButton = null;
+			}
+
 			if (LinqButton != null) {
 				LinqButton.Dispose ();
 				LinqButton = null;
@@ -88,9 +99,14 @@ namespace SiaqodbManager
 				RemoveButton = null;
 			}
 
-			if (ExecuteButton != null) {
-				ExecuteButton.Dispose ();
-				ExecuteButton = null;
+			if (OpenLinqFile != null) {
+				OpenLinqFile.Dispose ();
+				OpenLinqFile = null;
+			}
+
+			if (SaveLinqFile != null) {
+				SaveLinqFile.Dispose ();
+				SaveLinqFile = null;
 			}
 
 			if (TableActionButtons != null) {

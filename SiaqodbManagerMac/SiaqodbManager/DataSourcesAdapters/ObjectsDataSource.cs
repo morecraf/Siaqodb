@@ -69,9 +69,11 @@ namespace SiaqodbManager
 		public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn tableColumn, int row)
 		{
 			var valueKey = tableColumn.HeaderCell.Identifier;
-			if(valueKey != null){
-				var value = viewModel.GetValue(valueKey,row);
-				return NSObject.FromObject(value);
+			if(SiaqodbRepo.Opened){
+				if(valueKey != null){
+					var value = viewModel.GetValue(valueKey,row);
+					return NSObject.FromObject(value);
+				}
 			}
 			return new NSString("0");
 		}

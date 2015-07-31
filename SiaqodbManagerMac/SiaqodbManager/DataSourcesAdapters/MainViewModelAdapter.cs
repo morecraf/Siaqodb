@@ -27,11 +27,6 @@ namespace SiaqodbManager.DataSourcesAdapters
 			}
 		}
 
-		public object Siaqodb {
-			get{
-				return viewModel.Siaqodb;
-			}
-		}
 	
 		public List<MetaTypeViewModelAdapter> TypesList {
 			get{

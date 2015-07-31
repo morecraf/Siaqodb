@@ -13,8 +13,10 @@
                 <outlet property="ExecuteButton" destination="dTp-X2-11E" id="KlP-ch-Ukw"/>
                 <outlet property="LinqButton" destination="1ic-bJ-fso" id="m8D-1p-err"/>
                 <outlet property="MainWindow" destination="3" id="24"/>
+                <outlet property="OpenLinqFile" destination="PVf-Tg-yGd" id="y7a-vk-ZhA"/>
                 <outlet property="PathInput" destination="55" id="58"/>
                 <outlet property="RemoveButton" destination="95" id="99"/>
+                <outlet property="SaveLinqFile" destination="Grf-AL-bOP" id="Vbw-3h-BQ1"/>
                 <outlet property="TabView" destination="77" id="82"/>
                 <outlet property="TableActionButtons" destination="97" id="101"/>
                 <outlet property="TypesView" destination="27" id="52"/>
@@ -155,7 +157,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="1ic-bJ-fso">
-                        <rect key="frame" x="138" y="578" width="146" height="32"/>
+                        <rect key="frame" x="280" y="578" width="146" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Linq" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="srJ-kh-S2b">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -174,9 +176,25 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="dTp-X2-11E">
-                        <rect key="frame" x="138" y="549" width="146" height="32"/>
+                        <rect key="frame" x="280" y="549" width="146" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Execute" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PuE-Im-jap">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
+                    <button verticalHuggingPriority="750" id="PVf-Tg-yGd">
+                        <rect key="frame" x="134" y="578" width="146" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Open Linq File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rUf-qQ-4q1">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
+                    <button verticalHuggingPriority="750" id="Grf-AL-bOP">
+                        <rect key="frame" x="134" y="549" width="146" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Save Linq File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7SU-8p-yhb">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>

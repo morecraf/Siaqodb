@@ -45,6 +45,7 @@ namespace SiaqodbManager
 		{
 			Instance = this;
 			TablesDictionry = new Dictionary<string, NSTableView> ();
+			LinqTabDictionary = new Dictionary<NSTabViewItem, QueryViewModelAdapter> ();
 		}
 
 		#endregion
@@ -55,6 +56,7 @@ namespace SiaqodbManager
 		public static PropertyChangedEventHandler BindHandler{ get { return Instance.PropretyChangeHandler;} }
 
 		private Dictionary<string,NSTableView> TablesDictionry; 
+		private Dictionary<NSTabViewItem,QueryViewModelAdapter> LinqTabDictionary; 
 
 
 		public void PropretyChangeHandler (object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -78,9 +80,17 @@ namespace SiaqodbManager
 
 		partial void OnEncryption (NSObject sender)
 		{
-			EncryptionViewModel.Instance.Parent = mainViewModel;
 			var controller = new EncryptionWindowController ();
 			NSApplication.SharedApplication.RunModalForWindow(controller.Window);
+
+			foreach(var label in TablesDictionry.Keys){
+				//	TablesDictionry[label];
+
+				var tabItem = TabView.Items.FirstOrDefault(t=> t.Label == label);
+				if(tabItem != null){
+					TabView.Remove(tabItem);
+				}
+			}
 		}
 
 		partial void OnReferences (NSObject sender)
@@ -159,6 +169,11 @@ namespace SiaqodbManager
 		{
 			var tab = TabView.Selected;
 			TabView.Remove (tab);
+			if(TablesDictionry.ContainsKey(TabView.Selected.Label)){
+				TablesDictionry.Remove (TabView.Selected.Label);
+			}else if(LinqTabDictionary.ContainsKey(TabView.Selected)){
+				LinqTabDictionary.Remove(TabView.Selected);
+			}
 		}
 
 		void OnLinqTab (object sender, EventArgs e)
@@ -176,8 +191,8 @@ namespace SiaqodbManager
 			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService());
 			var documentView = new DocumentTextView ();
 			documentView.Bind ("attributedString",queryViewModel,"Linq",BindingUtil.ContinuouslyUpdatesValue);
-			BindButton (queryViewModel,"ExecuteCommand",ExecuteButton);
 			documentScrollView.ContentView.DocumentView = documentView;
+			BindSelectedLinq (queryViewModel);
 
 			var tableView = new LinqTable (queryViewModel);
 			scrolView.ContentView.DocumentView = tableView;
@@ -189,6 +204,8 @@ namespace SiaqodbManager
 			tabViewItem.Label = "New linq doc";
 			TabView.Add (tabViewItem);
 			TabView.Select (tabViewItem);
+			LinqTabDictionary[tabViewItem] = queryViewModel;
+
 		}
 
 		void OnTabSelectionChanged (object sender, NSTabViewItemEventArgs e)
@@ -196,9 +213,14 @@ namespace SiaqodbManager
 			var label = TabView.Selected.Label;
 			if(TablesDictionry.ContainsKey(label)){
 				TableActionButtons.Hidden = false;
+			}else if(LinqTabDictionary.ContainsKey(TabView.Selected)){
+				var queryViewModel = LinqTabDictionary[TabView.Selected];
+				BindSelectedLinq (queryViewModel);
+				TableActionButtons.Hidden = true;
 			}else{
 				TableActionButtons.Hidden = true;
 			}
+
 		}
 
 		void LinqExecuted (object sender, LinqEventArgs e)
@@ -217,6 +239,13 @@ namespace SiaqodbManager
 				dataSource.RemoveRow (rowIndex);
 				tableView.ReloadData ();
 			}
+		}
+
+		void BindSelectedLinq (QueryViewModelAdapter queryViewModel)
+		{
+			BindButton (queryViewModel, "ExecuteCommand", ExecuteButton);
+			BindButton (queryViewModel, "SaveCommand", SaveLinqFile);
+			BindButton (queryViewModel, "OpenCommand", OpenLinqFile);
 		}
 
 		private void BindButton(NSObject target,string action,NSButton button){

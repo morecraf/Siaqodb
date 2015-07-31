@@ -83,6 +83,7 @@
     <Folder Include="MacWinInterface\" />
     <Folder Include="CodeDom\" />
     <Folder Include="CustomWindow\" />
+    <Folder Include="Repo\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -172,9 +173,11 @@
       <Link>Model\LinqEventArgs.cs</Link>
     </Compile>
     <Compile Include="DataSourcesAdapters\ReferencesViewModelAdapter.cs" />
-    <Compile Include="CustomWindow\ReferenceFileService.cs" />
     <Compile Include="DataSourcesAdapters\LinqDataSource.cs" />
     <Compile Include="Controls\LinqTable.cs" />
+    <Compile Include="CustomWindow\MessageBox.cs" />
+    <Compile Include="Repo\SiaqodbRepo.cs" />
+    <Compile Include="CustomWindow\OpenFileService.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />

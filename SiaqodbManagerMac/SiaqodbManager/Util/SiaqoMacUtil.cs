@@ -30,6 +30,12 @@ namespace SiaqodbManager
 				value = Convert.ToUInt64(stringValue);
 			}else if(metaField.FieldType == typeof(float)){
 				value = Convert.ToDouble(stringValue);
+			}else if(metaField.FieldType == typeof(decimal)){
+				value = Convert.ToDecimal(stringValue);
+			}else if(metaField.FieldType == typeof(bool)){
+				value = Convert.ToBoolean(stringValue);
+			}else if(metaField.FieldType == typeof(DateTime)){
+				value = Convert.ToDateTime(stringValue);
 			}
 			return value;
 		}
