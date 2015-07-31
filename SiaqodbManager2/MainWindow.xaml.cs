@@ -387,9 +387,9 @@ namespace SiaqodbManager
 
         private void menuEncryption_Click(object sender, RoutedEventArgs e)
         {
-            EncryptionSettings es = new EncryptionSettings(EncryptionViewModel.Instance);
+            EncryptionSettings es = new EncryptionSettings(EncryptionViewModel.Instance,viewModel);
             bool? res = es.ShowDialog();
-            if (res.HasValue )
+            if (res.HasValue)
             {
                 if (res.Value)
                 {
@@ -406,7 +406,6 @@ namespace SiaqodbManager
                     {
                         doc.Close();
                     }
-                    treeView1.Items.Clear();
                 }
             }
         }

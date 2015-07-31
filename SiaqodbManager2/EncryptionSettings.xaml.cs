@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Sqo;
 using SiaqodbManager.DialogService;
+using SiaqodbManager.ViewModel;
 
 namespace SiaqodbManager
 {
@@ -20,13 +21,21 @@ namespace SiaqodbManager
     /// </summary>
     public partial class EncryptionSettings : Window
     {
- 
+        private ViewModel.EncryptionViewModel encryptionViewModel;
+        private ViewModel.MainViewModel viewModel;
 
-        public EncryptionSettings(ViewModel.EncryptionViewModel encryptionViewModel)
+
+
+        public EncryptionSettings(ViewModel.EncryptionViewModel encryptionViewModel, MainViewModel viewModel)
         {
             InitializeComponent();
             DataContext = encryptionViewModel;
-            encryptionViewModel.ClosingRequest += (sender, e) => this.Close();
+            encryptionViewModel.ClosingRequest += (sender, e) =>
+            {
+                this.DialogResult = true;
+                this.Close();
+            };
+            encryptionViewModel.Parent = viewModel;
             encryptionViewModel.ConfirmationBox = new MessageDialog();
         }
     }

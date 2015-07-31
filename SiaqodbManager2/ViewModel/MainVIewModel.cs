@@ -319,5 +319,11 @@ namespace SiaqodbManager.ViewModel
         {
             return new QueryViewModel(saveLinqService,this);
         }
+
+        internal void ClearTypes()
+        {
+            TypesList.Clear();
+            OnPropertyChanged("TypesList");
+        }
     }
 }

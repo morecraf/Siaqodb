@@ -40,10 +40,13 @@ namespace SiaqodbManager.ViewModel
                 return;
             }
             if(ConfirmationBox.Show("Changing encryption settings will disconnect current database,continue?","Encryption",true)){
-                if(passwordCont == null){
+                if(passwordCont != null){
                     SetEncryptionSettings();
                 }
                 OnClosingRequest();
+                if(Parent != null){
+                    Parent.ClearTypes();
+                }
             }
         }
 
@@ -122,5 +125,7 @@ namespace SiaqodbManager.ViewModel
         }
 
         public EventHandler<EventArgs> ClosingRequest;
+
+        public MainViewModel Parent { get; set; }
     }
 }

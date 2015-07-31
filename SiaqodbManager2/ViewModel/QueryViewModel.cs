@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using MonoMac.AppKit;
 
 namespace SiaqodbManager.ViewModel
 {
@@ -206,15 +205,7 @@ namespace SiaqodbManager.ViewModel
 
         private void WriteErrors(string errorLine)
         {
-			var alert = new NSAlert {
-				MessageText = errorLine,
-				AlertStyle = NSAlertStyle.Informational
-			};
-
-			alert.AddButton ("OK");
-			alert.AddButton ("Cancel");
-
-			var returnValue = alert.RunModal();
+		
             //Error text
           //  this.textBox1.Text += errorLine + "\r\n";
         }
