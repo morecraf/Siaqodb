@@ -17,6 +17,8 @@ namespace SiaqodbManager
 		public override void FinishedLaunching (NSObject notification)
 		{
 			mainWindowController = new MainWindowController ();
+			EncryptionMenu.Activated += mainWindowController.OnEncryption;
+			ReferenceMenu.Activated += mainWindowController.OnReference;
 			mainWindowController.Window.MakeKeyAndOrderFront (this);
 		}
 	}

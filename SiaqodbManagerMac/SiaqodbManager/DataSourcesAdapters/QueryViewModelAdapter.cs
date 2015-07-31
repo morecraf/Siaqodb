@@ -35,12 +35,7 @@ namespace SiaqodbManager
 		{
 			viewModel.Execute ();
 		}
-
-		[Export("OpenCommand")]
-		public void OpenCommand(NSObject obj)
-		{
-			//viewModel. ();
-		}
+			
 		[Export("SaveCommand")]
 		public void SaveCommand(NSObject obj)
 		{

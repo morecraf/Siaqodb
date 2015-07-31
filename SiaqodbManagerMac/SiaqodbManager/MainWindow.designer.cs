@@ -31,9 +31,6 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSView MainWindow { get; set; }
 
 		[Outlet]
-		MonoMac.AppKit.NSButton OpenLinqFile { get; set; }
-
-		[Outlet]
 		MonoMac.AppKit.NSTextField PathInput { get; set; }
 
 		[Outlet]
@@ -53,6 +50,9 @@ namespace SiaqodbManager
 
 		[Action ("OnEncryption:")]
 		partial void OnEncryption (MonoMac.Foundation.NSObject sender);
+
+		[Action ("OnLinqOpen:")]
+		partial void OnLinqOpen (MonoMac.Foundation.NSObject sender);
 
 		[Action ("OnReferences:")]
 		partial void OnReferences (MonoMac.Foundation.NSObject sender);
@@ -97,11 +97,6 @@ namespace SiaqodbManager
 			if (RemoveButton != null) {
 				RemoveButton.Dispose ();
 				RemoveButton = null;
-			}
-
-			if (OpenLinqFile != null) {
-				OpenLinqFile.Dispose ();
-				OpenLinqFile = null;
 			}
 
 			if (SaveLinqFile != null) {

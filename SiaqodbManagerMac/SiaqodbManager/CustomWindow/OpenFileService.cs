@@ -7,9 +7,12 @@ namespace SiaqodbManager.CustomWindow
 	public class OpenFileService:IDialogService
 	{
 		private string extension;
-		public OpenFileService (string extension)
+		private string message;
+
+		public OpenFileService (string extension, string message)
 		{
 			this.extension = extension;
+			this.message = message;
 		}
 
 		#region IDialogService implementation
@@ -18,7 +21,7 @@ namespace SiaqodbManager.CustomWindow
 		{
 			var referencePanel = new NSOpenPanel();
 			referencePanel.ReleasedWhenClosed = true;
-			referencePanel.Prompt = "Add reference";
+			referencePanel.Prompt = message;
 			referencePanel.CanCreateDirectories = true;
 			referencePanel.AllowedFileTypes = new [] {extension};
 

@@ -12,6 +12,7 @@ using SiaqodbManager.Util;
 using SiaqodbManager.Entities;
 using SiaqodbManager.Controls;
 using SiaqodbManager.CustomWindow;
+using System.IO;
 
 namespace SiaqodbManager
 {
@@ -78,19 +79,45 @@ namespace SiaqodbManager
 			NSObject.FromObject (sender).DidChangeValue (e.PropertyName);
 		}
 
+		public void OnEncryption (object sender, EventArgs e)
+		{
+			OnEncryption (NSObject.FromObject(sender));
+		}
+	
+
 		partial void OnEncryption (NSObject sender)
 		{
 			var controller = new EncryptionWindowController ();
-			NSApplication.SharedApplication.RunModalForWindow(controller.Window);
+			var number = NSApplication.SharedApplication.RunModalForWindow(controller.Window);
 
 			foreach(var label in TablesDictionry.Keys){
-				//	TablesDictionry[label];
-
-				var tabItem = TabView.Items.FirstOrDefault(t=> t.Label == label);
+				var tabItem = TabView.Items.FirstOrDefault(t => t.Label == label);
 				if(tabItem != null){
 					TabView.Remove(tabItem);
 				}
 			}
+			TablesDictionry.Clear();
+		}
+
+		partial void OnLinqOpen (NSObject sender)
+		{
+			var fileDialog = new OpenFileService("","Select file");
+
+			var file = fileDialog.OpenDialog();
+			if(file != null){
+				using(var sr = new StreamReader(file)){
+					string  s = sr.ReadToEnd();
+					OnLinqTab(sender, new EventArgs());
+					var queryView = LinqTabDictionary[TabView.Selected];
+					TabView.Selected.Label = file;
+					queryView.Linq = new NSAttributedString(s);
+				}
+			}
+		}
+
+		public void OnReference (object sender, EventArgs e)
+		{
+			OnReferences (NSObject.FromObject(sender));
 		}
 
 		partial void OnReferences (NSObject sender)
@@ -103,6 +130,7 @@ namespace SiaqodbManager
 		//BIND THE LOGIN PANEL
 		public  override void AwakeFromNib ()
 		{
+
 			base.AwakeFromNib ();
 			EncryptionViewModel.Instance.SetEncryptionSettings ();
 			mainViewModel = new MainViewModelAdapter (new MainViewModel());
@@ -205,7 +233,6 @@ namespace SiaqodbManager
 			TabView.Add (tabViewItem);
 			TabView.Select (tabViewItem);
 			LinqTabDictionary[tabViewItem] = queryViewModel;
-
 		}
 
 		void OnTabSelectionChanged (object sender, NSTabViewItemEventArgs e)
@@ -245,7 +272,6 @@ namespace SiaqodbManager
 		{
 			BindButton (queryViewModel, "ExecuteCommand", ExecuteButton);
 			BindButton (queryViewModel, "SaveCommand", SaveLinqFile);
-			BindButton (queryViewModel, "OpenCommand", OpenLinqFile);
 		}
 
 		private void BindButton(NSObject target,string action,NSButton button){
