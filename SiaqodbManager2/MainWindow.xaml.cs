@@ -113,7 +113,7 @@ namespace SiaqodbManager
                 
             }
             QueryDocument query = dockingManager1.ActiveDocument as QueryDocument;
-            
+
             if (query != null)
             {
                 btnExecute.IsEnabled = true;
@@ -122,7 +122,7 @@ namespace SiaqodbManager
                 menuSave.IsEnabled = true;
                 menuSaveAs.IsEnabled = true;
             }
-            else 
+            else
             {
                 btnExecute.IsEnabled = false;
                 menuExecute.IsEnabled = false;
@@ -142,12 +142,6 @@ namespace SiaqodbManager
             SetDefaultSettings(uq);
             uq.Show(this.dockingManager1);
             uq.Activate();
-
-            btnExecute.IsEnabled = true;
-            menuExecute.IsEnabled = true;
-            btnSave.IsEnabled = true;
-            menuSave.IsEnabled = true;
-            menuSaveAs.IsEnabled = true;
         }
         void newCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -212,12 +206,6 @@ namespace SiaqodbManager
                     uq.Show(this.dockingManager1);
                     uq.SetText(s, opf.FileName);
                     uq.Activate();
-
-                    btnExecute.IsEnabled = true;
-                    menuExecute.IsEnabled = true;
-                    btnSave.IsEnabled = true;
-                    menuSave.IsEnabled = true;
-                    menuSaveAs.IsEnabled = true;
                 }
             }
         }
@@ -334,7 +322,7 @@ namespace SiaqodbManager
                 var objectsModel = viewModel.CreateObjectsModel(metaType);
                 objectsModel.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
                 ObjectsDocument uco = new ObjectsDocument(objectsModel);
-                uco.Initialize(metaType.MetaType, viewModel.Siaqodb, siaqodbList);
+                uco.Initialize(metaType.MetaType, siaqodbList);
                 uco.Title = metaType.Name;
                 SetDefaultSettings(uco);
                 uco.Show(this.dockingManager1);
@@ -353,11 +341,6 @@ namespace SiaqodbManager
             //        SetDefaultSettings(uco);
             //        uco.Show(this.dockingManager1);
             //        uco.Activate();
-            //        btnExecute.IsEnabled = false;
-            //        menuExecute.IsEnabled = false;
-            //        btnSave.IsEnabled = false;
-            //        menuSave.IsEnabled = false;
-            //        menuSaveAs.IsEnabled = false;
             //    }
             //}
         }
@@ -367,16 +350,11 @@ namespace SiaqodbManager
             var objectsModel = viewModel.CreateObjectsModel(new MetaTypeViewModel(e.mType),e.oids);
             objectsModel.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
             ObjectsDocument uco = new ObjectsDocument(objectsModel);
-            uco.Initialize(e.mType, siaqodb, siaqodbList);
+            uco.Initialize(e.mType,  siaqodbList);
             uco.Title = e.mType.Name;
             SetDefaultSettings(uco);
             uco.Show(this.dockingManager1);
             uco.Activate();
-            //btnExecute.IsEnabled = false;
-            //menuExecute.IsEnabled = false;
-            //btnSave.IsEnabled = false; 
-            //menuSave.IsEnabled = false;
-            //menuSaveAs.IsEnabled = false;
         }
         private void SetDefaultSettings(DocumentContent doc)
         {

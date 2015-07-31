@@ -8,8 +8,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SiaqodbManager.Entities;
-using MonoMac.AppKit;
 using Sqo.Exceptions;
+using SiaqodbManager.Repo;
 
 namespace SiaqodbManager.ViewModel
 {
@@ -257,15 +257,7 @@ namespace SiaqodbManager.ViewModel
         {
             var metaType = SelectedType.MetaType;
 			Sqo.Internal._bs._uf(SiaqodbRepo.Instance, oids[rowIndex], metaType, columnName, value);
-			var alert = new NSAlert {
-				MessageText = value.ToString(),
-				AlertStyle = NSAlertStyle.Informational
-			};
-
-			alert.AddButton ("OK");
-			alert.AddButton ("Cancel");
-
-			var returnValue = alert.RunModal();
+		
 
         }
 

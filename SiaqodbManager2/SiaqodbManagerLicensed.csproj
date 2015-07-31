@@ -108,6 +108,7 @@
     <Compile Include="MacWinInterface\IDialogService.cs" />
     <Compile Include="MacWinInterface\IMessageBox.cs" />
     <Compile Include="MacWinInterface\IPasswordContainer.cs" />
+    <Compile Include="Repo\SiaqodbRepo.cs" />
     <Compile Include="SetTrialLicense.xaml.cs">
       <DependentUpon>SetTrialLicense.xaml</DependentUpon>
     </Compile>

@@ -19,6 +19,7 @@ using System.Collections;
 using Sqo.Internal;
 using SiaqodbManager.ViewModel;
 using SiaqodbManager.Entities;
+using SiaqodbManager.Repo;
 
 namespace SiaqodbManager
 {
@@ -78,14 +79,13 @@ namespace SiaqodbManager
         #endregion
 
         List<int> oids = null;
-        Siaqodb siaqodb;
         MetaType metaType;
         System.Windows.Forms.DataGridView dataGridView1 = null;
         List<Sqo.MetaType> typesList;
         internal event EventHandler<MetaEventArgs> OpenObjects;
         Dictionary<int, MetaType> columnsTypes = new Dictionary<int, MetaType>();
 
-        internal void Initialize(MetaType metaType, Siaqodb siaqodb, List<Sqo.MetaType> typesList)
+        internal void Initialize(MetaType metaType,  List<Sqo.MetaType> typesList)
         {
             dataGridView1 = new System.Windows.Forms.DataGridView();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -115,7 +115,6 @@ namespace SiaqodbManager
             myhost.Child = dataGridView1;
             this.typesList = typesList;
             this.metaType = metaType;
-            this.siaqodb = siaqodb;
          
             dataGridView1.Columns.Clear();
             dataGridView1.Columns.Add("OID", "OID");
@@ -204,7 +203,7 @@ namespace SiaqodbManager
                 List<SortableEntity> seList = new List<SortableEntity>();
                 foreach (int oid in oids)
                 {
-                    object val = siaqodb.LoadValue(oid, metaType.Fields[currentSortedColumn - 1].Name, metaType);
+                    object val = SiaqodbRepo.Instance.LoadValue(oid, metaType.Fields[currentSortedColumn - 1].Name, metaType);
                     SortableEntity se = new SortableEntity() { OID = oid, SortableValue = val };
                     seList.Add(se);
                 }
@@ -288,7 +287,7 @@ namespace SiaqodbManager
                 try
                 {
 
-                    Sqo.Internal._bs._uf(siaqodb, oids[rowIndex], metaType, metaType.Fields[columnIndex - 1].Name, ar);
+                    Sqo.Internal._bs._uf(SiaqodbRepo.Instance, oids[rowIndex], metaType, metaType.Fields[columnIndex - 1].Name, ar);
                     dataGridView1.Rows[rowIndex].Cells[columnIndex].ErrorText = string.Empty;
                 }
                 catch (SiaqodbException ex)
@@ -330,9 +329,9 @@ namespace SiaqodbManager
             }
             else//is new
             {
-                int oid = oids[oids.Count-1];
-                Sqo.Internal._bs._do(siaqodb, oid, metaType);
-                oids.Remove(oid);
+               // int oid = oids[oids.Count-1];
+               // Sqo.Internal._bs._do(siaqodb, oid, metaType);
+               // oids.Remove(oid);
             }
         }
         private void dataGridView1_CellValueNeeded(object sender, System.Windows.Forms.DataGridViewCellValueEventArgs e)

@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using SiaqodbManager.MacWinInterface;
+using SiaqodbManager.Repo;
 
 namespace SiaqodbManager.ViewModel
 {
@@ -275,6 +276,12 @@ namespace SiaqodbManager.ViewModel
         }
 		public ObjectViewModel CreateObjectsModel (MetaTypeViewModel viewModel,List<int> oids)
 		{
+            ExecuteEnabled = false;
+            // menuExecute.IsEnabled = false;
+            SaveEnabled = false;
+            //menuSave.IsEnabled = false;
+            //menuSaveAs.IsEnabled = false;
+            InfoEnabled = false;
             return new ObjectViewModel(viewModel, TypesList, oids);
 		}
 
@@ -306,6 +313,12 @@ namespace SiaqodbManager.ViewModel
 
 		internal QueryViewModel CreateQueryModel(IDialogService saveLinqService)
         {
+            ExecuteEnabled = true;
+            // menuExecute.IsEnabled = false;
+            SaveEnabled = true;
+            //menuSave.IsEnabled = false;
+            //menuSaveAs.IsEnabled = false;
+            InfoEnabled = true;
             return new QueryViewModel(saveLinqService,this);
         }
 
