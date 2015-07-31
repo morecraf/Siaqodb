@@ -46,6 +46,7 @@ namespace SiaqodbManager.ViewModel
                 OnClosingRequest();
                 if(Parent != null){
                     Parent.ClearTypes();
+                    Parent.Dispose();
                 }
             }
         }

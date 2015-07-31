@@ -12,7 +12,7 @@ using SiaqodbManager.MacWinInterface;
 
 namespace SiaqodbManager.ViewModel
 {
-	public class MainViewModel : INotifyPropertyChanged
+	public class MainViewModel : INotifyPropertyChanged,IDisposable
     {
         private bool infoEnabled;
         private bool saveEnabled;
@@ -324,6 +324,12 @@ namespace SiaqodbManager.ViewModel
         {
             TypesList.Clear();
             OnPropertyChanged("TypesList");
+        }
+
+
+        public void Dispose()
+        {
+            siaqodb.Close();
         }
     }
 }
