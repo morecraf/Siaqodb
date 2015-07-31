@@ -78,6 +78,7 @@ namespace SiaqodbManager
 
 		partial void OnEncryption (NSObject sender)
 		{
+			EncryptionViewModel.Instance.Parent = mainViewModel;
 			var controller = new EncryptionWindowController ();
 			NSApplication.SharedApplication.RunModalForWindow(controller.Window);
 		}
@@ -163,41 +164,27 @@ namespace SiaqodbManager
 		void OnLinqTab (object sender, EventArgs e)
 		{
 			var tabViewItem = new NSTabViewItem ();
-			var queryView = new NSView ();
+			var queryView = new NSSplitView ();
 			queryView.AutoresizingMask = NSViewResizingMask.MaxXMargin|
 				NSViewResizingMask.MaxYMargin|
 				NSViewResizingMask.HeightSizable|
 				NSViewResizingMask.WidthSizable;
 
-			var documentView = new DocumentTextView ();
-			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService());
-			documentView.Bind ("attributedString",queryViewModel,"Linq",BindingUtil.ContinuouslyUpdatesValue);
-
-			BindButton (queryViewModel,"ExecuteCommand",ExecuteButton);
-
 			var scrolView = new NSScrollView ();
-			documentView.SetFrameOrigin (new System.Drawing.PointF(300,300));
+			var documentScrollView = new NSScrollView ();
 
-			scrolView.SetFrameSize (new System.Drawing.SizeF(200,200));
-			scrolView.SetFrameOrigin (new System.Drawing.PointF(100,100));
-			//scrolView.AutoresizingMask =
-//				NSViewResizingMask.MaxXMargin|
-				//			NSViewResizingMask.HeightSizable|
-				//				NSViewResizingMask.WidthSizable;
+			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService());
+			var documentView = new DocumentTextView ();
+			documentView.Bind ("attributedString",queryViewModel,"Linq",BindingUtil.ContinuouslyUpdatesValue);
+			BindButton (queryViewModel,"ExecuteCommand",ExecuteButton);
+			documentScrollView.ContentView.DocumentView = documentView;
+
 			var tableView = new LinqTable (queryViewModel);
 			scrolView.ContentView.DocumentView = tableView;
 
-			var column = new NSTableColumn ();
-			column.HeaderCell.Identifier = "incercare";
-			column.HeaderCell.Title = "incercare";
-			tableView.AddColumn (column);
-			tableView.HeaderView.NeedsDisplay = true;
-
-			queryView.AddSubview (documentView);
+			queryView.AddSubview (documentScrollView);
 			queryView.AddSubview (scrolView);
-			//	tableView.SizeToFit ();
 			tabViewItem.View.AddSubview (queryView);
-			//MainWindow.AddSubview (tableView);
 
 			tabViewItem.Label = "New linq doc";
 			TabView.Add (tabViewItem);

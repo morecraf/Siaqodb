@@ -69,10 +69,7 @@
       <HintPath>libs\SiaqodbPortable.dll</HintPath>
     </Reference>
     <Reference Include="Siaqodb">
-      <HintPath>libs\siaqodb.dll</HintPath>
-    </Reference>
-    <Reference Include="Model">
-      <HintPath>bin\Debug\Model.dll</HintPath>
+      <HintPath>libs\Siaqodb.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

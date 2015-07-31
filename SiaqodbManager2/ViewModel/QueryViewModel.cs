@@ -133,11 +133,18 @@ namespace SiaqodbManager.ViewModel
 #if TRIAL
             ifEncrypted += @" SiaqodbConfigurator.SetTrialLicense("""+TrialLicense.LicenseKey+@""");";
 #endif
-            string metBody = ifEncrypted + @" Siaqodb siaqodb = Sqo.Internal._bs._ofm(@""" + Path + @""",""SiaqodbManager,SiaqodbManager2"");
-			
-							object list= (" + Linq + @").ToList();
-                            siaqodb.Close();
-                            return list;
+			string metBody = ifEncrypted + @"
+							 Siaqodb siaqodb = null;
+							 try{
+							    siaqodb = Sqo.Internal._bs._ofm(@""" + Path + @""",""SiaqodbManager,SiaqodbManager2"");
+				
+								object list= (" + Linq + @").ToList();
+								return list;
+                            }finally{
+								if(siaqodb != null){
+									siaqodb.Close();
+								}
+							}
 							 ";
             var c = new CodeDom();
 			c.AddReference(@"System.Core.dll"); 

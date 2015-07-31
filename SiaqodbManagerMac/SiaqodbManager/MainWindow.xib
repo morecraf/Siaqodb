@@ -26,21 +26,21 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" animationBehavior="default" id="2" customClass="MainWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="131" y="74" width="1126" height="626"/>
+            <rect key="contentRect" x="131" y="74" width="1049" height="620"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <view key="contentView" id="3">
-                <rect key="frame" x="0.0" y="0.0" width="1126" height="626"/>
+                <rect key="frame" x="0.0" y="0.0" width="1049" height="620"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="26">
-                        <rect key="frame" x="73" y="79" width="258" height="439"/>
+                        <rect key="frame" x="20" y="44" width="258" height="474"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="mhw-OO-EOm">
-                            <rect key="frame" x="1" y="17" width="256" height="421"/>
+                            <rect key="frame" x="1" y="17" width="256" height="456"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" headerView="29" indentationPerLevel="16" outlineTableColumn="31" id="27">
-                                    <rect key="frame" x="0.0" y="0.0" width="256" height="421"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="256" height="456"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -78,7 +78,7 @@
                         </tableHeaderView>
                     </scrollView>
                     <button verticalHuggingPriority="750" id="53">
-                        <rect key="frame" x="255" y="520" width="82" height="32"/>
+                        <rect key="frame" x="202" y="520" width="82" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Connect" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="54">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -86,7 +86,7 @@
                         </buttonCell>
                     </button>
                     <textField verticalHuggingPriority="750" id="55">
-                        <rect key="frame" x="73" y="526" width="180" height="22"/>
+                        <rect key="frame" x="20" y="526" width="180" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="56">
                             <font key="font" metaFont="system"/>
@@ -95,24 +95,24 @@
                         </textFieldCell>
                     </textField>
                     <customView id="98">
-                        <rect key="frame" x="339" y="79" width="751" height="469"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
+                        <rect key="frame" x="286" y="15" width="751" height="533"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES"/>
                         <subviews>
                             <tabView id="77">
-                                <rect key="frame" x="0.0" y="18" width="731" height="443"/>
+                                <rect key="frame" x="0.0" y="22" width="731" height="503"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <font key="font" metaFont="system"/>
                                 <tabViewItems>
                                     <tabViewItem label="Start" identifier="1" id="90">
                                         <view key="view" id="91">
-                                            <rect key="frame" x="10" y="33" width="711" height="397"/>
+                                            <rect key="frame" x="10" y="33" width="711" height="457"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         </view>
                                     </tabViewItem>
                                 </tabViewItems>
                             </tabView>
                             <customView id="97">
-                                <rect key="frame" x="334" y="8" width="57" height="21"/>
+                                <rect key="frame" x="337" y="10" width="57" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <button verticalHuggingPriority="750" id="95">
@@ -134,8 +134,8 @@
                                 </subviews>
                             </customView>
                             <button verticalHuggingPriority="750" id="102">
-                                <rect key="frame" x="717" y="441" width="40" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <rect key="frame" x="717" y="505" width="40" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="X" bezelStyle="rounded" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="103">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -144,7 +144,7 @@
                         </subviews>
                     </customView>
                     <button verticalHuggingPriority="750" id="CDo-Nc-tY4">
-                        <rect key="frame" x="67" y="578" width="124" height="32"/>
+                        <rect key="frame" x="14" y="578" width="124" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Encryption" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qyj-TY-fIm">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -155,7 +155,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="1ic-bJ-fso">
-                        <rect key="frame" x="191" y="578" width="146" height="32"/>
+                        <rect key="frame" x="138" y="578" width="146" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Linq" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="srJ-kh-S2b">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -163,7 +163,7 @@
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" id="0gn-yL-9KJ">
-                        <rect key="frame" x="67" y="549" width="124" height="32"/>
+                        <rect key="frame" x="14" y="549" width="124" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="References" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="LDc-sZ-tiG">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -174,7 +174,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="dTp-X2-11E">
-                        <rect key="frame" x="191" y="549" width="146" height="32"/>
+                        <rect key="frame" x="138" y="549" width="146" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Execute" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PuE-Im-jap">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

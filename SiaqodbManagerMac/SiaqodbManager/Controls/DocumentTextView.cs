@@ -10,11 +10,12 @@ namespace SiaqodbManager.Controls
 	{
 		public DocumentTextView ()
 		{
-			SetFrameSize (new SizeF(100,100));
+
 			TextDidChange += SyntaxHighlightJson;
-			//inputError = new ValidateionResultAdapter (true,"");
-			//AutoresizingMask = NSViewResizingMask.HeightSizable | NSViewResizingMask.WidthSizable|
-			//	NSViewResizingMask.MaxXMargin  ;
+			AutoresizingMask = NSViewResizingMask.HeightSizable 
+			  | NSViewResizingMask.WidthSizable|
+				NSViewResizingMask.MaxXMargin |
+				NSViewResizingMask.MaxYMargin;
 
 		}
 //		[Export("error")]

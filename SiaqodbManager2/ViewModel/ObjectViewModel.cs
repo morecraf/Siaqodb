@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SiaqodbManager.Entities;
+using MonoMac.AppKit;
 
 namespace SiaqodbManager.ViewModel
 {
@@ -94,62 +95,66 @@ namespace SiaqodbManager.ViewModel
             object value;
 			var columnIndex = 0;
 
-
 			if(ColumnIndexes.ContainsKey(columnName)){
 				columnIndex = ColumnIndexes[columnName].Item1;
 			}
-            if (columnIndex == 0)
-            {
-				value = oids[rowIndex];
-            }
-            else
-            {
-                if (field.FieldType == null)//complex type
-                {
-                    int TID = 0;
-                    bool isArray = false;
-					Sqo.Internal._bs._ltid(siaqodb, Convert.ToInt32(oids[rowIndex]), SelectedType.MetaType, field.ActualName, ref TID, ref isArray);
-                    if (TID <= 0)
-                    {
-                        if (TID == -31)
-                        {
-                            value = "[Dictionary<,>]";
-                        }
-                        else if (TID == -32)
-                        {
+			try{
+	            if (columnIndex == 0)
+	            {
+					value = oids[rowIndex];
+	            }
+	            else
+	            {
+	                if (field.FieldType == null)//complex type
+	                {
+	                    int TID = 0;
+	                    bool isArray = false;
+						Sqo.Internal._bs._ltid(siaqodb, Convert.ToInt32(oids[rowIndex]), SelectedType.MetaType, field.ActualName, ref TID, ref isArray);
+	                    if (TID <= 0)
+	                    {
+	                        if (TID == -31)
+	                        {
+	                            value = "[Dictionary<,>]";
+	                        }
+	                        else if (TID == -32)
+	                        {
 
-                            value = "[Jagged Array]";
-                        }
-                        else
-                        {
-                            value = "[null]";
-                        }
-                    }
-                    else
-                    {
-                        MetaType mtOfComplex = FindMeta(TID);
-                        if (isArray)
-                        {
-                            string[] name = mtOfComplex.Name.Split(',');
-                            value = name[0] + " []";
-                        }
-                        else
-                        {
-                            string[] name = mtOfComplex.Name.Split(',');
-                            value = name[0];
-                        }
-                    }
-                }
-                else
-                {
-                    value = siaqodb.LoadValue(oids[rowIndex], field.ActualName, SelectedType.MetaType);
-                }
-                if (value == null)
-                {
-                    value = "[null]";
-                }
-            }
-			return value;
+	                            value = "[Jagged Array]";
+	                        }
+	                        else
+	                        {
+	                            value = "[null]";
+	                        }
+	                    }
+	                    else
+	                    {
+	                        MetaType mtOfComplex = FindMeta(TID);
+	                        if (isArray)
+	                        {
+	                            string[] name = mtOfComplex.Name.Split(',');
+	                            value = name[0] + " []";
+	                        }
+	                        else
+	                        {
+	                            string[] name = mtOfComplex.Name.Split(',');
+	                            value = name[0];
+	                        }
+	                    }
+	                }
+	                else
+	                {
+	                    value = siaqodb.LoadValue(oids[rowIndex], field.ActualName, SelectedType.MetaType);
+	                }
+	                if (value == null)
+	                {
+	                    value = "[null]";
+	                }
+	            }
+				return value;
+			}catch(Exception ex){
+				siaqodb.Close ();
+				throw ex;
+			}
 		}
      
 
@@ -251,45 +256,71 @@ namespace SiaqodbManager.ViewModel
         {
             var metaType = SelectedType.MetaType;
             Sqo.Internal._bs._uf(siaqodb, oids[rowIndex], metaType, columnName, value);
+			var alert = new NSAlert {
+				MessageText = value.ToString(),
+				AlertStyle = NSAlertStyle.Informational
+			};
+
+			alert.AddButton ("OK");
+			alert.AddButton ("Cancel");
+
+			var returnValue = alert.RunModal();
+
         }
 
         internal void RemoveRow(int index)
         {
-            int oid = (int)oids[index];
-            Sqo.Internal._bs._do(siaqodb, oid, SelectedType.MetaType);
-            oids.RemoveAt(index);
+			try{
+	            int oid = (int)oids[index];
+	            Sqo.Internal._bs._do(siaqodb, oid, SelectedType.MetaType);
+	            oids.RemoveAt(index);
+			}catch(Exception ex){
+				siaqodb.Close ();
+				throw ex;
+			}
         }
 
         internal void AddRow()
         {
-            int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
-            this.oids.Add(oid);
+			try
+			{
+	            int oid = Sqo.Internal._bs._io(siaqodb, SelectedType.MetaType);
+	            this.oids.Add(oid);
+			}catch(Exception ex){
+				siaqodb.Close ();
+				throw ex;
+			}
         }
 
         internal void EditComplexObject(int rowIndex,int columnIndex, string columnName)
         {
-            MetaField fi = SelectedType.MetaType.Fields[columnIndex-1];
+			try{
+	            MetaField fi = SelectedType.MetaType.Fields[columnIndex-1];
 
-            List<int> selectedOids = new List<int>();
-            int TID=0;
-            var value = GetValue(columnName,rowIndex);
-            if (value == "[null]")
-            {
-                return;
-            }
-            if (oids[0] != null)//is not new row
-            {
-                _bs._loidtid(this.siaqodb, Convert.ToInt32(oids[0]), SelectedType.MetaType, fi.Name, ref selectedOids, ref TID);
-                if (selectedOids.Count == 0 || TID <= 0)
-                {
+	            List<int> selectedOids = new List<int>();
+	            int TID=0;
+	            var value = GetValue(columnName,rowIndex);
+	            if (value == "[null]")
+	            {
+	                return;
+	            }
+	            if (oids[0] != null)//is not new row
+	            {
+	                _bs._loidtid(this.siaqodb, Convert.ToInt32(oids[0]), SelectedType.MetaType, fi.Name, ref selectedOids, ref TID);
+	                if (selectedOids.Count == 0 || TID <= 0)
+	                {
 
-                }
-                else
-                {
-                    MetaType mtOfComplex = FindMeta(TID);
-                    OnOpenObjects(new MetaEventArgs(mtOfComplex, selectedOids));
-                }
-            }
+	                }
+	                else
+	                {
+	                    MetaType mtOfComplex = FindMeta(TID);
+	                    OnOpenObjects(new MetaEventArgs(mtOfComplex, selectedOids));
+	                }
+	            }
+			}catch(Exception ex){
+				siaqodb.Close ();
+				throw ex;
+			}
         }
         protected void OnOpenObjects(MetaEventArgs args)
         {

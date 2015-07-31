@@ -1,6 +1,7 @@
 ﻿using System;
 using MonoMac.AppKit;
 using System.Linq;
+using System.Drawing;
 
 namespace SiaqodbManager.Controls
 {
@@ -8,13 +9,13 @@ namespace SiaqodbManager.Controls
 	{
 		public LinqTable (QueryViewModelAdapter queryView):base(){
 			queryView.LinqExecuted += LinqExecuted;
-			SetFrameSize (new System.Drawing.SizeF(100,100));
+		
+			HeaderView.NeedsDisplay = true;
 
-			SetFrameOrigin (new System.Drawing.PointF(100,100));		
-//			this.AutoresizingMask = NSViewResizingMask.WidthSizable |
-//				NSViewResizingMask.MaxXMargin|
-//				NSViewResizingMask.MaxYMargin|
-//				NSViewResizingMask.HeightSizable;
+			this.AutoresizingMask = NSViewResizingMask.WidthSizable |
+				NSViewResizingMask.MaxXMargin|
+				NSViewResizingMask.MaxYMargin|
+				NSViewResizingMask.HeightSizable;
 		}
 			
 		void LinqExecuted (object sender, SiaqodbManager.Entities.LinqEventArgs e)
