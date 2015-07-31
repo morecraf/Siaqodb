@@ -64,7 +64,9 @@ namespace SiaqodbManager
 
 		public override void AwakeFromNib ()
 		{
-			referenceViewModel = new ReferencesViewModelAdapter (new ReferencesViewModel(new OpenFileService("dll","Add reference")));
+			var viewModel = new ReferencesViewModel (new OpenFileService ("dll", "Add reference"));
+			viewModel.ClosingRequest += CloseWindow;
+			referenceViewModel = new ReferencesViewModelAdapter (viewModel);
 
 			ReferencesArray.Bind ("contentArray",referenceViewModel,"References",null);
 			Namespaces.Bind ("value",referenceViewModel,"Namespaces",BindingUtil.ContinuouslyUpdatesValue);
@@ -75,6 +77,11 @@ namespace SiaqodbManager
 			BindButton (OkButton,referenceViewModel,"LoadReferencesCommand");
 
 			ReferencesArray.AddObserver (referenceViewModel, new NSString ("selectionIndexes"), NSKeyValueObservingOptions.New, IntPtr.Zero);
+		}
+
+		void CloseWindow (object sender, EventArgs e)
+		{
+			Close ();
 		}
 
 		public override void Close ()

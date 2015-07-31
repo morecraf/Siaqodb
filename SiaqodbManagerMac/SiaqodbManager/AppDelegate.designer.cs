@@ -19,23 +19,58 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSMenuItem ExecuteMenu { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSMenuItem NewLinqMenu { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSMenuItem OpenLinqMenu { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSMenuItem ReferenceMenu { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSMenuItem SaveAsMenu { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSMenuItem SaveMenu { get; set; }
+
+		[Action ("NewLinq:")]
+		partial void NewLinq (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (ExecuteMenu != null) {
-				ExecuteMenu.Dispose ();
-				ExecuteMenu = null;
-			}
-
 			if (EncryptionMenu != null) {
 				EncryptionMenu.Dispose ();
 				EncryptionMenu = null;
 			}
 
+			if (ExecuteMenu != null) {
+				ExecuteMenu.Dispose ();
+				ExecuteMenu = null;
+			}
+
+			if (OpenLinqMenu != null) {
+				OpenLinqMenu.Dispose ();
+				OpenLinqMenu = null;
+			}
+
+			if (SaveMenu != null) {
+				SaveMenu.Dispose ();
+				SaveMenu = null;
+			}
+
+			if (SaveAsMenu != null) {
+				SaveAsMenu.Dispose ();
+				SaveAsMenu = null;
+			}
+
 			if (ReferenceMenu != null) {
 				ReferenceMenu.Dispose ();
 				ReferenceMenu = null;
+			}
+
+			if (NewLinqMenu != null) {
+				NewLinqMenu.Dispose ();
+				NewLinqMenu = null;
 			}
 		}
 	}

@@ -176,7 +176,6 @@
     <Compile Include="DataSourcesAdapters\LinqDataSource.cs" />
     <Compile Include="Controls\LinqTable.cs" />
     <Compile Include="CustomWindow\MessageBox.cs" />
-    <Compile Include="Repo\SiaqodbRepo.cs" />
     <Compile Include="CustomWindow\OpenFileService.cs" />
   </ItemGroup>
   <ItemGroup>

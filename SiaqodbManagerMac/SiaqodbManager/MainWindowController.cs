@@ -99,6 +99,16 @@ namespace SiaqodbManager
 			TablesDictionry.Clear();
 		}
 
+		public void OnExecuteLinq (object sender, EventArgs e)
+		{
+			ExecuteButton.PerformClick (NSObject.FromObject(sender));
+		}
+
+		public void OnOpenLinq (object sender, EventArgs e)
+		{
+			OnLinqOpen (NSObject.FromObject(sender));
+		}
+
 		partial void OnLinqOpen (NSObject sender)
 		{
 			var fileDialog = new OpenFileService("","Select file");
@@ -115,6 +125,11 @@ namespace SiaqodbManager
 			}
 		}
 
+		public void OnSaveLinq (object sender, EventArgs e)
+		{
+			SaveLinqFile.PerformClick (NSObject.FromObject(sender));
+		}
+
 		public void OnReference (object sender, EventArgs e)
 		{
 			OnReferences (NSObject.FromObject(sender));
@@ -125,7 +140,7 @@ namespace SiaqodbManager
 			var controller = new ReferenceWindowController ();
 			NSApplication.SharedApplication.RunModalForWindow(controller.Window);
 		}
-
+			
 
 		//BIND THE LOGIN PANEL
 		public  override void AwakeFromNib ()
@@ -133,7 +148,6 @@ namespace SiaqodbManager
 
 			base.AwakeFromNib ();
 			EncryptionViewModel.Instance.SetEncryptionSettings ();
-			mainViewModel = new MainViewModelAdapter (new MainViewModel());
 
 			BindButton (mainViewModel,"ConnectCommand",ConnectButton);
 			PathInput.Bind ("value",mainViewModel,"SelectedPath",BindingUtil.ContinuouslyUpdatesValue);
@@ -204,7 +218,7 @@ namespace SiaqodbManager
 			}
 		}
 
-		void OnLinqTab (object sender, EventArgs e)
+		public void OnLinqTab (object sender, EventArgs e)
 		{
 			var tabViewItem = new NSTabViewItem ();
 			var queryView = new NSSplitView ();
@@ -250,10 +264,6 @@ namespace SiaqodbManager
 
 		}
 
-		void LinqExecuted (object sender, LinqEventArgs e)
-		{
-
-		}
 
 		void OnRemoveRow (object sender, EventArgs e)
 		{
@@ -267,6 +277,7 @@ namespace SiaqodbManager
 				tableView.ReloadData ();
 			}
 		}
+
 
 		void BindSelectedLinq (QueryViewModelAdapter queryViewModel)
 		{
