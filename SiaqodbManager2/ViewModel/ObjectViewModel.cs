@@ -297,9 +297,9 @@ namespace SiaqodbManager.ViewModel
 	            {
 	                return;
 	            }
-	            if (oids[0] != null)//is not new row
+                if (oids[rowIndex] != null)//is not new row
 	            {
-					_bs._loidtid(SiaqodbRepo.Instance, Convert.ToInt32(oids[0]), SelectedType.MetaType, fi.Name, ref selectedOids, ref TID);
+					_bs._loidtid(SiaqodbRepo.Instance, Convert.ToInt32(oids[rowIndex]), SelectedType.MetaType, fi.Name, ref selectedOids, ref TID);
 	                if (selectedOids.Count == 0 || TID <= 0)
 	                {
 
@@ -324,5 +324,10 @@ namespace SiaqodbManager.ViewModel
         }
 
         public EventHandler<MetaEventArgs> OpenObjects;
+
+        public void EditArray(object ar,int rowIndex)
+        {
+            Sqo.Internal._bs._uf(SiaqodbRepo.Instance, Convert.ToInt32(oids[rowIndex]), SelectedType.MetaType, fi.Name, ar);
+        }
     }
 }

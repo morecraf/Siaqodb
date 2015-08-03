@@ -286,8 +286,7 @@ namespace SiaqodbManager
 
                 try
                 {
-
-                    Sqo.Internal._bs._uf(SiaqodbRepo.Instance, oids[rowIndex], metaType, metaType.Fields[columnIndex - 1].Name, ar);
+                    viewModel.EditArray(ar,rowIndex);
                     dataGridView1.Rows[rowIndex].Cells[columnIndex].ErrorText = string.Empty;
                 }
                 catch (SiaqodbException ex)
