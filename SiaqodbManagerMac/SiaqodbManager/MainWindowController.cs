@@ -12,6 +12,7 @@ using SiaqodbManager.Util;
 using SiaqodbManager.Entities;
 using SiaqodbManager.Controls;
 using SiaqodbManager.CustomWindow;
+using SiaqodbManager.Model;
 using System.IO;
 
 namespace SiaqodbManager
@@ -39,6 +40,11 @@ namespace SiaqodbManager
 			Initialize ();
 		}
 
+		public MainWindowController (MainViewModelAdapter mainViewModel): base ("MainWindow")
+		{
+			this.mainViewModel = mainViewModel;
+			Initialize ();
+		}
 
 		
 		// Shared initialization code
@@ -173,7 +179,9 @@ namespace SiaqodbManager
 			var tableView = new CustomTable ();
 			//table managing section
 			var objectAdapter = mainViewModel.CreateObjectsView (metaType, oids);
-			tableView.Delegate = new ObjectsDelegate (objectAdapter);
+			var objDelegate = new ObjectsDelegate (objectAdapter);
+			objDelegate.ArrayClicked += OnArrayClicked;
+			tableView.Delegate = objDelegate;
 			objectAdapter.OpenObjects += OpenObjects;
 			ObjectsViewCreator.AddColumnsAndData (tableView, objectAdapter);
 			var tableContainer = ObjectsViewCreator.TableActionsLayout (tableView);
@@ -261,7 +269,6 @@ namespace SiaqodbManager
 			}else{
 				TableActionButtons.Hidden = true;
 			}
-
 		}
 
 
@@ -278,6 +285,17 @@ namespace SiaqodbManager
 			}
 		}
 
+		void OnArrayClicked (object sender, ArrayEditArgs e)
+		{
+			var value = e.ViewModel.GetValue (e.ColumnName,e.RowIndex);
+			if(value is Array){
+				var controller = new ArrayWindowController (value as Array);
+				NSApplication.SharedApplication.RunModalForWindow(controller.Window);
+				if(controller.HasValue){
+
+				}
+			}
+		}
 
 		void BindSelectedLinq (QueryViewModelAdapter queryViewModel)
 		{

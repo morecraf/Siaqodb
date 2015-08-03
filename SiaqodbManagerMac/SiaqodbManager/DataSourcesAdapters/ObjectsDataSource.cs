@@ -3,6 +3,7 @@ using MonoMac.AppKit;
 using MonoMac.Foundation;
 using System.Collections.Generic;
 using SiaqodbManager.ViewModel;
+using SiaqodbManager.Repo;
 
 namespace SiaqodbManager
 {

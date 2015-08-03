@@ -36,6 +36,7 @@ namespace SiaqodbManager.DataSourcesAdapters
 			}
 		}
 
+
 		public ObjectViewModelAdapter CreateObjectsView (MetaTypeViewModelAdapter metaType,List<int> oids)
 		{
 			var objectsViewModel = viewModel.CreateObjectsModel (metaType.viewModel,oids);

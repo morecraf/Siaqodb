@@ -3,6 +3,8 @@ using System.Drawing;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
+using SiaqodbManager.DataSourcesAdapters;
+using SiaqodbManager.ViewModel;
 
 namespace SiaqodbManager
 {
@@ -16,7 +18,9 @@ namespace SiaqodbManager
 
 		public override void FinishedLaunching (NSObject notification)
 		{
-			mainWindowController = new MainWindowController ();
+			var mainViewModel = new MainViewModelAdapter (new MainViewModel());
+
+			mainWindowController = new MainWindowController (mainViewModel);
 
 			EncryptionMenu.Activated += mainWindowController.OnEncryption;
 			ReferenceMenu.Activated += mainWindowController.OnReference;
@@ -24,6 +28,8 @@ namespace SiaqodbManager
 			SaveAsMenu.Activated += mainWindowController.OnSaveLinq;
 			ExecuteMenu.Activated += mainWindowController.OnExecuteLinq;
 			OpenLinqMenu.Activated += mainWindowController.OnOpenLinq;
+
+
 
 			mainWindowController.Window.MakeKeyAndOrderFront (this);
 		}

@@ -84,6 +84,7 @@
     <Folder Include="CodeDom\" />
     <Folder Include="CustomWindow\" />
     <Folder Include="Repo\" />
+    <Folder Include="Window\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -124,11 +125,6 @@
     <Compile Include="..\..\SiaqodbManager2\MetaItems.cs">
       <Link>Model\MetaItems.cs</Link>
     </Compile>
-    <Compile Include="EncryptionWindow.cs" />
-    <Compile Include="EncryptionWindowController.cs" />
-    <Compile Include="EncryptionWindow.designer.cs">
-      <DependentUpon>EncryptionWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="Util\SiaqoMacUtil.cs" />
     <Compile Include="Controls\ObjectsViewCreator.cs" />
     <Compile Include="Controls\CustomTable.cs" />
@@ -161,11 +157,6 @@
     <Compile Include="Controls\DocumentTextView.cs" />
     <Compile Include="DataSourcesAdapters\QueryViewModelAdapter.cs" />
     <Compile Include="CustomWindow\SaveFileService.cs" />
-    <Compile Include="ReferenceWindow.cs" />
-    <Compile Include="ReferenceWindowController.cs" />
-    <Compile Include="ReferenceWindow.designer.cs">
-      <DependentUpon>ReferenceWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="..\..\SiaqodbManager2\ViewModel\ReferencesVIewModel.cs">
       <Link>VIewModel\ReferencesVIewModel.cs</Link>
     </Compile>
@@ -177,12 +168,32 @@
     <Compile Include="Controls\LinqTable.cs" />
     <Compile Include="CustomWindow\MessageBox.cs" />
     <Compile Include="CustomWindow\OpenFileService.cs" />
+    <Compile Include="..\..\SiaqodbManager2\Repo\SiaqodbRepo.cs">
+      <Link>Repo\SiaqodbRepo.cs</Link>
+    </Compile>
+    <Compile Include="Window\ReferenceWindow.cs" />
+    <Compile Include="Window\ReferenceWindow.designer.cs">
+      <DependentUpon>ReferenceWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Window\ReferenceWindowController.cs" />
+    <Compile Include="Window\EncryptionWindowController.cs" />
+    <Compile Include="Window\EncryptionWindow.cs" />
+    <Compile Include="Window\EncryptionWindow.designer.cs">
+      <DependentUpon>EncryptionWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Window\ArrayWindow.cs" />
+    <Compile Include="Window\ArrayWindowController.cs" />
+    <Compile Include="Window\ArrayWindow.designer.cs">
+      <DependentUpon>ArrayWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\ArrayEditArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
     <InterfaceDefinition Include="MainMenu.xib" />
-    <InterfaceDefinition Include="EncryptionWindow.xib" />
-    <InterfaceDefinition Include="ReferenceWindow.xib" />
+    <InterfaceDefinition Include="Window\ReferenceWindow.xib" />
+    <InterfaceDefinition Include="Window\EncryptionWindow.xib" />
+    <InterfaceDefinition Include="Window\ArrayWindow.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

@@ -2,6 +2,7 @@
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 using System.Drawing;
+using SiaqodbManager.Model;
 
 
 namespace SiaqodbManager
@@ -19,13 +20,29 @@ namespace SiaqodbManager
 		{
 			var table = notification.Object as CustomTable;
 			if(table.CurrentCell != null && table.CurrentColumn != null){
-
 				var column =  table.CurrentColumn;
 				var columnIndex = GetColumnIndex (table,column);
-				viewModel.EditComplexObject (table.SelectedRow,columnIndex,column.HeaderCell.Identifier);
+				if(viewModel.Columns[column.HeaderCell.Identifier].Item2.FieldType == typeof(string)){
+					viewModel.EditComplexObject (table.SelectedRow,columnIndex,column.HeaderCell.Identifier);
+				}else{
+					OnArrayClicked (column.HeaderCell.Identifier,table.SelectedRow);
+					//viewModel.
+				}
 			}
 		}
-			
+
+		public event EventHandler<ArrayEditArgs> ArrayClicked;
+
+		public void OnArrayClicked(string column,int row){
+		
+			if(ArrayClicked != null){
+				ArrayClicked (this,new ArrayEditArgs{
+					ColumnName = column,
+					RowIndex = row,
+					ViewModel = viewModel
+				});
+			}
+		}
 
 		public override void WillDisplayCell (NSTableView tableView, MonoMac.Foundation.NSObject cell, NSTableColumn tableColumn, int row)
 		{

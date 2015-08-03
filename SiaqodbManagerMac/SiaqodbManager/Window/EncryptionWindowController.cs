@@ -16,7 +16,6 @@ namespace SiaqodbManager
 		#region Constructors
 
 
-
 		// Called when created from unmanaged code
 		public EncryptionWindowController (IntPtr handle) : base (handle)
 		{
@@ -73,7 +72,6 @@ namespace SiaqodbManager
 			AlgorithmCombo.Bind ("enabled",viewModel,"IsEncryptionChecked",null);
 			PasswordText.Bind ("enabled",viewModel,"IsEncryptionChecked",null);
 		}
-
 		public override void Close ()
 		{
 			base.Close ();
