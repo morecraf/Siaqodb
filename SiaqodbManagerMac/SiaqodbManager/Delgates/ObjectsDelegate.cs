@@ -25,7 +25,7 @@ namespace SiaqodbManager
 				if(viewModel.Columns[column.HeaderCell.Identifier].Item2.FieldType == typeof(string)){
 					viewModel.EditComplexObject (table.SelectedRow,columnIndex,column.HeaderCell.Identifier);
 				}else{
-					OnArrayClicked (column.HeaderCell.Identifier,table.SelectedRow);
+					OnArrayClicked (column.HeaderCell.Identifier,table.SelectedRow,columnIndex);
 					//viewModel.
 				}
 			}
@@ -33,10 +33,11 @@ namespace SiaqodbManager
 
 		public event EventHandler<ArrayEditArgs> ArrayClicked;
 
-		public void OnArrayClicked(string column,int row){
+		public void OnArrayClicked(string column,int row,int columnIndex){
 		
 			if(ArrayClicked != null){
 				ArrayClicked (this,new ArrayEditArgs{
+					ColumnIndex = columnIndex,
 					ColumnName = column,
 					RowIndex = row,
 					ViewModel = viewModel

@@ -37,7 +37,9 @@ namespace SiaqodbManager.ViewModel
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                 }
             }
+
 			Sqo.SiaqodbConfigurator.SetLicense(@"FPVCOWv3/oiGt2tD5Pp+CyYXt1wVjNllMiFOJPhTQm0=");
+
 #if TRIAL
             string folder = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config";
             string trialFile = folder + System.IO.Path.DirectorySeparatorChar + "trial.lic";

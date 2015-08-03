@@ -39,9 +39,6 @@ namespace SiaqodbManager
                 {
                     this.textBox1.AppendText(Environment.NewLine+ obj.ToString());
                 }
-
-
-
             }
         }
         private Array values;

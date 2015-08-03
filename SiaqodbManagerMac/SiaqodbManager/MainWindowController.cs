@@ -292,7 +292,7 @@ namespace SiaqodbManager
 				var controller = new ArrayWindowController (value as Array);
 				NSApplication.SharedApplication.RunModalForWindow(controller.Window);
 				if(controller.HasValue){
-
+					e.ViewModel.EditArray (controller.Values,e.RowIndex,e.ColumnIndex);
 				}
 			}
 		}
