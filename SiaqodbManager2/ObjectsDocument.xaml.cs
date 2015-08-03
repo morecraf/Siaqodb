@@ -286,7 +286,7 @@ namespace SiaqodbManager
 
                 try
                 {
-                    viewModel.EditArray(ar,rowIndex);
+                    viewModel.EditArray(ar,rowIndex,columnIndex);
                     dataGridView1.Rows[rowIndex].Cells[columnIndex].ErrorText = string.Empty;
                 }
                 catch (SiaqodbException ex)

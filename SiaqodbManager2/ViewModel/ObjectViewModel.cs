@@ -325,8 +325,9 @@ namespace SiaqodbManager.ViewModel
 
         public EventHandler<MetaEventArgs> OpenObjects;
 
-        public void EditArray(object ar,int rowIndex)
+        public void EditArray(object ar,int rowIndex,int columnIndex)
         {
+            MetaField fi = SelectedType.MetaType.Fields[columnIndex - 1];
             Sqo.Internal._bs._uf(SiaqodbRepo.Instance, Convert.ToInt32(oids[rowIndex]), SelectedType.MetaType, fi.Name, ar);
         }
     }
