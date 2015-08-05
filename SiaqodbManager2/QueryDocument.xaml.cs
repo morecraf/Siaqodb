@@ -34,6 +34,14 @@ namespace SiaqodbManager
             DataContext = queryViewModel;
             this.queryViewModel = queryViewModel;
             queryViewModel.LinqExecuted += LinqExecuted;
+            queryViewModel.ErrorOccured += ErrorOccured;
+        }
+
+   
+
+        private void ErrorOccured(object sender, ErrorMessageArgs e)
+        {
+            textBox1.Text = e.Message;
         }
         private void LinqExecuted(object sender, LinqEventArgs e)
         {

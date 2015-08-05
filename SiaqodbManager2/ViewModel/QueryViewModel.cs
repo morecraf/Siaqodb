@@ -207,12 +207,25 @@ namespace SiaqodbManager.ViewModel
                 });
             }
         }
+
+        private void OnErrorOccured(string errorLine)
+        {
+            if (ErrorOccured != null)
+            {
+                ErrorOccured(this, new ErrorMessageArgs
+                {
+                    Message = errorLine
+                });
+            }
+        }
+
         public EventHandler<LinqEventArgs> LinqExecuted;
+        public EventHandler<ErrorMessageArgs> ErrorOccured;
         private MainViewModel Parent;
 
         private void WriteErrors(string errorLine)
         {
-		
+            OnErrorOccured(errorLine);
             //Error text
           //  this.textBox1.Text += errorLine + "\r\n";
         }

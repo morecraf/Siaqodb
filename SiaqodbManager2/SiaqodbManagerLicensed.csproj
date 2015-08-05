@@ -102,6 +102,7 @@
     <Compile Include="DialogService\MessageDialog.cs" />
     <Compile Include="DialogService\ReferenceFileService.cs" />
     <Compile Include="DialogService\SaveDialogService.cs" />
+    <Compile Include="Entities\ErrorMessageArgs.cs" />
     <Compile Include="Entities\LinqEventArgs.cs" />
     <Compile Include="Entities\MetaEventArgs.cs" />
     <Compile Include="Entities\TypeMetaDetail.cs" />
