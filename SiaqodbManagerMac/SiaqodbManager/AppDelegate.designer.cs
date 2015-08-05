@@ -1,4 +1,4 @@
-﻿// WARNING
+// WARNING
 //
 // This file has been generated automatically by Xamarin Studio to store outlets and
 // actions made in the UI designer. If it is removed, they will be lost.
@@ -25,6 +25,9 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSMenuItem OpenLinqMenu { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSMenuItem QueryMenu { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSMenuItem ReferenceMenu { get; set; }
 
 		[Outlet]
@@ -38,6 +41,11 @@ namespace SiaqodbManager
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (QueryMenu != null) {
+				QueryMenu.Dispose ();
+				QueryMenu = null;
+			}
+
 			if (EncryptionMenu != null) {
 				EncryptionMenu.Dispose ();
 				EncryptionMenu = null;
@@ -48,19 +56,14 @@ namespace SiaqodbManager
 				ExecuteMenu = null;
 			}
 
+			if (NewLinqMenu != null) {
+				NewLinqMenu.Dispose ();
+				NewLinqMenu = null;
+			}
+
 			if (OpenLinqMenu != null) {
 				OpenLinqMenu.Dispose ();
 				OpenLinqMenu = null;
-			}
-
-			if (SaveMenu != null) {
-				SaveMenu.Dispose ();
-				SaveMenu = null;
-			}
-
-			if (SaveAsMenu != null) {
-				SaveAsMenu.Dispose ();
-				SaveAsMenu = null;
 			}
 
 			if (ReferenceMenu != null) {
@@ -68,9 +71,14 @@ namespace SiaqodbManager
 				ReferenceMenu = null;
 			}
 
-			if (NewLinqMenu != null) {
-				NewLinqMenu.Dispose ();
-				NewLinqMenu = null;
+			if (SaveAsMenu != null) {
+				SaveAsMenu.Dispose ();
+				SaveAsMenu = null;
+			}
+
+			if (SaveMenu != null) {
+				SaveMenu.Dispose ();
+				SaveMenu = null;
 			}
 		}
 	}

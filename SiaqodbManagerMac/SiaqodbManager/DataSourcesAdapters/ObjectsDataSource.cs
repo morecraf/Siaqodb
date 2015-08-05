@@ -4,6 +4,7 @@ using MonoMac.Foundation;
 using System.Collections.Generic;
 using SiaqodbManager.ViewModel;
 using SiaqodbManager.Repo;
+using System.Linq;
 
 namespace SiaqodbManager
 {
@@ -60,9 +61,26 @@ namespace SiaqodbManager
 		public override void SetObjectValue (NSTableView tableView, NSObject theObject, NSTableColumn tableColumn, int row)
 		{
 			var valueKey = (string)(NSString)tableColumn.HeaderCell.Identifier;
+			var columnIndex = 0;
+			foreach(var column in tableView.TableColumns()){
+				if(column.Equals(tableColumn)){
+					break;
+				}
+				columnIndex++;
+			}
 
+			var customTable = tableView as CustomTable;
 			if(valueKey != null){
-				viewModel.UpdateValue (valueKey,row,theObject);
+				try{
+					viewModel.UpdateValue (valueKey,row,theObject);
+					if(customTable != null){
+						customTable.RemoveErrorForCell (row, columnIndex);
+					}
+				}catch(Exception ex){
+					if(customTable != null){
+						customTable.AddErrorForCell (row, columnIndex,ex.Message);
+					}
+				}
 			}
 		}
 
@@ -72,7 +90,7 @@ namespace SiaqodbManager
 			var valueKey = tableColumn.HeaderCell.Identifier;
 			if(SiaqodbRepo.Opened){
 				if(valueKey != null){
-					var value = viewModel.GetValue(valueKey,row);
+					var value = viewModel.GetValue(valueKey,row).ToString();
 					return NSObject.FromObject(value);
 				}
 			}

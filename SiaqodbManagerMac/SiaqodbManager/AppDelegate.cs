@@ -15,7 +15,6 @@ namespace SiaqodbManager
 		public AppDelegate ()
 		{
 		}
-
 		public override void FinishedLaunching (NSObject notification)
 		{
 			var mainViewModel = new MainViewModelAdapter (new MainViewModel());
@@ -29,7 +28,8 @@ namespace SiaqodbManager
 			ExecuteMenu.Activated += mainWindowController.OnExecuteLinq;
 			OpenLinqMenu.Activated += mainWindowController.OnOpenLinq;
 
-
+			mainWindowController.RegisterLinqAction (SaveAsMenu);
+			mainWindowController.RegisterLinqAction (ExecuteMenu);
 
 			mainWindowController.Window.MakeKeyAndOrderFront (this);
 		}

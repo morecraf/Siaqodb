@@ -21,6 +21,14 @@ namespace SiaqodbManager
 			}
 		}
 
+		public void EditArray (Array macValues, int rowIndex, int columnIndex, string columnName)
+		{
+			var values = SiaqoMacUtil.FromNSObject (macValues,Columns[columnName].Item2);
+			viewModel.EditArray (values,rowIndex,columnIndex);
+		}
+
+
+	
 
 
 		public ObjectViewModelAdapter (ObjectViewModel viewModel):base(viewModel)

@@ -3,6 +3,8 @@ using MonoMac.AppKit;
 using MonoMac.Foundation;
 using System.Drawing;
 using SiaqodbManager.Model;
+using System.Collections;
+using MonoMac.CoreGraphics;
 
 
 namespace SiaqodbManager
@@ -15,14 +17,18 @@ namespace SiaqodbManager
 		{
 			this.viewModel = viewModel;
 		}
+			
 
 		public override void SelectionDidChange (NSNotification notification)
 		{
 			var table = notification.Object as CustomTable;
+			if(table.SelectedRow < 0){
+				return;
+			}
 			if(table.CurrentCell != null && table.CurrentColumn != null){
 				var column =  table.CurrentColumn;
 				var columnIndex = GetColumnIndex (table,column);
-				if(viewModel.Columns[column.HeaderCell.Identifier].Item2.FieldType == typeof(string)){
+				if(viewModel.Columns[column.HeaderCell.Identifier].Item2.FieldType == null){
 					viewModel.EditComplexObject (table.SelectedRow,columnIndex,column.HeaderCell.Identifier);
 				}else{
 					OnArrayClicked (column.HeaderCell.Identifier,table.SelectedRow,columnIndex);
@@ -30,6 +36,7 @@ namespace SiaqodbManager
 				}
 			}
 		}
+			
 
 		public event EventHandler<ArrayEditArgs> ArrayClicked;
 
@@ -45,18 +52,32 @@ namespace SiaqodbManager
 			}
 		}
 
+
 		public override void WillDisplayCell (NSTableView tableView, MonoMac.Foundation.NSObject cell, NSTableColumn tableColumn, int row)
 		{
-			var attributedCell = cell as NSCell;
+			var attributedCell = cell as NSTextFieldCell;
 			var objectSource = tableView.DataSource as ObjectsDataSource;
 			var customTable = tableView as CustomTable;		
+			var columnIndex = GetColumnIndex (tableView,tableColumn);
+
 
 			if(attributedCell != null && objectSource != null){
+				if(customTable.HasError(row,columnIndex)){
+					//var error = 
+					//attributedCell.SetCellAttribute (NSCellAttribute.ChangeBackgroundCell,1);
+					//attributedCell.ControlView.Layer.BorderColor = new CGColor(255,0,0);
+					attributedCell.DrawsBackground = true;
+					attributedCell.BackgroundColor = NSColor.Red;
+					//attributedCell.
+				}
 				attributedCell.SetCellAttribute (NSCellAttribute.CellHighlighted,0);
 				var type = objectSource.GetTypeOfColumn (tableColumn.HeaderCell.Identifier);
-				if (type == null) {
+				if (type == null || typeof(IList).IsAssignableFrom(type)) {
 					var value = attributedCell.Title;
 					var attributedValue = new NSMutableAttributedString (value);
+
+					//tableView.AddCursorRect (attributedCell.ControlView.Frame,NSCursor.PointingHandCursor);
+
 					attributedValue.AddAttribute (NSAttributedString.ForegroundColorAttributeName, NSColor.Blue, new NSRange (0, attributedValue.Length));
 					attributedValue.AddAttribute (NSAttributedString.CursorAttributeName, NSCursor.PointingHandCursor, new NSRange (0,attributedValue.Length));				
 					if (customTable.CurrentCell == attributedCell && row == customTable.SelectedRow) {
@@ -66,8 +87,7 @@ namespace SiaqodbManager
 					attributedCell.Editable = false;
 					attributedCell.Selectable = false;
 				} else {
-					var index = GetColumnIndex (tableView,tableColumn);
-					if (index != 0) {
+					if (columnIndex != 0) {
 						tableColumn.Editable = true;
 					} else {
 						tableColumn.Editable = false;
@@ -76,6 +96,8 @@ namespace SiaqodbManager
 			}
 		}
 			
+	
+
 		int GetColumnIndex (NSTableView tableView, NSTableColumn tableColumn)
 		{
 			var i = 0;

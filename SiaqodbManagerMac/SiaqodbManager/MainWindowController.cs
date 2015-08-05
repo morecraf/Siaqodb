@@ -14,6 +14,7 @@ using SiaqodbManager.Controls;
 using SiaqodbManager.CustomWindow;
 using SiaqodbManager.Model;
 using System.IO;
+using SiaqodbManager.CostumWindow;
 
 namespace SiaqodbManager
 {
@@ -53,7 +54,10 @@ namespace SiaqodbManager
 			Instance = this;
 			TablesDictionry = new Dictionary<string, NSTableView> ();
 			LinqTabDictionary = new Dictionary<NSTabViewItem, QueryViewModelAdapter> ();
-		}
+			LinqRelatedActions = new List<NSControl> ();
+			//add the buttons that should be enabled or disabled acording with the current document type
+			LinqRelatedMenuItem = new List<NSMenuItem> ();
+				}
 
 		#endregion
 		private MainViewModelAdapter mainViewModel;
@@ -61,6 +65,10 @@ namespace SiaqodbManager
 		public static MainWindowController Instance{ get; set;}
 
 		public static PropertyChangedEventHandler BindHandler{ get { return Instance.PropretyChangeHandler;} }
+
+		private List<NSControl> LinqRelatedActions;
+
+		private List<NSMenuItem>  LinqRelatedMenuItem;
 
 		private Dictionary<string,NSTableView> TablesDictionry; 
 		private Dictionary<NSTabViewItem,QueryViewModelAdapter> LinqTabDictionary; 
@@ -120,7 +128,7 @@ namespace SiaqodbManager
 			var fileDialog = new OpenFileService("","Select file");
 
 			var file = fileDialog.OpenDialog();
-			if(file != null){
+			if(!string.IsNullOrEmpty(file)){
 				using(var sr = new StreamReader(file)){
 					string  s = sr.ReadToEnd();
 					OnLinqTab(sender, new EventArgs());
@@ -166,6 +174,12 @@ namespace SiaqodbManager
 
 			//types tree view
 			TypesView.Delegate = new TypesDelegate (this);
+
+			//add button to be enabled or disabled
+			LinqRelatedActions.Add (SaveLinqFile);
+			LinqRelatedActions.Add (ExecuteButton);
+			SetLinqActionEnabled (false);
+
 		} 
 
 		public void CreateObjectsTable (MetaTypeViewModelAdapter metaType)
@@ -198,7 +212,6 @@ namespace SiaqodbManager
 			CreateObjectsTable (new MetaTypeViewModelAdapter(new MetaTypeViewModel(e.mType)),e.oids);
 		}
 
-
 		//strongly typed window accessor
 		public new MainWindow Window {
 			get {
@@ -218,11 +231,15 @@ namespace SiaqodbManager
 		void OnCloseTab (object sender, EventArgs e)
 		{
 			var tab = TabView.Selected;
+			if(tab == null){
+				return;
+			}
 			TabView.Remove (tab);
-			if(TablesDictionry.ContainsKey(TabView.Selected.Label)){
-				TablesDictionry.Remove (TabView.Selected.Label);
-			}else if(LinqTabDictionary.ContainsKey(TabView.Selected)){
-				LinqTabDictionary.Remove(TabView.Selected);
+
+			if(TablesDictionry.ContainsKey(tab.Label)){
+				TablesDictionry.Remove (tab.Label);
+			}else if(LinqTabDictionary.ContainsKey(tab)){
+				LinqTabDictionary.Remove(tab);
 			}
 		}
 
@@ -239,22 +256,70 @@ namespace SiaqodbManager
 			var documentScrollView = new NSScrollView ();
 
 			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService());
+
 			var documentView = new DocumentTextView ();
 			documentView.Bind ("attributedString",queryViewModel,"Linq",BindingUtil.ContinuouslyUpdatesValue);
 			documentScrollView.ContentView.DocumentView = documentView;
 			BindSelectedLinq (queryViewModel);
 
+			var resultTab = new NSTabView ();
+			resultTab.AutoresizingMask = NSViewResizingMask.MaxXMargin|
+				NSViewResizingMask.MaxYMargin|
+				NSViewResizingMask.HeightSizable|
+				NSViewResizingMask.WidthSizable;
+	
+			var tableTab = new NSTabViewItem ();
+
 			var tableView = new LinqTable (queryViewModel);
 			scrolView.ContentView.DocumentView = tableView;
 
+			scrolView.AutoresizingMask = NSViewResizingMask.MaxXMargin|
+				NSViewResizingMask.MaxYMargin|
+				NSViewResizingMask.HeightSizable|
+				NSViewResizingMask.WidthSizable;
+
+			tableTab.View.AddSubview (scrolView);
+			tableTab.Label = "Result";
+
+			resultTab.Add (tableTab);
+
+			var messageTab = new NSTabViewItem ();
+			var scrollMessage = new NSScrollView ();
+			var messageView = new NSTextView ();
+			scrollMessage.AutoresizingMask = NSViewResizingMask.MaxXMargin|
+				NSViewResizingMask.MaxYMargin|
+				NSViewResizingMask.HeightSizable|
+				NSViewResizingMask.WidthSizable;
+			messageTab.Label = "Message";
+			scrollMessage.ContentView.DocumentView = messageView;
+			messageTab.View.AddSubview (scrollMessage);
+
+			resultTab.Add (messageTab);
+
 			queryView.AddSubview (documentScrollView);
-			queryView.AddSubview (scrolView);
+			queryView.AddSubview (resultTab);
 			tabViewItem.View.AddSubview (queryView);
 
 			tabViewItem.Label = "New linq doc";
 			TabView.Add (tabViewItem);
 			TabView.Select (tabViewItem);
 			LinqTabDictionary[tabViewItem] = queryViewModel;
+			SetLinqActionEnabled (true);
+		}
+
+		public void RegisterLinqAction (NSMenuItem item)
+		{
+			LinqRelatedMenuItem.Add (item);
+		}
+
+		void SetLinqActionEnabled (bool isEnabled)
+		{
+			foreach(var view in LinqRelatedActions){
+				view.Enabled = isEnabled;
+			}
+			foreach(var view in LinqRelatedMenuItem){
+				view.Enabled = isEnabled;
+			}
 		}
 
 		void OnTabSelectionChanged (object sender, NSTabViewItemEventArgs e)
@@ -262,12 +327,15 @@ namespace SiaqodbManager
 			var label = TabView.Selected.Label;
 			if(TablesDictionry.ContainsKey(label)){
 				TableActionButtons.Hidden = false;
+				SetLinqActionEnabled (false);
 			}else if(LinqTabDictionary.ContainsKey(TabView.Selected)){
 				var queryViewModel = LinqTabDictionary[TabView.Selected];
 				BindSelectedLinq (queryViewModel);
+				SetLinqActionEnabled (true);
 				TableActionButtons.Hidden = true;
 			}else{
 				TableActionButtons.Hidden = true;
+				SetLinqActionEnabled (false);
 			}
 		}
 
@@ -291,8 +359,14 @@ namespace SiaqodbManager
 			if(value is Array){
 				var controller = new ArrayWindowController (value as Array);
 				NSApplication.SharedApplication.RunModalForWindow(controller.Window);
+				var messageBox = new MessageBox();
 				if(controller.HasValue){
-					e.ViewModel.EditArray (controller.Values,e.RowIndex,e.ColumnIndex);
+					try{
+						e.ViewModel.EditArray (controller.Values,e.RowIndex,e.ColumnIndex,e.ColumnName);
+						messageBox.Show("The operation was successful");
+					}catch(Exception ex){
+						messageBox.Show("You entered the input on the wrong format");
+					}
 				}
 			}
 		}

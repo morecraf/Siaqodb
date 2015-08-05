@@ -5,6 +5,7 @@ using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using System.Text;
+using SiaqodbManager.Util;
 
 namespace SiaqodbManager
 {
@@ -39,7 +40,7 @@ namespace SiaqodbManager
 		private string array;
 
 		public Array Values{
-			get{ return array.Split ('\n').ToArray ();}
+			get{ return array.TrimEnd().Split ('\n').ToArray ();}
 		}
 
 		public ArrayWindowController (Array values) : base ("ArrayWindow")
@@ -64,9 +65,19 @@ namespace SiaqodbManager
 
 		public override void AwakeFromNib ()
 		{
-			ArrayText.StringValue = array;
+		//	ArrayText.StringValue = array;
+			ArrayText.Bind ("value",this,"Array",BindingUtil.ContinuouslyUpdatesValue);
 		}
 
+		[Export("Array")]
+		public string Array{
+			get{
+				return array;
+			}
+			set{
+				array = value;
+			}
+		}
 
 		partial void OnSave (NSObject sender)
 		{
