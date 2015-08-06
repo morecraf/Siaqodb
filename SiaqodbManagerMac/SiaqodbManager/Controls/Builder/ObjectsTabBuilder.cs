@@ -3,9 +3,9 @@ using MonoMac.AppKit;
 
 namespace SiaqodbManager
 {
-	public class ObjectsViewCreator
+	public class ObjectsTabBuilder
 	{
-		public ObjectsViewCreator ()
+		public ObjectsTabBuilder ()
 		{
 		}
 

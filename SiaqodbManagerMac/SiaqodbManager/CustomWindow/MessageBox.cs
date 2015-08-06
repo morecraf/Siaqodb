@@ -12,7 +12,14 @@ namespace SiaqodbManager.CostumWindow
 
 		public void Show (string message)
 		{
-			throw new NotImplementedException ();
+			var alert = new NSAlert {
+				MessageText = message,
+				AlertStyle = NSAlertStyle.Informational,
+			};
+
+			alert.AddButton("Cancel");
+			alert.AddButton ("OK");
+			var result =  alert.RunModal();
 		}
 
 		public bool Show (string message, string title, bool YesNo)

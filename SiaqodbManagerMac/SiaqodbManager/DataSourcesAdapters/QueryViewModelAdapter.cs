@@ -50,6 +50,15 @@ namespace SiaqodbManager
 				viewModel.LinqExecuted = value;
 			}
 		}
+
+		public EventHandler<ErrorMessageArgs> ErrorOccured{
+			get{
+				return viewModel.ErrorOccured;
+			}
+			set{
+				viewModel.ErrorOccured = value;
+			}
+		}
 	}
 }
 

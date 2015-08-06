@@ -24,13 +24,7 @@ namespace SiaqodbManager
 		{
 			this.viewModel = viewModel;
 
-			normalCell = new NSTextFieldCell ();
 
-			headerCell = new NSTableHeaderCell ();
-			headerCell.LineBreakMode = NSLineBreakMode.TruncatingMiddle;
-			headerCell.FocusRingType = NSFocusRingType.None;
-			headerCell.Editable = false;
-			headerCell.Selectable = false;
 		}
 
 		public void AddNewRow ()
@@ -87,6 +81,9 @@ namespace SiaqodbManager
 
 		public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn tableColumn, int row)
 		{
+//			if(tableColumn == null){
+//				return new NSString("0");
+//			}
 			var valueKey = tableColumn.HeaderCell.Identifier;
 			if(SiaqodbRepo.Opened){
 				if(valueKey != null){

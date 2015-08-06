@@ -183,6 +183,7 @@ namespace SiaqodbManager.ViewModel
                     IList w = ((IList)retVal);
 
                     OnLinqExecuted(w);
+					OnErrorOccured("");
                 }
                 catch (Exception ex)
                 {

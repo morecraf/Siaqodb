@@ -2,6 +2,7 @@
 using MonoMac.AppKit;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SiaqodbManager
 {
@@ -13,10 +14,11 @@ namespace SiaqodbManager
 		{
 			//	SelectionHighlightStyle = NSTableViewSelectionHighlightStyle.None;
 			ErrorDict = new Dictionary<Tuple<int,int>,string> ();
+
 		}
 
 		public Dictionary<Tuple<int,int>,string> ErrorDict;
-			
+
 
 		public NSCell CurrentCell { get; set; }
 
@@ -46,10 +48,10 @@ namespace SiaqodbManager
 			set;
 		}
 
-		public override void ResetCursorRects ()
-		{
-			base.ResetCursorRects ();
-		}
+	
+
+	
+
 
 		public override void MouseDown (NSEvent theEvent)
 		{

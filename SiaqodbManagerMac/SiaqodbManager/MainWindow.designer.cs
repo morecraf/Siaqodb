@@ -16,13 +16,22 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSButton AddButton { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSTextView BlogLink { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSButton CloseTabButton { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSButton ConnectButton { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSTextView EmailLink { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSButton ExecuteButton { get; set; }
+
+		[Outlet]
+		MonoMac.AppKit.NSTextView ForumLink { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSButton LinqButton { get; set; }
@@ -38,6 +47,9 @@ namespace SiaqodbManager
 
 		[Outlet]
 		MonoMac.AppKit.NSButton SaveLinqFile { get; set; }
+
+		[Outlet]
+		MonoMac.WebKit.WebView StartView { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSView TableActionButtons { get; set; }
@@ -64,6 +76,11 @@ namespace SiaqodbManager
 				AddButton = null;
 			}
 
+			if (BlogLink != null) {
+				BlogLink.Dispose ();
+				BlogLink = null;
+			}
+
 			if (CloseTabButton != null) {
 				CloseTabButton.Dispose ();
 				CloseTabButton = null;
@@ -77,6 +94,11 @@ namespace SiaqodbManager
 			if (ExecuteButton != null) {
 				ExecuteButton.Dispose ();
 				ExecuteButton = null;
+			}
+
+			if (ForumLink != null) {
+				ForumLink.Dispose ();
+				ForumLink = null;
 			}
 
 			if (LinqButton != null) {
@@ -94,6 +116,11 @@ namespace SiaqodbManager
 				PathInput = null;
 			}
 
+			if (EmailLink != null) {
+				EmailLink.Dispose ();
+				EmailLink = null;
+			}
+
 			if (RemoveButton != null) {
 				RemoveButton.Dispose ();
 				RemoveButton = null;
@@ -102,6 +129,11 @@ namespace SiaqodbManager
 			if (SaveLinqFile != null) {
 				SaveLinqFile.Dispose ();
 				SaveLinqFile = null;
+			}
+
+			if (StartView != null) {
+				StartView.Dispose ();
+				StartView = null;
 			}
 
 			if (TableActionButtons != null) {

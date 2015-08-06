@@ -15,6 +15,8 @@ using SiaqodbManager.CustomWindow;
 using SiaqodbManager.Model;
 using System.IO;
 using SiaqodbManager.CostumWindow;
+using MonoMac.WebKit;
+using System.Diagnostics;
 
 namespace SiaqodbManager
 {
@@ -57,7 +59,7 @@ namespace SiaqodbManager
 			LinqRelatedActions = new List<NSControl> ();
 			//add the buttons that should be enabled or disabled acording with the current document type
 			LinqRelatedMenuItem = new List<NSMenuItem> ();
-				}
+		}
 
 		#endregion
 		private MainViewModelAdapter mainViewModel;
@@ -166,11 +168,18 @@ namespace SiaqodbManager
 			BindButton (mainViewModel,"ConnectCommand",ConnectButton);
 			PathInput.Bind ("value",mainViewModel,"SelectedPath",BindingUtil.ContinuouslyUpdatesValue);
 
+			CreateLink (ForumLink,"Visit forum","http://forum.siaqodb.com/");
+			CreateLink (BlogLink,"Visit blog","http://siaqodb.com/?page_id=13");
+			CreateLink (EmailLink,"Send us an email","mailto:support@siaqodb.com");
+			//EmailLink.CellClicked += EmailClicked;
+			AddDemoVideo ();
+
 			TabView.DidSelect += OnTabSelectionChanged;
 			AddButton.Activated += OnAddRow;
 			RemoveButton.Activated += OnRemoveRow;
 			CloseTabButton.Activated += OnCloseTab;
 			LinqButton.Activated += OnLinqTab;
+
 
 			//types tree view
 			TypesView.Delegate = new TypesDelegate (this);
@@ -181,6 +190,53 @@ namespace SiaqodbManager
 			SetLinqActionEnabled (false);
 
 		} 
+
+		void AddDemoVideo ()
+		{
+			var document = StartView.MainFrame.DomDocument;
+		
+			//<iframe width="420" height="315" src="https://www.youtube.com/embed/eUvTmL4Kxmc" frameborder="0" allowfullscreen></iframe>
+		
+			var frame = document.CreateElement ("iframe");
+
+			var srcAttr = document.CreateAttribute ("src");
+			srcAttr.Value = "https://www.youtube.com/embed/eUvTmL4Kxmc";
+			frame.SetAttributeNode (srcAttr);
+
+			var allowFullScreen = document.CreateAttribute ("allowfullscreen");;
+			frame.SetAttributeNode (allowFullScreen);
+
+			var height = document.CreateAttribute ("height");
+			height.Value = "100%";
+			frame.SetAttributeNode (height);
+
+			var width = document.CreateAttribute ("width");
+			width.Value = "100%";
+			frame.SetAttributeNode (width);
+
+			StartView.MainFrame.DomDocument.body.AppendChild (frame);
+		}
+
+		void CreateLink (NSTextView textView,string text,string link)
+		{
+			var str = new NSMutableAttributedString (new NSString (text));
+			str.AddAttribute (NSAttributedString.LinkAttributeName, new NSString (link), new NSRange (0, text.Length));
+			textView.InsertText (str);
+			textView.Editable = false;
+		}
+
+		void CreateLink(NSTextView textView,string text){
+			var str = new NSMutableAttributedString (new NSString (text));
+
+			str.AddAttribute (NSAttributedString.ForegroundColorAttributeName, NSColor.Blue, new NSRange (0, text.Length));
+			str.AddAttribute (NSAttributedString.UnderlineColorAttributeName, NSColor.Blue, new NSRange (0, text.Length));
+			str.AddAttribute (NSAttributedString.CursorAttributeName, NSCursor.PointingHandCursor, new NSRange (0,text.Length));				
+
+			str.AddAttribute (NSAttributedString.UnderlineStyleAttributeName, NSObject.FromObject(NSUnderlineStyle.Single), new NSRange (0, text.Length));
+			textView.InsertText (str);
+			textView.Editable = false;
+		}
+
 
 		public void CreateObjectsTable (MetaTypeViewModelAdapter metaType)
 		{
@@ -197,9 +253,9 @@ namespace SiaqodbManager
 			objDelegate.ArrayClicked += OnArrayClicked;
 			tableView.Delegate = objDelegate;
 			objectAdapter.OpenObjects += OpenObjects;
-			ObjectsViewCreator.AddColumnsAndData (tableView, objectAdapter);
-			var tableContainer = ObjectsViewCreator.TableActionsLayout (tableView);
-			ObjectsViewCreator.CostumizeTable (tableView);
+			ObjectsTabBuilder.AddColumnsAndData (tableView, objectAdapter);
+			var tableContainer = ObjectsTabBuilder.TableActionsLayout (tableView);
+			ObjectsTabBuilder.CostumizeTable (tableView);
 			tabViewItem.Label = metaType.Name;
 			tabViewItem.View.AddSubview (tableContainer);
 			TablesDictionry [metaType.Name] = tableView;
@@ -245,65 +301,12 @@ namespace SiaqodbManager
 
 		public void OnLinqTab (object sender, EventArgs e)
 		{
-			var tabViewItem = new NSTabViewItem ();
-			var queryView = new NSSplitView ();
-			queryView.AutoresizingMask = NSViewResizingMask.MaxXMargin|
-				NSViewResizingMask.MaxYMargin|
-				NSViewResizingMask.HeightSizable|
-				NSViewResizingMask.WidthSizable;
-
-			var scrolView = new NSScrollView ();
-			var documentScrollView = new NSScrollView ();
-
-			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService());
-
-			var documentView = new DocumentTextView ();
-			documentView.Bind ("attributedString",queryViewModel,"Linq",BindingUtil.ContinuouslyUpdatesValue);
-			documentScrollView.ContentView.DocumentView = documentView;
+			var queryViewModel = mainViewModel.CreateQueryView (new SaveFileService ());
+			var tabViewItem = LinqTabBuilder.BuildTab (queryViewModel);
 			BindSelectedLinq (queryViewModel);
-
-			var resultTab = new NSTabView ();
-			resultTab.AutoresizingMask = NSViewResizingMask.MaxXMargin|
-				NSViewResizingMask.MaxYMargin|
-				NSViewResizingMask.HeightSizable|
-				NSViewResizingMask.WidthSizable;
-	
-			var tableTab = new NSTabViewItem ();
-
-			var tableView = new LinqTable (queryViewModel);
-			scrolView.ContentView.DocumentView = tableView;
-
-			scrolView.AutoresizingMask = NSViewResizingMask.MaxXMargin|
-				NSViewResizingMask.MaxYMargin|
-				NSViewResizingMask.HeightSizable|
-				NSViewResizingMask.WidthSizable;
-
-			tableTab.View.AddSubview (scrolView);
-			tableTab.Label = "Result";
-
-			resultTab.Add (tableTab);
-
-			var messageTab = new NSTabViewItem ();
-			var scrollMessage = new NSScrollView ();
-			var messageView = new NSTextView ();
-			scrollMessage.AutoresizingMask = NSViewResizingMask.MaxXMargin|
-				NSViewResizingMask.MaxYMargin|
-				NSViewResizingMask.HeightSizable|
-				NSViewResizingMask.WidthSizable;
-			messageTab.Label = "Message";
-			scrollMessage.ContentView.DocumentView = messageView;
-			messageTab.View.AddSubview (scrollMessage);
-
-			resultTab.Add (messageTab);
-
-			queryView.AddSubview (documentScrollView);
-			queryView.AddSubview (resultTab);
-			tabViewItem.View.AddSubview (queryView);
-
-			tabViewItem.Label = "New linq doc";
+			LinqTabDictionary [tabViewItem] = queryViewModel;
 			TabView.Add (tabViewItem);
 			TabView.Select (tabViewItem);
-			LinqTabDictionary[tabViewItem] = queryViewModel;
 			SetLinqActionEnabled (true);
 		}
 
@@ -369,6 +372,11 @@ namespace SiaqodbManager
 					}
 				}
 			}
+		}
+
+		void EmailClicked (object sender, NSTextViewClickedEventArgs e)
+		{
+			//Process.Start ("mailt:support@siaqodb.com");
 		}
 
 		void BindSelectedLinq (QueryViewModelAdapter queryViewModel)

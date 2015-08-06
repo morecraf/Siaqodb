@@ -52,6 +52,27 @@ namespace SiaqodbManager
 			}
 		}
 
+		public override NSCell GetDataCell (NSTableView tableView, NSTableColumn tableColumn, int row)
+		{
+			if(tableColumn == null){
+				return null;
+			}
+			var costumTable = tableView as CustomTable;
+			if(costumTable == null){
+				return new NSTextFieldCell {
+					Editable = true
+				};
+			}
+			var columnIndex = GetColumnIndex (tableView,tableColumn);
+			if (costumTable.HasError (row, columnIndex)) {
+				var error = costumTable.ErrorMessage(row,columnIndex);
+				return new CellWithError (error);
+			} else {
+				return new NSTextFieldCell {
+					Editable = true
+				};
+			}
+		}
 
 		public override void WillDisplayCell (NSTableView tableView, MonoMac.Foundation.NSObject cell, NSTableColumn tableColumn, int row)
 		{
@@ -60,29 +81,24 @@ namespace SiaqodbManager
 			var customTable = tableView as CustomTable;		
 			var columnIndex = GetColumnIndex (tableView,tableColumn);
 
-
 			if(attributedCell != null && objectSource != null){
-				if(customTable.HasError(row,columnIndex)){
-					//var error = 
-					//attributedCell.SetCellAttribute (NSCellAttribute.ChangeBackgroundCell,1);
-					//attributedCell.ControlView.Layer.BorderColor = new CGColor(255,0,0);
-					attributedCell.DrawsBackground = true;
-					attributedCell.BackgroundColor = NSColor.Red;
-					//attributedCell.
-				}
 				attributedCell.SetCellAttribute (NSCellAttribute.CellHighlighted,0);
 				var type = objectSource.GetTypeOfColumn (tableColumn.HeaderCell.Identifier);
 				if (type == null || typeof(IList).IsAssignableFrom(type)) {
 					var value = attributedCell.Title;
+
 					var attributedValue = new NSMutableAttributedString (value);
 
-					//tableView.AddCursorRect (attributedCell.ControlView.Frame,NSCursor.PointingHandCursor);
 
+					//tableView.AddCursorRect (attributedCell.ControlView.Frame,NSCursor.PointingHandCursor);
 					attributedValue.AddAttribute (NSAttributedString.ForegroundColorAttributeName, NSColor.Blue, new NSRange (0, attributedValue.Length));
+					attributedValue.AddAttribute (NSAttributedString.UnderlineColorAttributeName, NSColor.Blue, new NSRange (0, attributedValue.Length));
+
+					attributedValue.AddAttribute (NSAttributedString.UnderlineStyleAttributeName, NSObject.FromObject(NSUnderlineStyle.Single), new NSRange (0, attributedValue.Length));
 					attributedValue.AddAttribute (NSAttributedString.CursorAttributeName, NSCursor.PointingHandCursor, new NSRange (0,attributedValue.Length));				
-					if (customTable.CurrentCell == attributedCell && row == customTable.SelectedRow) {
-						attributedCell.SetCellAttribute (NSCellAttribute.CellHighlighted,1);
-					}
+
+					//attributedValue.AddAttribute (NSAttributedString.LinkAttributeName,new NSString("www.google.com"),new NSRange (0,value.Length));
+
 					attributedCell.AttributedStringValue = attributedValue;
 					attributedCell.Editable = false;
 					attributedCell.Selectable = false;

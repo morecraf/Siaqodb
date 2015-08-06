@@ -85,6 +85,7 @@
     <Folder Include="CustomWindow\" />
     <Folder Include="Repo\" />
     <Folder Include="Window\" />
+    <Folder Include="Controls\Builder\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -126,7 +127,6 @@
       <Link>Model\MetaItems.cs</Link>
     </Compile>
     <Compile Include="Util\SiaqoMacUtil.cs" />
-    <Compile Include="Controls\ObjectsViewCreator.cs" />
     <Compile Include="Controls\CustomTable.cs" />
     <Compile Include="..\..\SiaqodbManager2\Entities\MetaEventArgs.cs">
       <Link>Model\MetaEventArgs.cs</Link>
@@ -187,6 +187,14 @@
       <DependentUpon>ArrayWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\ArrayEditArgs.cs" />
+    <Compile Include="..\..\SiaqodbManager2\Entities\ErrorMessageArgs.cs">
+      <Link>Model\ErrorMessageArgs.cs</Link>
+    </Compile>
+    <Compile Include="Controls\ErrorTextView.cs" />
+    <Compile Include="Controls\CellWithError.cs" />
+    <Compile Include="Controls\Builder\LinqTabBuilder.cs" />
+    <Compile Include="Controls\Builder\ObjectsTabBuilder.cs" />
+    <Compile Include="Controls\LinkCell.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
