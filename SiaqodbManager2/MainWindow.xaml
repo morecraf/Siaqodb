@@ -17,13 +17,13 @@
         </Grid.RowDefinitions>
         <Menu  HorizontalAlignment="Stretch" Name="menu1" VerticalAlignment="Stretch" Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="New LINQ Editor" Click="OnNewLINQ" InputGestureText="Ctrl+N" >
+                <MenuItem Header="New LINQ Editor" Click="OnNewLINQ"  IsEnabled="{Binding OpenLinqEnabled,Mode=TwoWay}" InputGestureText="Ctrl+N" >
                     <MenuItem.Icon>
                         <Image Source="Resources/new.png" Height="20"/>
                     </MenuItem.Icon>
 
                 </MenuItem>
-                <MenuItem Header="Open LINQ file" Name="menuOpen" Click="menuOpen_Click" InputGestureText="Ctrl+O">
+                <MenuItem Header="Open LINQ file"  IsEnabled="{Binding OpenLinqEnabled,Mode=TwoWay}" Name="menuOpen" Click="menuOpen_Click" InputGestureText="Ctrl+O">
                     <MenuItem.Icon>
                         <Image Source="Resources/openlinq.png" Height="20"/>
                     </MenuItem.Icon>
@@ -63,13 +63,13 @@
                 </StackPanel>
 
             </Button>
-            <Button  Name="btnNewLINQ" Click="btnNewLINQ_Click" VerticalContentAlignment="Top" Height="50" ToolTip="New linq editor">
+            <Button  Name="btnNewLINQ" Click="btnNewLINQ_Click" IsEnabled="{Binding OpenLinqEnabled,Mode=TwoWay}"  VerticalContentAlignment="Top" Height="50" ToolTip="New linq editor">
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/new.png" Height="29"></Image>
                     <TextBlock Text="New linq editor"></TextBlock>
                 </StackPanel>
             </Button>
-            <Button  Name="btnOpenLINQ" Click="btnOpenLINQ_Click" Height="50" ToolTip="Open linq file">
+            <Button  Name="btnOpenLINQ" IsEnabled="{Binding OpenLinqEnabled,Mode=TwoWay}" Click="btnOpenLINQ_Click" Height="50" ToolTip="Open linq file">
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/openlinq.png" Height="29"></Image>
                     <TextBlock Text="Open linq file"></TextBlock>
