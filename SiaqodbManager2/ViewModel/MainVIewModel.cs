@@ -17,7 +17,6 @@ namespace SiaqodbManager.ViewModel
     {
         private bool infoEnabled;
         private bool saveEnabled;
-        private bool openLinqEnable;
         private bool startEnabled;
 		private ConnectionItem selectedPath;
         private bool executeEnabled;
@@ -122,9 +121,11 @@ namespace SiaqodbManager.ViewModel
 
                 siaqodbRef.Close();
                 ExecuteEnabled = false;
+               // menuExecute.IsEnabled = false;
                 SaveEnabled = false;
+                //menuSave.IsEnabled = false;
+                //menuSaveAs.IsEnabled = false;
                 InfoEnabled = false;
-                openLinqEnable = false;
                 ConnectCommand = new MyCommand<object>(OnConnect);
 
                 TypesList = new ObservableCollection<MetaTypeViewModel>();
@@ -154,7 +155,6 @@ namespace SiaqodbManager.ViewModel
 				var allMetaTypes = SiaqodbRepo.Instance.GetAllTypes().Select(m=>new MetaTypeViewModel(m));
                 TypesList = new ObservableCollection<MetaTypeViewModel>(allMetaTypes);
                 OnPropertyChanged("TypesList");
-                OpenLinqEnabled = true;
                 //treeView1.Items.Clear();
                 //ContextMenu cm = new ContextMenu();
                 //MenuItem mitem = new MenuItem();
@@ -215,15 +215,6 @@ namespace SiaqodbManager.ViewModel
             get { return selectedPath; }
             set { 
                 selectedPath = value;
-                if(string.IsNullOrEmpty(value.Item)){
-                    SaveEnabled = false;
-                    ExecuteEnabled = false;
-                }
-                else
-                {
-                    SaveEnabled = true;
-                    ExecuteEnabled = true;
-                }
                 OnPropertyChanged(); 
             }
         }
@@ -235,19 +226,6 @@ namespace SiaqodbManager.ViewModel
             set
             {
                 infoEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool OpenLinqEnabled
-        {
-            get
-            {
-                return openLinqEnable;
-            }
-            set
-            {
-                openLinqEnable = value; 
                 OnPropertyChanged();
             }
         }
