@@ -74,7 +74,7 @@ namespace SiaqodbManager
         {
             dockingManager1.ActiveDocumentChanged += new EventHandler(dockingManager1_ActiveDocumentChanged);
             dockingManager1.DocumentClosed += new EventHandler(dockingManager1_DocumentClosed);
-            dockingManager1.DocumentClosing += new EventHandler<System.ComponentModel.CancelEventArgs>(dockingManager1_DocumentClosing);
+     //       dockingManager1.DocumentClosing += new EventHandler<System.ComponentModel.CancelEventArgs>(dockingManager1_DocumentClosing);
             //btnExecute.IsEnabled = false;
             //menuExecute.IsEnabled = false;
             //btnSave.IsEnabled = false;
@@ -327,9 +327,9 @@ namespace SiaqodbManager
                 SetDefaultSettings(uco);
                 uco.Show(this.dockingManager1);
                 uco.Activate();
+            }
             //    viewModel.OnObjectLoad(metaType);
             //    uco.DataContext = viewModel.ObjectsTable;
-            }
             //if (item != null)
             //{
             //    MetaType mt = item.Tag as MetaType;
@@ -371,7 +371,7 @@ namespace SiaqodbManager
             {
                 if (res.Value)
                 {
-                    List<ObjectsDocument> list = new List<ObjectsDocument>();
+                    var list = new List<ObjectsDocument>();
                     foreach (DocumentContent doc in dockingManager1.Documents)
                     {
                         ObjectsDocument d = doc as ObjectsDocument;

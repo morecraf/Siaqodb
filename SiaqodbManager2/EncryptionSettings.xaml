@@ -13,7 +13,7 @@
         </ComboBox>
         <Label Content="Encryption password:" Height="28" HorizontalAlignment="Left" Margin="27,89,0,0" Name="label3" VerticalAlignment="Top" Width="122" />
         <Label Content="(Leave empty if you did not set it on database creation)" Height="27" HorizontalAlignment="Left" Margin="27,112,0,0" Name="label4" VerticalAlignment="Top" />
-        <Button Content="OK" Height="23" HorizontalAlignment="Right" Margin="0,0,133,25" Name="btnOK" VerticalAlignment="Bottom" Width="75" Command="{Binding EncryptCommand}"  CommandParameter="{Binding ElementName=TxtPassword}" />
+        <Button Content="Apply" Height="23" HorizontalAlignment="Right" IsDefault="True"  Margin="0,0,133,25" Name="btnOK" VerticalAlignment="Bottom" Width="75" Command="{Binding EncryptCommand}"  CommandParameter="{Binding ElementName=TxtPassword}" />
         <Button Content="Cancel" Height="23" HorizontalAlignment="Right" IsCancel="True" Margin="0,0,52,25" Name="btnCancel" VerticalAlignment="Bottom" Width="75" />
         <my:PasswordControl Height="23" HorizontalAlignment="Left" Margin="163,94,0,0" x:Name="TxtPassword" VerticalAlignment="Top" Width="198" IsEnabled="{Binding IsEncryptedChecked}"/>
     </Grid>

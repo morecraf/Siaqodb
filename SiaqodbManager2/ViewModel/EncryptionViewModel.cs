@@ -77,7 +77,7 @@ namespace SiaqodbManager.ViewModel
             {
                 SiaqodbConfigurator.SetEncryptor(Algorithm == "AES" ? BuildInAlgorithm.AES : BuildInAlgorithm.XTEA);
 
-                if (!string.IsNullOrEmpty(passwordCont.Password))
+                if (passwordCont.Password!=null)
                 {
                     SiaqodbConfigurator.SetEncryptionPassword(passwordCont.Password);
                 }

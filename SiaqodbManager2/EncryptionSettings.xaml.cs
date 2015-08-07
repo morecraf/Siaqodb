@@ -32,11 +32,15 @@ namespace SiaqodbManager
             DataContext = encryptionViewModel;
             encryptionViewModel.ClosingRequest += (sender, e) =>
             {
-                this.DialogResult = true;
+                if (this.IsActive)
+                {
+                    this.DialogResult = true;
+                }
                 this.Close();
             };
             encryptionViewModel.Parent = viewModel;
             encryptionViewModel.ConfirmationBox = new MessageDialog();
         }
+
     }
 }
