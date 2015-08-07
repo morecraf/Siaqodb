@@ -34,7 +34,11 @@ namespace SiaqodbManager.DataSourcesAdapters
 
 		[Export("AddDefaultCommand")]
 		public void AddDefaultCommand(NSObject obj){
-			viewModel.AddStandardCommand.Execute (null);
+			viewModel.References.Add(new ReferenceItem{ Item = "System.dll"});
+			viewModel.References.Add(new ReferenceItem { Item = "System.Core.dll" });
+			viewModel.References.Add(new ReferenceItem { Item = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "Siaqodb.dll"});
+			viewModel.References.Add(new ReferenceItem { Item = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "SiaqodbPortable.dll" });
+			OnPropertyChange ("References");
 		}
 		[Export("AddCommand")]
 		public void AddCommand(NSObject obj){

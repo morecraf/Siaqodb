@@ -17,6 +17,7 @@ using System.IO;
 using SiaqodbManager.CostumWindow;
 using MonoMac.WebKit;
 using System.Diagnostics;
+using SiaqodbManager.Repo;
 
 namespace SiaqodbManager
 {
@@ -329,9 +330,11 @@ namespace SiaqodbManager
 		{
 			var label = TabView.Selected.Label;
 			if(TablesDictionry.ContainsKey(label)){
+				// for the table 
 				TableActionButtons.Hidden = false;
 				SetLinqActionEnabled (false);
 			}else if(LinqTabDictionary.ContainsKey(TabView.Selected)){
+				// for the tab with linq
 				var queryViewModel = LinqTabDictionary[TabView.Selected];
 				BindSelectedLinq (queryViewModel);
 				SetLinqActionEnabled (true);
@@ -373,11 +376,7 @@ namespace SiaqodbManager
 				}
 			}
 		}
-
-		void EmailClicked (object sender, NSTextViewClickedEventArgs e)
-		{
-			//Process.Start ("mailt:support@siaqodb.com");
-		}
+			
 
 		void BindSelectedLinq (QueryViewModelAdapter queryViewModel)
 		{

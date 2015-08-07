@@ -3,6 +3,7 @@ using MonoMac.AppKit;
 using SiaqodbManager.Util;
 using SiaqodbManager.CustomWindow;
 using SiaqodbManager.Controls;
+using SiaqodbManager.Entities;
 
 namespace SiaqodbManager
 {
@@ -36,6 +37,12 @@ namespace SiaqodbManager
 
 			documentView.Bind ("attributedString", queryViewModel, "Linq", BindingUtil.ContinuouslyUpdatesValue);
 			queryViewModel.ErrorOccured += messageView.ErrorOccured;
+			queryViewModel.ErrorOccured += (object sender, ErrorMessageArgs e) => {
+				resultTab.SelectLast(tabViewItem);
+			};
+			queryViewModel.LinqExecuted += (object sender, LinqEventArgs e) => {
+				resultTab.SelectFirst(tabViewItem);
+			};
 
 			documentScrollView.ContentView.DocumentView = documentView;
 			scrolView.ContentView.DocumentView = tableView;
