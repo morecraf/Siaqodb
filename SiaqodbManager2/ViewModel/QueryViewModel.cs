@@ -103,12 +103,13 @@ namespace SiaqodbManager.ViewModel
 
             if (!System.IO.Directory.Exists(Path))
             {
-                //textBox1.Text = "Invalid folder! choose a valid database folder";
-                //tabControl1.SelectedIndex = 1;
+				OnErrorOccured ("Invalid folder, choose a valid database folder");
                 return;
             }
 
             //textBox1.Text = "";
+
+			Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
 
 			Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar +"config");
             Sqo.IObjectList<NamespaceItem> namespaces = siaqodbConfig.LoadAll<NamespaceItem>();
@@ -169,7 +170,6 @@ namespace SiaqodbManager.ViewModel
                 .AddMethod(c.Method("object", "FilterByLINQ", "", metBody)));
 
             Assembly assembly = c.Compile(WriteErrors);
-			RunModel ("");
 
             if (assembly != null)
             {
@@ -223,25 +223,11 @@ namespace SiaqodbManager.ViewModel
         public EventHandler<ErrorMessageArgs> ErrorOccured;
         private MainViewModel Parent;
 
-		void RunModel (string errorLine)
-		{
-			var alert = new NSAlert {
-				MessageText = errorLine,
-				AlertStyle = NSAlertStyle.Informational
-			};
-
-			alert.AddButton ("OK");
-			alert.AddButton ("Cancel");
-
-			var returnValue = alert.RunModal();
-		}
+	
 
         private void WriteErrors(string errorLine)
         {
             OnErrorOccured(errorLine);
-			RunModel (errorLine);
-            //Error text
-          //  this.textBox1.Text += errorLine + "\r\n";
         }
 
         public string Path

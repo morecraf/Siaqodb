@@ -30,6 +30,7 @@ namespace SiaqodbManager.ViewModel
                 RemoveCommand = new MyCommand<object>(OnRemoveRef);
                 LoadReferencesCommand = new MyCommand<object>(OnLoadReferences);
 
+				Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
                 Sqo.Siaqodb siaqodb = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config");
                 try
                 {
@@ -94,6 +95,8 @@ namespace SiaqodbManager.ViewModel
             {
                 assemblies.Clear();
                 namespaces.Clear();
+
+				Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
                 Sqo.Siaqodb siaqodb = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config");
                 try
                 {
