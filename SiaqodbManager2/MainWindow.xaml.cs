@@ -35,7 +35,7 @@ namespace SiaqodbManager
         private MainViewModel viewModel;
         public MainWindow()
         {
-            viewModel = new MainViewModel();
+            viewModel = new MainViewModel(new OpenDBFolderDialog());
             DataContext = viewModel;
             InitializeComponent();
             InputBinding ib = new InputBinding(execCommand,new KeyGesture(Key.F5));
@@ -290,17 +290,6 @@ namespace SiaqodbManager
             this.menuExecute_Click(sender, e);
         }
 
-        private void btnOpenDB_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Forms.FolderBrowserDialog fb = new System.Windows.Forms.FolderBrowserDialog();
-            
-            fb.Description = "Select a database folder";
-            
-            if (fb.ShowDialog(this.GetIWin32Window()) == System.Windows.Forms.DialogResult.OK)
-            {
-                this.cmbDBPath.Text = fb.SelectedPath;
-            }
-        }
         List<Sqo.MetaType> siaqodbList;
 
 

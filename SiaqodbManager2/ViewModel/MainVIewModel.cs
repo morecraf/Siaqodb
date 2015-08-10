@@ -20,10 +20,11 @@ namespace SiaqodbManager.ViewModel
         private bool startEnabled;
 		private ConnectionItem selectedPath;
         private bool executeEnabled;
+        private IDialogService folderOpenDialog;
 		//private ObjectViewModel objectsTable;
 
 
-        public MainViewModel()
+        public MainViewModel(IDialogService folderOpenDialog)
         {
 			EncryptionViewModel.Instance.Parent = this;
             if (!System.IO.Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config"))
@@ -127,12 +128,27 @@ namespace SiaqodbManager.ViewModel
                 //menuSaveAs.IsEnabled = false;
                 InfoEnabled = false;
                 ConnectCommand = new MyCommand<object>(OnConnect);
+                OpenFolderCommand = new MyCommand<object>(OnOpen);
 
                 TypesList = new ObservableCollection<MetaTypeViewModel>();
             }
 			selectedPath = new ConnectionItem {
 				Item =""
 			};
+            this.folderOpenDialog = folderOpenDialog; 
+        }
+
+        private void OnOpen(object obj)
+        {
+            var path = folderOpenDialog.OpenDialog();
+            if(!string.IsNullOrEmpty(path)){
+                var connectionPath = new ConnectionItem
+                {
+                    Item = path
+                };
+                List.Add(connectionPath);
+                SelectedPath = connectionPath;
+            }
         }
 
         private void OnConnect(object obj)
@@ -209,6 +225,7 @@ namespace SiaqodbManager.ViewModel
         }
 
         public MyCommand<object> ConnectCommand {get;set;}
+        public MyCommand<object> OpenFolderCommand { get; set; }
 
         public ConnectionItem SelectedPath {
             get { return selectedPath; }

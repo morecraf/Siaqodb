@@ -92,7 +92,7 @@
 
         </ToolBar>
         <ToolBar Height="35"  Grid.Row="2" >
-            <Button  Name="btnOpenDB" Click="btnOpenDB_Click" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Height="30" >
+            <Button  Name="btnOpenDB" Command="{Binding OpenFolderCommand }"  HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Height="30" >
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/opendb.png" Height="23" ToolTip="Open database..."></Image>
                     
