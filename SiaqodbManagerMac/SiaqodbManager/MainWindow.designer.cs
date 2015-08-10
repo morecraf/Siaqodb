@@ -40,6 +40,9 @@ namespace SiaqodbManager
 		MonoMac.AppKit.NSView MainWindow { get; set; }
 
 		[Outlet]
+		MonoMac.AppKit.NSButton OpenDBButton { get; set; }
+
+		[Outlet]
 		MonoMac.AppKit.NSTextField PathInput { get; set; }
 
 		[Outlet]
@@ -76,6 +79,11 @@ namespace SiaqodbManager
 				AddButton = null;
 			}
 
+			if (OpenDBButton != null) {
+				OpenDBButton.Dispose ();
+				OpenDBButton = null;
+			}
+
 			if (BlogLink != null) {
 				BlogLink.Dispose ();
 				BlogLink = null;
@@ -89,6 +97,11 @@ namespace SiaqodbManager
 			if (ConnectButton != null) {
 				ConnectButton.Dispose ();
 				ConnectButton = null;
+			}
+
+			if (EmailLink != null) {
+				EmailLink.Dispose ();
+				EmailLink = null;
 			}
 
 			if (ExecuteButton != null) {
@@ -114,11 +127,6 @@ namespace SiaqodbManager
 			if (PathInput != null) {
 				PathInput.Dispose ();
 				PathInput = null;
-			}
-
-			if (EmailLink != null) {
-				EmailLink.Dispose ();
-				EmailLink = null;
 			}
 
 			if (RemoveButton != null) {

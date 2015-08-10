@@ -17,6 +17,7 @@
                 <outlet property="LinqButton" destination="1ic-bJ-fso" id="m8D-1p-err"/>
                 <outlet property="MainWindow" destination="3" id="24"/>
                 <outlet property="OnOpenLinq" destination="PVf-Tg-yGd" id="nRW-5l-3Ov"/>
+                <outlet property="OpenDBButton" destination="W8x-2s-wfB" id="tLU-GV-qBf"/>
                 <outlet property="PathInput" destination="55" id="58"/>
                 <outlet property="RemoveButton" destination="95" id="99"/>
                 <outlet property="SaveLinqFile" destination="Grf-AL-bOP" id="Vbw-3h-BQ1"/>
@@ -91,15 +92,6 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
-                    <textField verticalHuggingPriority="750" id="55">
-                        <rect key="frame" x="13" y="545" width="180" height="22"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="56">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <customView id="98">
                         <rect key="frame" x="279" y="13" width="751" height="554"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES"/>
@@ -215,7 +207,7 @@
                                     </tabViewItem>
                                 </tabViewItems>
                             </tabView>
-                            <customView id="97">
+                            <customView hidden="YES" id="97">
                                 <rect key="frame" x="341" y="6" width="57" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
@@ -282,6 +274,23 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
+                    <button verticalHuggingPriority="750" id="W8x-2s-wfB">
+                        <rect key="frame" x="6" y="546" width="29" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="opendb" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gqP-4h-ML7">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                            <font key="font" metaFont="systemBold" size="12"/>
+                        </buttonCell>
+                    </button>
+                    <textField verticalHuggingPriority="750" id="55">
+                        <rect key="frame" x="37" y="543" width="156" height="22"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="56">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
             </view>
         </window>
@@ -289,5 +298,6 @@
     <resources>
         <image name="NSAddTemplate" width="8" height="8"/>
         <image name="NSRemoveTemplate" width="8" height="8"/>
+        <image name="opendb" width="32" height="32"/>
     </resources>
 </document>

@@ -86,6 +86,7 @@
     <Folder Include="Repo\" />
     <Folder Include="Window\" />
     <Folder Include="Controls\Builder\" />
+    <Folder Include="Images\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -205,6 +206,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+    <None Include="Images\siaqodb.ico" />
+    <None Include="Images\siaqodb32x32.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -212,5 +215,31 @@
       <IsCxx>False</IsCxx>
       <Kind>Dynamic</Kind>
     </NativeReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Images\new.png">
+      <Link>Images\new.png</Link>
+      <LogicalName>new.png</LogicalName>
+    </BundleResource>
+    <BundleResource Include="Images\openlinq.png">
+      <Link>Images\openLinq.png</Link>
+      <LogicalName>openLinq.png</LogicalName>
+    </BundleResource>
+    <BundleResource Include="Images\run.png">
+      <Link>Images\run.png</Link>
+      <LogicalName>run.png</LogicalName>
+    </BundleResource>
+    <BundleResource Include="Images\save.png">
+      <Link>Images\save.png</Link>
+      <LogicalName>save.png</LogicalName>
+    </BundleResource>
+    <BundleResource Include="Images\siaqodbLogoFull.png">
+      <Link>Images\siaqodbLogoFull.png</Link>
+      <LogicalName>siaqodbLogoFull.png</LogicalName>
+    </BundleResource>
+    <BundleResource Include="Images\opendb.png">
+      <Link>Images\opendb.png</Link>
+      <LogicalName>opendb.png</LogicalName>
+    </BundleResource>
   </ItemGroup>
 </Project>
