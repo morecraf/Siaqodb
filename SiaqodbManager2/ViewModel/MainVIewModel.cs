@@ -129,7 +129,6 @@ namespace SiaqodbManager.ViewModel
                 ConnectCommand = new MyCommand<object>(OnConnect);
 
                 TypesList = new ObservableCollection<MetaTypeViewModel>();
-                Sqo.SiaqodbConfigurator.EncryptedDatabase = true;
             }
 			selectedPath = new ConnectionItem {
 				Item =""

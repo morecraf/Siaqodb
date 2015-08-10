@@ -109,7 +109,6 @@ namespace SiaqodbManager.ViewModel
 
             //textBox1.Text = "";
 
-            Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
 
 			Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar +"config");
             Sqo.IObjectList<NamespaceItem> namespaces = siaqodbConfig.LoadAll<NamespaceItem>();
