@@ -11,6 +11,9 @@ namespace SiaqodbManager.Controls
 			queryView.LinqExecuted += LinqExecuted;
 		
 			HeaderView.NeedsDisplay = true;
+			//table view options
+			GridStyleMask = NSTableViewGridStyle.SolidHorizontalLine 
+				|NSTableViewGridStyle.SolidVerticalLine;
 
 			this.AutoresizingMask = NSViewResizingMask.WidthSizable |
 				NSViewResizingMask.MaxXMargin|

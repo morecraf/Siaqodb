@@ -167,6 +167,7 @@ namespace SiaqodbManager
 			EncryptionViewModel.Instance.SetEncryptionSettings ();
 
 			BindButton (mainViewModel,"ConnectCommand",ConnectButton);
+			BindButton (mainViewModel,"OpenFolderCommand",OpenDBButton);
 			PathInput.Bind ("value",mainViewModel,"SelectedPath",BindingUtil.ContinuouslyUpdatesValue);
 
 			CreateLink (ForumLink,"Visit forum","http://forum.siaqodb.com/");
@@ -256,7 +257,6 @@ namespace SiaqodbManager
 			objectAdapter.OpenObjects += OpenObjects;
 			ObjectsTabBuilder.AddColumnsAndData (tableView, objectAdapter);
 			var tableContainer = ObjectsTabBuilder.TableActionsLayout (tableView);
-			ObjectsTabBuilder.CostumizeTable (tableView);
 			tabViewItem.Label = metaType.Name;
 			tabViewItem.View.AddSubview (tableContainer);
 			TablesDictionry [metaType.Name] = tableView;

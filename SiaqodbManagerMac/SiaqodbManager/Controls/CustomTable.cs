@@ -14,7 +14,9 @@ namespace SiaqodbManager
 		{
 			//	SelectionHighlightStyle = NSTableViewSelectionHighlightStyle.None;
 			ErrorDict = new Dictionary<Tuple<int,int>,string> ();
-
+			//table view options
+			GridStyleMask = NSTableViewGridStyle.SolidHorizontalLine 
+				|NSTableViewGridStyle.SolidVerticalLine;
 		}
 
 		public Dictionary<Tuple<int,int>,string> ErrorDict;

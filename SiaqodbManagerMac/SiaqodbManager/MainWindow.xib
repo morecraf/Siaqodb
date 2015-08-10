@@ -35,25 +35,26 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="74" width="1042" height="618"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
+            <value key="minSize" type="size" width="600" height="300"/>
             <view key="contentView" id="3">
                 <rect key="frame" x="0.0" y="0.0" width="1042" height="618"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="26">
-                        <rect key="frame" x="13" y="42" width="258" height="493"/>
+                        <rect key="frame" x="13" y="42" width="292" height="493"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="mhw-OO-EOm">
                             <rect key="frame" x="1" y="17" width="256" height="475"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" headerView="29" indentationPerLevel="16" outlineTableColumn="31" id="27">
-                                    <rect key="frame" x="0.0" y="0.0" width="256" height="19"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="290" height="19"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn width="253" minWidth="40" maxWidth="1000" id="31">
+                                        <tableColumn width="287" minWidth="40" maxWidth="1000" id="31">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -84,37 +85,22 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
-                    <button verticalHuggingPriority="750" id="53">
-                        <rect key="frame" x="195" y="539" width="82" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Connect" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="54">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                    </button>
                     <customView id="98">
-                        <rect key="frame" x="279" y="13" width="751" height="554"/>
+                        <rect key="frame" x="313" y="13" width="717" height="554"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES"/>
                         <subviews>
                             <tabView id="77">
-                                <rect key="frame" x="-3" y="18" width="758" height="544"/>
+                                <rect key="frame" x="-2" y="18" width="721" height="544"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <font key="font" metaFont="system"/>
                                 <tabViewItems>
                                     <tabViewItem label="Start" identifier="1" id="90">
                                         <view key="view" id="91">
-                                            <rect key="frame" x="10" y="33" width="738" height="498"/>
+                                            <rect key="frame" x="10" y="33" width="701" height="498"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <webView id="fLj-Ry-lo9">
-                                                    <rect key="frame" x="5" y="5" width="727" height="461"/>
-                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                    <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12">
-                                                        <nil key="identifier"/>
-                                                    </webPreferences>
-                                                </webView>
                                                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="jM0-Dr-c1v">
-                                                    <rect key="frame" x="5" y="474" width="121" height="21"/>
+                                                    <rect key="frame" x="15" y="478" width="121" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="91I-3M-MD6">
                                                         <rect key="frame" x="1" y="1" width="223" height="133"/>
@@ -144,7 +130,7 @@
                                                     </scroller>
                                                 </scrollView>
                                                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="sHI-mZ-JTP">
-                                                    <rect key="frame" x="164" y="474" width="121" height="21"/>
+                                                    <rect key="frame" x="164" y="478" width="121" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="c76-4h-3tT">
                                                         <rect key="frame" x="1" y="1" width="223" height="133"/>
@@ -173,7 +159,7 @@
                                                     </scroller>
                                                 </scrollView>
                                                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="T5b-Cu-QHV">
-                                                    <rect key="frame" x="320" y="474" width="121" height="21"/>
+                                                    <rect key="frame" x="320" y="478" width="121" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="YfT-C4-YeH">
                                                         <rect key="frame" x="1" y="1" width="223" height="133"/>
@@ -202,13 +188,20 @@
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                 </scrollView>
+                                                <webView id="fLj-Ry-lo9">
+                                                    <rect key="frame" x="2" y="0.0" width="697" height="471"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12">
+                                                        <nil key="identifier"/>
+                                                    </webPreferences>
+                                                </webView>
                                             </subviews>
                                         </view>
                                     </tabViewItem>
                                 </tabViewItems>
                             </tabView>
                             <customView hidden="YES" id="97">
-                                <rect key="frame" x="341" y="6" width="57" height="21"/>
+                                <rect key="frame" x="307" y="6" width="57" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <button verticalHuggingPriority="750" id="95">
@@ -230,7 +223,7 @@
                                 </subviews>
                             </customView>
                             <button verticalHuggingPriority="750" id="102">
-                                <rect key="frame" x="719" y="530" width="34" height="28"/>
+                                <rect key="frame" x="685" y="530" width="34" height="28"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="X" bezelStyle="rounded" imagePosition="overlaps" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="103">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -240,25 +233,25 @@
                         </subviews>
                     </customView>
                     <button verticalHuggingPriority="750" id="1ic-bJ-fso">
-                        <rect key="frame" x="7" y="580" width="146" height="32"/>
+                        <rect key="frame" x="11" y="578" width="102" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="New Linq" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="srJ-kh-S2b">
+                        <buttonCell key="cell" type="bevel" title="New linq" bezelStyle="regularSquare" image="new" imagePosition="left" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="srJ-kh-S2b">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" id="dTp-X2-11E">
-                        <rect key="frame" x="422" y="580" width="146" height="32"/>
+                        <rect key="frame" x="340" y="578" width="101" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Execute" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PuE-Im-jap">
+                        <buttonCell key="cell" type="bevel" title="Execute" bezelStyle="regularSquare" image="run" imagePosition="left" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PuE-Im-jap">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" id="PVf-Tg-yGd">
-                        <rect key="frame" x="146" y="580" width="146" height="32"/>
+                        <rect key="frame" x="117" y="578" width="107" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Open Linq File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rUf-qQ-4q1">
+                        <buttonCell key="cell" type="bevel" title="Open linq" bezelStyle="regularSquare" image="openLinq" imagePosition="left" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rUf-qQ-4q1">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -267,23 +260,23 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="Grf-AL-bOP">
-                        <rect key="frame" x="284" y="580" width="146" height="32"/>
+                        <rect key="frame" x="228" y="578" width="108" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Save Linq File" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7SU-8p-yhb">
+                        <buttonCell key="cell" type="bevel" title="Save linq" bezelStyle="regularSquare" image="save" imagePosition="left" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7SU-8p-yhb">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
-                    <button verticalHuggingPriority="750" id="W8x-2s-wfB">
-                        <rect key="frame" x="6" y="546" width="29" height="19"/>
+                    <button focusRingType="none" verticalHuggingPriority="750" id="W8x-2s-wfB">
+                        <rect key="frame" x="11" y="540" width="36" height="30"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="opendb" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gqP-4h-ML7">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                            <font key="font" metaFont="systemBold" size="12"/>
+                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="opendb" imagePosition="only" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="gqP-4h-ML7">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
                     <textField verticalHuggingPriority="750" id="55">
-                        <rect key="frame" x="37" y="543" width="156" height="22"/>
+                        <rect key="frame" x="53" y="545" width="169" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="56">
                             <font key="font" metaFont="system"/>
@@ -291,6 +284,14 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button verticalHuggingPriority="750" id="53">
+                        <rect key="frame" x="224" y="538" width="82" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Connect" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="54">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
                 </subviews>
             </view>
         </window>
@@ -298,6 +299,10 @@
     <resources>
         <image name="NSAddTemplate" width="8" height="8"/>
         <image name="NSRemoveTemplate" width="8" height="8"/>
+        <image name="new" width="32" height="32"/>
+        <image name="openLinq" width="32" height="32"/>
         <image name="opendb" width="32" height="32"/>
+        <image name="run" width="32" height="32"/>
+        <image name="save" width="32" height="32"/>
     </resources>
 </document>

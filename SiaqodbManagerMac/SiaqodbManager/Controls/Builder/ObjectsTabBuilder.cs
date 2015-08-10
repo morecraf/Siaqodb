@@ -45,12 +45,7 @@ namespace SiaqodbManager
 			tableView.DataSource = new ObjectsDataSource (objectAdapter);
 		}
 
-		public static void CostumizeTable (NSTableView tableView)
-		{
-			//table view options
-			tableView.GridStyleMask = NSTableViewGridStyle.SolidHorizontalLine 
-				|NSTableViewGridStyle.SolidVerticalLine;
-		}
+	
 	}
 }
 

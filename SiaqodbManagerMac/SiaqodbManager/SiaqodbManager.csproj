@@ -196,6 +196,7 @@
     <Compile Include="Controls\Builder\LinqTabBuilder.cs" />
     <Compile Include="Controls\Builder\ObjectsTabBuilder.cs" />
     <Compile Include="Controls\LinkCell.cs" />
+    <Compile Include="CustomWindow\OpenFolderService.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />

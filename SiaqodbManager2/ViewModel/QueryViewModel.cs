@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using MonoMac.AppKit;
 
 namespace SiaqodbManager.ViewModel
 {
@@ -109,7 +110,6 @@ namespace SiaqodbManager.ViewModel
 
             //textBox1.Text = "";
 
-
 			Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar +"config");
             Sqo.IObjectList<NamespaceItem> namespaces = siaqodbConfig.LoadAll<NamespaceItem>();
             Sqo.IObjectList<ReferenceItem> references = siaqodbConfig.LoadAll<ReferenceItem>();
@@ -169,6 +169,7 @@ namespace SiaqodbManager.ViewModel
                 .AddMethod(c.Method("object", "FilterByLINQ", "", metBody)));
 
             Assembly assembly = c.Compile(WriteErrors);
+			RunModel ("");
 
             if (assembly != null)
             {
@@ -182,7 +183,6 @@ namespace SiaqodbManager.ViewModel
                     IList w = ((IList)retVal);
 
                     OnLinqExecuted(w);
-					OnErrorOccured("");
                 }
                 catch (Exception ex)
                 {
@@ -223,9 +223,23 @@ namespace SiaqodbManager.ViewModel
         public EventHandler<ErrorMessageArgs> ErrorOccured;
         private MainViewModel Parent;
 
+		void RunModel (string errorLine)
+		{
+			var alert = new NSAlert {
+				MessageText = errorLine,
+				AlertStyle = NSAlertStyle.Informational
+			};
+
+			alert.AddButton ("OK");
+			alert.AddButton ("Cancel");
+
+			var returnValue = alert.RunModal();
+		}
+
         private void WriteErrors(string errorLine)
         {
             OnErrorOccured(errorLine);
+			RunModel (errorLine);
             //Error text
           //  this.textBox1.Text += errorLine + "\r\n";
         }

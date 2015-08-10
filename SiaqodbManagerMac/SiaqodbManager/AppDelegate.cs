@@ -5,6 +5,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using SiaqodbManager.DataSourcesAdapters;
 using SiaqodbManager.ViewModel;
+using SiaqodbManager.CustomWindow;
 
 namespace SiaqodbManager
 {
@@ -17,7 +18,7 @@ namespace SiaqodbManager
 		}
 		public override void FinishedLaunching (NSObject notification)
 		{
-			var mainViewModel = new MainViewModelAdapter (new MainViewModel());
+			var mainViewModel = new MainViewModelAdapter (new MainViewModel(new OpenFolderService("Select DB path")));
 
 			mainWindowController = new MainWindowController (mainViewModel);
 

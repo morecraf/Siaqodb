@@ -100,7 +100,9 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Query" id="UeU-pz-9g6">
                         <items>
-                            <menuItem title="Execute" keyEquivalent="e" id="ahD-Sv-jYC"/>
+                            <menuItem title="Execute" keyEquivalent="e" id="ahD-Sv-jYC">
+                                <attributedString key="attributedTitle"/>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="sVq-8f-NBq"/>
                             <menuItem title="Encryption" keyEquivalent="c" id="Zfm-gt-meH"/>
                             <menuItem title="Reference" keyEquivalent="r" id="tWJ-3J-UUT"/>

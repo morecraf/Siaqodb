@@ -53,6 +53,11 @@ namespace SiaqodbManager.DataSourcesAdapters
 		void OnConnect(NSObject obj){
 			viewModel.ConnectCommand.Execute (obj);
 		}
+
+		[Export("OpenFolderCommand")]
+		void OnOpen(NSObject obj){
+			viewModel.OpenFolderCommand.Execute (obj);
+		}
 	}
 }
 
