@@ -26,6 +26,7 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
+            /*
 
             SiaqodbConfigurator.SetLicense(@"4IZR9dJliEpR4ngOmfSywnQvq5ZFzwSJCM4fk2nenkU=");
             Dotissi.Siaqodb siaqodb2 = new Dotissi.Siaqodb(@"e:\work\temp\");
@@ -118,6 +119,8 @@ namespace WindowsFormsApplication1
             string d = "";
         //    MemoryStream memStr=new MemoryStream();
           //  ProtoBuf.Serializer.Serialize(memStr, new Player());
+
+    */
         }
         private void Logging(string msg, VerboseLevel vbl)
         { 

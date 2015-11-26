@@ -1452,11 +1452,17 @@ namespace Sqo
 
         internal object LoadValue(int oid, string fieldName, Type type)
         {
-            using (var transaction = transactionManager.BeginTransaction())
+            bool started;
+            var transaction = transactionManager.GetActiveTransaction(out started);
+            try
             {
-                var val= this.LoadValue(oid, fieldName, type, transactionManager.GetActiveTransaction());
-                transaction.Commit();
+                var val = this.LoadValue(oid, fieldName, type, transactionManager.GetActiveTransaction());
                 return val;
+            }
+            finally
+            {
+                if (started)
+                    transaction.Commit();
             }
         }
         internal object LoadValue(int oid, string fieldName, Type type,LightningDB.LightningTransaction transaction)

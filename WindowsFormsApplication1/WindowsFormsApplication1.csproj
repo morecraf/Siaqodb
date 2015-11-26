@@ -88,14 +88,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lmdb32.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lmdb64.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
       <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
       <Name>SiaqodbPortable %28.NET 4.5%29</Name>
