@@ -22,16 +22,16 @@ namespace Sqo
         internal static Dictionary<Type, List<string>> Texts;
         internal static Dictionary<Type, List<string>> Documents;
 
-        internal static Dictionary<Type, Dictionary<string,int>> MaxLengths;
+        internal static Dictionary<Type, Dictionary<string, int>> MaxLengths;
         internal static Dictionary<Type, Dictionary<string, string>> PropertyMaps;
         internal static Dictionary<Type, bool> LazyLoaded;
-        
+
         internal static bool RaiseLoadEvents;
         internal static DateTimeKind? DateTimeKindToSerialize;
-        internal static bool OptimisticConcurrencyEnabled=true;
+        internal static bool OptimisticConcurrencyEnabled = true;
         internal static Configurator defaultConfigurator;
-        internal static KeyValuePair<int,DateTime> CurrentVersion = new KeyValuePair<int,DateTime>(50,new DateTime(2015,7,22));
-       
+        internal static KeyValuePair<int, DateTime> CurrentVersion = new KeyValuePair<int, DateTime>(50, new DateTime(2015, 7, 22));
+
         /// <summary>
         /// Add an index for a field or automatic property of a certain Type,an Index can be added also by using Attribute: Sqo.Attributes.Index;
         /// both ways of adding index are similar
@@ -44,7 +44,7 @@ namespace Sqo
             if (Indexes == null)
             {
                 Indexes = new Dictionary<Type, List<string>>();
-                
+
             }
             AddSettingToField(field, type, Indexes);
 
@@ -61,7 +61,7 @@ namespace Sqo
             if (Constraints == null)
             {
                 Constraints = new Dictionary<Type, List<string>>();
-               
+
             }
             if (!Constraints.ContainsKey(type))
             {
@@ -84,7 +84,7 @@ namespace Sqo
             AddSettingToField(field, type, LazyLoadedFields);
 
         }
-        private static void AddSettingToField(string field, Type type, Dictionary<Type, List<string>>  settings)
+        private static void AddSettingToField(string field, Type type, Dictionary<Type, List<string>> settings)
         {
 
             if (!settings.ContainsKey(type))
@@ -125,7 +125,7 @@ namespace Sqo
         /// <param name="field">Field name or automatic property name</param>
         /// <param name="maxLength">max length for a string</param>
         /// <param name="type">Type that declare the field</param>
-        public static void AddMaxLength(string field,int maxLength, Type type)
+        public static void AddMaxLength(string field, int maxLength, Type type)
         {
             if (MaxLengths == null)
             {
@@ -134,7 +134,7 @@ namespace Sqo
             }
             if (!MaxLengths.ContainsKey(type))
             {
-                MaxLengths.Add(type, new Dictionary<string,int>());
+                MaxLengths.Add(type, new Dictionary<string, int>());
             }
             List<FieldInfo> fi = new List<FieldInfo>();
             Dictionary<FieldInfo, PropertyInfo> automaticProperties = new Dictionary<FieldInfo, PropertyInfo>();
@@ -182,7 +182,7 @@ namespace Sqo
                 Ignored = new Dictionary<Type, List<string>>();
             }
             AddSettingToField(field, type, Ignored);
-        
+
         }
         /// <summary>
         /// Mark field to be stored as a string with unlimited length 
@@ -221,31 +221,31 @@ namespace Sqo
         /// <param name="propertyName">Name of property</param>
         /// <param name="fieldName">Name of backing field of property</param>
         /// <param name="type"></param>
-        public static void PropertyUseField(string propertyName, string fieldName,Type type)
+        public static void PropertyUseField(string propertyName, string fieldName, Type type)
         {
             if (PropertyMaps == null)
             {
-                PropertyMaps = new Dictionary<Type, Dictionary<string,string>>();
+                PropertyMaps = new Dictionary<Type, Dictionary<string, string>>();
                 PropertyMaps[type] = new Dictionary<string, string>();
             }
             if (!PropertyMaps.ContainsKey(type))
             {
-                PropertyMaps.Add(type, new Dictionary<string,string>());
+                PropertyMaps.Add(type, new Dictionary<string, string>());
             }
             PropertyMaps[type][propertyName] = fieldName;
 
         }
-        private static bool encryptedDatabase=false;
+        private static bool encryptedDatabase = false;
         /// <summary>
         /// Set if database will be encrypted or not
         /// </summary>
         public static bool EncryptedDatabase
         {
             get { return encryptedDatabase; }
-            set { 
+            set {
                 encryptedDatabase = value;
                 if (encryptedDatabase)
-                { 
+                {
                     Encryptor = new AESEncryptor();
                 }
             }
@@ -256,9 +256,9 @@ namespace Sqo
         /// <param name="pwd">The password</param>
         public static void SetEncryptionPassword(string pwd)
         {
-            int keyLength=32;//used by XTEA algorithm
+            int keyLength = 32;//used by XTEA algorithm
 
-            byte[] key = ByteConverter.SerializeValueType(pwd, typeof(string),keyLength,keyLength,0 );
+            byte[] key = ByteConverter.SerializeValueType(pwd, typeof(string), keyLength, keyLength, 0);
             XTEAEncryptor enc = Encryptor as XTEAEncryptor;
             if (enc != null)
             {
@@ -299,7 +299,7 @@ namespace Sqo
                 Encryptor = new XTEAEncryptor();
             }
         }
-        
+
 #if SILVERLIGHT
 
         static bool useLargeBuffers = true;
@@ -322,7 +322,7 @@ namespace Sqo
         /// </summary>
         /// <typeparam name="T">Type of objects</typeparam>
         /// <param name="fileName">Name of database file on disk</param>
-       
+
         public static void SetDatabaseFileName<T>(string fileName)
         {
             SetDatabaseFileName(typeof(T), fileName);
@@ -332,7 +332,7 @@ namespace Sqo
         /// </summary>
         /// <param name="type">Type of objects</typeparam>
         /// <param name="fileName">Name of database file on disk</param>
-        public static void SetDatabaseFileName(Type type,string fileName)
+        public static void SetDatabaseFileName(Type type, string fileName)
         {
 
             SqoTypeInfo ti = MetaExtractor.GetSqoTypeInfo(type);
@@ -369,7 +369,7 @@ namespace Sqo
                 LazyLoaded = new Dictionary<Type, bool>();
             }
             LazyLoaded[type] = !loadRelatedObjects;
-           
+
 
         }
         /// <summary>
@@ -406,12 +406,12 @@ namespace Sqo
 
         internal static void LogMessage(string message, VerboseLevel level)
         {
-            if (VerboseLevel >= level && LoggingMethod!=null)
+            if (VerboseLevel >= level && LoggingMethod != null)
             {
                 LoggingMethod(message, level);
             }
         }
-       
+
         internal static IDocumentSerializer DocumentSerializer;
         /// <summary>
         /// Set your custom document serializer
@@ -463,7 +463,7 @@ namespace Sqo
                 {
                     foreach (string field in config.MaxLengths[item].Keys)
                     {
-                        AddMaxLength(field,config.MaxLengths[item][field], item);
+                        AddMaxLength(field, config.MaxLengths[item][field], item);
                     }
                 }
             }
@@ -513,7 +513,7 @@ namespace Sqo
                 {
                     foreach (string field in config.PropertyMaps[item].Keys)
                     {
-                        PropertyUseField(field,config.PropertyMaps[item][field], item);
+                        PropertyUseField(field, config.PropertyMaps[item][field], item);
                     }
                 }
             }
@@ -552,13 +552,13 @@ namespace Sqo
             {
                 SetDocumentSerializer(config.DocumentSerializer);
             }
-           
+
             SetRaiseLoadEvents(config.RaiseLoadEvents);
             SpecifyStoredDateTimeKind(config.DateTimeKindToSerialize);
             EnableOptimisticConcurrency(config.OptimisticConcurrencyEnabled);
             LoggingMethod = config.LoggingMethod;
             VerboseLevel = config.VerboseLevel;
-            
+
         }
 
         static void defaultConfigurator_LoadRelatedObjectsPropetyChanged(object sender, EventArgs e)
@@ -597,6 +597,44 @@ namespace Sqo
                 bufferingChunkPercent = value;
             }
         }
+        private static int autoGrowththresholdPercent = 80;
+
+        /// <summary>
+        /// Get or set the Threshold percent when DB automatically increase the size of database when it is opened.
+        /// Database is increased with AutoGrowthSize amount of bytes.
+        /// Default Threshold is 80%
+        /// </summary>
+        public static int AutoGrowthThresholdPercent
+        {
+            get
+            {
+                return autoGrowththresholdPercent;
+            }
+            set
+            {
+                if (value > 100 || value <= 0)
+                {
+                    throw new SiaqodbException("Max percent must be 100");
+                }
+                autoGrowththresholdPercent = value;
+            }
+        }
+        private static long autoGrowthSize =  5 * 1024 *1024;
+
+        /// <summary>
+        /// Get or set automatic growth size of database(default is 5 MB).
+        /// </summary>
+        public static long AutoGrowthSize
+        {
+            get
+            {
+                return autoGrowthSize;
+            }
+            set
+            {
+                autoGrowthSize = value;
+            }
+        }
+
     }
-    
 }

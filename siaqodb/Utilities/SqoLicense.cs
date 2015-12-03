@@ -43,7 +43,7 @@ namespace Sqo.Utilities
 #endif
                 if (notTrial && lcMode == 1)
                 {
-                    if (System.Diagnostics.Debugger.IsAttached)
+                    /*if (System.Diagnostics.Debugger.IsAttached)
                     {
 #if !SL4 && !WinRT && !WP7 && !UNITY3D && !MONODROID && !CF
                         if (keyValues[2] != Environment.MachineName)
@@ -51,7 +51,7 @@ namespace Sqo.Utilities
                             throw new InvalidLicenseException("License is generated from another machine, you have to use current machine to generate the license key!");
                         }
 #endif
-                    }
+                    }*/
                     string licType = keyValues[3];
                     int vers = Convert.ToInt32(keyValues[4]);
                     int year = Convert.ToInt32(keyValues[5].Substring(0, 4));

@@ -196,7 +196,7 @@ namespace Sqo
 
                 byte[] objBytes = transaction.Get(db, key);
                 if (objBytes == null)
-                    return null;
+                    continue;
           
                 serializer.ReadObjectRow(row, ti, objBytes, rawSerializer);
 

@@ -27,6 +27,23 @@ namespace Sqo.Transactions
             env.MaxDatabases = maxDbs;
             
             env.Open();
+            decimal occupiedPercent = (decimal)this.EnvUsedSize() * 100 / (decimal)this.EnvMaxSize();
+            long tempMaxSize = this.EnvMaxSize();
+            if (occupiedPercent > SiaqodbConfigurator.AutoGrowthThresholdPercent)
+            {
+                //resize
+                env.Close();
+#if MONODROID
+			    this.env = new LightningEnvironment(path, EnvironmentOpenFlags.None);
+#else
+                this.env = new LightningEnvironment(path, EnvironmentOpenFlags.NoLock);
+#endif
+                env.MapSize = tempMaxSize + SiaqodbConfigurator.AutoGrowthSize;
+                env.MaxDatabases = maxDbs;
+
+                env.Open();
+
+            }
         }
 #if UNITY3D
         internal  Dictionary<Guid, TransactionInternal> transactions = new Dictionary<Guid, TransactionInternal>(new Sqo.Utilities.EqualityComparer<Guid>());

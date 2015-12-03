@@ -41,27 +41,30 @@ namespace WindowsFormsApplication1
         {
 
             // create sample invoice 
-            Invoice inv = new Invoice();
-            inv.Date = DateTime.Now;
-            inv.Description = "Sample Invoice";
-            inv.CustomerName = "Customer 001";
+            /* Invoice inv = new Invoice();
+             inv.Date = DateTime.Now;
+             inv.Description = "Sample Invoice";
+             inv.CustomerName = "Customer 001";
 
 
-            InvoiceItem item1 = new InvoiceItem();
-            item1.Description = "Keyboard";
-            item1.Quantity = 4;
-            item1.UnitPrice = 10;
+             InvoiceItem item1 = new InvoiceItem();
+             item1.Description = "Keyboard";
+             item1.Quantity = 4;
+             item1.UnitPrice = 10;
 
 
-            InvoiceItem item2 = new InvoiceItem();
-            item1.Description = "Speakers";
-            item1.Quantity = 3;
-            item1.UnitPrice = 60;
+             InvoiceItem item2 = new InvoiceItem();
+             item1.Description = "Speakers";
+             item1.Quantity = 3;
+             item1.UnitPrice = 60;
 
-            inv.InvoiceDetails = new List<InvoiceItem>();
-            inv.InvoiceDetails.AddRange(new InvoiceItem[] { item1, item2 });
+             inv.InvoiceDetails = new List<InvoiceItem>();
+             inv.InvoiceDetails.AddRange(new InvoiceItem[] { item1, item2 });
 
-            AddInvoice(inv);
+             AddInvoice(inv);*/
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
 
         }
 

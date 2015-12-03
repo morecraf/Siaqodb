@@ -130,19 +130,25 @@ namespace WindowsFormsApplication1
         {
             A a = new A(); a.Name = "AAA";
             B b = new B(); b.Name = "BBB"; b.age = 10;
-            Z z = new Z();
-            z.a = a;
-            z.b = b;
-            //a.Name.Contains
-            z.items.Add(a);
-            z.items.Add(b);
-           // SiaqodbConfigurator.SetLicense(@"qU3TtvA4T4L30VSlCCGUTXNXoKgzghhG5v8/UHPmMf8=");
-           
-            Siaqodb sqo = new Siaqodb(@"e:\sqoo\temp\db\");
 
-            sqo.StoreObject(z);
-            int count = (from aBase aa in sqo select aa).Count();
+            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+
+            Siaqodb sqo = new Siaqodb(@"c:\work\temp\db\", 1 * 1024 * 1024);
+            var trans=sqo.BeginTransaction();
+            for (int i = 0; i < 7000; i++)
+            {
+                Z z = new Z();
+                z.a = a;
+                z.b = b;
+                //a.Name.Contains
+                z.items.Add(a);
+                z.items.Add(b);
+                sqo.StoreObject(z,trans);
+            }
+            trans.Commit();
+            int count = (from Z aa in sqo select aa).Count();
             string ass = "s";
+            sqo.Close();
         }
 
         //private void button3_Click(object sender, EventArgs e)

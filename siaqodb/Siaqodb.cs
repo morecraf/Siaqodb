@@ -1015,14 +1015,21 @@ namespace Sqo
         {
             lock (_locker)
             {
-                using (var transaction = transactionManager.BeginTransaction())
+                bool started;
+                var transaction = transactionManager.GetActiveTransaction(out started);
+                try
                 {
+
                     SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
 
                     List<int> oids = LoadOids<T>(expression);
-                    var list= storageEngine.LoadByOIDs<T>(oids, ti);
-                    transaction.Commit();
+                    var list = storageEngine.LoadByOIDs<T>(oids, ti);
                     return list;
+                }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
                 }
             }
 
@@ -1072,12 +1079,19 @@ namespace Sqo
         {
             lock (_locker)
             {
-                using (var transaction = transactionManager.BeginTransaction())
+                bool started;
+                var transaction = transactionManager.GetActiveTransaction(out started);
+                try
                 {
+                    
                     SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
                     var all= storageEngine.LoadAll<T>(ti);
-                    transaction.Commit();
                     return all;
+                }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
                 }
             }
         }

@@ -76,7 +76,7 @@ namespace LightningDB
             {
                 var envInfo = new MDBEnvInfo();
                 NativeMethods.Execute(lib => lib.mdb_env_info(_handle, out envInfo));
-
+                this._mapSize = envInfo.me_mapsize.ToInt64();
                 return envInfo.me_last_pgno.ToInt64() * PageSize;
             }
         }

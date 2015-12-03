@@ -28,11 +28,11 @@ namespace TestSiaqodb
 		public LINQTest()
 		{
             SiaqodbConfigurator.EncryptedDatabase = true;
-            Sqo.SiaqodbConfigurator.SetLicense(@" OqNhH+uqOErNs375SRgMEXbBB0dyx7R8MAM2M4i+fwWiiS3Qv+QVT8odOEjHSkEX");
-			#if __MOBILE__
+            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+#if __MOBILE__
 			objPath=Environment.GetFolderPath (Environment.SpecialFolder.Personal);
-			#else
-			objPath=@"c:\work\temp\unitTests_siaqodbLMDB\";
+#else
+            objPath =@"c:\work\temp\unitTests_siaqodbLMDB\";
 			#endif
 		}
 
