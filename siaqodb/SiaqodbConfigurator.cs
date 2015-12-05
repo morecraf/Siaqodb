@@ -619,7 +619,7 @@ namespace Sqo
                 autoGrowththresholdPercent = value;
             }
         }
-        private static long autoGrowthSize =  5 * 1024 *1024;
+        private static long autoGrowthSize = 5 * 1024 * 1024;
 
         /// <summary>
         /// Get or set automatic growth size of database(default is 5 MB).
@@ -635,6 +635,38 @@ namespace Sqo
                 autoGrowthSize = value;
             }
         }
+        internal static Dictionary<string, bool> syncableBuckets;
+        public static void SetSyncableBucket(string bucketName, bool syncable)
+        {
+            if (syncableBuckets == null)
+            {
+                syncableBuckets = new Dictionary<string, bool>();
+            }
+            syncableBuckets["buk_"+bucketName] = syncable;
+        }
+        internal static bool IsBucketSyncable(string bucketName)
+        {
+            if (syncableBuckets != null && syncableBuckets.ContainsKey(bucketName))
+            {
+                return syncableBuckets[bucketName];
+            }
+            return false;
+        }
+        internal static Dictionary<Type, Func<object, string>> KeyConventions = new Dictionary<Type, Func<object, string>>();
+        internal static Dictionary<Type, Func<object, string>> VersionSetConventions = new Dictionary<Type, Func<object, string>>();
+        internal static Dictionary<Type, Action<object, string>> VersionGetConventions = new Dictionary<Type, Action<object, string>>();
+        public static void RegisterKeyConvention<T>(Func<T, string> func)
+        {
+            KeyConventions[typeof(T)] = a => func((T)a);
+        }
+        public static void RegisterSetVersionConvention<T>(Func<T, string> func)
+        {
+            VersionSetConventions[typeof(T)] = a => func((T)a);
+        }
 
+        public static void RegisterGetVersionConvention<T>(Action<T, string> action)
+        {
+            VersionGetConventions[typeof(T)] = (a, b) => action((T)a, b);
+        }
     }
 }

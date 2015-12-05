@@ -45,7 +45,7 @@ namespace Sqo
         bool opened;
         internal List<object> circularRefCache = new List<object>();
         bool storeOnlyReferencesOfListItems;//used only in StoreObjectPartially to store only references of list items
-        Transactions.TransactionManager transactionManager;
+        internal Transactions.TransactionManager transactionManager;
         /// <summary>
         /// Raised before an object is saved in database
         /// </summary>
@@ -1220,7 +1220,8 @@ namespace Sqo
                 this.opened = false;
                 this.metaCache = null;
                 this.storageEngine.Close();
-               
+                if (documentStore != null)
+                    documentStore.ClearCache();
             }
         }
         public void Dispose()
@@ -2736,6 +2737,18 @@ namespace Sqo
         }
         #endregion
 
+        #region Documents
+        Documents.DocumentStore documentStore;
+        public Documents.DocumentStore Documents
+        {
+            get
+            {
+                if (documentStore == null)
+                    documentStore = new Sqo.Documents.DocumentStore(this);
+                return documentStore;
+            }
+        }
+        #endregion
         public class Stat
         {
            /// <summary>

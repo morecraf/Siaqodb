@@ -14,6 +14,9 @@ using Sqo.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Sqo.Transactions;
+using Sqo.Documents;
+using Raven.Client.Embedded;
+using Raven.Client;
 
 namespace WindowsFormsApplication1
 {
@@ -132,23 +135,79 @@ namespace WindowsFormsApplication1
             B b = new B(); b.Name = "BBB"; b.age = 10;
 
             Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+            Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
+            Siaqodb sqo = new Siaqodb(@"c:\work\temp\db\", 50 * 1024 * 1024);
 
-            Siaqodb sqo = new Siaqodb(@"c:\work\temp\db\", 1 * 1024 * 1024);
-            var trans=sqo.BeginTransaction();
-            for (int i = 0; i < 7000; i++)
+            DateTime start = DateTime.Now;
+            var trans = sqo.BeginTransaction();
+            for (int i = 0; i < 10000; i++)
             {
-                Z z = new Z();
-                z.a = a;
-                z.b = b;
-                //a.Name.Contains
-                z.items.Add(a);
-                z.items.Add(b);
-                sqo.StoreObject(z,trans);
+                Tick t = new Tick();
+                t.mydate = DateTime.Now;
+                t.MyInt = i;
+                t.mylong = i;
+                t.mystring = "asdasd" + i.ToString();
+                sqo.StoreObject(t, trans);
             }
             trans.Commit();
+            string elapsed = (DateTime.Now - start).ToString();
+
+            start = DateTime.Now;
+            trans = sqo.BeginTransaction();
+            for (int i = 0; i < 10000; i++)
+            {
+                Tick t = new Tick();
+                t.mydate = DateTime.Now;
+                t.MyInt = i;
+                t.mylong = i;
+                t.mystring = "asdasd" + i.ToString();
+                Document doc = new Document();
+                doc.Key = i.ToString();
+                doc.SetContent<Tick>(t);
+                doc.SetTag<int>("ana", i);
+                sqo.Documents["contacts"].Store(doc, trans);
+            }
+            trans.Commit();
+            elapsed = (DateTime.Now - start).ToString();
+            Query quqery = new Query("ana");
+            long astr = 8000;
+            quqery.Start = astr;
+
+            var all = sqo.Documents["contacts"].Get(quqery);
+            foreach (var doc in all)
+            {
+                Z zeca = doc.GetContent<Z>();
+                string aeeee = "ss";
+            }
+
             int count = (from Z aa in sqo select aa).Count();
             string ass = "s";
             sqo.Close();
+
+            EmbeddableDocumentStore store = new EmbeddableDocumentStore
+            {
+                DataDirectory = @"c:\work\temp\db\raven\"
+
+            };
+            store.Initialize(); // initializes document store, by connecting to server and downloading various configurations
+            start = DateTime.Now;
+            using (IDocumentSession session = store.OpenSession()) // opens a session that will work in context of 'DefaultDatabase'
+            {
+                for (int i = 10000; i < 20000; i++)
+                {
+                    Tick t = new Tick();
+                    t.mydate = DateTime.Now;
+                    t.MyInt = i;
+                    t.mylong = i;
+                    t.mystring = "asdasd" + i.ToString();
+                    session.Store(t,i.ToString());
+                   
+                }
+                session.SaveChanges();
+            }
+            elapsed = (DateTime.Now - start).ToString();
+            string awss = "s";
+
         }
 
         //private void button3_Click(object sender, EventArgs e)
@@ -244,7 +303,7 @@ namespace WindowsFormsApplication1
 
         public int OID { get; set; }
 
-      
+      [Index]
         public int MyInt;
         public string mystring;
         public DateTime mydate;
@@ -298,6 +357,47 @@ namespace WindowsFormsApplication1
              
                return ms.ToArray();
             }
+        }
+
+        #endregion
+    }
+    internal class MyJsonSerializer : IDocumentSerializer
+    {
+        #region IDocumentSerializer Members
+
+#if !UNITY3D && !CF
+        readonly JsonSerializer serializer = new JsonSerializer();
+#endif
+        public object Deserialize(Type type, byte[] objectBytes)
+        {
+#if SILVERLIGHT || CF || WinRT
+
+            string jsonStr = Encoding.UTF8.GetString(objectBytes, 0, objectBytes.Length);
+
+#else
+            string jsonStr = Encoding.UTF8.GetString(objectBytes);
+
+#endif
+#if !UNITY3D && !CF
+            return JsonConvert.DeserializeObject(jsonStr.TrimEnd('\0'), type);
+#else
+            LitJson.JsonReader reader = new LitJson.JsonReader(jsonStr.TrimEnd('\0'));
+
+            return LitJson.JsonMapper.ReadValue(type, reader);
+#endif
+
+        }
+
+        public byte[] Serialize(object obj)
+        {
+#if !UNITY3D && !CF
+            string jsonStr = JsonConvert.SerializeObject(obj, Formatting.Indented);
+
+#else
+            string jsonStr = LitJson.JsonMapper.ToJson(obj);
+
+#endif
+            return Encoding.UTF8.GetBytes(jsonStr);
         }
 
         #endregion
