@@ -137,6 +137,7 @@ namespace WindowsFormsApplication1
             Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
             Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
             Siaqodb sqo = new Siaqodb(@"c:\work\temp\db\", 50 * 1024 * 1024);
+           
 
             DateTime start = DateTime.Now;
             var trans = sqo.BeginTransaction();
@@ -165,18 +166,28 @@ namespace WindowsFormsApplication1
                 doc.Key = i.ToString();
                 doc.SetContent<Tick>(t);
                 doc.SetTag<int>("ana", i);
+                doc.SetTag<int>("toy", i%3);
                 sqo.Documents["contacts"].Store(doc, trans);
             }
             trans.Commit();
             elapsed = (DateTime.Now - start).ToString();
-            Query quqery = new Query("ana");
-            long astr = 8000;
-            quqery.Start = astr;
+            long startL = 10;
+            long endL = 20;
+            long toy = 2;
+            Query quqery = new Query();
+            quqery.WhereLessThan("ana", endL)
+                  .WhereGreaterThan("ana", startL)
+                  .OrderByDesc("ana");
+            var q2 = new Query();
+            q2.WhereEqual("toy", toy);
+            
+           // long astr = 8000;
+           // quqery.Start = astr;
 
-            var all = sqo.Documents["contacts"].Get(quqery);
+            var all = sqo.Documents["contacts"].Get(quqery.Or(q2));
             foreach (var doc in all)
             {
-                Z zeca = doc.GetContent<Z>();
+                Tick zeca = doc.GetContent<Tick>();
                 string aeeee = "ss";
             }
 

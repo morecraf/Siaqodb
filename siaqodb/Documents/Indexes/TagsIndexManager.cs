@@ -95,11 +95,11 @@ namespace Sqo.Documents.Indexes
             string indexName = bucket + "_tags_" + tagName;
             return new Index(indexName, transaction);
         }
-        internal void LoadKeysByIndex(Query query, List<string> keys, string bucketName, LightningTransaction transaction)
+        internal List<string> LoadKeysByIndex(Where query, string bucketName, LightningTransaction transaction)
         {
             using (Index index = this.GetIndex(bucketName, query.TagName, transaction))
             {
-                IndexQueryFinder.FindKeys(index, query, keys);
+                return IndexQueryFinder.FindKeys(index, query);
             }
         }
     }

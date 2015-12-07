@@ -1,5 +1,6 @@
 ﻿using LightningDB;
 using Sqo.Documents.Indexes;
+using Sqo.Documents.Queries;
 using Sqo.Documents.Utils;
 using Sqo.Transactions;
 using System;
@@ -84,21 +85,14 @@ namespace Sqo.Documents
                     try
                     {
                         var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        List<string> keys = new List<string>();
-                        if (string.Compare(query.TagName, "key", StringComparison.OrdinalIgnoreCase) == 0)
-                        {
-                            this.LoadByKey(query, keys, lmdbTransaction);
-                        }
-                        else //by tags
-                        {
-                            this.indexManag.LoadKeysByIndex(query, keys, this.BucketName, lmdbTransaction);
-                        }
+                        var qr = new QueryRunner(indexManag, lmdbTransaction, this.BucketName);
+                        var keys = qr.Run(query);
                         List<Document> allFiltered = new List<Document>();
                         IEnumerable<string> keysLoaded = keys;
-                        if (query.Skip != null)
-                            keysLoaded = keysLoaded.Skip(query.Skip.Value);
-                        if (query.Limit != null)
-                            keysLoaded = keysLoaded.Take(query.Limit.Value);
+                        if (query.skip != null)
+                            keysLoaded = keysLoaded.Skip(query.skip.Value);
+                        if (query.limit != null)
+                            keysLoaded = keysLoaded.Take(query.limit.Value);
                         foreach (string key in keysLoaded)
                         {
                             var obj = Get(key, lmdbTransaction);
@@ -114,14 +108,7 @@ namespace Sqo.Documents
             }
         }
 
-        private void LoadByKey(Query query, List<string> keys, LightningTransaction transaction)
-        {
-            using (var db = transaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
-            {
-                IIndex index = new IndexKey(db, transaction);
-                IndexQueryFinder.FindKeys(index, query, keys);
-            }
-        }
+        
 
         public T Get<T>(string key)
         {

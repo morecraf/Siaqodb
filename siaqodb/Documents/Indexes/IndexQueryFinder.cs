@@ -8,26 +8,82 @@ namespace Sqo.Documents.Indexes
 {
     class IndexQueryFinder
     {
-        public static void FindKeys(IIndex index, Query query, List<string> keys)
+        public static List<string> FindKeys(IIndex index, Where query)
         {
-            IEnumerable<string> keysFound = null;
-            if (query.Value != null)
+            List<string> keys = new List<string>();
+            List<string> keysFound = null;
+            if (query.Operator == WhereOp.Equal)
             {
                 keysFound = index.FindItem(query.Value);
 
             }
-            else if (query.Start != null && query.End != null)
+            else if (query.Operator == WhereOp.NotEqual)
             {
-                keysFound = GetByStartEnd(query.Descending, query.Start, query.End, index);
-
+                keysFound = index.FindAllExcept(query.Value);
             }
-            else if (query.Start != null && query.End == null)
+            else if (query.Operator == WhereOp.Between)
             {
-                keysFound = GetByStart(query.Descending, query.Start, index);
+                keysFound =index.FindItemsBetween(query.Between[0], query.Between[1]);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
             }
-            else if (query.Start == null && query.End != null)
+            else if (query.Operator == WhereOp.BetweenExceptStart)
             {
-                keysFound = GetByEnd(query.Descending, query.End, index);
+                keysFound = index.FindItemsBetweenExceptStart(query.Between[0], query.Between[1]);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
+            }
+            else if (query.Operator == WhereOp.BetweenExceptEnd)
+            {
+                keysFound = index.FindItemsBetweenExceptEnd(query.Between[0], query.Between[1]);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
+            }
+            else if (query.Operator == WhereOp.BetweenExceptStartEnd)
+            {
+                keysFound = index.FindItemsBetweenExceptStartEnd(query.Between[0], query.Between[1]);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
+            }
+            else if (query.Operator == WhereOp.GreaterThanOrEqual)
+            {
+                keysFound = index.FindItemsBiggerThanOrEqual(query.Value);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
+            }
+            else if (query.Operator == WhereOp.GreaterThan)
+            {
+                keysFound = index.FindItemsBiggerThan(query.Value);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
+            }
+            else if (query.Operator == WhereOp.LessThanOrEqual)
+            {
+                keysFound = index.FindItemsLessThanOrEqual(query.Value);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
+            }
+            else if (query.Operator == WhereOp.LessThan)
+            {
+                keysFound = index.FindItemsLessThan(query.Value);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
             }
             else if (query.In != null)
             {
@@ -45,48 +101,9 @@ namespace Sqo.Documents.Indexes
             {
                 keys.AddRange(keysFound);
             }
+            return keys;
         }
 
-        private static IEnumerable<string> GetByStartEnd(bool? desc, object start, object end, IIndex index)
-        {
-            List<string> oids = null;
-            if (desc == true)
-            {
-                oids = index.FindItemsBetween(end, start);
-                oids.Reverse();
-            }
-            else
-            {
-                oids = index.FindItemsBetween(start, end);
-            }
-            return oids;
-        }
-        private static List<string> GetByStart(bool? desc, object start, IIndex index)
-        {
-            if (desc == true)
-            {
-                var oids = index.FindItemsLessThanOrEqual(start);
-                oids.Reverse();
-                return oids;
-            }
-            else
-            {
-                var oids = index.FindItemsBiggerThanOrEqual(start);
-                return oids;
-            }
-        }
-        private static List<string> GetByEnd(bool? desc, object end, IIndex index)
-        {
-            if (desc == true)
-            {
-                var oids = index.FindItemsBiggerThanOrEqual(end);
-                oids.Reverse();
-                return oids;
-            }
-            else
-            {
-                return index.FindItemsLessThanOrEqual(end);
-            }
-        }
+        
     }
 }
