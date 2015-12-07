@@ -180,11 +180,14 @@ namespace WindowsFormsApplication1
                   .OrderByDesc("ana");
             var q2 = new Query();
             q2.WhereEqual("toy", toy);
-            
-           // long astr = 8000;
-           // quqery.Start = astr;
+            var linq223 = (from Document doc in sqo.Documents["contacts"]
+                       where (doc.GetTag<long>("ana") > 10 && doc.GetTag<long>("ana") < 20) 
+                       orderby doc.GetTag<long>("ana") descending
+                       select doc).ToObjects<Tick>();
+            // long astr = 8000;
+            // quqery.Start = astr;
 
-            var all = sqo.Documents["contacts"].Get(quqery.Or(q2));
+            var all = sqo.Documents["contacts"].Find(quqery.Or(q2));
             foreach (var doc in all)
             {
                 Tick zeca = doc.GetContent<Tick>();

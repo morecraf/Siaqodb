@@ -93,6 +93,9 @@
     <Compile Include="Core\RawdataSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
     <Compile Include="Documents\Bucket.cs" />
+    <Compile Include="Documents\LINQ\DocQuery.cs" />
+    <Compile Include="Documents\LINQ\DocQueryExtensions.cs" />
+    <Compile Include="Documents\LINQ\IDocQuery.cs" />
     <Compile Include="Documents\Queries\QueryRunner.cs" />
     <Compile Include="Documents\Query.cs" />
     <Compile Include="Documents\Document.cs" />

@@ -83,7 +83,7 @@ namespace Sqo
 
 
 
-            protected override Expression Visit(Expression exp)
+            public override Expression Visit(Expression exp)
             {
 
                 if (exp == null)
@@ -209,7 +209,7 @@ namespace Sqo
 
 
 
-            protected override Expression Visit(Expression expression)
+            public override Expression Visit(Expression expression)
             {
 
                 if (expression != null)

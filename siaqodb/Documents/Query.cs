@@ -41,6 +41,22 @@ namespace Sqo.Documents
             wheres.Add(w);
             return this;
         }
+
+        internal void WhereStartsWith(object p1, object p2)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void WhereEndsWith(object p1, object p2)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void WhereContains(object p1, object p2)
+        {
+            throw new NotImplementedException();
+        }
+
         public Query WhereGreaterThan(string tagName, object value)
         {
             Where w = new Where(tagName);

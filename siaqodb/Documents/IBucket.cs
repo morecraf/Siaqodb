@@ -9,11 +9,11 @@ namespace Sqo.Documents
 {
     public interface IBucket
     {
-        Document Get(string key);
-        T Get<T>(string key);
-        IList<Document> Get(Query query);
-        IList<Document> GetAll();
-        IList<Document> GetAll(int skip, int limit);
+        Document Load(string key);
+        T Load<T>(string key);
+        IList<Document> Find(Query query);
+        IList<Document> LoadAll();
+        IList<Document> LoadAll(int skip, int limit);
         void Store(Document doc);
         void Store(Document doc, ITransaction transaction);
         void Store(string key, object obj);
@@ -24,5 +24,7 @@ namespace Sqo.Documents
         void Delete(string key);
         void Delete(Document doc);
         string BucketName { get; set; }
+        IDocQuery<T> Cast<T>() where T : Document;
+        IDocQuery<T> Query<T>() where T : Document;
     }
 }

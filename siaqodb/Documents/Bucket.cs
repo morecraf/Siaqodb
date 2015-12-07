@@ -71,12 +71,12 @@ namespace Sqo.Documents
 
         public void Delete(string key)
         {
-            Document doc = this.Get(key);
+            Document doc = this.Load(key);
             Delete(doc);
         }
        
 
-        public IList<Document> Get(Query query)
+        public IList<Document> Find(Query query)
         {
             lock (_locker)
             {
@@ -110,15 +110,15 @@ namespace Sqo.Documents
 
         
 
-        public T Get<T>(string key)
+        public T Load<T>(string key)
         {
             lock (_locker)
             {
-                Document obj = this.Get(key);
+                Document obj = this.Load(key);
                 return obj.GetContent<T>();
             }
         }
-        public Document Get(string key)
+        public Document Load(string key)
         {
             lock (_locker)
             {
@@ -157,7 +157,7 @@ namespace Sqo.Documents
 
     
 
-        public IList<Document> GetAll()
+        public IList<Document> LoadAll()
         {
             lock (_locker)
             {
@@ -202,7 +202,7 @@ namespace Sqo.Documents
             }
         }
 
-        public IList<Document> GetAll(int skip, int limit)
+        public IList<Document> LoadAll(int skip, int limit)
         {
             lock (_locker)
             {
@@ -405,6 +405,24 @@ namespace Sqo.Documents
         public override int GetHashCode()
         {
             return this.BucketName.GetHashCode();
+        }
+        /// <summary>
+        /// Cast method to be used in LINQ queries
+        /// </summary>
+        /// <typeparam name="T">Type over which LINQ will take action</typeparam>
+        /// <returns></returns>
+        public IDocQuery<T> Cast<T>() where T :Document
+        {
+            return new DocQuery<T>(this, new Query());
+        }
+        /// <summary>
+        /// Query method to be used in LINQ queries
+        /// </summary>
+        /// <typeparam name="T">Type over which LINQ will take action</typeparam>
+        /// <returns></returns>
+        public IDocQuery<T> Query<T>() where T : Document
+        {
+            return this.Cast<T>();
         }
 
 
