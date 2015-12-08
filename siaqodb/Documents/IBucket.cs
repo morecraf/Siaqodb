@@ -12,6 +12,9 @@ namespace Sqo.Documents
         Document Load(string key);
         T Load<T>(string key);
         IList<Document> Find(Query query);
+        Document FindFirst(Query query);
+        int Count(Query query);
+        int Count();
         IList<Document> LoadAll();
         IList<Document> LoadAll(int skip, int limit);
         void Store(Document doc);

@@ -76,6 +76,29 @@ namespace Sqo.Documents
         }
        
 
+        public Document FindFirst(Query query)
+        {
+            lock (_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    try
+                    {
+                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
+                        string key = keysLoaded.FirstOrDefault();
+                        if(key!=null)
+                            return Get(key, lmdbTransaction); 
+                       
+                    }
+                    finally
+                    {
+                        transaction.Commit();
+                    }
+                }
+                return null;
+            }
+        }
         public IList<Document> Find(Query query)
         {
             lock (_locker)
@@ -85,14 +108,9 @@ namespace Sqo.Documents
                     try
                     {
                         var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        var qr = new QueryRunner(indexManag, lmdbTransaction, this.BucketName);
-                        var keys = qr.Run(query);
                         List<Document> allFiltered = new List<Document>();
-                        IEnumerable<string> keysLoaded = keys;
-                        if (query.skip != null)
-                            keysLoaded = keysLoaded.Skip(query.skip.Value);
-                        if (query.limit != null)
-                            keysLoaded = keysLoaded.Take(query.limit.Value);
+                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction,query);
+                      
                         foreach (string key in keysLoaded)
                         {
                             var obj = Get(key, lmdbTransaction);
@@ -107,8 +125,64 @@ namespace Sqo.Documents
                 }
             }
         }
+        public int Count(Query query)
+        {
+            lock (_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    try
+                    {
+                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
+                        return keysLoaded.Count();
 
-        
+                    }
+                    finally
+                    {
+                        transaction.Commit();
+                    }
+                }
+            }
+        }
+        public int Count()
+        {
+            using (var transaction = siaqodb.BeginTransaction())
+            {
+                try
+                {
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    using (var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
+                    {
+                        var c = lmdbTransaction.CreateCursor(db);
+                        var i = 0;
+                        var current = c.MoveToFirst();
+                        while (current.HasValue)
+                        {
+                            i++;
+                            current = c.MoveNext();
+                        }
+                        return i;
+                    }
+                }
+                finally
+                {
+                    transaction.Commit();
+                }
+            }
+        }
+
+        private IEnumerable<string> GetKeys(LightningTransaction lmdbTransaction,Query query)
+        {
+            var qr = new QueryRunner(indexManag, lmdbTransaction, this.BucketName);
+            var keys = qr.Run(query);
+            IEnumerable<string> keysLoaded = keys;
+            if (query.skip != null)
+                keysLoaded = keysLoaded.Skip(query.skip.Value);
+            if (query.limit != null)
+                keysLoaded = keysLoaded.Take(query.limit.Value);
+            return keysLoaded;
+        }
 
         public T Load<T>(string key)
         {

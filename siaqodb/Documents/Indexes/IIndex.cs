@@ -18,7 +18,9 @@ namespace Sqo.Documents.Indexes
         List<string> FindItemsBiggerThanOrEqual(object start);
         List<string> FindItemsLessThan(object start);
         List<string> FindItemsLessThanOrEqual(object start);
-       
-       
+        List<string> FindItemsStartsWith(object target_key);
+
+
+
     }
 }

@@ -85,6 +85,14 @@ namespace Sqo.Documents.Indexes
                     keysFound.Reverse();
                 }
             }
+            else if (query.Operator == WhereOp.StartWith)
+            {
+                keysFound = index.FindItemsStartsWith(query.Value);
+                if (query.Descending == true)
+                {
+                    keysFound.Reverse();
+                }
+            }
             else if (query.In != null)
             {
                 foreach (object objTarget in query.In)

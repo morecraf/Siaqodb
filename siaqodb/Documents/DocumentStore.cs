@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LightningDB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,7 @@ namespace Sqo.Documents
         {
             lock(_locker)
             {
+              
                 if (!cache.ContainsKey(bucketName))
                 {
                     cache[bucketName] = new Bucket(bucketName, siaqodb);
@@ -33,9 +35,34 @@ namespace Sqo.Documents
                 return cache[bucketName];
             }
         }
+        public void DropBucket(string bucketName)
+        {
+            lock (_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    try
+                    {
+                        bucketName = "buk_" + bucketName;
+                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                        var db = lmdbTransaction.OpenDatabase(bucketName, DatabaseOpenFlags.Create);
+                        lmdbTransaction.DropDatabase(db, true);
+                        //TODO delete all indexes
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
         internal void ClearCache()
         {
             cache.Clear();
         }
+
     }
 }

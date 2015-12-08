@@ -36,6 +36,36 @@ namespace Sqo.Documents
                 },
             };
         }
+        public static Document FirstOrDefault(this IDocQuery<Document> source) 
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+            return source.Bucket.FindFirst(source.InnerQuery);
+        }
+        public static Document First(this IDocQuery<Document> source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+            var doc= source.Bucket.FindFirst(source.InnerQuery);
+            if (doc != null)
+                return doc;
+            else
+            {
+                throw new InvalidOperationException("The source sequence is empty.");
+            }
+        }
+        public static int Count(this IDocQuery<Document> source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+            return source.Bucket.Count(source.InnerQuery);
+        }
         public static IDocQuery<TSource> Where<TSource>(this IDocQuery<TSource> source, Expression<Func<TSource, bool>> predicate)
         {
 
@@ -112,6 +142,25 @@ namespace Sqo.Documents
             source.InnerQuery.ThenByDesc(GetOrderByPath(keySelector));
             return source;
         }
+        public static IDocQuery<TSource> Skip<TSource>(this IDocQuery<TSource> source, int count)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+            source.InnerQuery.skip = count;
+            return source;
+        }
+        public static IDocQuery<TSource> Take<TSource>(this IDocQuery<TSource> source, int count)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+            source.InnerQuery.limit = count;
+            return source;
+        }
+
         private static string GetOrderByPath<TSource, TSelector>(Expression<Func<TSource, TSelector>> keySelector)
         {
             string result = null;

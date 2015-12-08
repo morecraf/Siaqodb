@@ -183,7 +183,7 @@ namespace WindowsFormsApplication1
             var linq223 = (from Document doc in sqo.Documents["contacts"]
                        where (doc.GetTag<long>("ana") > 10 && doc.GetTag<long>("ana") < 20) 
                        orderby doc.GetTag<long>("ana") descending
-                       select doc).ToObjects<Tick>();
+                       select doc).FirstOrDefault();
             // long astr = 8000;
             // quqery.Start = astr;
 

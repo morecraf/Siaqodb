@@ -218,6 +218,33 @@ namespace Sqo.Documents.Indexes
                 return indexValues;
             }
         }
+        public List<string> FindItemsStartsWith(object target_key)
+        {
+            string start = (string)target_key;
+            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            using (var cursor = transaction.CreateCursor(this.db))
+            {
+                var firstKV = cursor.MoveToFirstAfter(keyBytes);
+                List<string> indexValues = new List<string>();
+
+                while (firstKV.HasValue)
+                {
+                    string currentKey = (string)ByteConverter.ReadBytes(firstKV.Value.Key, typeof(string));
+                    if (string.Compare(currentKey, start) >= 0)
+                    {
+                        if (currentKey.StartsWith( start))
+                        {
+                            ReadDuplicates(firstKV, indexValues, cursor);
+                        }
+                        else
+                            return indexValues;
+                    }
+                    firstKV = cursor.MoveNext();
+                }
+
+                return indexValues;
+            }
+        }
         private void ReadDuplicates(KeyValuePair<byte[], byte[]>? firstKV, List<string> duplicates, LightningCursor cursor)
         {
             object currentVal = ByteConverter.ReadBytes(firstKV.Value.Value, typeof(string));

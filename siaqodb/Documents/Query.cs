@@ -42,19 +42,31 @@ namespace Sqo.Documents
             return this;
         }
 
-        internal void WhereStartsWith(object p1, object p2)
+        public Query WhereStartsWith(string tagName, string substring)
         {
-            throw new NotImplementedException();
+            Where w = new Where(tagName);
+            w.Value = substring;
+            w.Operator = WhereOp.StartWith;
+            wheres.Add(w);
+            return this;
         }
 
-        internal void WhereEndsWith(object p1, object p2)
+        public Query WhereEndsWith(string tagName, string substring)
         {
-            throw new NotImplementedException();
+            Where w = new Where(tagName);
+            w.Value = substring;
+            w.Operator = WhereOp.EndWith;
+            wheres.Add(w);
+            return this;
         }
 
-        internal void WhereContains(object p1, object p2)
+        public Query WhereContains(string tagName, string substring)
         {
-            throw new NotImplementedException();
+            Where w = new Where(tagName);
+            w.Value = substring;
+            w.Operator = WhereOp.Contains;
+            wheres.Add(w);
+            return this;
         }
 
         public Query WhereGreaterThan(string tagName, object value)
