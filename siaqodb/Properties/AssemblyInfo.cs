@@ -27,7 +27,7 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("6499f830-6a14-4472-9eb7-dabbf0470ceb")]
 
-//[assembly:InternalsVisibleTo("SiaqodbManager")]
+[assembly:InternalsVisibleTo("SiaqodbCloud")]
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version

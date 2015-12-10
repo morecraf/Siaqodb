@@ -245,6 +245,55 @@ namespace Sqo.Documents.Indexes
                 return indexValues;
             }
         }
+        public List<string> FindItemsContains(object target_key)
+        {
+            string start = (string)target_key;
+            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            using (var cursor = transaction.CreateCursor(this.db))
+            {
+                var firstKV = cursor.MoveToFirst();
+                List<string> indexValues = new List<string>();
+
+                while (firstKV.HasValue)
+                {
+                    string currentKey = (string)ByteConverter.ReadBytes(firstKV.Value.Key, typeof(string));
+
+                    if (currentKey.Contains(start))
+                    {
+                        ReadDuplicates(firstKV, indexValues, cursor);
+                    }
+
+                    firstKV = cursor.MoveNext();
+                }
+
+                return indexValues;
+            }
+        }
+
+        public List<string> FindItemsEndsWith(object target_key)
+        {
+            string start = (string)target_key;
+            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            using (var cursor = transaction.CreateCursor(this.db))
+            {
+                var firstKV = cursor.MoveToFirst();
+                List<string> indexValues = new List<string>();
+
+                while (firstKV.HasValue)
+                {
+                    string currentKey = (string)ByteConverter.ReadBytes(firstKV.Value.Key, typeof(string));
+
+                    if (currentKey.EndsWith(start))
+                    {
+                        ReadDuplicates(firstKV, indexValues, cursor);
+                    }
+
+                    firstKV = cursor.MoveNext();
+                }
+
+                return indexValues;
+            }
+        }
         private void ReadDuplicates(KeyValuePair<byte[], byte[]>? firstKV, List<string> duplicates, LightningCursor cursor)
         {
             object currentVal = ByteConverter.ReadBytes(firstKV.Value.Value, typeof(string));
@@ -263,7 +312,6 @@ namespace Sqo.Documents.Indexes
             db.Close();
         }
 
-
-       
+      
     }
 }

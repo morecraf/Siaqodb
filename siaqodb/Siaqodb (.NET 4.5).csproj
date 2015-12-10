@@ -107,6 +107,7 @@
     <Compile Include="Documents\Indexes\IndexQueryFinder.cs" />
     <Compile Include="Documents\Indexes\TagsIndexManager.cs" />
     <Compile Include="Documents\Queries\Where.cs" />
+    <Compile Include="Documents\SyncEntities.cs" />
     <Compile Include="Documents\Utils\ByteConverter.cs" />
     <Compile Include="Documents\Utils\EndianBitConverter.cs" />
     <Compile Include="Documents\Utils\Util.cs" />

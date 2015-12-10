@@ -17,6 +17,7 @@ using Sqo.Transactions;
 using Sqo.Documents;
 using Raven.Client.Embedded;
 using Raven.Client;
+using SiaqodbCloud;
 
 namespace WindowsFormsApplication1
 {
@@ -167,6 +168,7 @@ namespace WindowsFormsApplication1
                 doc.SetContent<Tick>(t);
                 doc.SetTag<int>("ana", i);
                 doc.SetTag<int>("toy", i%3);
+                doc.SetTag<string>("str", "aa"+i+"pp");
                 sqo.Documents["contacts"].Store(doc, trans);
             }
             trans.Commit();
@@ -186,6 +188,9 @@ namespace WindowsFormsApplication1
                        select doc).FirstOrDefault();
             // long astr = 8000;
             // quqery.Start = astr;
+            var linq224 = (from Document doc in sqo.Documents["contacts"]
+                          where doc.GetTag<string>("str").EndsWith("1pp")
+                          select doc).ToList();
 
             var all = sqo.Documents["contacts"].Find(quqery.Or(q2));
             foreach (var doc in all)
@@ -310,6 +315,38 @@ namespace WindowsFormsApplication1
             elapsed = (DateTime.Now - start).ToString();
             string g = "";
 
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+            Sqo.SiaqodbConfigurator.SetSyncableBucket("contacts", true);
+            Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
+            Siaqodb sqo = new Siaqodb(@"c:\work\temp\db_sync\", 50 * 1024 * 1024);
+
+            var start = DateTime.Now;
+            var trans = sqo.BeginTransaction();
+            for (int i = 0; i < 100; i++)
+            {
+                Tick t = new Tick();
+                t.mydate = DateTime.Now;
+                t.MyInt = i;
+                t.mylong = i;
+                t.mystring = "asdasd" + i.ToString();
+                Document doc = new Document();
+                doc.Key = i.ToString();
+                doc.Version = "aa-a";
+                doc.SetContent<Tick>(t);
+                doc.SetTag<int>("ana", i);
+                doc.SetTag<int>("toy", i % 3);
+                doc.SetTag<string>("str", "aa" + i + "pp");
+                sqo.Documents["contacts"].Store(doc, trans);
+            }
+            trans.Commit();
+            SiaqodbSync syncContext = new SiaqodbSync(@"http://localhost:11735/v0/", "aa", "aa");
+            var pushRes= syncContext.Pull(sqo.Documents["contacts"]);
+            string a = "sda";
+            sqo.Close();
         }
     }
     public class Tick

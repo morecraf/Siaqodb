@@ -35,8 +35,9 @@
     <Reference Include="MsgPack">
       <HintPath>..\packages\MsgPack.Cli.0.4.1\lib\net40-client\MsgPack.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
@@ -104,6 +105,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SiaqodbCloud\SiaqodbCloud\SiaqodbCloud.csproj">
+      <Project>{63dda5ca-461a-4307-8798-11154c157aa9}</Project>
+      <Name>SiaqodbCloud</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
       <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
       <Name>SiaqodbPortable %28.NET 4.5%29</Name>

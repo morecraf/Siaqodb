@@ -9,18 +9,21 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-
+using Sqo.Documents.Sync;
 namespace Sqo.Documents
 {
     public class Bucket : IBucket
     {
         Siaqodb siaqodb;
         TagsIndexManager indexManag;
-        const string dirtyEntitiesDB = "sys_dirtydb";
+        string dirtyEntitiesDB;
+        string anchorDB;
         private readonly object _locker = new object();
         public Bucket(string bucketName,Siaqodb siaqodb)
         {
             this.BucketName = "buk_"+bucketName;
+            dirtyEntitiesDB = this.BucketName + "_sys_dirtydb";
+            this.anchorDB = this.BucketName + "_sys_anchordb";
             this.siaqodb = siaqodb;
             indexManag = new TagsIndexManager();
         }
@@ -29,8 +32,23 @@ namespace Sqo.Documents
             get;
             set;
         }
-
+        internal void Delete(string key, bool isDirty)
+        {
+            Document doc = this.Load(key);
+            if (doc != null)
+            {
+                Delete(doc, isDirty);
+            }
+        }
+        public void Delete(string key)
+        {
+            this.Delete(key, true);
+        }
         public void Delete(Document doc)
+        {
+            this.Delete(doc, true);
+        }
+        internal void Delete(Document doc, bool isDirty)
         {
             lock(_locker)
             {
@@ -45,10 +63,9 @@ namespace Sqo.Documents
                             var oldTags = indexManag.PrepareUpdateIndexes(keyBytes, lmdbTransaction, db);
 
                             lmdbTransaction.Delete(db, keyBytes);
-                            if (SiaqodbConfigurator.IsBucketSyncable(this.BucketName))
+                            if (SiaqodbConfigurator.IsBucketSyncable(this.BucketName) && isDirty)
                             {
-                                //  LOG CHANGES IF THE DELETE WAS MADE ON THE USER BUCKET
-                                CreateDirtyEntity(DirtyOperation.Deleted, lmdbTransaction, keyBytes, doc.Version);
+                                CreateDirtyEntity(DirtyOperation.Deleted, lmdbTransaction, doc.Key, doc.Version);
                             }
                             indexManag.UpdateIndexesAfterDelete(doc.Key, oldTags, lmdbTransaction, BucketName);
                             transaction.Commit();
@@ -69,11 +86,7 @@ namespace Sqo.Documents
             }
         }
 
-        public void Delete(string key)
-        {
-            Document doc = this.Load(key);
-            Delete(doc);
-        }
+      
        
 
         public Document FindFirst(Query query)
@@ -456,14 +469,13 @@ namespace Sqo.Documents
 
         private void CreateDirtyEntity(DirtyOperation dop, LightningTransaction transaction, Document obj)
         {
-            byte[] keyBytes = ByteConverter.StringToByteArray(obj.Key);
-            CreateDirtyEntity(dop, transaction, keyBytes, obj.Version);
+            CreateDirtyEntity(dop, transaction, obj.Key, obj.Version);
         }
-        private void CreateDirtyEntity(DirtyOperation dirtyOperation, LightningTransaction transaction, byte[] keyBytes, string version)
+        private void CreateDirtyEntity(DirtyOperation dirtyOperation, LightningTransaction transaction, string key, string version)
         {
-            DirtyEntityLmdb dirtyEntity = new DirtyEntityLmdb();
+            DirtyEntity dirtyEntity = new DirtyEntity();
             dirtyEntity.DirtyOp = dirtyOperation;
-            dirtyEntity.KeyBytes = keyBytes;
+            dirtyEntity.Key = key;
             dirtyEntity.OperationTime = DateTime.Now;
             dirtyEntity.Version = version;
 
@@ -471,7 +483,7 @@ namespace Sqo.Documents
 
             IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
             byte[] dirtyEntityBytes = serializer.Serialize(dirtyEntity);
-
+            byte[] keyBytes = ByteConverter.StringToByteArray(key);
             transaction.Put(db, keyBytes, dirtyEntityBytes);
 
 
@@ -498,6 +510,223 @@ namespace Sqo.Documents
         {
             return this.Cast<T>();
         }
+        internal ChangeSet GetChangeSet()
+        {
+            lock(_locker)
+            {
+                IList<DirtyEntity> all = this.GetAllDirtyEntities(dirtyEntitiesDB).OrderBy(a => a.OperationTime).ToList();
+
+                Dictionary<string, ATuple<Document, DirtyEntity>> inserts = new Dictionary<string, ATuple<Document, DirtyEntity>>();
+                Dictionary<string, ATuple<Document, DirtyEntity>> updates = new Dictionary<string, ATuple<Document, DirtyEntity>>();
+                Dictionary<string, ATuple<DeletedDocument, DirtyEntity>> deletes = new Dictionary<string, ATuple<DeletedDocument, DirtyEntity>>();
+
+                foreach (DirtyEntity en in all)
+                {
+                    if (en.Key == null)
+                        continue;
+                    if (en.DirtyOp == DirtyOperation.Deleted)
+                    {
+                        if (inserts.ContainsKey(en.Key))
+                        {
+                            DeleteTombstoneEntity(en);
+                            inserts.Remove(en.Key);
+                            continue;
+                        }
+                        else if (updates.ContainsKey(en.Key))
+                        {
+                            updates.Remove(en.Key);
+                        }
+                    }
+                    else
+                    {
+                        if (deletes.ContainsKey(en.Key) || inserts.ContainsKey(en.Key) || updates.ContainsKey(en.Key))
+                        {
+                            DeleteTombstoneEntity(en);
+                            continue;
+                        }
+                    }
+
+                  
+                    Document entityFromDB = Load(en.Key);
+                    if (en.DirtyOp == DirtyOperation.Inserted)
+                    {
+                        inserts.Add(en.Key, new ATuple<Document, DirtyEntity>(entityFromDB, en));
+                    }
+                    else if (en.DirtyOp == DirtyOperation.Updated)
+                    {
+                        updates.Add(en.Key, new ATuple<Document, DirtyEntity>(entityFromDB, en));
+                    }
+                    else if (en.DirtyOp == DirtyOperation.Deleted)
+                    {
+                        var deletedFromDb = new DeletedDocument { Version = en.Version, Key = en.Key };
+                        deletes.Add(en.Key, new ATuple<DeletedDocument, DirtyEntity>(deletedFromDb, en));
+                    }
+
+                }
+                List<Document> changed = new List<Document>();
+                List<DeletedDocument> deleted = new List<DeletedDocument>();
+                foreach (ATuple<Document, DirtyEntity> val in inserts.Values)
+                {
+                    changed.Add(val.Name);
+                }
+                foreach (ATuple<Document, DirtyEntity> val in updates.Values)
+                {
+                    changed.Add(val.Name);
+                }
+                foreach (ATuple<DeletedDocument, DirtyEntity> val in deletes.Values)
+                {
+                    deleted.Add(new DeletedDocument { Version = val.Name.Version, Key = val.Name.Key });
+                }
+                return new ChangeSet { ChangedDocuments = changed, DeletedDocuments = deleted };
+            }
+        }
+        private IList<DirtyEntity> GetAllDirtyEntities(string dbName)
+        {
+
+            using (var transaction = siaqodb.BeginTransaction())
+            {
+                var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+
+                var db = lmdbTransaction.OpenDatabase(dbName, DatabaseOpenFlags.Create | DatabaseOpenFlags.DuplicatesSort);
+
+                IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+                List<DirtyEntity> list = new List<DirtyEntity>();
+                using (var cursor = lmdbTransaction.CreateCursor(db))
+                {
+                    var current = cursor.MoveNext();
+                    while (current.HasValue)
+                    {
+                        byte[] crObjBytes = current.Value.Value;
+                        if (crObjBytes != null)
+                        {
+                            var obj = (DirtyEntity)serializer.Deserialize(typeof(DirtyEntity), crObjBytes);
+                            list.Add(obj);
+                        }
+                        GetDuplicates(cursor, list, serializer);
+                        current = cursor.MoveNext();
+                    }
+                }
+                transaction.Commit();
+                return list;
+
+            }
+
+        }
+        private void DeleteTombstoneEntity(DirtyEntity entity)
+        {
+            using (var transaction = siaqodb.BeginTransaction())
+            {
+                var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                try
+                {
+                    using (var db = lmdbTransaction.OpenDatabase(dirtyEntitiesDB, DatabaseOpenFlags.Create | DatabaseOpenFlags.DuplicatesSort))
+                    {
+                        byte[] keyBytes = ByteConverter.StringToByteArray(entity.Key);
+                        IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+                        byte[] dirtyEntityBytes = serializer.Serialize(entity);
+
+                        lmdbTransaction.Delete(db, keyBytes, dirtyEntityBytes);
+                        transaction.Commit();
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw ex;
+                }
+            }
+        }
+        private static void GetDuplicates(LightningCursor cursor, List<DirtyEntity> list, IDocumentSerializer serializer)
+        {
+            var currentDuplicate = cursor.MoveNextDuplicate();
+            while (currentDuplicate.HasValue)
+            {
+                var obj = (DirtyEntity)serializer.Deserialize(typeof(DirtyEntity), currentDuplicate.Value.Value);
+                list.Add(obj);
+                currentDuplicate = cursor.MoveNextDuplicate();
+            }
+        }
+        internal void ClearSyncMetadata()
+        {
+            lock (_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    try
+                    {
+                        using (var db = lmdbTransaction.OpenDatabase(dirtyEntitiesDB, DatabaseOpenFlags.Create | DatabaseOpenFlags.DuplicatesSort))
+                        {
+                            lmdbTransaction.DropDatabase(db, true);
+                        }
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
+        internal string GetAnchor()
+        {
+            lock(_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    try
+                    {
+                        var db = lmdbTransaction.OpenDatabase(anchorDB, DatabaseOpenFlags.Create);
+
+                        byte[] keyBytes = ByteConverter.StringToByteArray("anchor");
+                        byte[] ancBytes = lmdbTransaction.Get(db, keyBytes);
+                        if (ancBytes != null)
+                            return ByteConverter.ByteArrayToString(ancBytes);
+                        return null;
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                    finally
+                    {
+                        transaction.Commit();
+                    }
+                }
+            }
+        }
+        internal void StoreAnchor(string anchor)
+        {
+            lock(_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    try
+                    {
+                        using (var db = lmdbTransaction.OpenDatabase(anchorDB, DatabaseOpenFlags.Create))
+                        {
+                            byte[] keyBytes = ByteConverter.StringToByteArray("anchor");
+                            var anchorBytes = ByteConverter.StringToByteArray(anchor);
+                            lmdbTransaction.Put(db, keyBytes, anchorBytes);
+                            transaction.Commit();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
+
 
 
     }
@@ -512,28 +741,25 @@ namespace Sqo.Documents
     [System.Reflection.Obfuscation(Exclude = true)]
     class DirtyEntity
     {
-        public int EntityOID;
         public DirtyOperation DirtyOp;
         public DateTime OperationTime;
-        public int OID
+        public string Key{ get; set; }
+        public string Version { get; set; }
+
+    }
+    
+
+  
+    class ATuple<T, V>
+    {
+        public T Name { get; set; }
+        public V Value { get; set; }
+        public ATuple(T name, V value)
         {
-            get;
-            set;
+            Name = name;
+            Value = value;
         }
 
     }
-    [System.Reflection.Obfuscation(Exclude = true)]
-    class DirtyEntityLmdb : DirtyEntity
-    {
-        public byte[] KeyBytes { get; set; }
-        public string Version { get; set; }
-    }
 
-    [System.Reflection.Obfuscation(Exclude = true)]
-    internal class Anchor
-    {
-        public int OID { get; set; }
-        public string AnchorValue { get; set; }
-
-    }
 }
