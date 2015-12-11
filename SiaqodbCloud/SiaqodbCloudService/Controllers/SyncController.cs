@@ -53,15 +53,33 @@ namespace SiaqodbCloudService.Controllers
         /// <returns></returns>
         [Route("v0/{bucketName}/changes")]
         [HttpGet]
-        public async Task<BatchSet> GetChanges(string bucketName, int limit = 100, string anchor = null)
+        public async Task<BatchSet> GetChanges(string bucketName, int limit = 100, string anchor = null,string uploadanchor= null)
         {
             if (limit > 10000)
                 limit = 10000;
-            var result = await repository.GetAllChanges(bucketName, limit, anchor);
+            var result = await repository.GetAllChanges(bucketName, limit, anchor, uploadanchor);
 
             return result;
         }
+        /// <summary>
+        /// Get changes based on a Query 
+        /// </summary>
+        /// <param name="bucketName">Bucket name</param>
+        /// <param name="query">Query value</param>
+        /// <param name="limit">Max number of objects</param>
+        /// <param name="anchor">The anchor after which the changes occured</param>
+        /// <returns></returns>
+        [Route("v0/{bucketName}/changes")]
+        [HttpPost]
+        public async Task<BatchSet> GetChanges(string bucketName, [FromBody] Filter query, int limit = 100, string anchor = null,string uploadanchor = null)
+        {
+            if (limit > 1000)
+                limit = 1000;
+            var result = await repository.GetChanges(bucketName, query, limit, anchor, uploadanchor);
 
+
+            return result;
+        }
 
 
         /// <summary>
@@ -92,25 +110,7 @@ namespace SiaqodbCloudService.Controllers
 
             return result;
         }
-        /// <summary>
-        /// Get changes based on a Query 
-        /// </summary>
-        /// <param name="bucketName">Bucket name</param>
-        /// <param name="query">Query value</param>
-        /// <param name="limit">Max number of objects</param>
-        /// <param name="anchor">The anchor after which the changes occured</param>
-        /// <returns></returns>
-        [Route("v0/{bucketName}/changes")]
-        [HttpPost]
-        public async Task<BatchSet> GetChanges(string bucketName, [FromBody] Filter query, int limit = 100, string anchor = null)
-        {
-            if (limit > 1000)
-                limit = 1000;
-            var result = await repository.GetChanges(bucketName, query, limit, anchor);
-
-
-            return result;
-        }
+       
         /// <summary>
         /// Store and object within a bucket
         /// </summary>

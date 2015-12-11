@@ -89,12 +89,13 @@ namespace SiaqodbCloud
         public PushStatistics SyncStatistics { get; set; }
 
         public List<Conflict> Conflicts { get; set; }
-
-        public PushResult(Exception error, PushStatistics syncStatistics, List<Conflict> conflicts)
+        public string UploadAnchor  { get; set; }
+        public PushResult(Exception error, PushStatistics syncStatistics, List<Conflict> conflicts,string uploadAnchor)
         {
             Error = error;
             SyncStatistics = syncStatistics;
             Conflicts = conflicts;
+            UploadAnchor = uploadAnchor;
         }
     }
     public class PullResult

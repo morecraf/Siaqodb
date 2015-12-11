@@ -11,10 +11,10 @@ namespace SiaqodbCloudService.Repository
     {
         Task<string> GetUserPassword(string appKeyString);
         Task<SiaqodbDocument> Get(string bucketName, string key, string version);
-        Task<BatchSet> GetAllChanges(string bucketName, int limit, string anchor);
+        Task<BatchSet> GetAllChanges(string bucketName, int limit, string anchor,string uploadAnchor);
         Task<BatchResponse> Store(string bucketName, BatchSet value);
         Task<StoreResponse> Store(string bucketName, SiaqodbDocument document);
         Task<StoreResponse> Delete(string bucketName, string key, string version);
-        Task<BatchSet> GetChanges(string bucketName, Filter query, int limit, string anchor);
+        Task<BatchSet> GetChanges(string bucketName, Filter query, int limit, string anchor, string uploadAnchor);
     }
 }

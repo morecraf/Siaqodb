@@ -325,24 +325,37 @@ namespace WindowsFormsApplication1
             Siaqodb sqo = new Siaqodb(@"c:\work\temp\db_sync\", 50 * 1024 * 1024);
 
             var start = DateTime.Now;
-            var trans = sqo.BeginTransaction();
-            for (int i = 0; i < 100; i++)
+            //var trans = sqo.BeginTransaction();
+            for (int i = 140; i < 160; i++)
             {
-                Tick t = new Tick();
-                t.mydate = DateTime.Now;
-                t.MyInt = i;
-                t.mylong = i;
-                t.mystring = "asdasd" + i.ToString();
-                Document doc = new Document();
-                doc.Key = i.ToString();
-                doc.Version = "aa-a";
-                doc.SetContent<Tick>(t);
-                doc.SetTag<int>("ana", i);
-                doc.SetTag<int>("toy", i % 3);
-                doc.SetTag<string>("str", "aa" + i + "pp");
-                sqo.Documents["contacts"].Store(doc, trans);
+                /* Tick t = new Tick();
+                 t.mydate = DateTime.Now;
+                 t.MyInt = i;
+                 t.mylong = i;
+                 t.mystring = "asdasd" + i.ToString();
+                 Document doc = new Document();
+                 doc.Key = i.ToString();
+                
+                 doc.SetContent<Tick>(t);
+                 doc.SetTag<int>("ana", i);
+                 doc.SetTag<int>("toy", i % 3);
+                 doc.SetTag<string>("str", "aa" + i + "pp");
+                sqo.Documents["contacts"].Store(doc, trans);*/
+
+
+                sqo.Documents["contacts"].Load(i.ToString());
+                sqo.Documents["contacts"].Delete(i.ToString());
+
+                if (i >= 20 && i < 30)
+                {
+                    // var doc = sqo.Documents["contacts"].Load(i.ToString());
+                    //sqo.Documents["contacts"].Store(doc);
+
+                }
             }
-            trans.Commit();
+            //trans.Commit();
+            var all=sqo.Documents["contacts"].LoadAll();
+           
             SiaqodbSync syncContext = new SiaqodbSync(@"http://localhost:11735/v0/", "aa", "aa");
             var pushRes= syncContext.Pull(sqo.Documents["contacts"]);
             string a = "sda";

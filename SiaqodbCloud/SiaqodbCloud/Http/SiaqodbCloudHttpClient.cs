@@ -245,7 +245,7 @@ namespace SiaqodbCloud
         /// <param name="limit"></param>
         /// <param name="anchor"></param>
         /// <returns></returns>
-        public ChangeSet GetChanges(string bucket, Filter query, int limit, string anchor)
+        public ChangeSet GetChanges(string bucket, Filter query, int limit, string anchor,string uploadAnchor)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             var parameters = new Dictionary<string, string>();
@@ -256,6 +256,10 @@ namespace SiaqodbCloud
             if (!string.IsNullOrEmpty(anchor))
             {
                 parameters.Add("anchor", anchor);
+            }
+            if (!string.IsNullOrEmpty(uploadAnchor))
+            {
+                parameters.Add("uploadanchor", uploadAnchor);
             }
 
             HttpWebRequest request = requestBuilder.BuildPostRequest(uriFragment, parameters);
@@ -292,7 +296,7 @@ namespace SiaqodbCloud
 #endif
 
 #if ASYNC
-        public async Task<ChangeSet> GetChangesAsync(string bucket, Query query, int limit, string anchor)
+        public async Task<ChangeSet> GetChangesAsync(string bucket, Query query, int limit, string anchor,string uploadAnchor)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -304,6 +308,10 @@ namespace SiaqodbCloud
             {
                 parameters.Add("anchor", anchor);
             }
+            if (!string.IsNullOrEmpty(uploadAnchor))
+            {
+                parameters.Add("uploadanchor", uploadAnchor);
+            }
             HttpRequestMessage request = requestBuilder.BuildPostRequestAsync(uriFragment, query, parameters);
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
@@ -314,7 +322,7 @@ namespace SiaqodbCloud
         }
 #endif
 #if NON_ASYNC
-        public ChangeSet GetChanges(string bucket, int limit, string anchor)
+        public ChangeSet GetChanges(string bucket, int limit, string anchor,string uploadAnchor)
         {
             var uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             var parameters = new Dictionary<string, string>();
@@ -325,6 +333,10 @@ namespace SiaqodbCloud
             if (!string.IsNullOrEmpty(anchor))
             {
                 parameters.Add("anchor", anchor);
+            }
+            if (!string.IsNullOrEmpty(uploadAnchor))
+            {
+                parameters.Add("uploadanchor", uploadAnchor);
             }
             var request = requestBuilder.BuildGetRequest(uriFragment, parameters);
 
@@ -339,7 +351,7 @@ namespace SiaqodbCloud
 #endif
 
 #if ASYNC
-        public async Task<ChangeSet> GetChangesAsync(string bucket, int limit, string anchor)
+        public async Task<ChangeSet> GetChangesAsync(string bucket, int limit, string anchor,string uploadAnchor)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -350,6 +362,10 @@ namespace SiaqodbCloud
             if (!string.IsNullOrEmpty(anchor))
             {
                 parameters.Add("anchor", anchor);
+            }
+            if (!string.IsNullOrEmpty(uploadAnchor))
+            {
+                parameters.Add("uploadanchor", uploadAnchor);
             }
             HttpRequestMessage request = requestBuilder.BuildGetRequestAsync(uriFragment, parameters);
 
@@ -653,7 +669,7 @@ namespace SiaqodbCloud
         public List<BatchItemResponse> BatchItemResponses { get; set; }
         public int ItemsWithErrors { get; set; }
         public int Total { get; set; }
-
+        public string UploadAnchor { get; set; }
     }
 
     public class BucketSet

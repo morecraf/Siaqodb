@@ -16,6 +16,7 @@ namespace SiaqodbCloudService.Models
             }
         }
         public List<BatchItemResponse> BatchItemResponses { get; set; }
+        public string UploadAnchor { get; set; }
 
     }
     public class BatchItemResponse

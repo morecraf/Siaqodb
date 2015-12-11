@@ -92,7 +92,7 @@ namespace SiaqodbCloudService.Repository
             }
         }
 
-        public async Task<BatchSet> GetAllChanges(string bucketName, int limit, string anchor)
+        public async Task<BatchSet> GetAllChanges(string bucketName, int limit, string anchor,string uploadAnchor)
         {
             using (var client = new MyCouchClient(CouchInfo.DbServerUrl, bucketName))
             {
@@ -108,13 +108,25 @@ namespace SiaqodbCloudService.Repository
                     BatchSet changeSet = new BatchSet();
                     if (response.Results != null)
                     {
+                        SyncLogItem logItem = null;
+                        if (!string.IsNullOrEmpty(uploadAnchor))
+                        {
+                            using (var clientLog = new MyCouchClient(CouchInfo.DbServerUrl, "synclog"))
+                            {
+                                logItem = (await clientLog.Entities.GetAsync<SyncLogItem>(uploadAnchor)).Content;
+                            }
+                        }
                         foreach (var row in response.Results)
                         {
+                           
                             if (row.Deleted)
                             {
                                 if (changeSet.DeletedDocuments == null)
                                     changeSet.DeletedDocuments = new List<DeletedDocument>();
                                 DeletedDocument delObj = new DeletedDocument() { Key = row.Id, Version = row.Changes[0].Rev };
+                                //check uploaded anchor- means cliet just uploaded this record and we should not return back
+                                if (logItem != null && logItem.KeyVersion != null && logItem.KeyVersion.ContainsKey(delObj.Key) && logItem.KeyVersion[delObj.Key] == delObj.Version)
+                                    continue;
                                 changeSet.DeletedDocuments.Add(delObj);
 
                             }
@@ -125,6 +137,9 @@ namespace SiaqodbCloudService.Repository
                                 size += row.IncludedDoc.Length;
                                 CouchDBDocument co = client.Serializer.Deserialize<CouchDBDocument>(row.IncludedDoc);
                                 if (co._id.StartsWith("_design/"))
+                                    continue;
+                                //check uploaded anchor- means cliet just uploaded this record and we should not return back
+                                if (logItem != null && logItem.KeyVersion != null && logItem.KeyVersion.ContainsKey(co._id) && logItem.KeyVersion[co._id] == co._rev)
                                     continue;
                                 changeSet.ChangedDocuments.Add(Mapper.ToSiaqodbDocument(co));
                             }
@@ -154,7 +169,7 @@ namespace SiaqodbCloudService.Repository
             else throw new GenericCouchDBException(response.Reason, response.StatusCode);
         }
 
-        public async Task<BatchSet> GetChanges(string bucketName, Filter query, int limit, string anchor)
+        public async Task<BatchSet> GetChanges(string bucketName, Filter query, int limit, string anchor,string uploadAnchor)
         {
             using (var client = new MyCouchClient(CouchInfo.DbServerUrl, bucketName))
             {
@@ -171,14 +186,25 @@ namespace SiaqodbCloudService.Repository
                     if (response.Results != null)
                     {
                         HashSet<string> changesHashSet = new HashSet<string>();
-
+                        SyncLogItem logItem = null;
+                        if (!string.IsNullOrEmpty(uploadAnchor))
+                        {
+                            using (var clientLog = new MyCouchClient(CouchInfo.DbServerUrl, "synclog"))
+                            {
+                                logItem = (await clientLog.Entities.GetAsync<SyncLogItem>(uploadAnchor)).Content;
+                            }
+                        }
                         foreach (var row in response.Results)
                         {
                             if (row.Deleted && !string.IsNullOrEmpty(anchor))
                             {
                                 if (changeSet.DeletedDocuments == null)
                                     changeSet.DeletedDocuments = new List<DeletedDocument>();
+                            
                                 DeletedDocument delObj = new DeletedDocument() { Key = row.Id, Version = row.Changes[0].Rev };
+                                //check uploaded anchor- means cliet just uploaded this record and we should not return back
+                                if (logItem != null && logItem.KeyVersion != null && logItem.KeyVersion.ContainsKey(delObj.Key) && logItem.KeyVersion[delObj.Key] == delObj.Version)
+                                    continue;
                                 changeSet.DeletedDocuments.Add(delObj);
 
                             }
@@ -202,8 +228,13 @@ namespace SiaqodbCloudService.Repository
                                 if (i % 100 == 0 && i > 0)
                                 {
                                     var resultSet = await this.GetByTag(client, PrepareQueryIN(docsPart));
-
-                                    ((List<SiaqodbDocument>)changeSet.ChangedDocuments).AddRange(resultSet);
+                                    foreach (SiaqodbDocument document in resultSet)
+                                    {
+                                        //check uploaded anchor- means cliet just uploaded this record and we should not return back
+                                        if (logItem != null && logItem.KeyVersion != null && logItem.KeyVersion.ContainsKey(document.Key) && logItem.KeyVersion[document.Key] == document.Version)
+                                            continue;
+                                        ((List<SiaqodbDocument>)changeSet.ChangedDocuments).Add(document);
+                                    }
 
                                     docsPart = new List<string>();
                                 }
@@ -213,7 +244,14 @@ namespace SiaqodbCloudService.Repository
                             {
                                 var resultSet = await this.GetByTag(client, PrepareQueryIN(docsPart));
 
-                                ((List<SiaqodbDocument>)changeSet.ChangedDocuments).AddRange(resultSet);
+                                foreach (SiaqodbDocument document in resultSet)
+                                {
+                                    //check uploaded anchor- means cliet just uploaded this record and we should not return back
+                                    if (logItem != null && logItem.KeyVersion != null && logItem.KeyVersion.ContainsKey(document.Key) && logItem.KeyVersion[document.Key] == document.Version)
+                                        continue;
+                                    ((List<SiaqodbDocument>)changeSet.ChangedDocuments).Add(document);
+                                }
+
 
                             }
                         }
@@ -471,7 +509,8 @@ namespace SiaqodbCloudService.Repository
                     if (response.Rows != null)
                     {
                         cnorResponse.BatchItemResponses = new List<BatchItemResponse>();
-
+                        SyncLogItem syncLogItem = new SyncLogItem();
+                        syncLogItem.KeyVersion = new Dictionary<string, string>();
                         foreach (var row in response.Rows)
                         {
                             BatchItemResponse wresp = new BatchItemResponse();
@@ -484,6 +523,19 @@ namespace SiaqodbCloudService.Repository
                             wresp.Key = row.Id;
                             wresp.Version = row.Rev;
                             cnorResponse.BatchItemResponses.Add(wresp);
+                            if (string.IsNullOrEmpty(row.Error))
+                            {
+                                syncLogItem.KeyVersion.Add(row.Id, row.Rev);
+                            }
+                        }
+                        if (syncLogItem.KeyVersion.Count > 0)
+                        {
+                            syncLogItem.TimeInserted = DateTime.UtcNow;
+                            using (var clientLog = new MyCouchClient(CouchInfo.DbServerUrl, "synclog"))
+                            {
+                                var logResp = await clientLog.Entities.PostAsync(syncLogItem);
+                                cnorResponse.UploadAnchor = logResp.Id;
+                            }
                         }
                     }
                     if (crObjForUpdateViews != null)

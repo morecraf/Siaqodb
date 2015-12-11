@@ -23,16 +23,18 @@ namespace SiaqodbCloud
         {
             return this.Push(bucket, null);
         }
-        public PushResult Push(IBucket bucket, Func<Document, Document, Document> conflictResolver)
+        public PushResult Push(IBucket bucket, IConflictResolver conflictResolver)
         {
             var syncStatistics = new PushStatistics();
             syncStatistics.StartTime = DateTime.Now;
             Exception error = null;
             List<Conflict> conflicts = null;
+            string uploadAnchor = null;
             try
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Push operation started..."));
                 this.OnSyncProgress(new SyncProgressEventArgs("Get local changes..."));
+              
                 ChangeSet changeSet = ((Bucket)bucket).GetChangeSet();
                 if ((changeSet.ChangedDocuments != null && changeSet.ChangedDocuments.Count > 0) ||
                     (changeSet.DeletedDocuments != null && changeSet.DeletedDocuments.Count > 0))
@@ -40,6 +42,15 @@ namespace SiaqodbCloud
                     this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
                     var response = httpClient.Put(bucket.BucketName, changeSet);
                     this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
+
+                    //update versions
+                    var successfullUpdates = response.BatchItemResponses.Where(a => string.IsNullOrEmpty(a.Error))
+                        .Select(a=>new KeyValuePair<string,string>(a.Key,a.Version));
+                    if (successfullUpdates.Count() > 0)
+                    {
+                        ((Bucket)bucket).UpdateVersions(successfullUpdates);
+                        uploadAnchor = response.UploadAnchor;
+                    }
 
                     var conflictResponses = response.BatchItemResponses.Where(a => string.Compare(a.Error, "conflict", StringComparison.OrdinalIgnoreCase) == 0);
 
@@ -67,9 +78,9 @@ namespace SiaqodbCloud
                 error = err;
             }
             syncStatistics.EndTime = DateTime.Now;
-            return new PushResult(error, syncStatistics, conflicts);
+            return new PushResult(error, syncStatistics, conflicts, uploadAnchor);
         }
-        private List<Conflict> ManageConflicts(IBucket bucket, IEnumerable<BatchItemResponse> conflictResponses, ChangeSet changeSet, Func<Document, Document, Document> conflictResolver)
+        private List<Conflict> ManageConflicts(IBucket bucket, IEnumerable<BatchItemResponse> conflictResponses, ChangeSet changeSet, IConflictResolver conflictResolver)
         {
             List<Conflict> conflicts = null;
 
@@ -80,21 +91,20 @@ namespace SiaqodbCloud
                 var liveVersion = httpClient.Get(bucket.BucketName, conflictR.Key);
                 var version = liveVersion != null ? liveVersion.Version : null;
                 var cf = new Conflict() { Key = conflictR.Key, Version = version, Description = conflictR.ErrorDesc };
-                if (conflictResolver != null)
-                {
-                    Document localVersion = null;
-                    // TODO avoid the extra call to the local database
-                    localVersion = bucket.Load(conflictR.Key);
-                    KeepChangesByConflictConvension(bucket, localVersion, liveVersion, conflictR.Key, conflictResolver);
-                }
+                if (conflictResolver == null)
+                    conflictResolver = new ServerWinResolver();
+                // TODO avoid the extra call to the local database
+                Document localVersion = bucket.Load(conflictR.Key);
+                KeepChangesByConflictConvension(bucket, localVersion, liveVersion, conflictR.Key, conflictResolver);
+
                 conflicts.Add(cf);
             }
             return conflicts;
         }
 
-        private void KeepChangesByConflictConvension(IBucket bucket, Document localVersion, Document liveVersion, string key, Func<Document, Document, Document> conflictResolver)
+        private void KeepChangesByConflictConvension(IBucket bucket, Document localVersion, Document liveVersion, string key, IConflictResolver conflictResolver)
         {
-            var winner = conflictResolver(localVersion, liveVersion);
+            var winner = conflictResolver.Resolve(localVersion, liveVersion);
             var version = liveVersion != null ? liveVersion.Version : null;
             if (winner == null)
             {
@@ -120,7 +130,7 @@ namespace SiaqodbCloud
 #endif
 
 #if NON_ASYNC
-        public PullResult Pull(IBucket bucket, Func<Document, Document, Document> conflictResolver)
+        public PullResult Pull(IBucket bucket, IConflictResolver conflictResolver)
         {
             return this.Pull(bucket, null, conflictResolver);
 
@@ -133,7 +143,7 @@ namespace SiaqodbCloud
 #endif
 
 #if NON_ASYNC
-        public PullResult Pull(IBucket bucket, Filter filter, Func<Document, Document, Document> conflictResolver = null)
+        public PullResult Pull(IBucket bucket, Filter filter, IConflictResolver conflictResolver = null)
         {
             var pushResult = Push(bucket, conflictResolver);
             var syncStatistics = new PullStatistics();
@@ -161,7 +171,7 @@ namespace SiaqodbCloud
                 {
                     remainLimit = 0;
                     this.OnSyncProgress(new SyncProgressEventArgs("Downloading batch #" + nrBatch + " ..."));
-                    downloadedItems = DownloadChanges(bucket, anchor, filter);
+                    downloadedItems = DownloadChanges(bucket,filter, anchor, pushResult.UploadAnchor);
                     this.OnSyncProgress(new SyncProgressEventArgs("Batch #" + nrBatch + " downloaded, store items locally ..."));
 
                     if (downloadedItems != null)
@@ -207,16 +217,16 @@ namespace SiaqodbCloud
 
 
 #if NON_ASYNC
-        private ChangeSet DownloadChanges(IBucket bucket, string anchor, Filter query)
+        private ChangeSet DownloadChanges(IBucket bucket,  Filter query, string anchor,string uploadAnchor)
         {
             ChangeSet changes = null;
             if (query == null)
             {
-                changes = httpClient.GetChanges(bucket.BucketName, DownloadBatchSize, anchor);
+                changes = httpClient.GetChanges(bucket.BucketName, DownloadBatchSize, anchor, uploadAnchor);
             }
             else
             {
-                changes = httpClient.GetChanges(bucket.BucketName, query, DownloadBatchSize, anchor);
+                changes = httpClient.GetChanges(bucket.BucketName, query, DownloadBatchSize, anchor,uploadAnchor);
             }
             return changes;
         }

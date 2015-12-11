@@ -86,8 +86,7 @@ namespace Sqo.Documents
             }
         }
 
-      
-       
+
 
         public Document FindFirst(Query query)
         {
@@ -226,19 +225,17 @@ namespace Sqo.Documents
         private Document Get(string key, LightningTransaction transaction)
         {
 
-            using (var db = transaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
-            {
-                byte[] keyBytes = ByteConverter.StringToByteArray(key);
-                byte[] crObjBytes = transaction.Get(db, keyBytes);
-                if (crObjBytes != null)
-                {
-                    IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
-                    return serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+            var db = transaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
 
-                }
+            byte[] keyBytes = ByteConverter.StringToByteArray(key);
+            byte[] crObjBytes = transaction.Get(db, keyBytes);
+            if (crObjBytes != null)
+            {
+                IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+                return serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+
             }
             return null;
-
 
         }
 
@@ -255,27 +252,27 @@ namespace Sqo.Documents
                         var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
                         List<Document> list = new List<Document>();
 
-                        using (var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
+                        var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
+
+                        IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+
+                        using (var cursor = lmdbTransaction.CreateCursor(db))
                         {
-                            IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+                            var current = cursor.MoveNext();
 
-                            using (var cursor = lmdbTransaction.CreateCursor(db))
+                            while (current.HasValue)
                             {
-                                var current = cursor.MoveNext();
-
-                                while (current.HasValue)
+                                byte[] crObjBytes = current.Value.Value;
+                                if (crObjBytes != null)
                                 {
-                                    byte[] crObjBytes = current.Value.Value;
-                                    if (crObjBytes != null)
-                                    {
-                                        var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
-                                        list.Add(obj);
-                                    }
-                                    current = cursor.MoveNext();
+                                    var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                                    list.Add(obj);
                                 }
+                                current = cursor.MoveNext();
                             }
-
                         }
+
+
                         return list;
 
                     }
@@ -726,8 +723,37 @@ namespace Sqo.Documents
                 }
             }
         }
+        internal void UpdateVersions(IEnumerable<KeyValuePair<string, string>> successfullUpdates)
+        {
+            lock (_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
 
+                    using (var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
+                    {
+                        foreach (var keyVers in successfullUpdates)
+                        {
+                            byte[] keyBytes = ByteConverter.StringToByteArray(keyVers.Key);
+                            byte[] crObjBytes = lmdbTransaction.Get(db, keyBytes);
+                            if (crObjBytes != null)
+                            {
+                                IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+                                var doc = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                                doc.Version = keyVers.Value;
+                                var crObjBytesNew = serializer.Serialize(doc);
+                                lmdbTransaction.Put(db, keyBytes, crObjBytesNew);
 
+                            }
+
+                        }
+                        transaction.Commit();
+                    }
+                }
+            }
+
+        }
 
     }
 
