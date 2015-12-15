@@ -18,14 +18,16 @@ namespace Sqo.Documents
         TagsIndexManager indexManag;
         string dirtyEntitiesDB;
         string anchorDB;
+        string indexInfoDB;
         private readonly object _locker = new object();
-        public Bucket(string bucketName,Siaqodb siaqodb)
+        public Bucket(string bucketName, Siaqodb siaqodb)
         {
-            this.BucketName = "buk_"+bucketName;
+            this.BucketName = "buk_" + bucketName;
             dirtyEntitiesDB = this.BucketName + "_sys_dirtydb";
             this.anchorDB = this.BucketName + "_sys_anchordb";
             this.siaqodb = siaqodb;
-            indexManag = new TagsIndexManager();
+            indexInfoDB = this.BucketName + "_sys_indexinfo";
+            indexManag = new TagsIndexManager(indexInfoDB, this.siaqodb);
         }
         public string BucketName
         {
@@ -50,7 +52,7 @@ namespace Sqo.Documents
         }
         internal void Delete(Document doc, bool isDirty)
         {
-            lock(_locker)
+            lock (_locker)
             {
                 using (var transaction = siaqodb.BeginTransaction())
                 {
@@ -99,9 +101,9 @@ namespace Sqo.Documents
                         var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
                         IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
                         string key = keysLoaded.FirstOrDefault();
-                        if(key!=null)
-                            return Get(key, lmdbTransaction); 
-                       
+                        if (key != null)
+                            return Get(key, lmdbTransaction);
+
                     }
                     finally
                     {
@@ -121,8 +123,8 @@ namespace Sqo.Documents
                     {
                         var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
                         List<Document> allFiltered = new List<Document>();
-                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction,query);
-                      
+                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
+
                         foreach (string key in keysLoaded)
                         {
                             var obj = Get(key, lmdbTransaction);
@@ -184,7 +186,7 @@ namespace Sqo.Documents
             }
         }
 
-        private IEnumerable<string> GetKeys(LightningTransaction lmdbTransaction,Query query)
+        private IEnumerable<string> GetKeys(LightningTransaction lmdbTransaction, Query query)
         {
             var qr = new QueryRunner(indexManag, lmdbTransaction, this.BucketName);
             var keys = qr.Run(query);
@@ -239,7 +241,7 @@ namespace Sqo.Documents
 
         }
 
-    
+
 
         public IList<Document> LoadAll()
         {
@@ -350,7 +352,7 @@ namespace Sqo.Documents
 
                 }
             }
-           
+
         }
         public void Store(Document doc, ITransaction transaction)
         {
@@ -429,7 +431,7 @@ namespace Sqo.Documents
         {
             this.StoreBatch(docs, true);
         }
-        internal void StoreBatch(IList<Document> docs,bool isDirty)
+        internal void StoreBatch(IList<Document> docs, bool isDirty)
         {
             lock (_locker)
             {
@@ -494,7 +496,7 @@ namespace Sqo.Documents
         /// </summary>
         /// <typeparam name="T">Type over which LINQ will take action</typeparam>
         /// <returns></returns>
-        public IDocQuery<T> Cast<T>() where T :Document
+        public IDocQuery<T> Cast<T>() where T : Document
         {
             return new DocQuery<T>(this, new Query());
         }
@@ -509,7 +511,7 @@ namespace Sqo.Documents
         }
         internal ChangeSet GetChangeSet()
         {
-            lock(_locker)
+            lock (_locker)
             {
                 IList<DirtyEntity> all = this.GetAllDirtyEntities(dirtyEntitiesDB).OrderBy(a => a.OperationTime).ToList();
 
@@ -543,7 +545,7 @@ namespace Sqo.Documents
                         }
                     }
 
-                  
+
                     Document entityFromDB = Load(en.Key);
                     if (en.DirtyOp == DirtyOperation.Inserted)
                     {
@@ -669,7 +671,7 @@ namespace Sqo.Documents
         }
         internal string GetAnchor()
         {
-            lock(_locker)
+            lock (_locker)
             {
                 using (var transaction = siaqodb.BeginTransaction())
                 {
@@ -700,7 +702,7 @@ namespace Sqo.Documents
         }
         internal void StoreAnchor(string anchor)
         {
-            lock(_locker)
+            lock (_locker)
             {
                 using (var transaction = siaqodb.BeginTransaction())
                 {
@@ -754,7 +756,51 @@ namespace Sqo.Documents
             }
 
         }
+        private void DropIndexes(LightningTransaction transaction)
+        {
+            var indexes = indexManag.GetIndexes();
+            foreach (string index in indexes)
+            {
+                var db = transaction.OpenDatabase(index, DatabaseOpenFlags.Create | DatabaseOpenFlags.DuplicatesSort);
+                transaction.DropDatabase(db, true);
+            }
+        }
+        internal void Drop()
+        {
+            lock (_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+                    try
+                    {
+                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
 
+                        DropIndexes(lmdbTransaction);
+
+                        var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
+                        lmdbTransaction.DropDatabase(db, true);
+
+                        var dbAnc = lmdbTransaction.OpenDatabase(this.anchorDB, DatabaseOpenFlags.Create);
+                        lmdbTransaction.DropDatabase(dbAnc, true);
+
+                        var dbDE = lmdbTransaction.OpenDatabase(this.dirtyEntitiesDB, DatabaseOpenFlags.Create | DatabaseOpenFlags.DuplicatesSort);
+                        lmdbTransaction.DropDatabase(dbDE, true);
+
+                        var dbIndexInfo = lmdbTransaction.OpenDatabase(this.indexInfoDB, DatabaseOpenFlags.Create);
+                        lmdbTransaction.DropDatabase(dbIndexInfo, true);
+
+                        lmdbTransaction.Commit();
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
     }
 
     [System.Reflection.Obfuscation(Exclude = true)]

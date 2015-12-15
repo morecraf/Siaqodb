@@ -39,23 +39,11 @@ namespace Sqo.Documents
         {
             lock (_locker)
             {
-                using (var transaction = siaqodb.BeginTransaction())
+                Bucket buk = this.GetBucket(bucketName) as Bucket;
+                buk.Drop();
+                if (cache.ContainsKey(bucketName))
                 {
-                    try
-                    {
-                        bucketName = "buk_" + bucketName;
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        var db = lmdbTransaction.OpenDatabase(bucketName, DatabaseOpenFlags.Create);
-                        lmdbTransaction.DropDatabase(db, true);
-                        //TODO delete all indexes
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        throw ex;
-                    }
+                    cache.Remove(bucketName);
                 }
             }
         }

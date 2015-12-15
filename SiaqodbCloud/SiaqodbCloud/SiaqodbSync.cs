@@ -106,24 +106,14 @@ namespace SiaqodbCloud
         {
             var winner = conflictResolver.Resolve(localVersion, liveVersion);
             var version = liveVersion != null ? liveVersion.Version : null;
-            if (winner == null)
+            if (winner != null)
             {
-                if (version != null)
-                {
-                    httpClient.Delete(bucket.BucketName, key, version);
-                }
-                if (localVersion != null)
-                {
-                    ((Bucket)bucket).Delete(key, false);
-                }
-                return;
+
+                winner.Version = version;
+                var resp = httpClient.Put(bucket.BucketName, winner);
+                winner.Version = resp.Version;
+                bucket.Store(winner);
             }
-            //TODO
-            //winner.IsDirty = false;
-            winner.Version = version;
-            var resp = httpClient.Put(bucket.BucketName, winner);
-            winner.Version = resp.Version;
-            bucket.Store(winner);
         }
 
 

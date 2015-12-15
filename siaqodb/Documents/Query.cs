@@ -20,7 +20,7 @@ namespace Sqo.Documents
         public Query WhereEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = value;
+            w.Value = SetValue(value);
             w.Operator = WhereOp.Equal;
             wheres.Add(w);
             return this;
@@ -28,7 +28,7 @@ namespace Sqo.Documents
         public Query WhereNotEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = value;
+            w.Value = SetValue(value);
             w.Operator = WhereOp.NotEqual;
             wheres.Add(w);
             return this;
@@ -36,7 +36,7 @@ namespace Sqo.Documents
         public Query WhereGreaterThanOrEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = value;
+            w.Value = SetValue(value);
             w.Operator = WhereOp.GreaterThanOrEqual;
             wheres.Add(w);
             return this;
@@ -72,7 +72,7 @@ namespace Sqo.Documents
         public Query WhereGreaterThan(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = value;
+            w.Value = SetValue(value);
             w.Operator = WhereOp.GreaterThan;
             wheres.Add(w);
             return this;
@@ -80,7 +80,7 @@ namespace Sqo.Documents
         public Query WhereLessThan(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = value;
+            w.Value = SetValue(value);
             w.Operator = WhereOp.LessThan;
             wheres.Add(w);
             return this;
@@ -88,7 +88,7 @@ namespace Sqo.Documents
         public Query WhereLessThanOrEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = value;
+            w.Value = SetValue(value);
             w.Operator = WhereOp.LessThanOrEqual;
             wheres.Add(w);
             return this;
@@ -96,15 +96,17 @@ namespace Sqo.Documents
         public Query WhereIN(string tagName, object[] value)
         {
             Where w = new Where(tagName);
-            w.In = value;
+            w.In = SetValueArr(value);
             w.Operator = WhereOp.In;
             wheres.Add(w);
             return this;
         }
+
+       
         public Query WhereBetween(string tagName, object start,object end)
         {
             Where w = new Where(tagName);
-            w.Between = new object[] { start,end};
+            w.Between = new object[] { SetValue(start), SetValue(end) };
             w.Operator = WhereOp.Between;
             wheres.Add(w);
             return this;
@@ -155,10 +157,37 @@ namespace Sqo.Documents
             ors.Add(query);
             return this;
         }
+        private object SetValue(object obj)
+        {
+            Type t = obj.GetType();
+       
+            if (t == typeof(long) || t == typeof(int))
+            {
+                return Convert.ToInt64(obj);
+
+            }
+            else if (t == typeof(float) || t == typeof(double))
+            {
+
+                return Convert.ToDouble(obj);
+            }
+            return obj;
+
+        }
+        private object[] SetValueArr(object[] value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                value[i] = SetValue(value[i]);
+            }
+            return value;
+        }
+
         internal class SortableItem
         {
             public bool desc;
             public string tagName; 
         }
+        
     }
 }

@@ -11,7 +11,8 @@ namespace Sqo.Documents
     {
         public Where(string tagOrKey)
         {
-            this.TagName = tagOrKey;
+            
+            this.TagName = tagOrKey.ToLower();
 
         }
         public WhereOp Operator { get; set; }

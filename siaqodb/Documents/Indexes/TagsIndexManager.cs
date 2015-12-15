@@ -10,6 +10,44 @@ namespace Sqo.Documents.Indexes
 {
     class TagsIndexManager
     {
+        Dictionary<string, string> indexMetaInfo = new Dictionary<string, string>();
+        string indexInfoDBName;
+        public TagsIndexManager(string indexInfoDBName, Siaqodb siaqodb)
+        {
+            this.indexInfoDBName = indexInfoDBName;
+            bool started;
+            var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
+
+            try
+            {
+
+                var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                var db = lmdbTransaction.OpenDatabase(indexInfoDBName, DatabaseOpenFlags.Create);
+                using (var cursor = lmdbTransaction.CreateCursor(db))
+                {
+                    var firstKV = cursor.MoveToFirst();
+                    while (firstKV.HasValue)
+                    {
+                        string currentKey = (string)ByteConverter.ReadBytes(firstKV.Value.Key, typeof(string));
+                        indexMetaInfo[currentKey] = currentKey;
+                        firstKV = cursor.MoveNext();
+                    }
+                    if (started)
+                    {
+                        transaction.Commit();
+                    }
+                }
+            }
+            catch
+            {
+                if (started)
+                {
+                    transaction.Rollback();
+                }
+                throw;
+            }
+
+        }
         public Dictionary<string, object> PrepareUpdateIndexes(byte[] keyBytes, LightningTransaction transaction, LightningDatabase db)
         {
             byte[] crObjBytes = transaction.Get(db, keyBytes);
@@ -93,14 +131,32 @@ namespace Sqo.Documents.Indexes
         private Index GetIndex(string bucket, string tagName, LightningTransaction transaction)
         {
             string indexName = bucket + "_tags_" + tagName;
+            if (!indexMetaInfo.ContainsKey(indexName))
+            {
+                this.StoreIndexInfo(indexName, transaction);
+                indexMetaInfo[indexName] = indexName;
+            }
             return new Index(indexName, transaction);
         }
+
+        private void StoreIndexInfo(string indexName, LightningTransaction transaction)
+        {
+            var db=transaction.OpenDatabase(indexInfoDBName, DatabaseOpenFlags.Create);
+            byte[] keyBytes = ByteConverter.GetBytes(indexName, typeof(string));
+
+            transaction.Put(db, keyBytes, ByteConverter.GetBytes(indexName, typeof(string)));
+        }
+
         internal List<string> LoadKeysByIndex(Where query, string bucketName, LightningTransaction transaction)
         {
-            using (Index index = this.GetIndex(bucketName, query.TagName, transaction))
-            {
-                return IndexQueryFinder.FindKeys(index, query);
-            }
+            Index index = this.GetIndex(bucketName, query.TagName, transaction);
+
+            return IndexQueryFinder.FindKeys(index, query);
+
+        }
+        internal List<string> GetIndexes()
+        {
+            return indexMetaInfo.Keys.ToList();
         }
     }
 }
