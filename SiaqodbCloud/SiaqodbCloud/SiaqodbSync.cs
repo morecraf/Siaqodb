@@ -1,5 +1,6 @@
 ﻿using Sqo.Documents;
 using Sqo.Documents.Sync;
+using Sqo.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,10 @@ namespace SiaqodbCloud
         }
         public PushResult Push(IBucket bucket, IConflictResolver conflictResolver)
         {
+            if (Sqo.SiaqodbConfigurator.IsBucketSyncable(bucket.BucketName))
+            {
+                throw new SiaqodbException("Bucket:" + bucket.BucketName + " is not syncable, set it via SiaqodbConfigurator.SetSyncableBucket(...) method");
+            }
             var syncStatistics = new PushStatistics();
             syncStatistics.StartTime = DateTime.Now;
             Exception error = null;

@@ -55,6 +55,10 @@ namespace Sqo
         {
             return type.GetTypeInfo().GetDeclaredProperty(name);
         }
+        public static PropertyInfo[] GetProperties(this Type type)
+        {
+            return type.GetTypeInfo().DeclaredProperties.ToArray<PropertyInfo>();
+        }
         public static MethodInfo GetMethod(this Type type, string name)
         {
             return type.GetTypeInfo().GetDeclaredMethod(name);

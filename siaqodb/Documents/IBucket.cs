@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Sqo.Documents
 {
@@ -27,7 +26,7 @@ namespace Sqo.Documents
         void Delete(string key);
         void Delete(Document doc);
         void Delete(Document doc,ITransaction transaction);
-        string BucketName { get; set; }
+        string BucketName { get;  }
         IDocQuery<T> Cast<T>() where T : Document;
         IDocQuery<T> Query<T>() where T : Document;
     }

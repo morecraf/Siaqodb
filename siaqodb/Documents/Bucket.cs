@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Sqo.Documents.Sync;
 namespace Sqo.Documents
 {
@@ -32,7 +30,7 @@ namespace Sqo.Documents
         public string BucketName
         {
             get;
-            set;
+            internal set;
         }
         internal void Delete(string key, bool isDirty)
         {

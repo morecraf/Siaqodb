@@ -634,7 +634,7 @@ namespace SiaqodbCloud
 #endif
     }
 
-    public class ResultSet
+    class ResultSet
     {
         public int Total { get; set; }
         public int Count { get; set; }
@@ -649,12 +649,12 @@ namespace SiaqodbCloud
             return list;
         }
     }
-    public class StoreResponse
+    class StoreResponse
     {
         public string Key { get; set; }
         public string Version { get; set; }
     }
-    public class BatchItemResponse
+    class BatchItemResponse
     {
         public string Error { get; set; }
         public string ErrorDesc { get; set; }
@@ -663,7 +663,7 @@ namespace SiaqodbCloud
 
 
     }
-    public class BatchResponse
+    class BatchResponse
     {
 
         public List<BatchItemResponse> BatchItemResponses { get; set; }
@@ -672,7 +672,7 @@ namespace SiaqodbCloud
         public string UploadAnchor { get; set; }
     }
 
-    public class BucketSet
+    class BucketSet
     {
         public List<string> Buckets;
         public int Total { get; set; }

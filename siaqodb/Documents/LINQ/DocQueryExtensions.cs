@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Sqo.Documents
 {
@@ -263,7 +263,7 @@ namespace Sqo.Documents
             {
                 return false;
             }
-            if (!typeof(Document).GetTypeInfo().IsAssignableFrom(node.Object.Type.GetTypeInfo()))
+            if (!typeof(Document).IsAssignableFrom(node.Object.Type))
             {
                 return false;
             }

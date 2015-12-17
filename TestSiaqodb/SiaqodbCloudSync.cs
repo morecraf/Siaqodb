@@ -509,6 +509,7 @@ namespace TestSiaqodbBuckets
         {
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
+                
                 IBucket bucket = siaqodb1.Documents["persons"];
                 IBucket bucket2 = siaqodb2.Documents["persons"];
                 {

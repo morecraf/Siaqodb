@@ -411,8 +411,18 @@ namespace Sqo
                 LoggingMethod(message, level);
             }
         }
-
-        internal static IDocumentSerializer DocumentSerializer;
+        private static IDocumentSerializer docSerializer;
+        internal static IDocumentSerializer DocumentSerializer
+        {
+            get
+            {
+                if (docSerializer == null)
+                {
+                    throw new SiaqodbException("DocumentSerializer not set, use SiaqodbConfigurator.SetDocumentSerializer(...) to set it.");
+                }
+                return docSerializer;
+            }
+        }
         /// <summary>
         /// Set your custom document serializer
         /// </summary>
@@ -423,7 +433,7 @@ namespace Sqo
             {
                 throw new ArgumentNullException("documentSerializer");
             }
-            DocumentSerializer = documentSerializer;
+            docSerializer = documentSerializer;
         }
         /// <summary>
         /// Apply default configurations

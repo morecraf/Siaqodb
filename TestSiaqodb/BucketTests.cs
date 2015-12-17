@@ -299,12 +299,13 @@ namespace TestSiaqodbBuckets
             IBucket bucket = this.GetBucket();
             {
                 bucket.Store(p.UserName, p, new { Age = 33 });
-
+                
                 var fromDB = bucket.Load(username);
                 bucket.Delete(fromDB.Key);
 
                 fromDB = bucket.Load(username);
                 Assert.IsNull(fromDB);
+                
             }
         }
         [TestMethod]
