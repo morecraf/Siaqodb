@@ -195,7 +195,7 @@ namespace Sqo.Documents
             var filterValue = GetValue(node.Right);
 
             //TODO check if tagType is supported
-            /*if (filterValue != null && !ParseEncoder.IsValidType(filterValue))
+            /*if (filterValue != null && !tag.IsValidType(filterValue))
             {
                 throw new InvalidOperationException(
                   "Where clauses must use types compatible with Document.");

@@ -50,6 +50,31 @@ namespace Sqo.Documents
         {
             this.Delete(doc, true);
         }
+        public void Delete(Document doc, ITransaction transaction)
+        {
+            lock (_locker)
+            {
+                this.Delete(doc, transaction, true);
+            }
+        }
+        internal void Delete(Document doc, ITransaction transaction, bool isDirty)
+        {
+            var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+            var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
+
+            byte[] keyBytes = ByteConverter.StringToByteArray(doc.Key);
+            var oldTags = indexManag.PrepareUpdateIndexes(keyBytes, lmdbTransaction, db);
+
+            lmdbTransaction.Delete(db, keyBytes);
+            if (SiaqodbConfigurator.IsBucketSyncable(this.BucketName) && isDirty)
+            {
+                CreateDirtyEntity(DirtyOperation.Deleted, lmdbTransaction, doc.Key, doc.Version);
+            }
+            indexManag.UpdateIndexesAfterDelete(doc.Key, oldTags, lmdbTransaction, BucketName);
+
+
+
+        }
         internal void Delete(Document doc, bool isDirty)
         {
             lock (_locker)
@@ -58,21 +83,8 @@ namespace Sqo.Documents
                 {
                     try
                     {
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        using (var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
-                        {
-                            byte[] keyBytes = ByteConverter.StringToByteArray(doc.Key);
-                            var oldTags = indexManag.PrepareUpdateIndexes(keyBytes, lmdbTransaction, db);
-
-                            lmdbTransaction.Delete(db, keyBytes);
-                            if (SiaqodbConfigurator.IsBucketSyncable(this.BucketName) && isDirty)
-                            {
-                                CreateDirtyEntity(DirtyOperation.Deleted, lmdbTransaction, doc.Key, doc.Version);
-                            }
-                            indexManag.UpdateIndexesAfterDelete(doc.Key, oldTags, lmdbTransaction, BucketName);
-                            transaction.Commit();
-
-                        }
+                        Delete(doc, transaction, isDirty);
+                        transaction.Commit();
                     }
                     catch (Exception ex)
                     {
@@ -94,21 +106,21 @@ namespace Sqo.Documents
         {
             lock (_locker)
             {
-                using (var transaction = siaqodb.BeginTransaction())
+                bool started;
+                var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
+                try
                 {
-                    try
-                    {
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
-                        string key = keysLoaded.FirstOrDefault();
-                        if (key != null)
-                            return Get(key, lmdbTransaction);
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
+                    string key = keysLoaded.FirstOrDefault();
+                    if (key != null)
+                        return Get(key, lmdbTransaction);
 
-                    }
-                    finally
-                    {
+                }
+                finally
+                {
+                    if (started)
                         transaction.Commit();
-                    }
                 }
                 return null;
             }
@@ -117,52 +129,56 @@ namespace Sqo.Documents
         {
             lock (_locker)
             {
-                using (var transaction = siaqodb.BeginTransaction())
+                bool started;
+                var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
+                try
                 {
-                    try
-                    {
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        List<Document> allFiltered = new List<Document>();
-                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    List<Document> allFiltered = new List<Document>();
+                    IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
 
-                        foreach (string key in keysLoaded)
-                        {
-                            var obj = Get(key, lmdbTransaction);
-                            allFiltered.Add(obj);
-                        }
-                        return allFiltered;
-                    }
-                    finally
+                    foreach (string key in keysLoaded)
                     {
-                        transaction.Commit();
+                        var obj = Get(key, lmdbTransaction);
+                        allFiltered.Add(obj);
                     }
+                    return allFiltered;
+                }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
                 }
             }
+
         }
         public int Count(Query query)
         {
             lock (_locker)
             {
-                using (var transaction = siaqodb.BeginTransaction())
+                bool started;
+                var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
+                try
                 {
-                    try
-                    {
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
-                        return keysLoaded.Count();
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    IEnumerable<string> keysLoaded = this.GetKeys(lmdbTransaction, query);
+                    return keysLoaded.Count();
 
-                    }
-                    finally
-                    {
-                        transaction.Commit();
-                    }
                 }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
+                }
+
             }
         }
         public int Count()
         {
-            using (var transaction = siaqodb.BeginTransaction())
+            lock (_locker)
             {
+                bool started;
+                var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
                 try
                 {
                     var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
@@ -181,9 +197,11 @@ namespace Sqo.Documents
                 }
                 finally
                 {
-                    transaction.Commit();
+                    if (started)
+                        transaction.Commit();
                 }
             }
+
         }
 
         private IEnumerable<string> GetKeys(LightningTransaction lmdbTransaction, Query query)
@@ -208,21 +226,23 @@ namespace Sqo.Documents
         }
         public Document Load(string key)
         {
+
             lock (_locker)
             {
-                using (var transaction = siaqodb.BeginTransaction())
+                bool started;
+                var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
+                try
                 {
-                    try
-                    {
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        return Get(key, lmdbTransaction);
-                    }
-                    finally
-                    {
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    return Get(key, lmdbTransaction);
+                }
+                finally
+                {
+                    if (started)
                         transaction.Commit();
-                    }
                 }
             }
+
         }
         private Document Get(string key, LightningTransaction transaction)
         {
@@ -247,96 +267,96 @@ namespace Sqo.Documents
         {
             lock (_locker)
             {
-                using (var transaction = siaqodb.BeginTransaction())
+                bool started;
+                var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
+                try
                 {
-                    try
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    List<Document> list = new List<Document>();
+
+                    var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
+
+                    IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+
+                    using (var cursor = lmdbTransaction.CreateCursor(db))
                     {
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        List<Document> list = new List<Document>();
+                        var current = cursor.MoveNext();
 
-                        var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
-
-                        IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
-
-                        using (var cursor = lmdbTransaction.CreateCursor(db))
+                        while (current.HasValue)
                         {
-                            var current = cursor.MoveNext();
-
-                            while (current.HasValue)
+                            byte[] crObjBytes = current.Value.Value;
+                            if (crObjBytes != null)
                             {
-                                byte[] crObjBytes = current.Value.Value;
-                                if (crObjBytes != null)
-                                {
-                                    var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
-                                    list.Add(obj);
-                                }
-                                current = cursor.MoveNext();
+                                var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                                list.Add(obj);
                             }
+                            current = cursor.MoveNext();
                         }
-
-
-                        return list;
-
-                    }
-                    finally
-                    {
-                        transaction.Commit();
                     }
 
+
+                    return list;
 
                 }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
+                }
+
+
             }
+
         }
 
         public IList<Document> LoadAll(int skip, int limit)
         {
             lock (_locker)
             {
-                using (var transaction = siaqodb.BeginTransaction())
+                bool started;
+                var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);
+                try
                 {
-                    try
+                    var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                    List<Document> list = new List<Document>();
+                    using (var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
                     {
-                        var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                        List<Document> list = new List<Document>();
-                        using (var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
-                        {
-                            IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+                        IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
 
-                            using (var cursor = lmdbTransaction.CreateCursor(db))
+                        using (var cursor = lmdbTransaction.CreateCursor(db))
+                        {
+                            var current = cursor.MoveNext();
+                            int i = 0;
+                            while (current.HasValue)
                             {
-                                var current = cursor.MoveNext();
-                                int i = 0;
-                                while (current.HasValue)
+                                if (i < skip)
                                 {
-                                    if (i < skip)
-                                    {
-                                        current = cursor.MoveNext();
-                                        i++;
-                                        continue;
-                                    }
-                                    byte[] crObjBytes = current.Value.Value;
-                                    if (crObjBytes != null)
-                                    {
-                                        var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
-                                        list.Add(obj);
-                                    }
-                                    if (list.Count == limit)
-                                        break;
                                     current = cursor.MoveNext();
                                     i++;
+                                    continue;
                                 }
+                                byte[] crObjBytes = current.Value.Value;
+                                if (crObjBytes != null)
+                                {
+                                    var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                                    list.Add(obj);
+                                }
+                                if (list.Count == limit)
+                                    break;
+                                current = cursor.MoveNext();
+                                i++;
                             }
-
                         }
-                        return list;
-                    }
-                    finally
-                    {
-                        transaction.Commit();
-                    }
 
-
+                    }
+                    return list;
                 }
+                finally
+                {
+                    if (started)
+                        transaction.Commit();
+                }
+
             }
         }
 

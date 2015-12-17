@@ -26,6 +26,7 @@ namespace Sqo.Documents
         void StoreBatch(IList<Document> docs);
         void Delete(string key);
         void Delete(Document doc);
+        void Delete(Document doc,ITransaction transaction);
         string BucketName { get; set; }
         IDocQuery<T> Cast<T>() where T : Document;
         IDocQuery<T> Query<T>() where T : Document;
