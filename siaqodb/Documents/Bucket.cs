@@ -354,31 +354,46 @@ namespace Sqo.Documents
             }
 
         }
+        internal void Store(Document doc,bool isDirty)
+        {
+            lock (_locker)
+            {
+                using (var transaction = siaqodb.BeginTransaction())
+                {
+
+                    this.Store(doc, transaction,isDirty);
+                    transaction.Commit();
+
+                }
+            }
+
+        }
+        internal void Store(Document doc, ITransaction transaction, bool isDirty)
+        {
+            var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+
+
+            DirtyOperation dop;
+            var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
+
+            byte[] keyBytes = ByteConverter.StringToByteArray(doc.Key);
+            var oldTags = indexManag.PrepareUpdateIndexes(keyBytes, lmdbTransaction, db);
+            dop = oldTags != null ? DirtyOperation.Updated : DirtyOperation.Inserted;
+
+            IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
+            byte[] crObjBytes = serializer.Serialize(doc);
+            lmdbTransaction.Put(db, keyBytes, crObjBytes);
+            indexManag.UpdateIndexes(doc.Key, oldTags, doc.Tags, lmdbTransaction, BucketName);
+            if (SiaqodbConfigurator.IsBucketSyncable(this.BucketName) && isDirty)
+            {
+                CreateDirtyEntity(dop, lmdbTransaction, doc);
+            }
+        }
         public void Store(Document doc, ITransaction transaction)
         {
             lock (_locker)
             {
-
-                var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-
-
-                DirtyOperation dop;
-                var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
-
-                byte[] keyBytes = ByteConverter.StringToByteArray(doc.Key);
-                var oldTags = indexManag.PrepareUpdateIndexes(keyBytes, lmdbTransaction, db);
-                dop = oldTags != null ? DirtyOperation.Updated : DirtyOperation.Inserted;
-
-                IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
-                byte[] crObjBytes = serializer.Serialize(doc);
-                lmdbTransaction.Put(db, keyBytes, crObjBytes);
-                indexManag.UpdateIndexes(doc.Key, oldTags, doc.Tags, lmdbTransaction, BucketName);
-                if (SiaqodbConfigurator.IsBucketSyncable(this.BucketName))
-                {
-                    CreateDirtyEntity(dop, lmdbTransaction, doc);
-                }
-
-
+                this.Store(doc, transaction, true);
             }
 
         }
