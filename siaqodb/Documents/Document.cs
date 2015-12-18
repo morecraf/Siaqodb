@@ -19,10 +19,6 @@ namespace Sqo.Documents
             this.content = content;
         }
        
-        internal bool ShouldSerializeIsDirty()
-        {
-            return false;
-        }
         private string key;
 
         public string Key
@@ -44,11 +40,11 @@ namespace Sqo.Documents
             set { content = value; }
         }
         public string Version { get; set; }
-        public void SetContent<T>(T objValue)
+        public virtual void SetContent<T>(T objValue)
         {
             this.SetContent((object)objValue);
         }
-        public void SetContent(object objValue)
+        public virtual void SetContent(object objValue)
         {
 
             if (objValue == null)
@@ -66,7 +62,7 @@ namespace Sqo.Documents
             this.Content = serializedObj;
             
         }
-        public object GetContent( Type type)
+        public virtual object GetContent( Type type)
         {
             if (this.Content == null || this.Content.Length == 0)
                 return null;
@@ -78,7 +74,7 @@ namespace Sqo.Documents
             }
             return obj;
         }
-        public T GetContent<T>()
+        public virtual T GetContent<T>()
         {
             return (T)((object)this.GetContent(typeof(T)));
         }
@@ -86,12 +82,12 @@ namespace Sqo.Documents
 
 
 
-        public void SetTag<T>(string tagName, T value)
+        public virtual void SetTag<T>(string tagName, T value)
         {
             this.SetTag(tagName, (object)value);
 
         }
-        public void SetTag(string tagName, object value)
+        public virtual void SetTag(string tagName, object value)
         {
             tagName = tagName.ToLower();
             Type type = value.GetType();
@@ -145,7 +141,7 @@ namespace Sqo.Documents
             return true;
         }
 
-        public T GetTag<T>(string tagName)
+        public virtual T GetTag<T>(string tagName)
         {
             if (Tags != null)
             {

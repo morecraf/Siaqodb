@@ -678,5 +678,37 @@ namespace Sqo
         {
             VersionGetConventions[typeof(T)] = (a, b) => action((T)a, b);
         }
+        internal static Dictionary<string, Type> documentFactory;
+        internal static void RegisterDocumentSubclass<T>(string bucketName) where T : Documents.Document
+        {
+            if (documentFactory == null)
+                documentFactory = new Dictionary<string, Type>();
+            documentFactory["buk_" + bucketName] = typeof(T);
+        }
+        internal static Type GetDocumentTypeToBuild(string bucketName)
+        {
+            if (documentFactory != null && documentFactory.ContainsKey(bucketName))
+            {
+                return documentFactory[bucketName];
+            }
+                 
+            return typeof(Documents.Document);
+        }
+        internal static Dictionary<string, Type> queryFactory;
+        internal static void RegisterQuerySubclass<T>(string bucketName) where T : Documents.Query
+        {
+            if (queryFactory == null)
+                queryFactory = new Dictionary<string, Type>();
+            queryFactory["buk_" + bucketName] = typeof(T);
+        }
+        internal static Type GetQueryTypeToBuild(string bucketName)
+        {
+            if (queryFactory != null && queryFactory.ContainsKey(bucketName))
+            {
+                return queryFactory[bucketName];
+            }
+
+            return typeof(Documents.Query);
+        }
     }
 }

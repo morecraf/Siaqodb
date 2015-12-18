@@ -84,7 +84,18 @@ namespace Sqo.Documents
                 {
                     var left = source.Where(Expression.Lambda<Func<TSource, bool>>(
                             binaryExpression.Left, predicate.Parameters));
-                    IDocQuery<TSource> rightNew = new DocQuery<TSource>(source.Bucket, new Query());
+                    Query q = null;
+                    Type t = SiaqodbConfigurator.GetQueryTypeToBuild(source.Bucket.BucketName);
+                    if (t == typeof(Query))
+                    {
+                        q = new Query();
+                    }
+                    else//subclass like IQryptQuery
+                    {
+                        q = Activator.CreateInstance(t) as Query;
+                    }
+
+                    IDocQuery<TSource> rightNew = new DocQuery<TSource>(source.Bucket, q);
                     var right = rightNew.Where(Expression.Lambda<Func<TSource, bool>>(
                             binaryExpression.Right, predicate.Parameters));
 

@@ -252,7 +252,7 @@ namespace Sqo.Documents
             if (crObjBytes != null)
             {
                 IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
-                return serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                return serializer.Deserialize(SiaqodbConfigurator.GetDocumentTypeToBuild(this.BucketName), crObjBytes) as Document;
 
             }
             return null;
@@ -285,7 +285,7 @@ namespace Sqo.Documents
                             byte[] crObjBytes = current.Value.Value;
                             if (crObjBytes != null)
                             {
-                                var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                                var obj = serializer.Deserialize(SiaqodbConfigurator.GetDocumentTypeToBuild(this.BucketName), crObjBytes) as Document;
                                 list.Add(obj);
                             }
                             current = cursor.MoveNext();
@@ -336,7 +336,7 @@ namespace Sqo.Documents
                                 byte[] crObjBytes = current.Value.Value;
                                 if (crObjBytes != null)
                                 {
-                                    var obj = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                                    var obj = serializer.Deserialize(SiaqodbConfigurator.GetDocumentTypeToBuild(this.BucketName), crObjBytes) as Document;
                                     list.Add(obj);
                                 }
                                 if (list.Count == limit)
@@ -443,10 +443,22 @@ namespace Sqo.Documents
 
             Store(key, obj, tags_Dict);
         }
-
+        private Document BuildDocInstance()
+        {
+            Type t = SiaqodbConfigurator.GetDocumentTypeToBuild(this.BucketName);
+            if ( t == typeof(Document))
+            {
+                return new Document();
+            }
+            else//subclass
+            {
+                return Activator.CreateInstance(t) as Document;
+            }
+        }
         public void Store(string key, object obj, Dictionary<string, object> tags)
         {
-            Document doc = new Document();
+
+            Document doc = BuildDocInstance();
             doc.Key = key;
             doc.SetContent(obj);
 
@@ -531,7 +543,17 @@ namespace Sqo.Documents
         /// <returns></returns>
         public IDocQuery<T> Cast<T>() where T : Document
         {
-            return new DocQuery<T>(this, new Query());
+            Query q = null;
+            Type t = SiaqodbConfigurator.GetQueryTypeToBuild(this.BucketName);
+            if ( t == typeof(Query))
+            {
+                q = new Query();
+            }
+            else//subclass like IQryptQuery
+            {
+                q = Activator.CreateInstance(t) as Query;
+            }
+            return new DocQuery<T>(this,q );
         }
         /// <summary>
         /// Query method to be used in LINQ queries
@@ -775,7 +797,7 @@ namespace Sqo.Documents
                             if (crObjBytes != null)
                             {
                                 IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
-                                var doc = serializer.Deserialize(typeof(Document), crObjBytes) as Document;
+                                var doc = serializer.Deserialize(SiaqodbConfigurator.GetDocumentTypeToBuild(this.BucketName), crObjBytes) as Document;
                                 doc.Version = keyVers.Value;
                                 var crObjBytesNew = serializer.Serialize(doc);
                                 lmdbTransaction.Put(db, keyBytes, crObjBytesNew);

@@ -44,7 +44,7 @@ namespace Sqo.Documents
         public Query WhereStartsWith(string tagName, string substring)
         {
             Where w = new Where(tagName);
-            w.Value = substring;
+            w.Value = SetValue( substring);
             w.Operator = WhereOp.StartWith;
             wheres.Add(w);
             return this;
@@ -53,7 +53,7 @@ namespace Sqo.Documents
         public Query WhereEndsWith(string tagName, string substring)
         {
             Where w = new Where(tagName);
-            w.Value = substring;
+            w.Value = SetValue(substring);
             w.Operator = WhereOp.EndWith;
             wheres.Add(w);
             return this;
@@ -62,7 +62,7 @@ namespace Sqo.Documents
         public Query WhereContains(string tagName, string substring)
         {
             Where w = new Where(tagName);
-            w.Value = substring;
+            w.Value = SetValue(substring);
             w.Operator = WhereOp.Contains;
             wheres.Add(w);
             return this;
@@ -156,7 +156,7 @@ namespace Sqo.Documents
             ors.Add(query);
             return this;
         }
-        private object SetValue(object obj)
+        protected virtual object SetValue(object obj)
         {
             Type t = obj.GetType();
        
@@ -173,7 +173,7 @@ namespace Sqo.Documents
             return obj;
 
         }
-        private object[] SetValueArr(object[] value)
+        protected virtual object[] SetValueArr(object[] value)
         {
             for (int i = 0; i < value.Length; i++)
             {

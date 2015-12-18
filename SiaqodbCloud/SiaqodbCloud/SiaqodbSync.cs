@@ -26,7 +26,7 @@ namespace SiaqodbCloud
         }
         public PushResult Push(IBucket bucket, IConflictResolver conflictResolver)
         {
-            if (Sqo.SiaqodbConfigurator.IsBucketSyncable(bucket.BucketName))
+            if (!Sqo.SiaqodbConfigurator.IsBucketSyncable(bucket.BucketName))
             {
                 throw new SiaqodbException("Bucket:" + bucket.BucketName + " is not syncable, set it via SiaqodbConfigurator.SetSyncableBucket(...) method");
             }
