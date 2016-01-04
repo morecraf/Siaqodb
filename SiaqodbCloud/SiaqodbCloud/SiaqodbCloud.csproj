@@ -62,18 +62,13 @@
     <Compile Include="Http\Signature.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
-      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
-      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\siaqodb\Siaqodb %28.NET 4.5%29.csproj">
-      <Project>{f5bd2e1f-dcdd-4a1c-8130-236c2d75ff93}</Project>
-      <Name>Siaqodb %28.NET 4.5%29</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
+    <ProjectReference Include="..\..\siaqodb\Siaqodb %28.NET 3.5%29.csproj">
+      <Project>{243748a0-9797-4fa9-a805-d71127eac3da}</Project>
+      <Name>Siaqodb %28.NET 3.5%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
