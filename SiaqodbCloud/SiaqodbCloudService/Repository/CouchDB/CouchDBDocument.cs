@@ -12,4 +12,10 @@ namespace SiaqodbCloudService.Repository.CouchDB
         public byte[] doc { get; set; }
         public Dictionary<string, object> tags { get; set; }
     }
+    public class AccessKey
+    {
+        public string _id { get; set; }
+        public string _rev { get; set; }
+        public string secretkey { get; set; }
+    }
 }

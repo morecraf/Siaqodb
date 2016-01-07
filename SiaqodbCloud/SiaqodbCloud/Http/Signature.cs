@@ -28,9 +28,9 @@ namespace SiaqodbCloud
 {
     class Signature
     {
-        private const string UsernameHeaderName = "X-SQO-Username";
-        private const string TimestampHeaderName = "X-SQO-Date";
-        private const string SignatureHeaderName = "X-SQO-Signature";
+        private const string UsernameHeaderName = "X-SQO-ACCESS_KEY_ID";
+        private const string TimestampHeaderName = "X-SQO-DATE";
+        private const string SignatureHeaderName = "X-SQO-SIGNATURE";
         string username;
         string password;
         public Signature(string username, string password)

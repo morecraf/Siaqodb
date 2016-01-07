@@ -19,7 +19,7 @@ namespace Sqo.Documents
         public Query WhereEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(value);
+            w.Value = SetValue(tagName,value);
             w.Operator = WhereOp.Equal;
             wheres.Add(w);
             return this;
@@ -27,7 +27,7 @@ namespace Sqo.Documents
         public Query WhereNotEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(value);
+            w.Value = SetValue(tagName,value);
             w.Operator = WhereOp.NotEqual;
             wheres.Add(w);
             return this;
@@ -35,7 +35,7 @@ namespace Sqo.Documents
         public Query WhereGreaterThanOrEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(value);
+            w.Value = SetValue(tagName,value);
             w.Operator = WhereOp.GreaterThanOrEqual;
             wheres.Add(w);
             return this;
@@ -44,7 +44,7 @@ namespace Sqo.Documents
         public Query WhereStartsWith(string tagName, string substring)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue( substring);
+            w.Value = SetValue(tagName, substring);
             w.Operator = WhereOp.StartWith;
             wheres.Add(w);
             return this;
@@ -53,7 +53,7 @@ namespace Sqo.Documents
         public Query WhereEndsWith(string tagName, string substring)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(substring);
+            w.Value = SetValue(tagName, substring);
             w.Operator = WhereOp.EndWith;
             wheres.Add(w);
             return this;
@@ -62,7 +62,7 @@ namespace Sqo.Documents
         public Query WhereContains(string tagName, string substring)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(substring);
+            w.Value = SetValue(tagName, substring);
             w.Operator = WhereOp.Contains;
             wheres.Add(w);
             return this;
@@ -71,7 +71,7 @@ namespace Sqo.Documents
         public Query WhereGreaterThan(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(value);
+            w.Value = SetValue(tagName, value);
             w.Operator = WhereOp.GreaterThan;
             wheres.Add(w);
             return this;
@@ -79,7 +79,7 @@ namespace Sqo.Documents
         public Query WhereLessThan(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(value);
+            w.Value = SetValue(tagName, value);
             w.Operator = WhereOp.LessThan;
             wheres.Add(w);
             return this;
@@ -87,7 +87,7 @@ namespace Sqo.Documents
         public Query WhereLessThanOrEqual(string tagName, object value)
         {
             Where w = new Where(tagName);
-            w.Value = SetValue(value);
+            w.Value = SetValue(tagName, value);
             w.Operator = WhereOp.LessThanOrEqual;
             wheres.Add(w);
             return this;
@@ -95,7 +95,7 @@ namespace Sqo.Documents
         public Query WhereIN(string tagName, object[] value)
         {
             Where w = new Where(tagName);
-            w.In = SetValueArr(value);
+            w.In = SetValueArr(tagName, value);
             w.Operator = WhereOp.In;
             wheres.Add(w);
             return this;
@@ -105,7 +105,7 @@ namespace Sqo.Documents
         public Query WhereBetween(string tagName, object start,object end)
         {
             Where w = new Where(tagName);
-            w.Between = new object[] { SetValue(start), SetValue(end) };
+            w.Between = new object[] { SetValue(tagName, start), SetValue(tagName, end) };
             w.Operator = WhereOp.Between;
             wheres.Add(w);
             return this;
@@ -156,7 +156,7 @@ namespace Sqo.Documents
             ors.Add(query);
             return this;
         }
-        protected virtual object SetValue(object obj)
+        protected virtual object SetValue(string tagName, object obj)
         {
             Type t = obj.GetType();
        
@@ -173,11 +173,11 @@ namespace Sqo.Documents
             return obj;
 
         }
-        protected virtual object[] SetValueArr(object[] value)
+        private object[] SetValueArr(string tagName,object[] value)
         {
             for (int i = 0; i < value.Length; i++)
             {
-                value[i] = SetValue(value[i]);
+                value[i] = SetValue(tagName, value[i]);
             }
             return value;
         }

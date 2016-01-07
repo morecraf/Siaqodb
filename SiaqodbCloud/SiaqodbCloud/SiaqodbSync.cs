@@ -12,9 +12,13 @@ namespace SiaqodbCloud
     public class SiaqodbSync : IDisposable
     {
         SiaqodbCloudHttpClient httpClient;
-        public SiaqodbSync(string uri, string username, string password)
+        public SiaqodbSync(string uri, string access_key_id, string secret_access_key)
         {
-            this.httpClient = new SiaqodbCloudHttpClient(uri, username, password);
+            if (!Sqo.Internal._bs._hsy())
+            {
+                throw new SiaqodbException("SiaqodbSync license not valid!");
+            }
+            this.httpClient = new SiaqodbCloudHttpClient(uri, access_key_id, secret_access_key);
             DownloadBatchSize = 10000;
         }
 
@@ -45,7 +49,7 @@ namespace SiaqodbCloud
                     (changeSet.DeletedDocuments != null && changeSet.DeletedDocuments.Count > 0))
                 {
                     this.OnSyncProgress(new SyncProgressEventArgs("Uploading local changes..."));
-                    var response = httpClient.Put(bucket.BucketName, changeSet);
+                    var response = httpClient.Put(RemovePrefix( bucket.BucketName), changeSet);
                     this.OnSyncProgress(new SyncProgressEventArgs("Upload finished, build the result..."));
 
                     //update versions
@@ -93,7 +97,7 @@ namespace SiaqodbCloud
             {
                 if (conflicts == null)
                     conflicts = new List<Conflict>();
-                var liveVersion = httpClient.Get(bucket.BucketName, conflictR.Key);
+                var liveVersion = httpClient.Get(RemovePrefix(bucket.BucketName), conflictR.Key);
                 var version = liveVersion != null ? liveVersion.Version : null;
                 var cf = new Conflict() { Key = conflictR.Key, Version = version, Description = conflictR.ErrorDesc };
                 if (conflictResolver == null)
@@ -115,7 +119,7 @@ namespace SiaqodbCloud
             {
                 if (version != null)
                 {
-                    httpClient.Delete(bucket.BucketName, key, version);
+                    httpClient.Delete(RemovePrefix(bucket.BucketName), key, version);
                 }
                 if (localVersion != null)
                 {
@@ -127,7 +131,7 @@ namespace SiaqodbCloud
             {
 
                 winner.Version = version;
-                var resp = httpClient.Put(bucket.BucketName, winner);
+                var resp = httpClient.Put(RemovePrefix(bucket.BucketName), winner);
                 winner.Version = resp.Version;
                 ((Bucket)bucket).Store(winner,false);
             }
@@ -229,11 +233,11 @@ namespace SiaqodbCloud
             ChangeSet changes = null;
             if (query == null)
             {
-                changes = httpClient.GetChanges(bucket.BucketName, DownloadBatchSize, anchor, uploadAnchor);
+                changes = httpClient.GetChanges(RemovePrefix(bucket.BucketName), DownloadBatchSize, anchor, uploadAnchor);
             }
             else
             {
-                changes = httpClient.GetChanges(bucket.BucketName, query, DownloadBatchSize, anchor,uploadAnchor);
+                changes = httpClient.GetChanges(RemovePrefix(bucket.BucketName), query, DownloadBatchSize, anchor,uploadAnchor);
             }
             return changes;
         }
@@ -256,6 +260,14 @@ namespace SiaqodbCloud
             {
                 httpClient.Dispose();
             }
+        }
+        private string RemovePrefix(string bucketName)
+        {
+            if (bucketName.StartsWith("buk_"))
+            {
+                return bucketName.Remove(0, 4);
+            }
+            return bucketName;
         }
     }
     public class SyncProgressEventArgs : EventArgs

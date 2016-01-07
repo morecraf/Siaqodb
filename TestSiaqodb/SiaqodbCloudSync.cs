@@ -16,7 +16,7 @@ namespace TestSiaqodbBuckets
         Random rnd = new Random();
         public SiaqodbCloudSync()
         {
-            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2cVvZnIPY8dL9wyf3RMWpjKO0WGBVXmnDc82AKBClJ/u");
             Sqo.SiaqodbConfigurator.SetSyncableBucket("contacts", true);
             Sqo.SiaqodbConfigurator.SetSyncableBucket("persons", true);
             Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
@@ -25,7 +25,7 @@ namespace TestSiaqodbBuckets
         }
         private SiaqodbSync GetSyncContext()
         {
-            return new SiaqodbSync("http://localhost:11735/v0/", "aa", "aa");
+            return new SiaqodbSync("http://localhost:11735/v0/", "7ba65b5855dddb308766b6756b00079a", "kHSFD8ADHFKS8998sxS");
         }
         [TestMethod]
         public void Insert()

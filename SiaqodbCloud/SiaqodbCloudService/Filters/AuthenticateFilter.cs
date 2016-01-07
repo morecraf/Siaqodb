@@ -24,9 +24,9 @@ namespace SiaqodbCloudService.Filters
     public class AuthenticateAttribute : ActionFilterAttribute
     {
        
-        private const string Username = "X-SQO-Username";
-        private const string TimestampHeaderName = "X-SQO-Date";
-        private const string Signature = "X-SQO-Signature";
+        private const string Access_Key_Id = "X-SQO-ACCESS_KEY_ID";
+        private const string TimestampHeaderName = "X-SQO-DATE";
+        private const string Signature = "X-SQO-SIGNATURE";
         IRepository repo;
         public AuthenticateAttribute()
         {
@@ -42,9 +42,9 @@ namespace SiaqodbCloudService.Filters
                             .SingleOrDefault();
         }
 
-        public  string GetHttpRequestUsernameHeader(HttpHeaders headers)
+        public  string GetHttpRequestAccessKeyIdHeader(HttpHeaders headers)
         {
-            return GetHttpRequestHeader(headers, Username);
+            return GetHttpRequestHeader(headers, Access_Key_Id);
         }
         public  string GetHttpRequestTimestampHeader(HttpHeaders headers)
         {
@@ -196,8 +196,8 @@ namespace SiaqodbCloudService.Filters
             if (!IsDateValidated(timeStampString))
                 return false;
 
-            var appKeyString = GetHttpRequestUsernameHeader(headers);
-            if (string.IsNullOrEmpty(appKeyString))
+            var accessKeyId = GetHttpRequestAccessKeyIdHeader(headers);
+            if (string.IsNullOrEmpty(accessKeyId))
                 return false;
 
             var signature = GetHttpRequestSignatureHeader(headers);
@@ -209,8 +209,9 @@ namespace SiaqodbCloudService.Filters
 
             AddToMemoryCache(signature);
 
-            var pwd = await repo.GetUserPassword(appKeyString);
-
+            var pwd = await repo.GetSecretAccessKey(accessKeyId);
+            if (pwd == null)
+                return false;
             var baseString = await BuildBaseString(actionContext);
             return AreSignaturesEqual(pwd, baseString, signature);
 

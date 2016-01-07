@@ -9,7 +9,7 @@ namespace SiaqodbCloudService.Repository
 {
     public interface IRepository
     {
-        Task<string> GetUserPassword(string appKeyString);
+        Task<string> GetSecretAccessKey(string appKeyString);
         Task<SiaqodbDocument> Get(string bucketName, string key, string version);
         Task<BatchSet> GetAllChanges(string bucketName, int limit, string anchor,string uploadAnchor);
         Task<BatchResponse> Store(string bucketName, BatchSet value);

@@ -13,6 +13,10 @@ namespace Sqo.Documents.Indexes
         string indexInfoDBName;
         public TagsIndexManager(string indexInfoDBName, Siaqodb siaqodb)
         {
+            if (Sqo.Utilities.SqoLicense.isStarterEdition)
+            {
+                throw new Exceptions.InvalidLicenseException("You cannot store documents with Starter Edition.");
+            }
             this.indexInfoDBName = indexInfoDBName;
             bool started;
             var transaction = siaqodb.transactionManager.GetActiveTransaction(out started);

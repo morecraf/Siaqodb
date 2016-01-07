@@ -13,9 +13,13 @@ namespace SiaqodbCloudService.Repository
 {
     class CouchDBRepo : IRepository
     {
+        private const string DbServerUrl = @"http://127.0.0.1:5984/";
+        private const string AccessKeysBucket = "sys_accesskeys";
+        private const string SyncLogBucket = "sys_synclog";
+
         public async Task<StoreResponse> Delete(string bucketName, string key, string version)
         {
-            using (var client = new MyCouchClient(CouchInfo.DbServerUrl, bucketName))
+            using (var client = new MyCouchClient(DbServerUrl, bucketName))
             {
                 var startTime = DateTime.Now;
                 if (version == null)
@@ -65,7 +69,7 @@ namespace SiaqodbCloudService.Repository
 
         public async Task<SiaqodbDocument> Get(string bucketName, string key, string version)
         {
-            using (var client = new MyCouchClient(CouchInfo.DbServerUrl , bucketName))
+            using (var client = new MyCouchClient(DbServerUrl , bucketName))
             {
                 var startTime = DateTime.Now;
                 var response = await client.Documents.GetAsync(key, version);
@@ -94,7 +98,7 @@ namespace SiaqodbCloudService.Repository
 
         public async Task<BatchSet> GetAllChanges(string bucketName, int limit, string anchor,string uploadAnchor)
         {
-            using (var client = new MyCouchClient(CouchInfo.DbServerUrl, bucketName))
+            using (var client = new MyCouchClient(DbServerUrl, bucketName))
             {
              
                 var size = 0;
@@ -111,7 +115,7 @@ namespace SiaqodbCloudService.Repository
                         SyncLogItem logItem = null;
                         if (!string.IsNullOrEmpty(uploadAnchor))
                         {
-                            using (var clientLog = new MyCouchClient(CouchInfo.DbServerUrl, "synclog"))
+                            using (var clientLog = new MyCouchClient(DbServerUrl, SyncLogBucket))
                             {
                                 logItem = (await clientLog.Entities.GetAsync<SyncLogItem>(uploadAnchor)).Content;
                             }
@@ -171,7 +175,7 @@ namespace SiaqodbCloudService.Repository
 
         public async Task<BatchSet> GetChanges(string bucketName, Filter query, int limit, string anchor,string uploadAnchor)
         {
-            using (var client = new MyCouchClient(CouchInfo.DbServerUrl, bucketName))
+            using (var client = new MyCouchClient(DbServerUrl, bucketName))
             {
                 // loggingService.BeforeActionLog(bucketName, "GetChanges", value, anchor);
                 var startTime = DateTime.Now;
@@ -189,7 +193,7 @@ namespace SiaqodbCloudService.Repository
                         SyncLogItem logItem = null;
                         if (!string.IsNullOrEmpty(uploadAnchor))
                         {
-                            using (var clientLog = new MyCouchClient(CouchInfo.DbServerUrl, "synclog"))
+                            using (var clientLog = new MyCouchClient(DbServerUrl, SyncLogBucket))
                             {
                                 logItem = (await clientLog.Entities.GetAsync<SyncLogItem>(uploadAnchor)).Content;
                             }
@@ -424,14 +428,27 @@ namespace SiaqodbCloudService.Repository
             queryFinal.TagName = "key";
             return queryFinal;
         }
-        public async Task<string> GetUserPassword(string userName)
+        public async Task<string> GetSecretAccessKey(string accessKeyId)
         {
-            return "aa";
+            using (var client = new MyCouchClient(DbServerUrl, AccessKeysBucket))
+            {
+                var response = await client.Documents.GetAsync(accessKeyId);
+                if (response.IsSuccess)
+                {
+                    var size = response.Content == null ? 0 : response.Content.Length;
+
+                    if (size == 0) return null;
+                    var doc = client.Serializer.Deserialize<AccessKey>(response.Content);
+                    return doc.secretkey;
+                }
+                
+            }
+            return null;
         }
 
         public async Task<StoreResponse> Store(string bucketName, SiaqodbDocument document)
         {
-            using (var client = new MyCouchClient(CouchInfo.DbServerUrl, bucketName))
+            using (var client = new MyCouchClient(DbServerUrl, bucketName))
             {
                 
                 await CheckTagsViews(client, bucketName, document.Tags);
@@ -463,7 +480,7 @@ namespace SiaqodbCloudService.Repository
 
         public async Task<BatchResponse> Store(string bucketName, BatchSet batch)
         {
-            using (var client = new MyCouchClient(CouchInfo.DbServerUrl, bucketName))
+            using (var client = new MyCouchClient(DbServerUrl, bucketName))
             {
                
                 BulkRequest bulkRequest = new BulkRequest();
@@ -531,7 +548,7 @@ namespace SiaqodbCloudService.Repository
                         if (syncLogItem.KeyVersion.Count > 0)
                         {
                             syncLogItem.TimeInserted = DateTime.UtcNow;
-                            using (var clientLog = new MyCouchClient(CouchInfo.DbServerUrl, "synclog"))
+                            using (var clientLog = new MyCouchClient(DbServerUrl, SyncLogBucket))
                             {
                                 var logResp = await clientLog.Entities.PostAsync(syncLogItem);
                                 cnorResponse.UploadAnchor = logResp.Id;

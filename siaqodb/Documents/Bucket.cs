@@ -388,6 +388,10 @@ namespace Sqo.Documents
         }
         internal void Store(Document doc, ITransaction transaction, bool isDirty)
         {
+            if (string.IsNullOrEmpty(doc.Key))
+            {
+                throw new ArgumentNullException("Key property of the document is not set.");
+            }
             var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
 
 
