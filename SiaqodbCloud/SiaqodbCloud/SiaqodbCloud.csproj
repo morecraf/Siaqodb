@@ -55,6 +55,7 @@
     <Compile Include="Entities\Filter.cs" />
     <Compile Include="Http\SiaqodbCloudHttpClient.cs" />
     <Compile Include="IConflictResolver.cs" />
+    <Compile Include="Obfuscation\ObfuscationAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Http\RequestBuilder.cs" />
     <Compile Include="ServerWinResolver.cs" />

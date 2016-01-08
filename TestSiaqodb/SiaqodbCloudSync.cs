@@ -175,7 +175,7 @@ namespace TestSiaqodbBuckets
 
                     syncContext.Pull(bucket2, query);
                     //now both databases has same object with same version
-
+                     
                     var fromDB1 = bucket.Load(userName);
                     var value = fromDB1.GetContent<Person>();
                     value.FirstName = "Alisia";
@@ -658,7 +658,7 @@ namespace TestSiaqodbBuckets
 
                     //Sync the live and the local version
                     syncContext.Pull(bucket, query, new LiveResolver());//also calls Push()
-
+                    
                     localVersion = bucket.Load(p.UserName);
 
                     //the live object should be the same as the one stored local

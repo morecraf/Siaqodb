@@ -633,7 +633,7 @@ namespace SiaqodbCloud
         }
 #endif
     }
-
+    [System.Reflection.Obfuscation(Exclude = true)]
     class ResultSet
     {
         public int Total { get; set; }
@@ -649,11 +649,13 @@ namespace SiaqodbCloud
             return list;
         }
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     class StoreResponse
     {
         public string Key { get; set; }
         public string Version { get; set; }
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     class BatchItemResponse
     {
         public string Error { get; set; }
@@ -663,6 +665,7 @@ namespace SiaqodbCloud
 
 
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     class BatchResponse
     {
 
@@ -671,7 +674,7 @@ namespace SiaqodbCloud
         public int Total { get; set; }
         public string UploadAnchor { get; set; }
     }
-
+    [System.Reflection.Obfuscation(Exclude = true)]
     class BucketSet
     {
         public List<string> Buckets;

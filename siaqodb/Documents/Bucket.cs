@@ -372,7 +372,7 @@ namespace Sqo.Documents
             }
 
         }
-        internal void Store(Document doc,bool isDirty)
+        internal void StoreInternal(Document doc,bool isDirty)
         {
             lock (_locker)
             {

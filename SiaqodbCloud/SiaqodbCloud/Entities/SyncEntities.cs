@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace SiaqodbCloud
 {
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class Conflict
     {
         public string Key { get; set; }
         public string Version { get; set; }
         public string Description { get; set; }
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class PushStatistics
     {
         public DateTime StartTime
@@ -50,6 +52,7 @@ namespace SiaqodbCloud
 
 
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class PullStatistics
     {
 
@@ -83,6 +86,7 @@ namespace SiaqodbCloud
             internal set;
         }
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class PushResult
     {
         public Exception Error { get; set; }
@@ -98,6 +102,7 @@ namespace SiaqodbCloud
             UploadAnchor = uploadAnchor;
         }
     }
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class PullResult
     {
         public PullResult(Exception error, PullStatistics syncStatistics, PushResult pushResult)

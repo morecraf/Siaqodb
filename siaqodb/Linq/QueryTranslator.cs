@@ -72,7 +72,7 @@ namespace Sqo
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
 
-			if (m.Method.DeclaringType == typeof(IEnumerable) && m.Method.Name == "Where")
+            if (m.Method.DeclaringType == typeof(IEnumerable) && m.Method.Name == "Where")
             {
 
                 this.Visit(m.Arguments[0]);
@@ -83,7 +83,7 @@ namespace Sqo
                 return m;
 
             }
-            else if (typeof(IList).IsAssignableFrom(m.Method.DeclaringType) )
+            else if (typeof(IList).IsAssignableFrom(m.Method.DeclaringType))
             {
                 HandleIListMethods(m);
                 return m;
@@ -97,7 +97,7 @@ namespace Sqo
             {
 
             }
-            else if (m.Method.DeclaringType == typeof(string) )
+            else if (m.Method.DeclaringType == typeof(string))
             {
 
 
@@ -105,10 +105,24 @@ namespace Sqo
                 return m;
 
             }
-            else if ((m.Method.DeclaringType == typeof(SqoStringExtensions) && m.Method.Name == "Contains"))
+            else if (m.Method.Name == "Contains")
             {
-                HandleStringContainsMethod(m);
-                return m;
+                if (m.Method.DeclaringType == typeof(SqoStringExtensions))
+                {
+
+                    HandleStringContainsMethod(m);
+                    return m;
+                }
+                else if (m.Arguments != null && m.Arguments.Count == 3)//hack to catch user defined Contains methods
+                {
+                    ConstantExpression c2 = m.Arguments[2] as ConstantExpression;
+                    if (c2.Value != null && c2.Value.GetType() == typeof(StringComparison))
+                    {
+                        HandleStringContainsMethod(m);
+                        return m;
+                    }
+                }
+
             }
             throw new Exceptions.LINQUnoptimizeException(string.Format("The method '{0}' is not supported", m.Method.Name));
 

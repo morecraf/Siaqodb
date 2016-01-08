@@ -30,7 +30,7 @@ namespace SiaqodbCloud
         }
         public PushResult Push(IBucket bucket, IConflictResolver conflictResolver)
         {
-            if (!Sqo.SiaqodbConfigurator.IsBucketSyncable(bucket.BucketName))
+            if (!Sqo.Internal._bs._ibs((Bucket)bucket))
             {
                 throw new SiaqodbException("Bucket:" + bucket.BucketName + " is not syncable, set it via SiaqodbConfigurator.SetSyncableBucket(...) method");
             }
@@ -43,8 +43,8 @@ namespace SiaqodbCloud
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Push operation started..."));
                 this.OnSyncProgress(new SyncProgressEventArgs("Get local changes..."));
-              
-                ChangeSet changeSet = ((Bucket)bucket).GetChangeSet();
+
+                ChangeSet changeSet = Sqo.Internal._bs._gcs((Bucket)bucket);
                 if ((changeSet.ChangedDocuments != null && changeSet.ChangedDocuments.Count > 0) ||
                     (changeSet.DeletedDocuments != null && changeSet.DeletedDocuments.Count > 0))
                 {
@@ -57,7 +57,8 @@ namespace SiaqodbCloud
                         .Select(a=>new KeyValuePair<string,string>(a.Key,a.Version));
                     if (successfullUpdates.Count() > 0)
                     {
-                        ((Bucket)bucket).UpdateVersions(successfullUpdates);
+                        Sqo.Internal._bs._uv((Bucket)bucket,successfullUpdates);
+
                         uploadAnchor = response.UploadAnchor;
                     }
 
@@ -76,7 +77,7 @@ namespace SiaqodbCloud
                     {
                         syncStatistics.TotalConflicted = conflicts.Count;
                     }
-                    ((Bucket)bucket).ClearSyncMetadata();
+                    Sqo.Internal._bs._csm((Bucket)bucket);
                 }
 
                 this.OnSyncProgress(new SyncProgressEventArgs("Push finshed!"));
@@ -123,7 +124,7 @@ namespace SiaqodbCloud
                 }
                 if (localVersion != null)
                 {
-                    ((Bucket)bucket).Delete(key, false);
+                   Sqo.Internal._bs._de((Bucket)bucket,key, false);
                 }
                 return;
             }
@@ -133,7 +134,7 @@ namespace SiaqodbCloud
                 winner.Version = version;
                 var resp = httpClient.Put(RemovePrefix(bucket.BucketName), winner);
                 winner.Version = resp.Version;
-                ((Bucket)bucket).Store(winner,false);
+                Sqo.Internal._bs._si((Bucket)bucket,winner,false);
             }
         }
 
@@ -173,7 +174,7 @@ namespace SiaqodbCloud
             {
                 this.OnSyncProgress(new SyncProgressEventArgs("Pull operation started..."));
 
-                string anchor = ((Bucket)bucket).GetAnchor();
+                string anchor =Sqo.Internal._bs._gab((Bucket)bucket);
 
                 int remainLimit = 1;
                 int nrBatch = 1;
@@ -190,7 +191,7 @@ namespace SiaqodbCloud
                         if (downloadedItems.ChangedDocuments != null)
                         {
                             DateTime start = DateTime.Now;
-                            ((Bucket)bucket).StoreBatch(downloadedItems.ChangedDocuments, false);
+                            Sqo.Internal._bs._sb((Bucket)bucket,downloadedItems.ChangedDocuments, false);
                             string elapsed = (DateTime.Now - start).ToString();
                             remainLimit += downloadedItems.ChangedDocuments.Count;
                             syncStatistics.TotalChangesDownloads += downloadedItems.ChangedDocuments.Count;
@@ -199,7 +200,7 @@ namespace SiaqodbCloud
                         {
                             foreach (DeletedDocument delObj in downloadedItems.DeletedDocuments)
                             {
-                                ((Bucket)bucket).Delete(delObj.Key, false);
+                               Sqo.Internal._bs._de((Bucket)bucket,delObj.Key, false);
                             }
                             remainLimit += downloadedItems.DeletedDocuments.Count;
                             syncStatistics.TotalDeletedDownloads += downloadedItems.DeletedDocuments.Count;
@@ -207,7 +208,7 @@ namespace SiaqodbCloud
                         anchor = downloadedItems.Anchor;
                         if (!string.IsNullOrEmpty(anchor))
                         {
-                            ((Bucket)bucket).StoreAnchor(anchor);
+                            Sqo.Internal._bs._sa((Bucket)bucket,anchor);
                         }
                         this.OnSyncProgress(new SyncProgressEventArgs("Items of batch " + nrBatch + "stored locally ..."));
 

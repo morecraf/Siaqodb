@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using Sqo.Documents;
+using Sqo.Documents.Sync;
 
 namespace Sqo.Internal
 {
@@ -134,5 +136,69 @@ namespace Sqo.Internal
         {
             siaqodb.DropAnchor(k);
         }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static ChangeSet _gcs(Bucket b)
+        {
+            return b.GetChangeSet();
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _uv(Bucket b,IEnumerable<KeyValuePair<string, string>> su)
+        {
+            b.UpdateVersions(su);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _csm(Bucket b)
+        {
+            b.ClearSyncMetadata();
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _de(Bucket b,string k,bool d)
+        {
+            b.Delete(k, d);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _sa(Bucket b, string a)
+        {
+            b.StoreAnchor(a);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _sb(Bucket b,IList<Document> dcs, bool d)
+        {
+            b.StoreBatch(dcs,d);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static string _gab(Bucket b)
+        {
+           return b.GetAnchor();
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static bool _ibs(Bucket b)
+        {
+            return Sqo.SiaqodbConfigurator.IsBucketSyncable(b.BucketName);
+        }
+        /// <summary>
+        /// Do NOT use it!, it is used only internally
+        /// </summary>
+        public static void _si(Bucket b, Document d,bool id)
+        {
+            b.StoreInternal(d, id);
+        }
+
     }
 }

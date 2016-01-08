@@ -1196,7 +1196,85 @@ namespace TestSiaqodb
 
 
         }
+#if __MOBILE__
+		[Test]
+#else
+        [TestMethod]
 
+#endif
+        public void TestOrderByOptimized()
+        {
+            SiaqodbConfigurator.VerboseLevel = VerboseLevel.Info;
+            SiaqodbConfigurator.LoggingMethod = Tr;
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<D40>();
 
-	}
+                for (int i = 0; i < 10; i++)
+                {
+                    D40 c = new D40();
+                    c.i = i;
+                    c.dt = DateTime.Now;
+
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                var posts = (from p in nop.Query<D40>()
+                         orderby p.dt descending
+                         select p).ToArray();
+            }
+        }
+#if __MOBILE__
+		[Test]
+#else
+        [TestMethod]
+
+#endif
+        public void TestCustomContainsOptimized()
+        {
+            SiaqodbConfigurator.VerboseLevel = VerboseLevel.Info;
+            SiaqodbConfigurator.LoggingMethod = Tr;
+            using (Siaqodb nop = new Siaqodb(objPath))
+            {
+                nop.DropType<D40>();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    D40 c = new D40();
+                    c.i = i;
+                    c.str = "AAA";
+
+                    nop.StoreObject(c);
+                }
+                nop.Flush();
+                var posts = (from p in nop.Query<D40>()
+                             where CustomStringExtensions.Contains(p.str, "aaa", StringComparison.InvariantCultureIgnoreCase)
+                             select p).ToArray();
+            }
+        }
+        private void Tr(string msg, VerboseLevel lvl)
+        {
+            Console.WriteLine(msg);
+        }
+        
+
+    }
+    public static class CustomStringExtensions
+    {
+        /// <summary>
+        ///  Returns a value indicating whether the specified System.String object occurs
+        ///    within this string.A parameter specifies the type of search
+        ///     to use for the specified string.
+        /// </summary>
+        /// <param name="stringObj">Input string</param>
+        /// <param name="value">The string to seek.</param>
+        /// <param name="comparisonType"> One of the enumeration values that specifies the rules for the search.</param>
+        /// <returns>true if the value parameter occurs within this string, or if value is the
+        ///     empty string (""); otherwise, false.</returns>
+        public static bool Contains(this string stringObj, string value, StringComparison comparisonType)
+        {
+            return stringObj.IndexOf(value, comparisonType) != -1;
+        }
+
+    }
 }

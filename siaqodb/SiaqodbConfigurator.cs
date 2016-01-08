@@ -679,7 +679,7 @@ namespace Sqo
             VersionGetConventions[typeof(T)] = (a, b) => action((T)a, b);
         }
         internal static Dictionary<string, Type> documentFactory;
-        internal static void RegisterDocumentSubclass<T>(string bucketName) where T : Documents.Document
+        public static void RegisterDocumentSubclass<T>(string bucketName) where T : Documents.Document
         {
             if (documentFactory == null)
                 documentFactory = new Dictionary<string, Type>();
@@ -695,7 +695,7 @@ namespace Sqo
             return typeof(Documents.Document);
         }
         internal static Dictionary<string, Type> queryFactory;
-        internal static void RegisterQuerySubclass<T>(string bucketName) where T : Documents.Query
+        public static void RegisterQuerySubclass<T>(string bucketName) where T : Documents.Query
         {
             if (queryFactory == null)
                 queryFactory = new Dictionary<string, Type>();
