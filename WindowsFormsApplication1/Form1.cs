@@ -341,8 +341,8 @@ namespace WindowsFormsApplication1
                  doc.SetTag<int>("toy", i % 3);
                  doc.SetTag<string>("str", "aa" + i + "pp");
                 sqo.Documents["contacts"].Store(doc, trans);*/
-
-
+                
+                //sqo.Documents["contacts"].Delete(
                 sqo.Documents["contacts"].Load(i.ToString());
                 sqo.Documents["contacts"].Delete(i.ToString());
 
@@ -361,6 +361,69 @@ namespace WindowsFormsApplication1
             string a = "sda";
             sqo.Close();
         }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            var database = new Siaqodb(@"c:\work\temp\_aaa\contentOK\");
+
+            var parent = new Parent() { Name = "Parent1" };
+
+            parent.Children = new List<Child>();
+
+            var child = new Child() { Name = "Child1", Parent = parent };
+            parent.Children.Add(child);
+
+            child = new Child() { Name = "Child2", Parent = parent };
+            parent.Children.Add(child);
+
+            database.StoreObject(parent);
+
+            var storedParent = database.LoadObjectByOID<Parent>(parent.OID);
+
+            var childCount = storedParent.Children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 2
+
+            SiaqodbConfigurator.LoadRelatedObjects<Parent>(false);
+
+            storedParent = database.LoadObjectByOID<Parent>(parent.OID);
+
+            childCount = storedParent.Children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 0 (expected this)
+
+            storedParent.Name += "X";
+            database.StoreObject(storedParent);
+
+            SiaqodbConfigurator.LoadRelatedObjects<Parent>(true);
+
+            storedParent = database.LoadObjectByOID<Parent>(parent.OID);
+
+            System.Console.WriteLine(storedParent.Name);
+
+            childCount = storedParent.Children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 0 (this is unexpected?)
+
+            var children = database.Query<Child>().Where(c => c.Parent.OID == parent.OID).ToList();
+
+            childCount = children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 2
+                                                                  // There are still 2 childrent in the database who have links to their parent. But the parent seems unaware that they exist.
+                                                                  // Is this the expected behavior? It seems like this would orphan a lot of objects
+
+            Console.ReadLine();
+        }
+    }
+    public class Parent
+    {
+        public int OID { get; set; }
+        public string Name { get; set; }
+        public List<Child> Children { get; set; }
+    }
+
+    public class Child
+    {
+        public int OID { get; set; }
+        public string Name { get; set; }
+        public Parent Parent { get; set; }
     }
     public class Tick
     {
@@ -427,44 +490,21 @@ namespace WindowsFormsApplication1
     }
     internal class MyJsonSerializer : IDocumentSerializer
     {
-        #region IDocumentSerializer Members
 
-#if !UNITY3D && !CF
-        readonly JsonSerializer serializer = new JsonSerializer();
-#endif
         public object Deserialize(Type type, byte[] objectBytes)
         {
-#if SILVERLIGHT || CF || WinRT
-
-            string jsonStr = Encoding.UTF8.GetString(objectBytes, 0, objectBytes.Length);
-
-#else
             string jsonStr = Encoding.UTF8.GetString(objectBytes);
-
-#endif
-#if !UNITY3D && !CF
             return JsonConvert.DeserializeObject(jsonStr.TrimEnd('\0'), type);
-#else
-            LitJson.JsonReader reader = new LitJson.JsonReader(jsonStr.TrimEnd('\0'));
 
-            return LitJson.JsonMapper.ReadValue(type, reader);
-#endif
 
         }
 
         public byte[] Serialize(object obj)
         {
-#if !UNITY3D && !CF
             string jsonStr = JsonConvert.SerializeObject(obj, Formatting.Indented);
-
-#else
-            string jsonStr = LitJson.JsonMapper.ToJson(obj);
-
-#endif
             return Encoding.UTF8.GetBytes(jsonStr);
         }
-
-        #endregion
+      
     }
     public class MsgPackSerializer : IDocumentSerializer
     {
