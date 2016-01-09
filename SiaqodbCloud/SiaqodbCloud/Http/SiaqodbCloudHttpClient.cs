@@ -296,7 +296,7 @@ namespace SiaqodbCloud
 #endif
 
 #if ASYNC
-        public async Task<ChangeSet> GetChangesAsync(string bucket, Query query, int limit, string anchor,string uploadAnchor)
+        public async Task<ChangeSet> GetChangesAsync(string bucket, Filter query, int limit, string anchor,string uploadAnchor)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, "changes");
             Dictionary<string, string> parameters = new Dictionary<string, string>();

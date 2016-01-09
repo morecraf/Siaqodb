@@ -120,9 +120,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SiaqodbCloud\SiaqodbCloud\SiaqodbCloud.csproj">
+    <ProjectReference Include="..\SiaqodbCloud\SiaqodbCloud\SiaqodbCloud %28.NET 4.5%29.csproj">
       <Project>{63dda5ca-461a-4307-8798-11154c157aa9}</Project>
-      <Name>SiaqodbCloud</Name>
+      <Name>SiaqodbCloud %28.NET 4.5%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
       <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
