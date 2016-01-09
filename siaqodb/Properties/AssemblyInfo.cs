@@ -26,8 +26,6 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("6499f830-6a14-4472-9eb7-dabbf0470ceb")]
-
-//[assembly:InternalsVisibleTo("SiaqodbManager")]
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
@@ -37,7 +35,7 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("5.0.0.10")]
+[assembly: AssemblyVersion("5.5.0.1")]
 #if XIOS
 [assembly: System.Runtime.Versioning.TargetFramework("MonoTouch,Version=v1.0", FrameworkDisplayName="Xamarin.iOS Support")]
 #endif

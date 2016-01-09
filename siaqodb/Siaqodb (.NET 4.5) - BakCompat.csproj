@@ -92,6 +92,25 @@
     <Compile Include="Core\ObjectSerializer.Writer.cs" />
     <Compile Include="Core\RawdataSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
+    <Compile Include="Documents\Bucket.cs" />
+    <Compile Include="Documents\Document.cs" />
+    <Compile Include="Documents\DocumentStore.cs" />
+    <Compile Include="Documents\IBucket.cs" />
+    <Compile Include="Documents\Indexes\IIndex.cs" />
+    <Compile Include="Documents\Indexes\Index.cs" />
+    <Compile Include="Documents\Indexes\IndexKey.cs" />
+    <Compile Include="Documents\Indexes\IndexQueryFinder.cs" />
+    <Compile Include="Documents\Indexes\TagsIndexManager.cs" />
+    <Compile Include="Documents\LINQ\DocQuery.cs" />
+    <Compile Include="Documents\LINQ\DocQueryExtensions.cs" />
+    <Compile Include="Documents\LINQ\IDocQuery.cs" />
+    <Compile Include="Documents\Queries\QueryRunner.cs" />
+    <Compile Include="Documents\Queries\Where.cs" />
+    <Compile Include="Documents\Query.cs" />
+    <Compile Include="Documents\SyncEntities.cs" />
+    <Compile Include="Documents\Utils\ByteConverter.cs" />
+    <Compile Include="Documents\Utils\EndianBitConverter.cs" />
+    <Compile Include="Documents\Utils\Util.cs" />
     <Compile Include="Dotissi\AsyncLocker\AsyncLock.cs">
       <SubType>Code</SubType>
     </Compile>

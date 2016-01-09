@@ -14,6 +14,10 @@ using Sqo.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Sqo.Transactions;
+using Sqo.Documents;
+using Raven.Client.Embedded;
+using Raven.Client;
+using SiaqodbCloud;
 
 namespace WindowsFormsApplication1
 {
@@ -132,23 +136,97 @@ namespace WindowsFormsApplication1
             B b = new B(); b.Name = "BBB"; b.age = 10;
 
             Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+            Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
+            Siaqodb sqo = new Siaqodb(@"c:\work\temp\db\", 50 * 1024 * 1024);
+           
 
-            Siaqodb sqo = new Siaqodb(@"c:\work\temp\db\", 1 * 1024 * 1024);
-            var trans=sqo.BeginTransaction();
-            for (int i = 0; i < 7000; i++)
+            DateTime start = DateTime.Now;
+            var trans = sqo.BeginTransaction();
+            for (int i = 0; i < 10000; i++)
             {
-                Z z = new Z();
-                z.a = a;
-                z.b = b;
-                //a.Name.Contains
-                z.items.Add(a);
-                z.items.Add(b);
-                sqo.StoreObject(z,trans);
+                Tick t = new Tick();
+                t.mydate = DateTime.Now;
+                t.MyInt = i;
+                t.mylong = i;
+                t.mystring = "asdasd" + i.ToString();
+                sqo.StoreObject(t, trans);
             }
             trans.Commit();
+            string elapsed = (DateTime.Now - start).ToString();
+
+            start = DateTime.Now;
+            trans = sqo.BeginTransaction();
+            for (int i = 0; i < 10000; i++)
+            {
+                Tick t = new Tick();
+                t.mydate = DateTime.Now;
+                t.MyInt = i;
+                t.mylong = i;
+                t.mystring = "asdasd" + i.ToString();
+                Document doc = new Document();
+                doc.Key = i.ToString();
+                doc.SetContent<Tick>(t);
+                doc.SetTag<int>("ana", i);
+                doc.SetTag<int>("toy", i%3);
+                doc.SetTag<string>("str", "aa"+i+"pp");
+                sqo.Documents["contacts"].Store(doc, trans);
+            }
+            trans.Commit();
+            elapsed = (DateTime.Now - start).ToString();
+            long startL = 10;
+            long endL = 20;
+            long toy = 2;
+            Query quqery = new Query();
+            quqery.WhereLessThan("ana", endL)
+                  .WhereGreaterThan("ana", startL)
+                  .OrderByDesc("ana");
+            var q2 = new Query();
+            q2.WhereEqual("toy", toy);
+            var linq223 = (from Document doc in sqo.Documents["contacts"]
+                       where (doc.GetTag<long>("ana") > 10 && doc.GetTag<long>("ana") < 20) 
+                       orderby doc.GetTag<long>("ana") descending
+                       select doc).FirstOrDefault();
+            // long astr = 8000;
+            // quqery.Start = astr;
+            var linq224 = (from Document doc in sqo.Documents["contacts"]
+                          where doc.GetTag<string>("str").EndsWith("1pp")
+                          select doc).ToList();
+
+            var all = sqo.Documents["contacts"].Find(quqery.Or(q2));
+            foreach (var doc in all)
+            {
+                Tick zeca = doc.GetContent<Tick>();
+                string aeeee = "ss";
+            }
+
             int count = (from Z aa in sqo select aa).Count();
             string ass = "s";
             sqo.Close();
+
+            EmbeddableDocumentStore store = new EmbeddableDocumentStore
+            {
+                DataDirectory = @"c:\work\temp\db\raven\"
+
+            };
+            store.Initialize(); // initializes document store, by connecting to server and downloading various configurations
+            start = DateTime.Now;
+            using (IDocumentSession session = store.OpenSession()) // opens a session that will work in context of 'DefaultDatabase'
+            {
+                for (int i = 10000; i < 20000; i++)
+                {
+                    Tick t = new Tick();
+                    t.mydate = DateTime.Now;
+                    t.MyInt = i;
+                    t.mylong = i;
+                    t.mystring = "asdasd" + i.ToString();
+                    session.Store(t,i.ToString());
+                   
+                }
+                session.SaveChanges();
+            }
+            elapsed = (DateTime.Now - start).ToString();
+            string awss = "s";
+
         }
 
         //private void button3_Click(object sender, EventArgs e)
@@ -238,13 +316,121 @@ namespace WindowsFormsApplication1
             string g = "";
 
         }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+            Sqo.SiaqodbConfigurator.SetSyncableBucket("contacts", true);
+            Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
+            Siaqodb sqo = new Siaqodb(@"c:\work\temp\db_sync\", 50 * 1024 * 1024);
+
+            var start = DateTime.Now;
+            //var trans = sqo.BeginTransaction();
+            for (int i = 140; i < 160; i++)
+            {
+                /* Tick t = new Tick();
+                 t.mydate = DateTime.Now;
+                 t.MyInt = i;
+                 t.mylong = i;
+                 t.mystring = "asdasd" + i.ToString();
+                 Document doc = new Document();
+                 doc.Key = i.ToString();
+                
+                 doc.SetContent<Tick>(t);
+                 doc.SetTag<int>("ana", i);
+                 doc.SetTag<int>("toy", i % 3);
+                 doc.SetTag<string>("str", "aa" + i + "pp");
+                sqo.Documents["contacts"].Store(doc, trans);*/
+                
+                //sqo.Documents["contacts"].Delete(
+                sqo.Documents["contacts"].Load(i.ToString());
+                sqo.Documents["contacts"].Delete(i.ToString());
+
+                if (i >= 20 && i < 30)
+                {
+                    // var doc = sqo.Documents["contacts"].Load(i.ToString());
+                    //sqo.Documents["contacts"].Store(doc);
+
+                }
+            }
+            //trans.Commit();
+            var all=sqo.Documents["contacts"].LoadAll();
+           
+            SiaqodbSync syncContext = new SiaqodbSync(@"http://localhost:11735/v0/", "aa", "aa");
+            var pushRes= syncContext.Pull(sqo.Documents["contacts"]);
+            string a = "sda";
+            sqo.Close();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            var database = new Siaqodb(@"c:\work\temp\_aaa\contentOK\");
+
+            var parent = new Parent() { Name = "Parent1" };
+
+            parent.Children = new List<Child>();
+
+            var child = new Child() { Name = "Child1", Parent = parent };
+            parent.Children.Add(child);
+
+            child = new Child() { Name = "Child2", Parent = parent };
+            parent.Children.Add(child);
+
+            database.StoreObject(parent);
+
+            var storedParent = database.LoadObjectByOID<Parent>(parent.OID);
+
+            var childCount = storedParent.Children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 2
+
+            SiaqodbConfigurator.LoadRelatedObjects<Parent>(false);
+
+            storedParent = database.LoadObjectByOID<Parent>(parent.OID);
+
+            childCount = storedParent.Children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 0 (expected this)
+
+            storedParent.Name += "X";
+            database.StoreObject(storedParent);
+
+            SiaqodbConfigurator.LoadRelatedObjects<Parent>(true);
+
+            storedParent = database.LoadObjectByOID<Parent>(parent.OID);
+
+            System.Console.WriteLine(storedParent.Name);
+
+            childCount = storedParent.Children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 0 (this is unexpected?)
+
+            var children = database.Query<Child>().Where(c => c.Parent.OID == parent.OID).ToList();
+
+            childCount = children.Count;
+            System.Console.WriteLine("Children = " + childCount); // <--- Children = 2
+                                                                  // There are still 2 childrent in the database who have links to their parent. But the parent seems unaware that they exist.
+                                                                  // Is this the expected behavior? It seems like this would orphan a lot of objects
+
+            Console.ReadLine();
+        }
+    }
+    public class Parent
+    {
+        public int OID { get; set; }
+        public string Name { get; set; }
+        public List<Child> Children { get; set; }
+    }
+
+    public class Child
+    {
+        public int OID { get; set; }
+        public string Name { get; set; }
+        public Parent Parent { get; set; }
     }
     public class Tick
     {
 
         public int OID { get; set; }
 
-      
+      [Index]
         public int MyInt;
         public string mystring;
         public DateTime mydate;
@@ -301,6 +487,24 @@ namespace WindowsFormsApplication1
         }
 
         #endregion
+    }
+    internal class MyJsonSerializer : IDocumentSerializer
+    {
+
+        public object Deserialize(Type type, byte[] objectBytes)
+        {
+            string jsonStr = Encoding.UTF8.GetString(objectBytes);
+            return JsonConvert.DeserializeObject(jsonStr.TrimEnd('\0'), type);
+
+
+        }
+
+        public byte[] Serialize(object obj)
+        {
+            string jsonStr = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            return Encoding.UTF8.GetBytes(jsonStr);
+        }
+      
     }
     public class MsgPackSerializer : IDocumentSerializer
     {

@@ -43,10 +43,11 @@
     <OutputPath>bin\Debug\net45\</OutputPath>
     <DefineConstants>TRACE;DEBUG;ASYNC_LMDB;LIC_WIN;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Debug\net45\Siaqodb.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
     <NoWarn>1591</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -92,6 +93,25 @@
     <Compile Include="Core\ObjectSerializer.Writer.cs" />
     <Compile Include="Core\RawdataSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
+    <Compile Include="Documents\Bucket.cs" />
+    <Compile Include="Documents\LINQ\DocQuery.cs" />
+    <Compile Include="Documents\LINQ\DocQueryExtensions.cs" />
+    <Compile Include="Documents\LINQ\IDocQuery.cs" />
+    <Compile Include="Documents\Queries\QueryRunner.cs" />
+    <Compile Include="Documents\Query.cs" />
+    <Compile Include="Documents\Document.cs" />
+    <Compile Include="Documents\DocumentStore.cs" />
+    <Compile Include="Documents\IBucket.cs" />
+    <Compile Include="Documents\Indexes\IIndex.cs" />
+    <Compile Include="Documents\Indexes\Index.cs" />
+    <Compile Include="Documents\Indexes\IndexKey.cs" />
+    <Compile Include="Documents\Indexes\IndexQueryFinder.cs" />
+    <Compile Include="Documents\Indexes\TagsIndexManager.cs" />
+    <Compile Include="Documents\Queries\Where.cs" />
+    <Compile Include="Documents\SyncEntities.cs" />
+    <Compile Include="Documents\Utils\ByteConverter.cs" />
+    <Compile Include="Documents\Utils\EndianBitConverter.cs" />
+    <Compile Include="Documents\Utils\Util.cs" />
     <Compile Include="Encryption\AESEncryptor.cs" />
     <Compile Include="Encryption\XTEAEncryptor.cs" />
     <Compile Include="Exceptions\InvalidLicenseException.cs" />
@@ -209,6 +229,7 @@
       <Name>SiaqodbPortable %28.NET 4.5%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

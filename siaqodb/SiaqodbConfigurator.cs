@@ -30,7 +30,7 @@ namespace Sqo
         internal static DateTimeKind? DateTimeKindToSerialize;
         internal static bool OptimisticConcurrencyEnabled = true;
         internal static Configurator defaultConfigurator;
-        internal static KeyValuePair<int, DateTime> CurrentVersion = new KeyValuePair<int, DateTime>(50, new DateTime(2015, 7, 22));
+        internal static KeyValuePair<int, DateTime> CurrentVersion = new KeyValuePair<int, DateTime>(55, new DateTime(2016, 1, 11));
 
         /// <summary>
         /// Add an index for a field or automatic property of a certain Type,an Index can be added also by using Attribute: Sqo.Attributes.Index;
@@ -411,8 +411,18 @@ namespace Sqo
                 LoggingMethod(message, level);
             }
         }
-
-        internal static IDocumentSerializer DocumentSerializer;
+        private static IDocumentSerializer docSerializer;
+        internal static IDocumentSerializer DocumentSerializer
+        {
+            get
+            {
+                if (docSerializer == null)
+                {
+                    throw new SiaqodbException("DocumentSerializer not set, use SiaqodbConfigurator.SetDocumentSerializer(...) to set it.");
+                }
+                return docSerializer;
+            }
+        }
         /// <summary>
         /// Set your custom document serializer
         /// </summary>
@@ -423,7 +433,7 @@ namespace Sqo
             {
                 throw new ArgumentNullException("documentSerializer");
             }
-            DocumentSerializer = documentSerializer;
+            docSerializer = documentSerializer;
         }
         /// <summary>
         /// Apply default configurations
@@ -619,7 +629,7 @@ namespace Sqo
                 autoGrowththresholdPercent = value;
             }
         }
-        private static long autoGrowthSize =  5 * 1024 *1024;
+        private static long autoGrowthSize = 5 * 1024 * 1024;
 
         /// <summary>
         /// Get or set automatic growth size of database(default is 5 MB).
@@ -635,6 +645,70 @@ namespace Sqo
                 autoGrowthSize = value;
             }
         }
+        internal static Dictionary<string, bool> syncableBuckets;
+        public static void SetSyncableBucket(string bucketName, bool syncable)
+        {
+            if (syncableBuckets == null)
+            {
+                syncableBuckets = new Dictionary<string, bool>();
+            }
+            syncableBuckets["buk_"+bucketName] = syncable;
+        }
+        internal static bool IsBucketSyncable(string bucketName)
+        {
+            if (syncableBuckets != null && syncableBuckets.ContainsKey(bucketName))
+            {
+                return syncableBuckets[bucketName];
+            }
+            return false;
+        }
+        internal static Dictionary<Type, Func<object, string>> KeyConventions = new Dictionary<Type, Func<object, string>>();
+        internal static Dictionary<Type, Func<object, string>> VersionSetConventions = new Dictionary<Type, Func<object, string>>();
+        internal static Dictionary<Type, Action<object, string>> VersionGetConventions = new Dictionary<Type, Action<object, string>>();
+        public static void RegisterKeyConvention<T>(Func<T, string> func)
+        {
+            KeyConventions[typeof(T)] = a => func((T)a);
+        }
+        public static void RegisterSetVersionConvention<T>(Func<T, string> func)
+        {
+            VersionSetConventions[typeof(T)] = a => func((T)a);
+        }
 
+        public static void RegisterGetVersionConvention<T>(Action<T, string> action)
+        {
+            VersionGetConventions[typeof(T)] = (a, b) => action((T)a, b);
+        }
+        internal static Dictionary<string, Type> documentFactory;
+        public static void RegisterDocumentSubclass<T>(string bucketName) where T : Documents.Document
+        {
+            if (documentFactory == null)
+                documentFactory = new Dictionary<string, Type>();
+            documentFactory["buk_" + bucketName] = typeof(T);
+        }
+        internal static Type GetDocumentTypeToBuild(string bucketName)
+        {
+            if (documentFactory != null && documentFactory.ContainsKey(bucketName))
+            {
+                return documentFactory[bucketName];
+            }
+                 
+            return typeof(Documents.Document);
+        }
+        internal static Dictionary<string, Type> queryFactory;
+        public static void RegisterQuerySubclass<T>(string bucketName) where T : Documents.Query
+        {
+            if (queryFactory == null)
+                queryFactory = new Dictionary<string, Type>();
+            queryFactory["buk_" + bucketName] = typeof(T);
+        }
+        internal static Type GetQueryTypeToBuild(string bucketName)
+        {
+            if (queryFactory != null && queryFactory.ContainsKey(bucketName))
+            {
+                return queryFactory[bucketName];
+            }
+
+            return typeof(Documents.Query);
+        }
     }
 }
