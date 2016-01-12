@@ -40,6 +40,6 @@ using System.Runtime.InteropServices;
 [assembly: System.Runtime.Versioning.TargetFramework("MonoTouch,Version=v1.0", FrameworkDisplayName="Xamarin.iOS Support")]
 #endif
 #if MONODROID && !UNITY3D
-[assembly: System.Runtime.Versioning.TargetFramework("MonoAndroid,Version=v2.3", FrameworkDisplayName="Xamarin.Android Support")]
+[assembly: System.Runtime.Versioning.TargetFramework("MonoAndroid,Version=v4.0.3", FrameworkDisplayName="Xamarin.Android Support")]
 #endif
 

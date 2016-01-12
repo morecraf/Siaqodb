@@ -119,7 +119,6 @@
     <Compile Include="SQLite.cs" />
     <Compile Include="SQLiteAsync.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\siaqodb\Siaqodb %28Xamarin.iOS%29.csproj">
       <Project>{3B0C0A5E-87DC-49AB-A48B-EAC9100DE104}</Project>
@@ -136,4 +135,5 @@
       <Kind>Static</Kind>
     </NativeReference>
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
 </Project>

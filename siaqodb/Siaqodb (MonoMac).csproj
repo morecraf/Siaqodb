@@ -176,6 +176,25 @@
     <Compile Include="Utilities\SqoLicense.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />
     <Compile Include="WinRTExtensions\TypeExtensions.cs" />
+    <Compile Include="Documents\Bucket.cs" />
+    <Compile Include="Documents\Document.cs" />
+    <Compile Include="Documents\DocumentStore.cs" />
+    <Compile Include="Documents\IBucket.cs" />
+    <Compile Include="Documents\Query.cs" />
+    <Compile Include="Documents\SyncEntities.cs" />
+    <Compile Include="Documents\Indexes\IIndex.cs" />
+    <Compile Include="Documents\Indexes\Index.cs" />
+    <Compile Include="Documents\Indexes\IndexKey.cs" />
+    <Compile Include="Documents\Indexes\IndexQueryFinder.cs" />
+    <Compile Include="Documents\Indexes\TagsIndexManager.cs" />
+    <Compile Include="Documents\LINQ\DocQuery.cs" />
+    <Compile Include="Documents\LINQ\DocQueryExtensions.cs" />
+    <Compile Include="Documents\LINQ\IDocQuery.cs" />
+    <Compile Include="Documents\Queries\QueryRunner.cs" />
+    <Compile Include="Documents\Queries\Where.cs" />
+    <Compile Include="Documents\Utils\ByteConverter.cs" />
+    <Compile Include="Documents\Utils\EndianBitConverter.cs" />
+    <Compile Include="Documents\Utils\Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="siaqodb.pfx" />
@@ -210,5 +229,8 @@
       <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
       <Name>SiaqodbPortable (Xamarin)</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Documents\" />
   </ItemGroup>
 </Project>

@@ -308,7 +308,4 @@ Global
 		{1C54D00D-7A52-467A-B930-D82475D39992} = {A067D70F-EE42-40F8-A1DC-34EABBBF993D}
 		{CE41A836-0B66-4BB5-BDD1-4F88EDD3175E} = {A067D70F-EE42-40F8-A1DC-34EABBBF993D}
 	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ..\..\Siaqodb_MonoMac\Siaqodb_MonoMac.csproj
-	EndGlobalSection
 EndGlobal

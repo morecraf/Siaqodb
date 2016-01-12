@@ -8,10 +8,11 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Sqo</RootNamespace>
     <AssemblyName>Siaqodb</AssemblyName>
-    <TargetFrameworkVersion>v2.3</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0.3</TargetFrameworkVersion>
     <AndroidStoreUncompressedFileExtensions />
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
+    <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +23,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -30,7 +30,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AndroidSupportedAbis>armeabi</AndroidSupportedAbis>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
   <ItemGroup>
@@ -131,40 +130,23 @@
     <Compile Include="Cache\CacheDocuments.cs" />
     <Compile Include="Utilities\SqoLicense.cs" />
     <Compile Include="Lightning\CursorDeleteOption.cs" />
-    <Compile Include="Lightning\CursorGetByOperation.cs" />
     <Compile Include="Lightning\CursorOperation.cs" />
     <Compile Include="Lightning\CursorPutOptions.cs" />
     <Compile Include="Lightning\DatabaseOpenFlags.cs" />
     <Compile Include="Lightning\EnvironmentOpenFlags.cs" />
-    <Compile Include="Lightning\GetByOperation.cs" />
     <Compile Include="Lightning\IClosingEventSource.cs" />
     <Compile Include="Lightning\LightningClosingEventArgs.cs" />
     <Compile Include="Lightning\LightningConfig.cs" />
     <Compile Include="Lightning\LightningCursor.cs" />
-    <Compile Include="Lightning\LightningCursorExtensions.cs" />
-    <Compile Include="Lightning\LightningCursorMoveExtensions.cs" />
     <Compile Include="Lightning\LightningDatabase.cs" />
     <Compile Include="Lightning\LightningEnvironment.cs" />
     <Compile Include="Lightning\LightningException.cs" />
     <Compile Include="Lightning\LightningTransaction.cs" />
-    <Compile Include="Lightning\LightningTransactionExtensions.cs" />
     <Compile Include="Lightning\LightningTransactionState.cs" />
     <Compile Include="Lightning\LightningVersionInfo.cs" />
     <Compile Include="Lightning\PutOptions.cs" />
     <Compile Include="Lightning\TransactionBeginFlags.cs" />
     <Compile Include="Lightning\UnixAccessMode.cs" />
-    <Compile Include="Lightning\Collections\CursorEnumerable.cs" />
-    <Compile Include="Lightning\Collections\CursorEnumerator.cs" />
-    <Compile Include="Lightning\Collections\CursorGenericEnumerable.cs" />
-    <Compile Include="Lightning\Collections\CursorGenericEnumerator.cs" />
-    <Compile Include="Lightning\Converters\ConvertFromBytesInstance.cs" />
-    <Compile Include="Lightning\Converters\ConvertToBytesInstance.cs" />
-    <Compile Include="Lightning\Converters\ConverterExtensions.cs" />
-    <Compile Include="Lightning\Converters\ConverterNotFoundException.cs" />
-    <Compile Include="Lightning\Converters\ConverterStore.cs" />
-    <Compile Include="Lightning\Converters\DefaultConverters.cs" />
-    <Compile Include="Lightning\Converters\IConvertFromBytes.cs" />
-    <Compile Include="Lightning\Converters\IConvertToBytes.cs" />
     <Compile Include="Lightning\Native\INativeLibraryFacade.cs" />
     <Compile Include="Lightning\Native\MarshalValueStructure.cs" />
     <Compile Include="Lightning\Native\Native.cs" />
@@ -255,15 +237,26 @@
     <Compile Include="Dotissi\Utilities\MetaHelper.cs" />
     <Compile Include="Dotissi\Utilities\ObjectTableHelper.cs" />
     <Compile Include="Dotissi\WinRTExtensions\TypeExtensions.cs" />
+    <Compile Include="Documents\Bucket.cs" />
+    <Compile Include="Documents\Document.cs" />
+    <Compile Include="Documents\DocumentStore.cs" />
+    <Compile Include="Documents\IBucket.cs" />
+    <Compile Include="Documents\Query.cs" />
+    <Compile Include="Documents\SyncEntities.cs" />
+    <Compile Include="Documents\Indexes\IIndex.cs" />
+    <Compile Include="Documents\Indexes\Index.cs" />
+    <Compile Include="Documents\Indexes\IndexKey.cs" />
+    <Compile Include="Documents\Indexes\IndexQueryFinder.cs" />
+    <Compile Include="Documents\Indexes\TagsIndexManager.cs" />
+    <Compile Include="Documents\LINQ\DocQuery.cs" />
+    <Compile Include="Documents\LINQ\DocQueryExtensions.cs" />
+    <Compile Include="Documents\LINQ\IDocQuery.cs" />
+    <Compile Include="Documents\Queries\QueryRunner.cs" />
+    <Compile Include="Documents\Queries\Where.cs" />
+    <Compile Include="Documents\Utils\ByteConverter.cs" />
+    <Compile Include="Documents\Utils\EndianBitConverter.cs" />
+    <Compile Include="Documents\Utils\Util.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AsyncLocker\" />
-    <Folder Include="Lightning\" />
-    <Folder Include="lib\" />
-    <Folder Include="Dotissi\" />
-    <Folder Include="lib\x86\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28Xamarin%29.csproj">
       <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
@@ -274,4 +267,5 @@
     <EmbeddedNativeLibrary Include="lib\armeabi-v7a\liblmdb.so" />
     <EmbeddedNativeLibrary Include="lib\x86\liblmdb.so" />
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
