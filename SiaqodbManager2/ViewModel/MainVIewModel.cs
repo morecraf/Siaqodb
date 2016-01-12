@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SiaqodbManager.MacWinInterface;
 using SiaqodbManager.Repo;
-
+using SiaqodbManager;
 namespace SiaqodbManager.ViewModel
 {
 	public class MainViewModel : INotifyPropertyChanged,IDisposable
@@ -39,7 +39,7 @@ namespace SiaqodbManager.ViewModel
                 }
             }
 
-			Sqo.SiaqodbConfigurator.SetLicense(@"FPVCOWv3/oiGt2tD5Pp+CyYXt1wVjNllMiFOJPhTQm0=");
+			Sqo.SiaqodbConfigurator.SetLicense(@"yP4C3I4T2xU6d/VXgvUjNzFQjSyVRGhniRr6/dW7OO8=");
 
 #if TRIAL
             string folder = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config";
