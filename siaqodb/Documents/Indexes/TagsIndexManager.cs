@@ -35,10 +35,11 @@ namespace Sqo.Documents.Indexes
                         indexMetaInfo[currentKey] = currentKey;
                         firstKV = cursor.MoveNext();
                     }
-                    if (started)
-                    {
-                        transaction.Commit();
-                    }
+                   
+                }
+                if (started)
+                {
+                    transaction.Commit();
                 }
             }
             catch

@@ -219,7 +219,11 @@ namespace Sqo.Documents
             lock (_locker)
             {
                 Document obj = this.Load(key);
-                return obj.GetContent<T>();
+                if (obj != null)
+                {
+                    return obj.GetContent<T>();
+                }
+                return default(T);
             }
         }
         public Document Load(string key)

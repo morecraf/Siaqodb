@@ -62,6 +62,10 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SiaqodbCloud, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Siaqodb_Setup\5.5.0.1\SiaqodbCloud\SiaqodbCloud-Client\bin\net3.5\SiaqodbCloud.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -121,10 +125,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SiaqodbCloud\SiaqodbCloud\SiaqodbCloud %28Unity3D%29.csproj">
-      <Project>{51eef325-4def-4849-a9ff-669e15a74d40}</Project>
-      <Name>SiaqodbCloud %28Unity3D%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\siaqodb\Siaqodb %28Unity3D%29 - Windows.csproj">
       <Project>{19368999-dd20-4534-8377-3d58063f8cfd}</Project>
       <Name>Siaqodb %28Unity3D%29 - Windows</Name>
