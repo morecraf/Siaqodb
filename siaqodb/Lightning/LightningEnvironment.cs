@@ -327,6 +327,12 @@ namespace LightningDB
             NativeMethods.Execute(lib => lib.mdb_env_copy(_handle, path));
         }
 
+        internal void ClearCachedDatabases()
+        {
+            this._openedDatabases.Clear();
+            this._databasesForReuse.Clear();
+        }
+
         //TODO: tests
         /// <summary>
         /// Flush the data buffers to disk. 

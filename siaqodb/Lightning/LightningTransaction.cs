@@ -350,6 +350,7 @@ namespace LightningDB
                 finally
                 {
                     NativeMethods.Library.mdb_txn_abort(_handle);
+                    this.Environment.ClearCachedDatabases();
                 }
             }
             finally

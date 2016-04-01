@@ -685,6 +685,15 @@ namespace Sqo
                 documentFactory = new Dictionary<string, Type>();
             documentFactory["buk_" + bucketName] = typeof(T);
         }
+        internal static Dictionary<string, string> autoIncrementTags;
+        public static void AutoIncrementTag(string bucketName, string tagName)
+        {
+            if (autoIncrementTags == null)
+                autoIncrementTags = new Dictionary<string, string>();
+            if (!bucketName.StartsWith("buk_"))
+                bucketName = "buk_" + bucketName;
+            autoIncrementTags[ bucketName] = tagName;
+        }
         internal static Type GetDocumentTypeToBuild(string bucketName)
         {
             if (documentFactory != null && documentFactory.ContainsKey(bucketName))

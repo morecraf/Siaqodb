@@ -1,18 +1,29 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using Sqo;
+#if __MOBILE__
+using NUnit.Framework;
+#else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endif
 using Sqo.Documents;
 using Sqo;
-using Newtonsoft.Json;
-using SiaqodbCloud;
+
 using System.Linq;
 using Sqo.Transactions;
+using Newtonsoft.Json;
 
 namespace TestSiaqodbBuckets
 {
-    [TestClass]
-    public  class BucketTests
+#if __MOBILE__
+    [TestFixture]
+#else
+	[TestClass]
+
+#endif
+    public class BucketTests
     {
         Siaqodb siaqodb;
         public IBucket GetBucket()
@@ -31,16 +42,29 @@ namespace TestSiaqodbBuckets
             Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
             Sqo.SiaqodbConfigurator.SetSyncableBucket("contacts", true);
             Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
+#if __MOBILE__
+            var objPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            this.siaqodb = new Siaqodb(objPath);
+#else
             this.siaqodb=new Siaqodb(@"c:\work\temp\buk_tests\");
+#endif
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void Ping()
         {
             //CryptonorClient client = new CryptonorClient(Init.Api_URL, Init.Username, Init.Password);
            // string pong = client.Ping();
            // Assert.AreEqual("pong", pong);
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void Insert()
         {
             int rndNr = rnd.Next(100000);
@@ -55,7 +79,11 @@ namespace TestSiaqodbBuckets
 
 
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void InsertByTags()
         {
             int rndNr = rnd.Next(100000);
@@ -74,7 +102,11 @@ namespace TestSiaqodbBuckets
                 Assert.AreEqual(username, value.UserName);
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void InsertOnlyObj()
         {
             int rndNr = rnd.Next(100000);
@@ -88,7 +120,11 @@ namespace TestSiaqodbBuckets
                 Assert.AreEqual(username, value.UserName);
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void InsertDocument()
         {
             int rndNr = rnd.Next(100000);
@@ -108,7 +144,11 @@ namespace TestSiaqodbBuckets
                 Assert.AreEqual(username, objFromDB.GetContent<Person>().UserName);
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void InsertBatch()
         {
             IBucket bucket = this.GetBucket();
@@ -143,7 +183,11 @@ namespace TestSiaqodbBuckets
                 }
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void TagsAllTypes()
         {
             int rndNr = rnd.Next(100000);
@@ -172,7 +216,11 @@ namespace TestSiaqodbBuckets
             }
 
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void Update()
         {
             int rndNr = rnd.Next(100000);
@@ -196,7 +244,11 @@ namespace TestSiaqodbBuckets
                 Assert.AreEqual(44, value.Age);
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void UpdateWithConflict()
         {
             int rndNr = rnd.Next(100000);
@@ -215,7 +267,7 @@ namespace TestSiaqodbBuckets
                     bucket.Store(value.UserName, value, new { Age = 44 });
                     //treat conflict here because Version is not set
                 }
-                catch (ConflictException ex)
+                catch (Exception ex)
                 {
 
                     conflict = true;
@@ -230,9 +282,13 @@ namespace TestSiaqodbBuckets
             }
         }
 
-      
 
+
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void DocumentNotFound()
         {
             IBucket bucket = this.GetBucket();
@@ -251,7 +307,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void Delete()
         {
             int rndNr = rnd.Next(100000);
@@ -290,7 +350,11 @@ namespace TestSiaqodbBuckets
             }
 
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void DeleteByKey()
         {
             int rndNr = rnd.Next(100000);
@@ -308,7 +372,11 @@ namespace TestSiaqodbBuckets
                 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByTags()
         {
             IBucket bucket = this.GetBucket();
@@ -434,7 +502,11 @@ namespace TestSiaqodbBuckets
                 }
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByWhereGreaterThanOrEqual()
         {
             this.DropBucket();
@@ -525,7 +597,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByWhereGreaterThan()
         {
             this.DropBucket();
@@ -610,7 +686,11 @@ namespace TestSiaqodbBuckets
                 }
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByWhereLessThanOrEqual()
         {
             this.DropBucket();
@@ -673,7 +753,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByWhereLessThan()
         {
             this.DropBucket();
@@ -731,7 +815,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByWhereBetween()
         {
             this.DropBucket();
@@ -836,7 +924,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByWhereIN()
         {
             this.DropBucket();
@@ -889,7 +981,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByTagsStartStringsOperations()
         {
             this.DropBucket();
@@ -953,8 +1049,12 @@ namespace TestSiaqodbBuckets
                 }
             }
         }
-       
+
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void SearchByKeyQuery()
         {
             IBucket bucket = this.GetBucket();
@@ -990,7 +1090,11 @@ namespace TestSiaqodbBuckets
                 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         [ExpectedException(typeof(ArgumentNullException))]
         public void StoreNullDoc()
         {
@@ -1002,7 +1106,11 @@ namespace TestSiaqodbBuckets
                 bucket.Store(username, null, new { Age = 33 });
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void StoreEmptyDoc()
         {
             int rndNr = rnd.Next(100000);
@@ -1018,7 +1126,11 @@ namespace TestSiaqodbBuckets
                 Assert.AreEqual(null, value);
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         [ExpectedException(typeof(ArgumentNullException))]
         public void StoreNullOrEmptyKey()
         {
@@ -1030,7 +1142,11 @@ namespace TestSiaqodbBuckets
             }
 
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void GetNonExistentDoc()
         {
             IBucket bucket = this.GetBucket();
@@ -1041,7 +1157,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void DeleteNonExistentDoc()
         {
             IBucket bucket = this.GetBucket();
@@ -1052,7 +1172,11 @@ namespace TestSiaqodbBuckets
 
             }
         }
+#if __MOBILE__
+        [Test]
+#else
         [TestMethod]
+#endif
         public void LoadAll()
         {
             this.DropBucket();
@@ -1125,9 +1249,10 @@ namespace TestSiaqodbBuckets
     }
     internal class MyJsonSerializer : IDocumentSerializer
     {
-        #region IDocumentSerializer Members
+#region IDocumentSerializer Members
 
 #if !UNITY3D && !CF
+
         readonly JsonSerializer serializer = new JsonSerializer();
 #endif
         public object Deserialize(Type type, byte[] objectBytes)
@@ -1162,6 +1287,6 @@ namespace TestSiaqodbBuckets
             return Encoding.UTF8.GetBytes(jsonStr);
         }
 
-        #endregion
+#endregion
     }
 }

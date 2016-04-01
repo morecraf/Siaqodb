@@ -18,22 +18,23 @@ namespace TestSiaqodbBuckets
         {
             Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2cVvZnIPY8dL9wyf3RMWpjKO0WGBVXmnDc82AKBClJ/u");
             Sqo.SiaqodbConfigurator.SetSyncableBucket("contacts", true);
-            Sqo.SiaqodbConfigurator.SetSyncableBucket("persons", true);
+            Sqo.SiaqodbConfigurator.SetSyncableBucket("personas", true);
+            Sqo.SiaqodbConfigurator.SetSyncableBucket("personas1", true);
             Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
             this.siaqodb1 = new Siaqodb(@"c:\work\temp\buk_tests\sync1\");
             this.siaqodb2 = new Siaqodb(@"c:\work\temp\buk_tests\sync2\");
         }
         private SiaqodbSync GetSyncContext()
         {
-            return new SiaqodbSync("http://localhost:11735/v0/", "7ba65b5855dddb308766b6756b00079a", "kHSFD8ADHFKS8998sxS");
+            return new SiaqodbSync("http://localhost:11735/v0/", "97c7835153fd66617fad7b43f4000647", "4362kljh63k4599hhgm");
         }
         [TestMethod]
         public void Insert()
         {
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas1"];
+                IBucket bucket2 = siaqodb2.Documents["personas1"];
                 {
 
                     int rndNr = rnd.Next(100000000);
@@ -63,8 +64,8 @@ namespace TestSiaqodbBuckets
         {
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
 
                     int rndNr = rnd.Next(100000000);
@@ -115,8 +116,8 @@ namespace TestSiaqodbBuckets
         {
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
 
                     int rndNr = rnd.Next(100000000);
@@ -154,8 +155,8 @@ namespace TestSiaqodbBuckets
         {//update on C1 and C2 at same time->should be conflict
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
 
                     int rndNr = rnd.Next(100000000);
@@ -220,8 +221,8 @@ namespace TestSiaqodbBuckets
         {//delete on C1 and update on C2->conflict
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
 
 
@@ -274,8 +275,8 @@ namespace TestSiaqodbBuckets
             //update on C1 and delete on C2->conflict
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
 
                     int rndNr = rnd.Next(100000000);
@@ -326,8 +327,8 @@ namespace TestSiaqodbBuckets
             //delete on C1 and delete on C2->conflict-> nothing happens on clients
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
 
                     int rndNr = rnd.Next(100000000);
@@ -382,8 +383,8 @@ namespace TestSiaqodbBuckets
           
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
                     int rndNr = rnd.Next(100000000);
                     string userName = "user" + rndNr;
@@ -455,8 +456,8 @@ namespace TestSiaqodbBuckets
         {
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
                    
                     int rndNr = rnd.Next(100000000);
@@ -510,8 +511,8 @@ namespace TestSiaqodbBuckets
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
                 
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
                     
                     int rndNr = rnd.Next(100000000);
@@ -567,8 +568,8 @@ namespace TestSiaqodbBuckets
         {
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
                     int rndNr = rnd.Next(100000000);
                     string userName = "user" + rndNr;
@@ -622,8 +623,8 @@ namespace TestSiaqodbBuckets
         {
             using (SiaqodbSync syncContext = this.GetSyncContext())
             {
-                IBucket bucket = siaqodb1.Documents["persons"];
-                IBucket bucket2 = siaqodb2.Documents["persons"];
+                IBucket bucket = siaqodb1.Documents["personas"];
+                IBucket bucket2 = siaqodb2.Documents["personas"];
                 {
                    
                     int rndNr = rnd.Next(100000000);

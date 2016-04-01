@@ -3047,6 +3047,30 @@ namespace TestSiaqodb
                  }
              }
          }
+#if __MOBILE__
+		[Test]
+#else
+        [TestMethod]
+
+#endif
+        public void TestRollback()
+        {
+           using (Siaqodb _database = new Siaqodb(objPath))
+            {
+                _database.DropType<Person>();
+
+                ITransaction transaction = _database.BeginTransaction();
+
+                for (var i = 0; i < 10; i++)
+                    _database.StoreObject(new Person(), transaction);
+
+                transaction.Rollback();
+
+                int couunt= _database.Query<Person>().ToList().Count();
+                Assert.AreEqual(0, couunt);
+            }
+        }
+
         public bool TryGetDocument(int id, out Customer data, Siaqodb _database)
         {
             var document = from Customer identifiable in _database
