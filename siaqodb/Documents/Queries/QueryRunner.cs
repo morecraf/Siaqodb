@@ -124,7 +124,7 @@ namespace Sqo.Documents.Queries
 
         private List<string> LoadByKey(Where where, LightningTransaction transaction)
         {
-            using (var db = transaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
+            var db = transaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
             {
                 IIndex index = new IndexKey(db, transaction);
                 return IndexQueryFinder.FindKeys(index, where);

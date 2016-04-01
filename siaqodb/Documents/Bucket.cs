@@ -17,6 +17,7 @@ namespace Sqo.Documents
         string dirtyEntitiesDB;
         string anchorDB;
         string indexInfoDB;
+        string autoIncrementDB;
         private readonly object _locker = new object();
         public Bucket(string bucketName, Siaqodb siaqodb)
         {
@@ -25,6 +26,7 @@ namespace Sqo.Documents
             this.anchorDB = this.BucketName + "_sys_anchordb";
             this.siaqodb = siaqodb;
             indexInfoDB = this.BucketName + "_sys_indexinfo";
+            autoIncrementDB = "sys_autoincr";//globally
             indexManag = new TagsIndexManager(indexInfoDB, this.siaqodb);
         }
         public string BucketName
@@ -376,14 +378,14 @@ namespace Sqo.Documents
             }
 
         }
-        internal void StoreInternal(Document doc,bool isDirty)
+        internal void StoreInternal(Document doc, bool isDirty)
         {
             lock (_locker)
             {
                 using (var transaction = siaqodb.BeginTransaction())
                 {
 
-                    this.Store(doc, transaction,isDirty);
+                    this.Store(doc, transaction, isDirty);
                     transaction.Commit();
 
                 }
@@ -398,14 +400,16 @@ namespace Sqo.Documents
             }
             var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
 
-
             DirtyOperation dop;
             var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
 
             byte[] keyBytes = ByteConverter.StringToByteArray(doc.Key);
             var oldTags = indexManag.PrepareUpdateIndexes(keyBytes, lmdbTransaction, db);
             dop = oldTags != null ? DirtyOperation.Updated : DirtyOperation.Inserted;
-
+            if (dop == DirtyOperation.Inserted)
+            {
+                this.AutoIncrmentTag(doc, lmdbTransaction);
+            }
             IDocumentSerializer serializer = SiaqodbConfigurator.DocumentSerializer;
             byte[] crObjBytes = serializer.Serialize(doc);
             lmdbTransaction.Put(db, keyBytes, crObjBytes);
@@ -415,6 +419,27 @@ namespace Sqo.Documents
                 CreateDirtyEntity(dop, lmdbTransaction, doc);
             }
         }
+
+        private void AutoIncrmentTag(Document doc, LightningTransaction transaction)
+        {
+            if (SiaqodbConfigurator.autoIncrementTags != null && SiaqodbConfigurator.autoIncrementTags.ContainsKey(this.BucketName))
+            {
+
+                var db = transaction.OpenDatabase(autoIncrementDB, DatabaseOpenFlags.Create);
+                byte[] keyBytes = ByteConverter.StringToByteArray(BucketName);
+                byte[] value = transaction.Get(db, keyBytes);
+                int currentVal = 0;
+                if (value != null)
+                {
+                    currentVal = ByteConverter.ByteArrayToInt(value);
+                }
+                int newValue = currentVal + 1;
+                transaction.Put(db, keyBytes, ByteConverter.IntToByteArray(newValue));
+
+                doc.SetTag<int>(SiaqodbConfigurator.autoIncrementTags[this.BucketName], newValue);
+            }
+        }
+
         public void Store(Document doc, ITransaction transaction)
         {
             lock (_locker)
@@ -454,7 +479,7 @@ namespace Sqo.Documents
         private Document BuildDocInstance()
         {
             Type t = SiaqodbConfigurator.GetDocumentTypeToBuild(this.BucketName);
-            if ( t == typeof(Document))
+            if (t == typeof(Document))
             {
                 return new Document();
             }
@@ -553,7 +578,7 @@ namespace Sqo.Documents
         {
             Query q = null;
             Type t = SiaqodbConfigurator.GetQueryTypeToBuild(this.BucketName);
-            if ( t == typeof(Query))
+            if (t == typeof(Query))
             {
                 q = new Query();
             }
@@ -561,7 +586,7 @@ namespace Sqo.Documents
             {
                 q = Activator.CreateInstance(t) as Query;
             }
-            return new DocQuery<T>(this,q );
+            return new DocQuery<T>(this, q);
         }
         /// <summary>
         /// Query method to be used in LINQ queries
@@ -852,6 +877,8 @@ namespace Sqo.Documents
                         var dbIndexInfo = lmdbTransaction.OpenDatabase(this.indexInfoDB, DatabaseOpenFlags.Create);
                         lmdbTransaction.DropDatabase(dbIndexInfo, true);
 
+                        var dbAutoIncr = lmdbTransaction.OpenDatabase(autoIncrementDB, DatabaseOpenFlags.Create);
+
                         lmdbTransaction.Commit();
 
 
@@ -878,13 +905,13 @@ namespace Sqo.Documents
     {
         public DirtyOperation DirtyOp;
         public DateTime OperationTime;
-        public string Key{ get; set; }
+        public string Key { get; set; }
         public string Version { get; set; }
 
     }
-    
 
-  
+
+
     class ATuple<T, V>
     {
         public T Name { get; set; }

@@ -216,7 +216,10 @@ namespace Sqo.Core
                     {
                         if (loadRealType)
                         {
-                            ai.AttributeType = ai.FInfo.FieldType;
+                            if (ai.FInfo != null)
+                            {
+                                ai.AttributeType = ai.FInfo.FieldType;
+                            }
                         }
                     }
                     else if (ai.Header.Length - 1 == MetaExtractor.GetSizeOfField(ai.AttributeTypeId))//is Nullable<>
@@ -265,7 +268,10 @@ namespace Sqo.Core
                     {
                         if (loadRealType)
                         {
-                            ai.AttributeType = ai.FInfo.FieldType;
+                            if (ai.FInfo != null)
+                            {
+                                ai.AttributeType = ai.FInfo.FieldType;
+                            }
                         }
                         else
                         {
