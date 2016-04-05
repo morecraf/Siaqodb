@@ -412,6 +412,13 @@ namespace Sqo
 
             
         }
+
+        public void Open(string dbpath)
+        {
+            var folder = StorageFolder.GetFolderFromPathAsync(dbpath).GetResults();
+            this.Open(folder);
+        }
+
         /// <summary>
         /// Open database folder
         /// </summary>
