@@ -328,6 +328,41 @@ namespace Sqo
             }
             DocumentSerializer = documentSerializer;
         }
+        private static int autoGrowththresholdPercent = 80;
+
+        /// <summary>
+        /// Get or set the Threshold percent when DB automatically increase the size of database when it is opened.
+        /// Database is increased with AutoGrowthSize amount of bytes.
+        /// Default Threshold is 80%
+        /// </summary>
+        public int AutoGrowthThresholdPercent
+        {
+            get
+            {
+                return autoGrowththresholdPercent;
+            }
+            set
+            {
+                autoGrowththresholdPercent = value;
+            }
+        }
+        private static long autoGrowthSize = 5 * 1024 * 1024;
+
+        /// <summary>
+        /// Get or set automatic growth size of database(default is 5 MB).
+        /// </summary>
+        public long AutoGrowthSize
+        {
+            get
+            {
+                return autoGrowthSize;
+            }
+            set
+            {
+                autoGrowthSize = value;
+            }
+        }
+       
     }
     public enum BuildInAlgorithm {NONE, AES, XTEA }
     public delegate void TraceListener(string traceMessage, VerboseLevel level);

@@ -21,19 +21,20 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\xamarin.android\</OutputPath>
+    <OutputPath>bin\Debug\xamarin.android\</OutputPath>
     <DefineConstants>TRACE;DEBUG;MONODROID;ASYNC_LMDB;LIC_ANDROID;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\xamarin.android\Siaqodb.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\xamarin.android\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>bin\Release\xamarin.android\</OutputPath>
+    <DefineConstants>TRACE;MONODROID;ASYNC_LMDB;LIC_ANDROID;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\xamarin.android\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />

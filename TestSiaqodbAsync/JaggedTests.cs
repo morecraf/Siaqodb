@@ -16,6 +16,11 @@ namespace SiaqodbUnitTests
     public class JaggedTests
     {
         string dbFolder = @"c:\work\temp\unitTests_siaqodbLMDB_ASYNC\";
+        public JaggedTests()
+        {
+            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+        }
+
 		
         [TestMethod]
         public async Task TestStoreSimpleJagged()

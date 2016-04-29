@@ -562,12 +562,15 @@ namespace Sqo
             {
                 SetDocumentSerializer(config.DocumentSerializer);
             }
-
             SetRaiseLoadEvents(config.RaiseLoadEvents);
             SpecifyStoredDateTimeKind(config.DateTimeKindToSerialize);
             EnableOptimisticConcurrency(config.OptimisticConcurrencyEnabled);
             LoggingMethod = config.LoggingMethod;
             VerboseLevel = config.VerboseLevel;
+
+            AutoGrowthSize = config.AutoGrowthSize;
+            AutoGrowthThresholdPercent = config.AutoGrowthThresholdPercent;
+           
 
         }
 
@@ -592,6 +595,7 @@ namespace Sqo
             PropertyMaps = null;
             LazyLoaded = null;
             LazyLoadedFields = null;
+            syncableBuckets = null;
         }
         private static decimal bufferingChunkPercent = 10;
 

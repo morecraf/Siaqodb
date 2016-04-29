@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dotissi")]
 [assembly: AssemblyProduct("SiaqodbPortable")]
-[assembly: AssemblyCopyright("Copyright © Dotissi 2014")]
+[assembly: AssemblyCopyright("Copyright © Dotissi 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -27,7 +27,7 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 //[assembly: InternalsVisibleTo(@"Siaqodb,PublicKey=0024000004800000940000000602000000240000525341310004000001000100e3a23dae29fceeaaaf2b9f11d3b9439abc077b3c89d613b328ca57814274a4836574afb8d89c14a2e2984bcefcfecbba93f10dda167e4ba78e52ea914f1f9f8467ab728241da2752996da6daca9ac6f9d34e288596b5f4689a06af1f1a3b6f87395400b36758fe67922a73e03d4bd7bcf3fbe2e5af6157eb711e7a251f7fdadc")]
 [assembly: InternalsVisibleTo("Siaqodb")]
-[assembly: AssemblyVersion("5.0.0.1")]
-[assembly: AssemblyFileVersion("5.0.0.1")]
-//[assembly: AssemblyKeyFile("siaqodb.pfx")]
+[assembly: AssemblyVersion("5.0.0.2")]
+[assembly: AssemblyFileVersion("5.0.0.2")]
+//[assembly: AssemblyKeyName("siaqodb.pfx")]
 

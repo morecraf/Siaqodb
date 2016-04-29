@@ -10,10 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sqo</RootNamespace>
     <AssemblyName>Siaqodb</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags></FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -34,7 +33,6 @@
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,12 +50,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Licensed\Release\.NET4.5\</OutputPath>
-    <DefineConstants>TRACE;ASYNC</DefineConstants>
+    <OutputPath>bin\Release\net45\</OutputPath>
+    <DefineConstants>TRACE;ASYNC_LMDB;LIC_WIN;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Licensed\Release\.NET4.5\Siaqodb.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\net45\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -94,20 +92,20 @@
     <Compile Include="Core\RawdataSerializer.cs" />
     <Compile Include="Core\SerializerFactory.cs" />
     <Compile Include="Documents\Bucket.cs" />
+    <Compile Include="Documents\Document.cs" />
+    <Compile Include="Documents\DocumentStore.cs" />
+    <Compile Include="Documents\IBucket.cs" />
     <Compile Include="Documents\LINQ\DocQuery.cs" />
     <Compile Include="Documents\LINQ\DocQueryExtensions.cs" />
     <Compile Include="Documents\LINQ\IDocQuery.cs" />
     <Compile Include="Documents\Queries\QueryRunner.cs" />
-    <Compile Include="Documents\Query.cs" />
-    <Compile Include="Documents\Document.cs" />
-    <Compile Include="Documents\DocumentStore.cs" />
-    <Compile Include="Documents\IBucket.cs" />
     <Compile Include="Documents\Indexes\IIndex.cs" />
     <Compile Include="Documents\Indexes\Index.cs" />
     <Compile Include="Documents\Indexes\IndexKey.cs" />
     <Compile Include="Documents\Indexes\IndexQueryFinder.cs" />
     <Compile Include="Documents\Indexes\TagsIndexManager.cs" />
     <Compile Include="Documents\Queries\Where.cs" />
+    <Compile Include="Documents\Query.cs" />
     <Compile Include="Documents\SyncEntities.cs" />
     <Compile Include="Documents\Utils\ByteConverter.cs" />
     <Compile Include="Documents\Utils\EndianBitConverter.cs" />
@@ -238,7 +236,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup>
-    <PostBuildEvent>if /I "$(ConfigurationName)" == "Release" Eazfuscator.NET.exe "$(TargetPath)" --msbuild-project-path "$(ProjectPath)" --msbuild-project-configuration "$(ConfigurationName)" --msbuild-project-platform "$(PlatformName)" --msbuild-solution-path "$(SolutionPath)" -n --newline-flush -v 3.6</PostBuildEvent>
-  </PropertyGroup>
 </Project>

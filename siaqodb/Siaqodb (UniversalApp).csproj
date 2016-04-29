@@ -20,20 +20,21 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\universal\</OutputPath>
+    <OutputPath>bin\Debug\netcore81\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NETFX_CORE WinRT ASYNC_LMDB LIC_UNIV</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateLibraryLayout>false</GenerateLibraryLayout>
-    <DocumentationFile>bin\Debug\universal\Siaqodb.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcore81\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Release\universal\</OutputPath>
+    <OutputPath>bin\Release\netcore81\</OutputPath>
     <DefineConstants>TRACE;NETFX_CORE WinRT ASYNC_LMDB LIC_UNIV</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
+    <DocumentationFile>bin\Release\netcore81\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->

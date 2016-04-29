@@ -16,20 +16,22 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\xamarin.ios\</OutputPath>
+    <OutputPath>bin\Debug\xamarin.ios\</OutputPath>
     <DefineConstants>DEBUG;__UNIFIED__;__MOBILE__;__IOS__;UNITY3D;XIOS;ASYNC_LMDB;LIC_IOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\xamarin.ios\Siaqodb.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\xamarin.ios\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\Release\xamarin.ios\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;UNITY3D;XIOS;ASYNC_LMDB;LIC_IOS</DefineConstants>
+    <DocumentationFile>bin\Release\xamarin.ios\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

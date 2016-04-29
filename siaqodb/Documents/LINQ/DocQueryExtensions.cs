@@ -300,13 +300,6 @@ namespace Sqo.Documents
         class ObjectNormalizer : ExpressionVisitor
         {
 
-           
-            protected override Expression VisitMemberAccess(MemberExpression node)
-            {
-               
-                return base.VisitMemberAccess(node);
-            }
-
           
             protected override Expression VisitUnary(UnaryExpression node)
             {

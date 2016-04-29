@@ -5,15 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F5BD2E1F-DCDD-4A1C-8130-236C2D75FF93}</ProjectGuid>
+    <ProjectGuid>{A72BF5C6-286F-47CE-85C5-513C9AFC2C7C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sqo</RootNamespace>
     <AssemblyName>Siaqodb</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags></FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -34,13 +33,12 @@
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\monomac\</OutputPath>
+    <OutputPath>bin\Debug\monomac\</OutputPath>
     <DefineConstants>TRACE;DEBUG;ASYNC_LMDB;LIC_MAC;MONOMAC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -50,12 +48,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Licensed\Release\.NET4.5\</OutputPath>
-    <DefineConstants>TRACE;ASYNC</DefineConstants>
+    <OutputPath>bin\Release\monomac\</OutputPath>
+    <DefineConstants>TRACE;ASYNC_LMDB;LIC_MAC;MONOMAC;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Licensed\Release\.NET4.5\Siaqodb.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\monomac\Siaqodb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>
@@ -225,12 +223,9 @@
   </Target>
   -->
   <ItemGroup>
-    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28Xamarin%29.csproj">
-      <Project>{34780267-6FB3-4F87-B61D-04F81A9F83A7}</Project>
-      <Name>SiaqodbPortable (Xamarin)</Name>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Documents\" />
   </ItemGroup>
 </Project>
