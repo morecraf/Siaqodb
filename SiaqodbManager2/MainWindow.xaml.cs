@@ -371,8 +371,8 @@ namespace SiaqodbManager
                 
                 siaqodbList = siaqodb.GetAllTypes();
                 treeView1.Items.Clear();
-                siaqodb.Documents.GetBucket
-                ImageTreeViewItem objectsNode = new ImageTreeViewItem();
+                
+                /*ImageTreeViewItem objectsNode = new ImageTreeViewItem();
                 objectsNode.Text = "Objects";
                 objectsNode.SelectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/objects-icon.png");
                 objectsNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/objects-icon.png");
@@ -382,7 +382,7 @@ namespace SiaqodbManager
                 documentsNode.Text = "Documents";
                 documentsNode.SelectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/documents.png");
                 documentsNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/documents.png");
-                treeView1.Items.Add(documentsNode);
+                treeView1.Items.Add(documentsNode);*/
 
                 ContextMenu cm = new ContextMenu();
                 MenuItem mitem = new MenuItem();
@@ -400,7 +400,7 @@ namespace SiaqodbManager
                     nodeType.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/pubclass.gif");
                     nodeType.ContextMenu = cm;
 
-                    objectsNode.Items.Add(nodeType);
+                    this.treeView1.Items.Add(nodeType);
                     foreach (Sqo.MetaField mf in mt.Fields)
                     {
                         ImageTreeViewItem nodeField = new ImageTreeViewItem();

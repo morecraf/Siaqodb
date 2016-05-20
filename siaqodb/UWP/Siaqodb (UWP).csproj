@@ -164,6 +164,7 @@
     <Compile Include="..\Indexes\BTree\BTree.cs" />
     <Compile Include="..\Indexes\BTree\IBTree.cs" />
     <Compile Include="..\Indexes\BTree\IndexManager.cs" />
+	 <Compile Include="..\Indexes\ByteConverterIdx.cs" />
     <Compile Include="..\Internal\_bs.cs" />
     <Compile Include="..\ISqoDataObject.cs" />
     <Compile Include="..\LazyObjectList.cs" />
@@ -240,6 +241,7 @@
     <Compile Include="..\Utilities\Path.cs" />
     <Compile Include="..\Utilities\SqoLicense.cs" />
     <Compile Include="..\Utilities\SqoSortableItem.cs" />
+	 <Compile Include="..\Utilities\EndianBitConverter.cs" />
     <Compile Include="..\WinRTExtensions\MemberInfoExtensions.cs" />
     <Compile Include="..\WinRTExtensions\TypeExtensions.cs" />
     <Compile Include="..\StorageEngine.Loader.cs" />

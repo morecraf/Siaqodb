@@ -41,6 +41,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Indexes\ByteConverterIdx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +107,7 @@
     <Compile Include="Transactions\TransactionInternal.cs" />
     <Compile Include="Transactions\TransactionManager.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
+    <Compile Include="Utilities\EndianBitConverter.cs" />
     <Compile Include="Utilities\EqualityComparer.cs" />
     <Compile Include="Utilities\ExternalMetaHelper.cs" />
     <Compile Include="Utilities\MetaHelper.cs" />

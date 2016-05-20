@@ -12,10 +12,12 @@
     <AssemblyName>Siaqodb</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <StartupObject></StartupObject>
+    <StartupObject>
+    </StartupObject>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>
-    <FileUpgradeFlags></FileUpgradeFlags>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <PublishUrl>publish\</PublishUrl>
@@ -175,6 +177,7 @@
     <Compile Include="Indexes\BTree\BTree.cs" />
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
+    <Compile Include="Indexes\ByteConverterIdx.cs" />
     <Compile Include="Internal\_bs.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="Lightning\CursorDeleteOption.cs" />
@@ -240,6 +243,7 @@
     <Compile Include="StorageEngine.Saver.cs" />
     <Compile Include="Utilities\ATuple.cs" />
     <Compile Include="Utilities\Convertor.cs" />
+    <Compile Include="Utilities\EndianBitConverter.cs" />
     <Compile Include="Utilities\EqualityComparer.cs" />
     <Compile Include="Utilities\SqoLicense.cs" />
     <Compile Include="Utilities\SqoSortableItem.cs" />

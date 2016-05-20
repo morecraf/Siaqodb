@@ -12,7 +12,8 @@
     <AssemblyName>Siaqodb</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags></FileUpgradeFlags>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -96,6 +97,7 @@
     <Compile Include="Indexes\BTree\BTree.cs" />
     <Compile Include="Indexes\BTree\IBTree.cs" />
     <Compile Include="Indexes\BTree\IndexManager.cs" />
+    <Compile Include="Indexes\ByteConverterIdx.cs" />
     <Compile Include="Internal\_bs.cs" />
     <Compile Include="ISqoDataObject.cs" />
     <Compile Include="LazyObjectList.cs" />
@@ -166,6 +168,7 @@
     <Compile Include="Utilities\ATuple.cs" />
     <Compile Include="Utilities\Convertor.cs" />
     <Compile Include="Utilities\Decryptor.cs" />
+    <Compile Include="Utilities\EndianBitConverter.cs" />
     <Compile Include="Utilities\ExternalMetaHelper.cs" />
     <Compile Include="Utilities\MetaHelper.cs" />
     <Compile Include="Utilities\ObjectRow.cs" />
