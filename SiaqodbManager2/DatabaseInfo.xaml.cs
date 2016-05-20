@@ -45,8 +45,11 @@ namespace SiaqodbManager
             System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(siaqodb.GetDBPath());
             if (di.Exists)
             {
-                dbSize.Content = ((decimal)(((decimal)DirSize(di))/(1024*1024))).ToString("0.00")+ " MB";
+                dbSize.Content ="Total: "+ ((decimal)(((decimal)DirSize(di))/(1024*1024))).ToString("0.00")+ " MB";
             }
+            dbSize.Content+="; Used: "+((decimal)(decimal)siaqodb.DbInfo.UsedSize/(1024*1024)).ToString("0.00") + " MB";
+            dbSize.Content += "; Free: " + ((decimal)(decimal)siaqodb.DbInfo.FreeSpace / (1024 * 1024)).ToString("0.00") + " MB";
+
             nrTypes.Content = typesList.Count.ToString();
             lblTitle.Content = "Database: "+di.Name ;
            
@@ -66,33 +69,17 @@ namespace SiaqodbManager
                 {
                     e.Value = typesList[e.RowIndex].Name;
                 }
+               
                 else if (e.ColumnIndex == 1)
-                {
-                    e.Value = typesList[e.RowIndex].FileName + (SiaqodbConfigurator.EncryptedDatabase ? ".esqo" : ".sqo");
-                }
-                else if (e.ColumnIndex == 2)
                 {
                     e.Value = siaqodb.LoadAllOIDs(typesList[e.RowIndex]).Count;
                 }
-                else if (e.ColumnIndex == 3)
+                else if (e.ColumnIndex == 2)
                 {
                     MetaType mt = typesList[e.RowIndex];
                     e.Value = mt.Fields.Count;
                 }
-                else if (e.ColumnIndex == 4)
-                {
-                      System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(siaqodb.GetDBPath());
-                      if (di.Exists)
-                      {
-                          string extension=SiaqodbConfigurator.EncryptedDatabase ? ".esqo" : ".sqo";
-                          FileInfo fi = new FileInfo(siaqodb.GetDBPath()+typesList[e.RowIndex].FileName+extension);
-                          if(fi.Exists)
-                          {
-                             e.Value = ((decimal)((decimal)fi.Length)/1024).ToString("0.00");
-                          }
-
-                      }
-                }
+               
             }
         }
         private void SetGridDesigner()
@@ -118,10 +105,9 @@ namespace SiaqodbManager
 
             dataGridView1.Columns.Clear();
             dataGridView1.Columns.Add("TypeName", "TypeName");
-            dataGridView1.Columns.Add("FileName", "FileName");
             dataGridView1.Columns.Add("NrTotalObjects", "Total Objects");
             dataGridView1.Columns.Add("NumberOfFields", "Number of Fields");
-            dataGridView1.Columns.Add("PhysicalFileSize", "PhysicalFileSize (KB)");
+            
 
             myhost.Child = dataGridView1;
 

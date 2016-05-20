@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Windows.Forms;
 using System.Reflection;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace SiaqodbManager
 {
@@ -27,17 +28,28 @@ namespace SiaqodbManager
         }
         private List<ReferenceItem> assemblies = new List<ReferenceItem>();
         private List<NamespaceItem> namespaces = new List<NamespaceItem>();
-		
+        string prevPath = null;
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog opf = new OpenFileDialog();
             opf.Filter = "assembly files (*.dll;*.exe)|*.dll;*.exe";
-            opf.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            opf.Multiselect = false;
+            if (prevPath == null)
+            {
+                opf.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            }
+            else
+            {
+                opf.InitialDirectory = prevPath;
+            }
+            opf.Multiselect = true;
             if (opf.ShowDialog(this.GetIWin32Window()) == System.Windows.Forms.DialogResult.OK)
             {
-                listBox1.Items.Add(opf.FileName);
-                
+                foreach (string fileName in opf.FileNames)
+                {
+                    listBox1.Items.Add(fileName);
+                    prevPath = System.IO.Path.GetDirectoryName(fileName);
+                }
+               
                
             }
         }
@@ -53,12 +65,13 @@ namespace SiaqodbManager
 
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config"))
+            if (Directory.Exists(App.ConfigDbPath))
             {
                 assemblies.Clear();
                 namespaces.Clear();
                 Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
-                Sqo.Siaqodb siaqodb = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config");
+
+                Sqo.Siaqodb siaqodb = new Sqo.Siaqodb(App.ConfigDbPath);
                 try
                 {
                     siaqodb.DropType<ReferenceItem>();
@@ -72,13 +85,11 @@ namespace SiaqodbManager
                         }
                         assemblies.Add(refItem);
                         siaqodb.StoreObject(refItem);
-
                         if (File.Exists(refItem.Item))
                         {
                             try
                             {
                                 File.Copy(refItem.Item, AppDomain.CurrentDomain.BaseDirectory + "\\" + System.IO.Path.GetFileName(refItem.Item), true);
-
 
                             }
                             catch
@@ -115,10 +126,10 @@ namespace SiaqodbManager
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config"))
+            if (Directory.Exists(App.ConfigDbPath))
             {
                 Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
-                Sqo.Siaqodb siaqodb = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config");
+                Sqo.Siaqodb siaqodb = new Sqo.Siaqodb(App.ConfigDbPath);
                 try
                 {
                     Sqo.IObjectList<ReferenceItem> references = siaqodb.LoadAll<ReferenceItem>();
@@ -143,10 +154,11 @@ namespace SiaqodbManager
 
         private void btnAddDefault_Click(object sender, RoutedEventArgs e)
         {
-            listBox1.Items.Add("System.dll");
-            listBox1.Items.Add("System.Core.dll");
-            listBox1.Items.Add("System.Windows.Forms.dll");
-            listBox1.Items.Add("siaqodb.dll");
+            listBox1.Items.Add(typeof(object).Assembly.Location);
+            listBox1.Items.Add(typeof(RuntimeBinderException).Assembly.Location);
+            listBox1.Items.Add(typeof(System.Runtime.CompilerServices.DynamicAttribute).Assembly.Location);
+            listBox1.Items.Add(typeof(Sqo.Siaqodb).Assembly.Location);
+
         }
     }
 }

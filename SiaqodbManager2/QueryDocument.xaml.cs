@@ -165,7 +165,7 @@ namespace SiaqodbManager
             
             Sqo.SiaqodbConfigurator.EncryptedDatabase = false;
             
-            Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + "\\config");
+            Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(App.ConfigDbPath);
             Sqo.IObjectList<NamespaceItem> namespaces = siaqodbConfig.LoadAll<NamespaceItem>();
             Sqo.IObjectList<ReferenceItem> references = siaqodbConfig.LoadAll<ReferenceItem>();
             siaqodbConfig.Close();
@@ -175,6 +175,7 @@ namespace SiaqodbManager
             string ifEncrypted = @" Sqo.SiaqodbConfigurator.SetLicense(@"" qU3TtvA4T4L30VSlCCGUTbooYKG1XXCnjJ+jaPPrPLaD7PdPw9HujjxmkZ467OqZ"");";
             if (EncryptionSettings.IsEncryptedChecked)
             {
+                //Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm)
                 ifEncrypted += @" Sqo.SiaqodbConfigurator.EncryptedDatabase=true;
                                  Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm." + EncryptionSettings.Algorithm + @"); 
 
@@ -185,9 +186,7 @@ namespace SiaqodbManager
 
                 }
             }
-#if TRIAL
-            ifEncrypted += @" SiaqodbConfigurator.SetTrialLicense("""+TrialLicense.LicenseKey+@""");";
-#endif
+
             string metBody = ifEncrypted + @" Siaqodb siaqodb = Sqo.Internal._bs._ofm(@""" + this.path + @""",""SiaqodbManager,SiaqodbManager2"");
 			
 							object list= (" + this.textEditor1.Text + @").ToList();
@@ -219,8 +218,9 @@ namespace SiaqodbManager
               c.Class("RunQuery")
                 .AddMethod(c.Method("object", "FilterByLINQ", "", metBody)));
 
-            Assembly assembly = c.Compile( WriteErrors);
-          
+            Assembly assembly = c.Compile(WriteErrors);
+            //Assembly assembly = this.GetOntheFlyAssembly(metBody,references, namespaces);
+
             if (assembly != null)
             {
                 Type t = assembly.GetType("LINQQuery.RunQuery");
@@ -249,6 +249,68 @@ namespace SiaqodbManager
             }
 
         }
+
+       /* 
+        * //using Roslyn
+        * private Assembly GetOntheFlyAssembly(string metBody,IList<ReferenceItem> references,IList<NamespaceItem> namespaces)
+        {
+            StringBuilder nams = new StringBuilder();
+            foreach (NamespaceItem ni in namespaces)
+            {
+                nams.Append("using " + ni.Item + ";");
+            }
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(@"
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Sqo; 
+   "+nams.ToString()+@"
+    namespace LINQQuery
+    {
+        public class RunQuery
+        {
+            public static object FilterByLINQ()
+            {
+                "+metBody+@"
+            }
+        }
+    }");
+            string assemblyName = "tempassembly";
+            List<MetadataReference> refs = new List<MetadataReference>();
+            foreach (ReferenceItem refi in references)
+            {
+                refs.Add(MetadataReference.CreateFromFile(refi.Item));
+            }
+            CSharpCompilation compilation = CSharpCompilation.Create(
+               assemblyName,
+               syntaxTrees: new[] { syntaxTree },
+               references: refs,
+               options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            using (var ms = new MemoryStream())
+            {
+                EmitResult result = compilation.Emit(ms);
+
+                if (!result.Success)
+                {
+                    IEnumerable<Diagnostic> failures = result.Diagnostics.Where(diagnostic =>
+                        diagnostic.IsWarningAsError ||
+                        diagnostic.Severity == DiagnosticSeverity.Error);
+
+                    foreach (Diagnostic diagnostic in failures)
+                    {
+                        WriteErrors(string.Format( "{0}:{1} ", diagnostic.Id, diagnostic.GetMessage()));
+                    }
+                }
+                else
+                {
+                    ms.Seek(0, SeekOrigin.Begin);
+                    Assembly assembly = Assembly.Load(ms.ToArray());
+                    return assembly;
+                }
+            }
+            return null;
+        }
+        */
         private void WriteErrors(string errorLine)
         {
             this.textBox1.Text += errorLine + "\r\n";

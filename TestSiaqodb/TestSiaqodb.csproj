@@ -83,7 +83,6 @@
     <Compile Include="ObjectTableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BasicsTest.cs" />
-    <Compile Include="SiaqodbCloudSync.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AuthoringTests.txt" />

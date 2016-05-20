@@ -2437,7 +2437,7 @@ namespace Sqo
         /// <returns> Transaction object</returns>
         public Transactions.ITransaction BeginTransaction()
         {
-            lock (_syncRoot)
+            lock (_locker)
             {
                 this.circularRefCache.Clear();
                 return transactionManager.BeginTransaction();

@@ -68,8 +68,7 @@ namespace Sqo
                                         continue;
                                     }
                                 }
-                                T currentObj = default(T);
-                                currentObj = Activator.CreateInstance<T>();
+                                T currentObj = (T)Activator.CreateInstance(typeof(T),true);
                                 circularRefCache.Clear();
                                 circularRefCache.Add(oid, ti, currentObj);
 
@@ -888,8 +887,7 @@ namespace Sqo
                                 continue;
                             }
                         }
-                        T currentObj = default(T);
-                        currentObj = Activator.CreateInstance<T>();
+                        T currentObj =(T) Activator.CreateInstance(typeof(T),true);
                         circularRefCache.Clear();
                         circularRefCache.Add(oid, ti, currentObj);
 
@@ -1073,7 +1071,7 @@ namespace Sqo
                             }
                         }
                       
-                        object currentObj = Activator.CreateInstance(ti.Type);
+                        object currentObj = Activator.CreateInstance(ti.Type,true);
                         circularRefCache.Clear();
                         circularRefCache.Add(oid, ti, currentObj);
 
@@ -1386,7 +1384,7 @@ namespace Sqo
                 }
             }
 
-            currentObj = Activator.CreateInstance(ti.Type);
+            currentObj = Activator.CreateInstance(ti.Type,true);
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);

@@ -22,6 +22,7 @@ namespace SiaqodbManager
         public About()
         {
             InitializeComponent();
+            this.copyLabel.Content = "Copyright © Dotissi " + DateTime.Now.Year;
         }
 
         private void label3_MouseDown(object sender, MouseButtonEventArgs e)

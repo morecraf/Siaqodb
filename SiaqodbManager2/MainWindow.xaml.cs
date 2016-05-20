@@ -29,6 +29,7 @@ namespace SiaqodbManager
         public static RoutedCommand saveCommand = new RoutedCommand();
         public static RoutedCommand newCommand = new RoutedCommand();
         public static RoutedCommand openCommand = new RoutedCommand();
+        
         public MainWindow()
         {
            
@@ -65,107 +66,36 @@ namespace SiaqodbManager
             
         }
 
-       
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!System.IO.Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config"))
+            if (!System.IO.Directory.Exists(App.ConfigDbPath))
             {
                 try
                 {
-                    System.IO.Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory+ System.IO.Path.DirectorySeparatorChar + "config");
+                    System.IO.Directory.CreateDirectory(App.ConfigDbPath);
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
                 }
             }
             Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTQ9J7I0xVsr5/glyn/JzNY4yVy640fieqvjNywXzj9og");
-#if TRIAL
-            string folder = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config";
-            string trialFile = folder + System.IO.Path.DirectorySeparatorChar + "trial.lic";
-            if (System.IO.File.Exists(trialFile))
+
+
+            using (Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(App.ConfigDbPath))
             {
-                string text = System.IO.File.ReadAllText(trialFile);
-                try
-                {
+                IObjectList<ConnectionItem> list = siaqodbConfig.LoadAll<ConnectionItem>();
 
-                    SiaqodbConfigurator.SetLicense(text);
-                    Sqo.Siaqodb siaqodbConfigTemp = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory);
-                    siaqodbConfigTemp.Close();
-                    TrialLicense.LicenseKey = text;
-                }
-                catch (Sqo.Exceptions.InvalidLicenseException ex)
+                foreach (ConnectionItem item in list)
                 {
-                    MessageBox.Show(ex.Message);
-                    this.Close();
-                    return;
+                    cmbDBPath.Items.Add(item.Item);
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                    SetTrialLicense trialWnd = new SetTrialLicense();
-                    if (trialWnd.ShowDialog() == true)
-                    {
-                        string trialKey = trialWnd.GetLicenseKey();
-                        System.IO.File.WriteAllText(trialFile, trialKey);
-                    }
-                    else
-                    {
-                        this.Close();
-                        return;
-                    }
-                }
+               
             }
-            else
-            {
-                SetTrialLicense trialWnd = new SetTrialLicense();
-                if (trialWnd.ShowDialog() == true)
-                {
-                    string trialKey = trialWnd.GetLicenseKey();
-                    System.IO.File.WriteAllText(trialFile, trialKey);
-                }
-                else
-                {
-                    this.Close();
-                    return;
-                }
-            }
-#endif
-
-            Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory);
 
 
-            IObjectList<ConnectionItem> list = siaqodbConfig.LoadAll<ConnectionItem>();
-
-            foreach (ConnectionItem item in list)
-            {
-                cmbDBPath.Items.Add(item.Item);
-            }
-            siaqodbConfig.Close();
-            if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config"))
-            {
-                Sqo.Siaqodb siaqodbRef = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory + "\\config");
-
-                Sqo.IObjectList<ReferenceItem> references = siaqodbRef.LoadAll<ReferenceItem>();
-                foreach (ReferenceItem refi in references)
-                {
-                    if (File.Exists(refi.Item))
-                    {
-                        try
-                        {
-                            File.Copy(refi.Item, AppDomain.CurrentDomain.BaseDirectory + "\\" + System.IO.Path.GetFileName(refi.Item), true);
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                }
-
-                siaqodbRef.Close();
-
-            }
             DefaultDocument uq = new DefaultDocument();
             uq.Title = "Start";
             SetDefaultSettings(uq);
@@ -173,7 +103,6 @@ namespace SiaqodbManager
             uq.Activate();
 
             dockingManager1.ActiveDocumentChanged += new EventHandler(dockingManager1_ActiveDocumentChanged);
-            dockingManager1.DocumentClosed += new EventHandler(dockingManager1_DocumentClosed);
             dockingManager1.DocumentClosing += new EventHandler<System.ComponentModel.CancelEventArgs>(dockingManager1_DocumentClosing);
             btnExecute.IsEnabled = false;
             menuExecute.IsEnabled = false;
@@ -181,7 +110,7 @@ namespace SiaqodbManager
             menuSave.IsEnabled = false;
             menuSaveAs.IsEnabled = false;
             btnDBInfo.IsEnabled = false;
-            
+
         }
 
         void dockingManager1_DocumentClosing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -192,17 +121,10 @@ namespace SiaqodbManager
                 {
                     prev.Activate();
                 }
-                else
-                {
-                   
-                }
+               
             }
         }
 
-        void dockingManager1_DocumentClosed(object sender, EventArgs e)
-        {
-            
-        }
         private ManagedContent current;
         private ManagedContent prev;
         void dockingManager1_ActiveDocumentChanged(object sender, EventArgs e)
@@ -338,31 +260,13 @@ namespace SiaqodbManager
         {
             this.menuExecute_Click(sender, e);
         }
-      
+
 
         private void menuReferences_Click(object sender, RoutedEventArgs e)
         {
             AddReference adref = new AddReference();
-            if (adref.ShowDialog() == true)
-            {
+            adref.ShowDialog();
 
-            }
-        }
-
-        private void ChangeColor(object sender, RoutedEventArgs e)
-        {
-            Color c = (Color)ColorConverter.ConvertFromString(((MenuItem)sender).Header.ToString());
-            ThemeFactory.ChangeColors(c);
-            //this.treeView1.Background = new LinearGradientBrush(c, Color.FromRgb(255, 255, 255),45);
-        }
-        private void ChangeStandardTheme(object sender, RoutedEventArgs e)
-        {
-            string name = (string)((MenuItem)sender).Tag;
-            ThemeFactory.ChangeTheme(name);
-        }
-        private void SetDefaultTheme(object sender, RoutedEventArgs e)
-        {
-            ThemeFactory.ResetTheme();
         }
 
       
@@ -402,16 +306,26 @@ namespace SiaqodbManager
         {
             this.menuExecute_Click(sender, e);
         }
-
+        string prevPath = null;
         private void btnOpenDB_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.FolderBrowserDialog fb = new System.Windows.Forms.FolderBrowserDialog();
+            if (prevPath != null)
+            {
+                fb.SelectedPath = prevPath;
+            }
+            else
+            {
+                fb.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
+               
+            }
             
             fb.Description = "Select a database folder";
             
             if (fb.ShowDialog(this.GetIWin32Window()) == System.Windows.Forms.DialogResult.OK)
             {
                 this.cmbDBPath.Text = fb.SelectedPath;
+                prevPath = fb.SelectedPath;
             }
         }
         List<Sqo.MetaType> siaqodbList;
@@ -423,16 +337,53 @@ namespace SiaqodbManager
                 {
                     cmbDBPath.Items.Add(cmbDBPath.Text);
                     SiaqodbConfigurator.EncryptedDatabase = false;
-                    Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(AppDomain.CurrentDomain.BaseDirectory);
-
-                    siaqodbConfig.StoreObject(new ConnectionItem(cmbDBPath.Text));
-                    siaqodbConfig.Close();
+                    using (Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(App.ConfigDbPath))
+                    {
+                        siaqodbConfig.StoreObject(new ConnectionItem(cmbDBPath.Text));
+                    }
                     EncryptionSettings.SetEncryptionSettings();//set back settings
                 }
-                siaqodb = Sqo.Internal._bs._b(cmbDBPath.Text);
+                try
+                {
+                    siaqodb = Sqo.Internal._bs._b(cmbDBPath.Text);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.StartsWith("MDB_INVALID: File is not an LMDB"))
+                    {
+                        string msg = "";
+                        if (IntPtr.Size == 8)//x64
+                        {
+                            msg = "Database is created on a x86 platform, open it wiht SiaqodbManager x86 version";
+                        }
+                        else//32 bit
+                        {
+                            msg = "Database is created on a x64 platform, open it wiht SiaqodbManager x64 version";
+                        }
+                        System.Windows.Forms.MessageBox.Show(msg);
+                    }
+                    else
+                    {
+                        System.Windows.Forms.MessageBox.Show(ex.Message);
+                    }
+                    return;
+                }
                 
                 siaqodbList = siaqodb.GetAllTypes();
                 treeView1.Items.Clear();
+                siaqodb.Documents.GetBucket
+                ImageTreeViewItem objectsNode = new ImageTreeViewItem();
+                objectsNode.Text = "Objects";
+                objectsNode.SelectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/objects-icon.png");
+                objectsNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/objects-icon.png");
+                treeView1.Items.Add(objectsNode);
+
+                ImageTreeViewItem documentsNode = new ImageTreeViewItem();
+                documentsNode.Text = "Documents";
+                documentsNode.SelectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/documents.png");
+                documentsNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/documents.png");
+                treeView1.Items.Add(documentsNode);
+
                 ContextMenu cm = new ContextMenu();
                 MenuItem mitem = new MenuItem();
                 mitem.Header = "Load objects";
@@ -449,7 +400,7 @@ namespace SiaqodbManager
                     nodeType.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/pubclass.gif");
                     nodeType.ContextMenu = cm;
 
-                    treeView1.Items.Add(nodeType);
+                    objectsNode.Items.Add(nodeType);
                     foreach (Sqo.MetaField mf in mt.Fields)
                     {
                         ImageTreeViewItem nodeField = new ImageTreeViewItem();

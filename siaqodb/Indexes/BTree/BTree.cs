@@ -36,14 +36,14 @@ namespace Sqo.Indexes
         // Add a new item to the tree.
         public void AddItem(object new_key, int new_value)
         {
-            byte[] key=ByteConverter.GetBytes(new_key,new_key.GetType());
+            byte[] key=ByteConverterIdx.GetBytes(new_key,new_key.GetType());
             transaction.Put(db,key , ByteConverter.IntToByteArray(new_value));
         }
 
         // Find this item.
         public IEnumerable<int> FindItem(object key)
         {
-            byte[] keyBytes = ByteConverter.GetBytes(key, key.GetType());
+            byte[] keyBytes = ByteConverterIdx.GetBytes(key, key.GetType());
 
             List<int> duplicates = new List<int>();
             using (var cursor = transaction.CreateCursor(this.db))
@@ -51,7 +51,7 @@ namespace Sqo.Indexes
                 var firstKV = cursor.MoveToFirstAfter(keyBytes);
                 if (firstKV.HasValue)
                 {
-                    object currentKey = ByteConverter.ReadBytes(firstKV.Value.Key, key.GetType());
+                    object currentKey = ByteConverterIdx.ReadBytes(firstKV.Value.Key, key.GetType());
                     if (Compare(currentKey, key) == 0)
                     {
                         ReadDuplicates(firstKV, duplicates, cursor);
@@ -66,14 +66,14 @@ namespace Sqo.Indexes
 
         public List<int> FindItemsLessThan(object start)
         {
-            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            byte[] keyBytes = ByteConverterIdx.GetBytes(start, start.GetType());
             using (var cursor = transaction.CreateCursor(this.db))
             {
                 var firstKV = cursor.MoveToFirst();
                 List<int> indexValues = new List<int>();
                 if (firstKV.HasValue)
                 {
-                    object currentKey = ByteConverter.ReadBytes(firstKV.Value.Key, start.GetType());
+                    object currentKey = ByteConverterIdx.ReadBytes(firstKV.Value.Key, start.GetType());
                     if (Compare(currentKey, start) < 0)
                     {
                         ReadDuplicates(firstKV, indexValues, cursor);
@@ -84,7 +84,7 @@ namespace Sqo.Indexes
                     firstKV = cursor.MoveNext();
                     if (firstKV.HasValue)
                     {
-                        object currentKey = ByteConverter.ReadBytes(firstKV.Value.Key, start.GetType());
+                        object currentKey = ByteConverterIdx.ReadBytes(firstKV.Value.Key, start.GetType());
                         int compareResult = Compare(currentKey, start);
                         if (compareResult < 0)
                         {
@@ -102,14 +102,14 @@ namespace Sqo.Indexes
 
         public List<int> FindItemsLessThanOrEqual(object start)
         {
-            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            byte[] keyBytes = ByteConverterIdx.GetBytes(start, start.GetType());
             using (var cursor = transaction.CreateCursor(this.db))
             {
                 var firstKV = cursor.MoveToFirst();
                 List<int> indexValues = new List<int>();
                 if (firstKV.HasValue)
                 {
-                    object currentKey = ByteConverter.ReadBytes(firstKV.Value.Key, start.GetType());
+                    object currentKey = ByteConverterIdx.ReadBytes(firstKV.Value.Key, start.GetType());
                     if (Compare(currentKey, start) <= 0)
                     {
                         ReadDuplicates(firstKV, indexValues, cursor);
@@ -120,7 +120,7 @@ namespace Sqo.Indexes
                     firstKV = cursor.MoveNext();
                     if (firstKV.HasValue)
                     {
-                        object currentKey = ByteConverter.ReadBytes(firstKV.Value.Key, start.GetType());
+                        object currentKey = ByteConverterIdx.ReadBytes(firstKV.Value.Key, start.GetType());
                         int compareResult = Compare(currentKey, start);
                         if (compareResult <= 0)
                         {
@@ -138,14 +138,14 @@ namespace Sqo.Indexes
 
         public List<int> FindItemsBiggerThan(object start)
         {
-            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            byte[] keyBytes = ByteConverterIdx.GetBytes(start, start.GetType());
             using (var cursor = transaction.CreateCursor(this.db))
             {
                 var firstKV = cursor.MoveToFirstAfter(keyBytes);
                 List<int> indexValues = new List<int>();
                 if (firstKV.HasValue)
                 {
-                    object currentKey = ByteConverter.ReadBytes(firstKV.Value.Key, start.GetType());
+                    object currentKey = ByteConverterIdx.ReadBytes(firstKV.Value.Key, start.GetType());
                     if (Compare(currentKey, start) > 0)
                     {
                         ReadDuplicates(firstKV, indexValues, cursor);
@@ -176,14 +176,14 @@ namespace Sqo.Indexes
 
         public List<int> FindItemsBiggerThanOrEqual(object start)
         {
-            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            byte[] keyBytes = ByteConverterIdx.GetBytes(start, start.GetType());
             using (var cursor = transaction.CreateCursor(this.db))
             {
                 var firstKV = cursor.MoveToFirstAfter(keyBytes);
                 List<int> indexValues = new List<int>();
                 if (firstKV.HasValue)
                 {
-                    object currentKey = ByteConverter.ReadBytes(firstKV.Value.Key, start.GetType());
+                    object currentKey = ByteConverterIdx.ReadBytes(firstKV.Value.Key, start.GetType());
                     if (Compare(currentKey, start) >= 0)
                     {
                         ReadDuplicates(firstKV, indexValues, cursor);
@@ -206,7 +206,7 @@ namespace Sqo.Indexes
         public List<int> FindItemsStartsWith(object target_key, bool defaultComparer, StringComparison stringComparison)
         {
             string start=(string)target_key;
-            byte[] keyBytes = ByteConverter.GetBytes(start, start.GetType());
+            byte[] keyBytes = ByteConverterIdx.GetBytes(start, start.GetType());
             using (var cursor = transaction.CreateCursor(this.db))
             {
                 var firstKV = cursor.MoveToFirstAfter(keyBytes);
@@ -214,7 +214,7 @@ namespace Sqo.Indexes
 
                 while (firstKV.HasValue)
                 {
-                    string currentKey = (string)ByteConverter.ReadBytes(firstKV.Value.Key, typeof(string));
+                    string currentKey = (string)ByteConverterIdx.ReadBytes(firstKV.Value.Key, typeof(string));
                     if (this.StringCompare(currentKey, start, defaultComparer, stringComparison) >= 0)
                     {
                         if (this.StringStartsWith(currentKey, start, defaultComparer, stringComparison))
@@ -252,7 +252,7 @@ namespace Sqo.Indexes
         }
         public void DeleteItem(object key,int oid)
         {
-            byte[] keyBytes = ByteConverter.GetBytes(key, key.GetType());
+            byte[] keyBytes = ByteConverterIdx.GetBytes(key, key.GetType());
             byte[] valueBytes = ByteConverter.GetBytes(oid, typeof(int));
 
             transaction.Delete(db, keyBytes, valueBytes);

@@ -12,6 +12,8 @@ namespace SiaqodbManager
     /// </summary>
     public partial class App : Application
     {
+        public static string ConfigDbPath = AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "config";
+           
         public App()
         {
             this.DispatcherUnhandledException += new System.Windows.Threading.DispatcherUnhandledExceptionEventHandler(App_DispatcherUnhandledException);

@@ -71,6 +71,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -134,10 +135,6 @@
       <DependentUpon>DatabaseInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Entities\TypeMetaDetail.cs" />
-    <Compile Include="SetTrialLicense.xaml.cs">
-      <DependentUpon>SetTrialLicense.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TrialLicense.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -207,10 +204,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SetTrialLicense.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MetaItems.cs" />
@@ -237,9 +230,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Themes\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\connect.png" />
@@ -304,6 +294,10 @@
       <Project>{243748a0-9797-4fa9-a805-d71127eac3da}</Project>
       <Name>Siaqodb %28.NET 3.5%29</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\documents.png" />
+    <Resource Include="Resources\objects-icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

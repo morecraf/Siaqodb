@@ -14,8 +14,7 @@ namespace Sqo.Utilities
             ObjectList<T> obList = new ObjectList<T>();
             foreach (ObjectRow row in table.Rows)
             {
-                T currentObj = default(T);
-                currentObj = Activator.CreateInstance<T>();
+                T currentObj = (T) Activator.CreateInstance(typeof(T),true);
                 //ISqoDataObject dObj = currentObj as ISqoDataObject;
 
                 foreach (string column in table.Columns.Keys)
