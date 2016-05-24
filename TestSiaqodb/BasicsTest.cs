@@ -48,7 +48,7 @@ namespace TestSiaqodb
 		
 		public BasicsTest()
 		{
-            SiaqodbConfigurator.EncryptedDatabase = true;
+           // SiaqodbConfigurator.EncryptedDatabase = true;
            // SiaqodbConfigurator.VerboseLevel = VerboseLevel.Info;
             SiaqodbConfigurator.LoggingMethod = this.LogWarns;
             //Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm.AES);

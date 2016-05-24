@@ -251,9 +251,14 @@ namespace SiaqodbManager
         private void menuExecute_Click(object sender, RoutedEventArgs e)
         {
             QueryDocument query = dockingManager1.ActiveDocument as QueryDocument;
+            DocsDocument queryBucket = dockingManager1.ActiveDocument as DocsDocument;
             if (query != null)
             {
                 query.Execute(this.cmbDBPath.Text);
+            }
+            else if (queryBucket != null)
+            {
+                queryBucket.Execute();
             }
         }
         void execCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -372,7 +377,7 @@ namespace SiaqodbManager
                 siaqodbList = siaqodb.GetAllTypes();
                 treeView1.Items.Clear();
                 
-                /*ImageTreeViewItem objectsNode = new ImageTreeViewItem();
+                ImageTreeViewItem objectsNode = new ImageTreeViewItem();
                 objectsNode.Text = "Objects";
                 objectsNode.SelectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/objects-icon.png");
                 objectsNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/objects-icon.png");
@@ -382,7 +387,7 @@ namespace SiaqodbManager
                 documentsNode.Text = "Documents";
                 documentsNode.SelectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/documents.png");
                 documentsNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/documents.png");
-                treeView1.Items.Add(documentsNode);*/
+                treeView1.Items.Add(documentsNode);
 
                 ContextMenu cm = new ContextMenu();
                 MenuItem mitem = new MenuItem();
@@ -400,7 +405,7 @@ namespace SiaqodbManager
                     nodeType.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/pubclass.gif");
                     nodeType.ContextMenu = cm;
 
-                    this.treeView1.Items.Add(nodeType);
+                    objectsNode.Items.Add(nodeType);
                     foreach (Sqo.MetaField mf in mt.Fields)
                     {
                         ImageTreeViewItem nodeField = new ImageTreeViewItem();
@@ -421,7 +426,18 @@ namespace SiaqodbManager
                     }
 
                 }
-                btnDBInfo.IsEnabled = true;
+                var buckets = siaqodb.Documents.GetAllBuckets();
+                foreach (string buk in buckets)
+                {
+                    ImageTreeViewItem bucketNode = new ImageTreeViewItem();
+                    bucketNode.Text = buk;
+                    bucketNode.Tag = buk;
+                    bucketNode.SelectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/bucket.png");
+                    bucketNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/bucket.png");
+                    documentsNode.Items.Add(bucketNode);
+
+                    btnDBInfo.IsEnabled = true;
+                }
             }
             else
             {
@@ -446,10 +462,11 @@ namespace SiaqodbManager
             if (item != null)
             {
                 MetaType mt = item.Tag as MetaType;
+                string bucketName = item.Tag as string;
                 if (mt != null)
                 {
                     ObjectsDocument uco = new ObjectsDocument();
-                    uco.Initialize(mt, siaqodb,siaqodbList);
+                    uco.Initialize(mt, siaqodb, siaqodbList);
                     uco.OpenObjects += new EventHandler<MetaEventArgs>(uco_OpenObjects);
                     uco.Title = mt.Name;
                     SetDefaultSettings(uco);
@@ -461,6 +478,21 @@ namespace SiaqodbManager
                     menuSave.IsEnabled = false;
                     menuSaveAs.IsEnabled = false;
                 }
+                else if (bucketName != null)
+                {
+                    DocsDocument uco = new DocsDocument();
+                    uco.Title ="Bucket:"+ bucketName;
+                    uco.Initialize(bucketName,siaqodb);
+                    SetDefaultSettings(uco);
+                    uco.Show(this.dockingManager1);
+                    uco.Activate();
+                    btnExecute.IsEnabled = true;
+                    menuExecute.IsEnabled = true;
+                    btnSave.IsEnabled = false;
+                    menuSave.IsEnabled = false;
+                    menuSaveAs.IsEnabled = false;
+                }
+                
             }
         }
 
