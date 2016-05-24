@@ -78,7 +78,7 @@
             <Button Name="btnExecute" Click="btnExecute_Click" Height="50" ToolTip="Run linq">
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/run.png" Height="29"></Image>
-                    <TextBlock Text="Run linq "></TextBlock>
+                    <TextBlock Text="Run query "></TextBlock>
                 </StackPanel>
                 
             </Button>

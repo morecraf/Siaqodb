@@ -47,7 +47,7 @@ namespace SiaqodbManager
 
         private void Expander_Expanded(object sender, RoutedEventArgs e)
         {
-            rowQueryEditor.Height =new GridLength(200);
+            rowQueryEditor.Height =new GridLength(270);
             splitterRowQueryEditor.Visibility = Visibility.Visible;
         }
         #region TextContent
@@ -110,15 +110,19 @@ namespace SiaqodbManager
                 }
             }
             queryEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
-            queryEditor.Text = @"
-   
-    Query query = new Query();
-    //query.WhereEqual(""key"",""username101"")
-     query.WhereStartsWith(""key"", ""username10"");
+            queryEditor.Text = @"//variable 'bucket' is already instantiated
+    var query = new Query();
+    query.WhereEqual(""key"",""username101"");
+    return bucket.Find(query);
 
-     return bucket.Find(query);
+//uncomment the statement bellow if you want to use LINQ query
+ //return (from Document doc in bucket
+ //            where doc.GetTag<string>(""industry"") == ""IT""
+ //               select doc).ToList();
 
-            ";
+          
+// see more info about queries here: http://siaqodb.com/docs/DocumentDB_Queries/
+";
             this.siaqodb = siaqodb;
             this.bucketName = bucketName;
             SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
@@ -177,6 +181,7 @@ namespace SiaqodbManager
                         Documents.Add(new DocumentWrapper(doc));
                     }
                     lblTotal.Content = Documents.Count + " documents out of " + totalDocs;
+                    this.listKeys.SelectedIndex = 0;
                 }
                 catch (Exception ex)
                 {
@@ -259,6 +264,89 @@ using (Siaqodb siaqodb = Sqo.Internal._bs._ofm(@""" + this.siaqodb.GetDBPath() +
         private void WriteErrors(string errorLine)
         {
             this.txtErrors.Text += errorLine + "\r\n";
+        }
+        private void btnAdd_Click(object sender, RoutedEventArgs e)
+        {
+            this.textEditor1.Text=@"{
+""Key"":"""",
+""Content"":{},
+""Tags"":{}
+
+}";
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                DocumentWrapper d = Newtonsoft.Json.JsonConvert.DeserializeObject<DocumentWrapper>(textEditor1.Text);
+                if (d != null)
+                {
+                    if (string.IsNullOrEmpty(d.Key))
+                    {
+                        System.Windows.Forms.MessageBox.Show("Document must have a Key.");
+                        return;
+                    }
+                    else if (d.Content==null || (d.Content is string && d.Content==""))
+                    {
+                        System.Windows.Forms.MessageBox.Show("Content is empty");
+                        return;
+                    }
+                    Document newDoc = new Document();
+                    var jsonStr=Newtonsoft.Json.JsonConvert.SerializeObject(d.Content);
+                    newDoc.Content = Encoding.UTF8.GetBytes(jsonStr);
+                    newDoc.Tags = d.Tags;
+                    newDoc.Key = d.Key;
+                    IBucket bucket = siaqodb.Documents[bucketName];
+                    bucket.Store(newDoc);
+                    DocumentWrapper dwSelected = listKeys.SelectedItem as DocumentWrapper;
+                    if (dwSelected != null && dwSelected.Key == newDoc.Key)
+                    {
+                        var newdw= new DocumentWrapper(newDoc);
+                        Documents[listKeys.SelectedIndex] = newdw;
+                        listKeys.SelectedItem = newdw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void btnDel_Click(object sender, RoutedEventArgs e)
+        {
+
+            DocumentWrapper d = Newtonsoft.Json.JsonConvert.DeserializeObject<DocumentWrapper>(textEditor1.Text);
+            if (d != null)
+            {
+                if (string.IsNullOrEmpty(d.Key))
+                {
+                    System.Windows.Forms.MessageBox.Show("Document must have a Key.");
+                    return;
+                }
+                if (System.Windows.Forms.MessageBox.Show("Are you sure you want to delete document with key:"+d.Key+"?", "", System.Windows.Forms.MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes)
+                {
+                    IBucket bucket = siaqodb.Documents[bucketName];
+                    try
+                    {
+                        bucket.Delete(d.Key);
+                        foreach (var dw in Documents)
+                        {
+                            if (dw.Key == d.Key)
+                            {
+                                Documents.Remove(dw);
+                                break;
+                            }
+                        }
+                    }
+                    catch
+                    (Exception ex)
+                    {
+                        System.Windows.Forms.MessageBox.Show(ex.Message);
+                    }
+                }
+            }
         }
 
         private string syntax = @"
@@ -388,6 +476,12 @@ using (Siaqodb siaqodb = Sqo.Internal._bs._ofm(@""" + this.siaqodb.GetDBPath() +
     </RuleSet>
 </SyntaxDefinition>";
 
-        
+        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                this.btnSearch_Click(this, new RoutedEventArgs());
+            }
+        }
     }
 }
