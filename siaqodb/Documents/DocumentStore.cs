@@ -48,6 +48,7 @@ namespace Sqo.Documents
                 {
                     cache.Remove(bucketName);
                 }
+                DeleteMetaBucket(bucketName);
             }
         }
         private void StoreMetaBucket(string bucketName)
@@ -59,6 +60,30 @@ namespace Sqo.Documents
                 byte[] keyBytes = ByteConverter.GetBytes(bucketName, typeof(string));
                 lmdbTransaction.Put(db, keyBytes, keyBytes);
                 transaction.Commit();
+            }
+        }
+        private void DeleteMetaBucket(string bucketName)
+        {
+            using (var transaction = siaqodb.BeginTransaction())
+            {
+                var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
+                var db = lmdbTransaction.OpenDatabase(sys_buckets, DatabaseOpenFlags.Create);
+                byte[] keyBytes = ByteConverter.GetBytes(bucketName, typeof(string));
+                try
+                {
+                    lmdbTransaction.Delete(db, keyBytes);
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    if (!ex.Message.Contains("MDB_NOTFOUND"))
+                    {
+                        throw ex;
+                    }
+                    
+                }
+               
             }
         }
         public List<string> GetAllBuckets()

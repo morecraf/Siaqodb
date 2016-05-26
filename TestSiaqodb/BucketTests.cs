@@ -30,11 +30,11 @@ namespace TestSiaqodbBuckets
         Siaqodb siaqodb;
         public IBucket GetBucket()
         {
-            return siaqodb.Documents["unittests6"];
+            return siaqodb.Documents["unittests"];
         }
         public void DropBucket()
         {
-            siaqodb.Documents.DropBucket("unittests6");
+            siaqodb.Documents.DropBucket("unittests");
         }
         public static readonly object _syncRoot = new object();
 
@@ -43,7 +43,7 @@ namespace TestSiaqodbBuckets
         {
             Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
             Sqo.SiaqodbConfigurator.SetSyncableBucket("contacts", true);
-            Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyBson());
+            Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
 #if __MOBILE__
             var objPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             this.siaqodb = new Siaqodb(objPath);
@@ -516,11 +516,11 @@ namespace TestSiaqodbBuckets
             {
 
                 List<Document> list = new List<Document>();
-                int myint = rnd.Next(100000);
+                int myint = rnd.Next(1000000);
                 double mydouble = myint + 0.34;
 
                 DateTime mydate = new DateTime(2014, (myint % 11) + 1, (myint % 27) + 1);
-                for (int i = -1; i < 3; i++)
+                for (int i = -1; i < 1000; i++)
                 {
                     int rndNr = rnd.Next(100000);
                     string username = "username" + rndNr;
@@ -530,7 +530,7 @@ namespace TestSiaqodbBuckets
                     obj.SetTag("myint", myint + i);
                     obj.SetTag("mydouble", mydouble + i);
                     obj.SetTag("mydatetime", mydate.AddDays(i));
-                    obj.Key = username;
+                    obj.Key = i.ToString();
                     list.Add(obj);
                 }
                 bucket.StoreBatch(list);
@@ -539,7 +539,7 @@ namespace TestSiaqodbBuckets
                 query1.WhereGreaterThanOrEqual("myint", myint);
                 var result = bucket.Find(query1);
                 int j = 0;
-                Assert.AreEqual(3, result.Count);
+                Assert.AreEqual(1000, result.Count);
                 foreach (Document co in result)
                 {
                     Assert.IsTrue(co.GetTag<int>("myint") >= myint);
@@ -548,7 +548,7 @@ namespace TestSiaqodbBuckets
                 var linqQ1 = (from Document doc in this.GetBucket()
                               where doc.GetTag<int>("myint") >= myint
                               select doc).ToList();
-                Assert.AreEqual(3, linqQ1.Count);
+                Assert.AreEqual(1000, linqQ1.Count);
                 foreach (Document co in linqQ1)
                 {
                     Assert.IsTrue(co.GetTag<int>("myint") >= myint);
@@ -558,7 +558,7 @@ namespace TestSiaqodbBuckets
                 query2.WhereGreaterThanOrEqual("mydouble", mydouble);
                 result = bucket.Find(query2);
                 j = 0;
-                Assert.AreEqual(3, result.Count);
+                Assert.AreEqual(1000, result.Count);
                 foreach (Document co in result)
                 {
 
@@ -569,7 +569,7 @@ namespace TestSiaqodbBuckets
                 var linqQ2 = (from Document doc in this.GetBucket()
                               where doc.GetTag<double>("mydouble") >= mydouble
                               select doc).ToList();
-                Assert.AreEqual(3, linqQ2.Count);
+                Assert.AreEqual(1000, linqQ2.Count);
                 foreach (Document co in linqQ2)
                 {
                     Assert.IsTrue(co.GetTag<double>("mydouble") >= mydouble);
@@ -579,7 +579,7 @@ namespace TestSiaqodbBuckets
                 query3.WhereGreaterThanOrEqual("mydatetime", mydate);
                 result = bucket.Find(query3);
                 j = 0;
-                Assert.AreEqual(3, result.Count);
+                Assert.AreEqual(1000, result.Count);
                 foreach (Document co in result)
                 {
 
@@ -591,7 +591,7 @@ namespace TestSiaqodbBuckets
                 var linqQ3 = (from Document doc in this.GetBucket()
                               where doc.GetTag<DateTime>("mydatetime") >= mydate
                               select doc).ToList();
-                Assert.AreEqual(3, linqQ3.Count);
+                Assert.AreEqual(1000, linqQ3.Count);
                 foreach (Document co in linqQ3)
                 {
                     Assert.IsTrue(co.GetTag<DateTime>("mydatetime") >= mydate);
