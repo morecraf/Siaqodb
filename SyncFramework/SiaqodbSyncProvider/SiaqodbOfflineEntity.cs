@@ -86,6 +86,7 @@ namespace SiaqodbSyncProvider
                 this._entityMetadata = value;
                 this._etag = this._entityMetadata.ETag;
                 this._idMeta2 = this._entityMetadata.Id;
+                if (this._idMeta2 != null && this._idMeta2 != string.Empty)
                 {
                     this._idMetaHash = this._idMeta2.GetHashCode();
                 }
@@ -101,6 +102,7 @@ namespace SiaqodbSyncProvider
         {
             get
             {
+                if ((_idMeta2 == null || _idMeta2==string.Empty) && MetaOldIsValid(_idMeta))
                 {
                     _idMeta2 = _idMeta;
                     _idMeta = null;
