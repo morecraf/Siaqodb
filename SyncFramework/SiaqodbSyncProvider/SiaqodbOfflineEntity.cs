@@ -54,6 +54,8 @@ namespace SiaqodbSyncProvider
         private string _etag;
         [Sqo.Attributes.Text] 
         internal string _idMeta;
+        [Sqo.Attributes.MaxLength(250)]
+        internal string _idMeta2;
          //used only for indexes
          [Index]
         internal int _idMetaHash;
@@ -74,7 +76,7 @@ namespace SiaqodbSyncProvider
                 {
                     _entityMetadata = new OfflineEntityMetadata();
                     _entityMetadata.ETag = this._etag;
-                    _entityMetadata.Id = this._idMeta;
+                    _entityMetadata.Id = this.IdMeta2;
                     _entityMetadata.IsTombstone = this.isTombstone;
                 }
                 return _entityMetadata;
@@ -83,19 +85,41 @@ namespace SiaqodbSyncProvider
             {
                 this._entityMetadata = value;
                 this._etag = this._entityMetadata.ETag;
-                this._idMeta = this._entityMetadata.Id;
-                if (this._idMeta != null)
+                this._idMeta2 = this._entityMetadata.Id;
                 {
-                    this._idMetaHash = this._idMeta.GetHashCode();
+                    this._idMetaHash = this._idMeta2.GetHashCode();
                 }
                 else
                 {
                     this._idMetaHash = 0;
                 }
                 this.isTombstone = this._entityMetadata.IsTombstone;
+                _idMeta = null;
             }
         }
-
+        internal string IdMeta2
+        {
+            get
+            {
+                {
+                    _idMeta2 = _idMeta;
+                    _idMeta = null;
+                }
+                return _idMeta2;
+            }
+            
+        }
+        private bool MetaOldIsValid(string idmeta)
+        {
+            if (!string.IsNullOrEmpty(idmeta))
+            {
+                Uri uriResult;
+                bool result = Uri.TryCreate(idmeta, UriKind.Absolute, out uriResult)
+                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                return result;
+            }
+            return false;
+        }
         
     }
 }

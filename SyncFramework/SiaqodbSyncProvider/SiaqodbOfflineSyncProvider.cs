@@ -453,11 +453,10 @@ namespace SiaqodbSyncProvider
                     SiaqodbOfflineEntity en = obj as SiaqodbOfflineEntity;
                     if (en != null)
                     {
-                        if (en._idMeta != null)
                         {
                             if (en._idMetaHash == 0)
                             {
-                                en._idMetaHash = en._idMeta.GetHashCode();
+                                en._idMetaHash = en._idMeta2.GetHashCode();
                                 siaqodb.StoreObject(obj);
                             }
                         }
