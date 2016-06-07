@@ -6,12 +6,12 @@ using System.Text;
 
 namespace LightningDB.Native
 {
-#if !WinRT
-	class Native32BitLibraryFacade : INativeLibraryFacade
+#if !WinRT && !LIC_U3D_IOS
+    class Native32BitLibraryFacade : INativeLibraryFacade
     {
         public const string LibraryName = "lmdb32";
 
-        #region Native functions
+    #region Native functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_create(out IntPtr env);
@@ -108,7 +108,7 @@ namespace LightningDB.Native
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_stat(IntPtr env, out MDBStat stat);
-        #endregion
+    #endregion
 
         int INativeLibraryFacade.mdb_env_create(out IntPtr env)
         {
@@ -286,7 +286,7 @@ namespace LightningDB.Native
     {
         public const string LibraryName = "lmdb64";
 
-        #region Native functions
+    #region Native functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_create(out IntPtr env);
@@ -384,7 +384,7 @@ namespace LightningDB.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_stat(IntPtr env, out MDBStat stat);
 
-        #endregion
+    #endregion
 
         int INativeLibraryFacade.mdb_env_create(out IntPtr env)
         {
@@ -556,7 +556,7 @@ namespace LightningDB.Native
         public const string LibraryName = "lmdb";
 #endif
 
-        #region Native functions
+    #region Native functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl,ExactSpelling =true)]
         private static extern int mdb_env_create(out IntPtr env);
@@ -653,7 +653,7 @@ namespace LightningDB.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         private static extern int mdb_env_stat(IntPtr env, out MDBStat stat);
 
-        #endregion
+    #endregion
 
         int INativeLibraryFacade.mdb_env_create(out IntPtr env)
         {
@@ -831,15 +831,16 @@ namespace LightningDB.Native
         }
     }
 #else
+
     class FallbackLibraryFacade : INativeLibraryFacade
     {
-        #if XIOS || LIC_U3D_IOS
+#if XIOS || LIC_U3D_IOS
         public const string LibraryName = "__Internal";    
-		#else 
+#else
 		public const string LibraryName = "lmdb";
-		#endif
+#endif
 
-        #region Native functions
+    #region Native functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_create(out IntPtr env);
@@ -850,9 +851,10 @@ namespace LightningDB.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_open(IntPtr env, string path, EnvironmentOpenFlags flags, UnixAccessMode mode);
 
+#if !LIC_U3D_IOS
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_open(IntPtr env, string path, EnvironmentOpenFlags flags, int mode);
-
+#endif
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_set_mapsize(IntPtr env, IntPtr size);
 
@@ -910,9 +912,10 @@ namespace LightningDB.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_del(IntPtr txn, UInt32 dbi, ref ValueStructure key, ref ValueStructure data);
 
+#if !LIC_U3D_IOS
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_del(IntPtr txn, UInt32 dbi, ref ValueStructure key, IntPtr data);
-
+#endif
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_cursor_open(IntPtr txn, UInt32 dbi, out IntPtr cursor);
 
@@ -936,7 +939,7 @@ namespace LightningDB.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int mdb_env_stat(IntPtr env, out MDBStat stat);
 
-        #endregion
+    #endregion
 
         int INativeLibraryFacade.mdb_env_create(out IntPtr env)
         {
@@ -952,12 +955,12 @@ namespace LightningDB.Native
         {
             return FallbackLibraryFacade.mdb_env_open(env, path, flags, mode);
         }
-
+#if !LIC_U3D_IOS
         int INativeLibraryFacade.mdb_env_open(IntPtr env, string path, EnvironmentOpenFlags flags, int mode)
         {
             return FallbackLibraryFacade.mdb_env_open(env, path, flags, mode);
         }
-
+#endif
         int INativeLibraryFacade.mdb_env_set_mapsize(IntPtr env, long size)
         {		
 			IntPtr sizeValue;
@@ -1069,11 +1072,13 @@ namespace LightningDB.Native
             return FallbackLibraryFacade.mdb_del(txn, dbi, ref key, ref data);
         }
 
+#if !LIC_U3D_IOS
         int INativeLibraryFacade.mdb_del(IntPtr txn, uint dbi, ref ValueStructure key, IntPtr data)
         {
             return FallbackLibraryFacade.mdb_del(txn, dbi, ref key, data);
         }
-
+#endif
+       
         int INativeLibraryFacade.mdb_cursor_open(IntPtr txn, uint dbi, out IntPtr cursor)
         {
             return FallbackLibraryFacade.mdb_cursor_open(txn, dbi, out cursor);
@@ -1113,5 +1118,5 @@ namespace LightningDB.Native
             return FallbackLibraryFacade.mdb_env_stat(env, out stat);
         }
 	}
-#endif	
+#endif
 }

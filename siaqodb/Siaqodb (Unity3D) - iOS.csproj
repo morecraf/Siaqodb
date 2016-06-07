@@ -52,11 +52,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Licensed\Release\Unity3D\</OutputPath>
-    <DefineConstants>TRACE;UNITY3D;STORE;</DefineConstants>
+    <OutputPath>bin\Release\Unity3D\xamarin.ios\</OutputPath>
+    <DefineConstants>TRACE;UNITY3D;LIC_U3D_IOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Licensed\Release\Unity3D\Siaqodb.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Unity3D\xamarin.ios\Siaqodb.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -107,6 +107,10 @@
     <Reference Include="ICSharpCode.AvalonEdit">
       <HintPath>..\libs\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -134,6 +138,11 @@
     <Compile Include="DatabaseInfo.xaml.cs">
       <DependentUpon>DatabaseInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DocsDocument.xaml.cs">
+      <DependentUpon>DocsDocument.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DocSerializer\DocumentWrapper.cs" />
+    <Compile Include="DocSerializer\MySerializer.cs" />
     <Compile Include="Entities\TypeMetaDetail.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
@@ -146,6 +155,10 @@
     <Page Include="DefaultDocument.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DocsDocument.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EditArrayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -224,6 +237,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Resources\app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -298,6 +312,16 @@
   <ItemGroup>
     <Resource Include="Resources\documents.png" />
     <Resource Include="Resources\objects-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bucket.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\delete.png" />
+    <Resource Include="Resources\plus.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

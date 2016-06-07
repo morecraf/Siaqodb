@@ -53,16 +53,45 @@ namespace LightningDB
         /// <summary>
         /// Triggered when the transaction is going to be deallocated.
         /// </summary>
-        public event EventHandler<LightningClosingEventArgs> Closing;
+#if UNITY3D
+       
+        readonly object _syncRoot = new object();
+        private EventHandler<LightningClosingEventArgs> closing;
+        public event EventHandler<LightningClosingEventArgs> Closing
+        {
+            add
+            {
+                lock (_syncRoot)
+                {
+                    closing += value;
+                }
+            }
+            remove
+            {
+                lock (_syncRoot)
+                {
+                    closing -= value;
+                }
+            }
 
+        }
+#else
+        public event EventHandler<LightningClosingEventArgs> Closing;
+#endif
         /// <summary>
         /// Called when the transaction is going to be deallocated.
         /// </summary>
         /// <param name="environmentClosing">Is this deallocation caused by closing corresponding environment.</param>
         protected virtual void OnClosing(bool environmentClosing)
         {
+#if UNITY3D
+            if (this.closing != null)
+                this.closing(this, new LightningClosingEventArgs(environmentClosing));
+#else
+           
             if (this.Closing != null)
                 this.Closing(this, new LightningClosingEventArgs(environmentClosing));
+#endif
         }
 
         private void EnvironmentOrParentTransactionClosing(object sender, LightningClosingEventArgs e)
@@ -265,7 +294,8 @@ namespace LightningDB
                         return;
                     }
                 }
-                NativeMethods.Execute(lib => lib.mdb_del(_handle, db._handle, ref keyStructure, IntPtr.Zero));
+                var valueStr = default(ValueStructure);
+                NativeMethods.Execute(lib => lib.mdb_del(_handle, db._handle, ref keyStructure,ref valueStr));
             }
         }
 

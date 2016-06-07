@@ -79,8 +79,9 @@ namespace LightningDB.Native
         ///     EACCES - the user didn't have permission to access the environment files.
         ///     EAGAIN - the environment was locked by another process.
         /// </returns>
+#if !LIC_U3D_IOS
         int mdb_env_open(IntPtr env, string path, EnvironmentOpenFlags flags, int mode);
-
+#endif
         /// <summary>
         /// Set the size of the memory map to use for this environment.
         /// The size should be a multiple of the OS page size. 
@@ -395,7 +396,10 @@ namespace LightningDB.Native
         ///     EACCES - an attempt was made to write in a read-only transaction.
         ///     EINVAL - an invalid parameter was specified.
         /// </returns>
+
+#if !LIC_U3D_IOS
         int mdb_del(IntPtr txn, UInt32 dbi, ref ValueStructure key, IntPtr data);
+#endif
 
         /// <summary>
         /// Create a cursor handle.

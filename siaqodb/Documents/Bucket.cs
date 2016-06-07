@@ -182,18 +182,18 @@ namespace Sqo.Documents
                 try
                 {
                     var lmdbTransaction = siaqodb.transactionManager.GetActiveTransaction();
-                    using (var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create))
+                    var db = lmdbTransaction.OpenDatabase(BucketName, DatabaseOpenFlags.Create);
+
+                    var c = lmdbTransaction.CreateCursor(db);
+                    var i = 0;
+                    var current = c.MoveToFirst();
+                    while (current.HasValue)
                     {
-                        var c = lmdbTransaction.CreateCursor(db);
-                        var i = 0;
-                        var current = c.MoveToFirst();
-                        while (current.HasValue)
-                        {
-                            i++;
-                            current = c.MoveNext();
-                        }
-                        return i;
+                        i++;
+                        current = c.MoveNext();
                     }
+                    return i;
+
                 }
                 finally
                 {

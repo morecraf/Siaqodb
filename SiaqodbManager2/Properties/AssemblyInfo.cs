@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("SiaqodbManager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("siaqodb")]
+[assembly: AssemblyCompany("Dotissi")]
 [assembly: AssemblyProduct("SiaqodbManager")]
-[assembly: AssemblyCopyright("Copyright © Dotissi  2015")]
+[assembly: AssemblyCopyright("Copyright © Dotissi  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.0")]
-[assembly: AssemblyFileVersion("5.0")]
+[assembly: AssemblyVersion("5.5")]
+[assembly: AssemblyFileVersion("5.5")]

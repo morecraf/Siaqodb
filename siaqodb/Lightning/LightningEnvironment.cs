@@ -83,8 +83,31 @@ namespace LightningDB
         /// <summary>
         /// Triggered when the environment is going to close.
         /// </summary>
-        public event EventHandler<LightningClosingEventArgs> Closing;
+#if UNITY3D
+       
+        readonly object _syncRoot = new object();
+        private EventHandler<LightningClosingEventArgs> closing;
+        public event EventHandler<LightningClosingEventArgs> Closing
+        {
+            add
+            {
+                lock (_syncRoot)
+                {
+                    closing += value;
+                }
+            }
+            remove
+            {
+                lock (_syncRoot)
+                {
+                    closing -= value;
+                }
+            }
 
+        }
+#else
+        public event EventHandler<LightningClosingEventArgs> Closing;
+#endif
         /// <summary>
         /// Whether the environment is opened.
         /// </summary>
@@ -217,8 +240,13 @@ namespace LightningDB
         /// </summary>
         protected virtual void OnClosing()
         {
+#if UNITY3D
+            if (this.closing != null)
+                this.closing(this, new LightningClosingEventArgs(true));
+#else
             if (this.Closing != null)
                 this.Closing(this, new LightningClosingEventArgs(true));
+#endif
         }
 
         /// <summary>

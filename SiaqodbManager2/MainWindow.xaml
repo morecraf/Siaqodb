@@ -1,7 +1,7 @@
 ﻿<Window x:Class="SiaqodbManager.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SiaqodbManager 5.0" Height="700" Width="900" xmlns:my="clr-namespace:AvalonDock;assembly=AvalonDock" Loaded="Window_Loaded" Icon="siaqodb.ico">
+        Title="SiaqodbManager 5.5" Height="700" Width="900" xmlns:my="clr-namespace:AvalonDock;assembly=AvalonDock" Loaded="Window_Loaded" Icon="siaqodb.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="28"/>
@@ -78,7 +78,7 @@
             <Button Name="btnExecute" Click="btnExecute_Click" Height="50" ToolTip="Run linq">
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="Resources/run.png" Height="29"></Image>
-                    <TextBlock Text="Run linq "></TextBlock>
+                    <TextBlock Text="Run query "></TextBlock>
                 </StackPanel>
                 
             </Button>

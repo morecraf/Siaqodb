@@ -11,8 +11,8 @@
             <RowDefinition Height="*"/>
            
         </Grid.RowDefinitions>
-       
-        <avalonedit:TextEditor HorizontalAlignment="Stretch"  Name="textEditor1" VerticalAlignment="Stretch"   Grid.Row="0"/>
+
+        <avalonedit:TextEditor HorizontalAlignment="Stretch"  Name="textEditor1" VerticalAlignment="Stretch" FontFamily="Courier New" FontSize="14"  Grid.Row="0"/>
         <GridSplitter Height="5" Background="Gray"
                 VerticalAlignment="Top" HorizontalAlignment="Stretch"  Grid.Row="1"  />
        
