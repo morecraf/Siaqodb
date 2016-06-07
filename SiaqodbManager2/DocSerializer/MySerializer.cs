@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace SiaqodbManager.DocSerializer
 {
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class MyJsonSerializer : IDocumentSerializer
     {
         #region IDocumentSerializer Members

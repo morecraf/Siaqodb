@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace SiaqodbManager.DocSerializer
 {
+    [System.Reflection.Obfuscation(Exclude = true)]
     public class DocumentWrapper
     {
         public string Key { get; set; }

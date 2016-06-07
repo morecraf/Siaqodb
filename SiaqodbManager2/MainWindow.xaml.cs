@@ -136,7 +136,8 @@ namespace SiaqodbManager
                 
             }
             QueryDocument query = dockingManager1.ActiveDocument as QueryDocument;
-            
+            DocsDocument queryDocs = dockingManager1.ActiveDocument as DocsDocument;
+
             if (query != null)
             {
                 btnExecute.IsEnabled = true;
@@ -145,7 +146,16 @@ namespace SiaqodbManager
                 menuSave.IsEnabled = true;
                 menuSaveAs.IsEnabled = true;
             }
-            else 
+            else if (queryDocs != null)
+            {
+
+                btnExecute.IsEnabled = true;
+                menuExecute.IsEnabled = true;
+                btnSave.IsEnabled = false;
+                menuSave.IsEnabled = false;
+                menuSaveAs.IsEnabled = false;
+            }
+            else
             {
                 btnExecute.IsEnabled = false;
                 menuExecute.IsEnabled = false;
