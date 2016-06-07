@@ -68,7 +68,11 @@ namespace Sqo
                                         continue;
                                     }
                                 }
+#if WinRT
+                                T currentObj = (T)Activator.CreateInstance(typeof(T));
+#else
                                 T currentObj = (T)Activator.CreateInstance(typeof(T),true);
+#endif
                                 circularRefCache.Clear();
                                 circularRefCache.Add(oid, ti, currentObj);
 
@@ -527,7 +531,7 @@ namespace Sqo
             }
             else
             {
-                #region IList
+#region IList
                 if (val is IList)
                 {
                     if (w.OperationType == OperationType.Contains)
@@ -579,9 +583,9 @@ namespace Sqo
                     }
                     return false;
                 }
-                #endregion
+#endregion
 
-                #region dictionary
+#region dictionary
                 else if (val is IDictionary)
                 {
                     IDictionary dictionary = val as IDictionary;
@@ -643,7 +647,7 @@ namespace Sqo
                     return false;
 
                 }
-                #endregion
+#endregion
 
                 if (val.GetType() != w.Value.GetType())
                 {
@@ -887,7 +891,12 @@ namespace Sqo
                                 continue;
                             }
                         }
-                        T currentObj =(T) Activator.CreateInstance(typeof(T),true);
+
+#if WinRT
+                        T currentObj = (T)Activator.CreateInstance(typeof(T));
+#else
+                                T currentObj = (T)Activator.CreateInstance(typeof(T),true);
+#endif
                         circularRefCache.Clear();
                         circularRefCache.Add(oid, ti, currentObj);
 
@@ -1070,8 +1079,12 @@ namespace Sqo
                                 continue;
                             }
                         }
-                      
-                        object currentObj = Activator.CreateInstance(ti.Type,true);
+#if WinRT
+                        object currentObj = Activator.CreateInstance(ti.Type);
+#else
+                              object currentObj = Activator.CreateInstance(ti.Type,true);
+#endif
+
                         circularRefCache.Clear();
                         circularRefCache.Add(oid, ti, currentObj);
 
@@ -1210,7 +1223,7 @@ namespace Sqo
             return oids;
 
         }
-        #if ASYNC
+#if ASYNC
         internal async Task<List<int>> LoadAllOIDsAsync(SqoTypeInfo ti)
         {
             List<int> oids = new List<int>();
@@ -1383,8 +1396,13 @@ namespace Sqo
 
                 }
             }
+#if WinRT
+            currentObj = Activator.CreateInstance(ti.Type);
+#else
+                      currentObj = Activator.CreateInstance(ti.Type,true);
+#endif
 
-            currentObj = Activator.CreateInstance(ti.Type,true);
+
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
             serializer.NeedReadComplexObject += new EventHandler<ComplexObjectEventArgs>(serializer_NeedReadComplexObject);
             serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
