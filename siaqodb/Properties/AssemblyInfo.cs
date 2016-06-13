@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("5.5.0.4")]
+[assembly: AssemblyVersion("5.5.0.5")]
 /*#if XIOS
 [assembly: System.Runtime.Versioning.TargetFramework("MonoTouch,Version=v1.0", FrameworkDisplayName="Xamarin.iOS Support")]
 #endif

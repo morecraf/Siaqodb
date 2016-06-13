@@ -369,11 +369,11 @@ namespace SiaqodbManager
                         string msg = "";
                         if (IntPtr.Size == 8)//x64
                         {
-                            msg = "Database is created on a x86 platform, open it wiht SiaqodbManager x86 version";
+                            msg = "Database is created on a x86 platform, open it with SiaqodbManager x86 version";
                         }
                         else//32 bit
                         {
-                            msg = "Database is created on a x64 platform, open it wiht SiaqodbManager x64 version";
+                            msg = "Database is created on a x64 platform, open it with SiaqodbManager x64 version";
                         }
                         System.Windows.Forms.MessageBox.Show(msg);
                     }
