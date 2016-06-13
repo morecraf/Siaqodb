@@ -19,7 +19,7 @@ using System.Web;
 
 namespace SiaqodbCloud
 {
-    internal class SiaqodbCloudHttpClient : IDisposable
+    internal class SiaqodbCloudHttpClient : IDisposable, ISiaqodbCloudClient
     {
         string uri;
 
@@ -185,6 +185,7 @@ namespace SiaqodbCloud
             BatchResponse bres = DeserializeResponse<BatchResponse>(resp);
             resp.Close();
             return bres;
+            
         }
 #endif
 
@@ -379,7 +380,7 @@ namespace SiaqodbCloud
 
 #endif
 #if NON_ASYNC
-        internal void Delete(string bucket, string key, string version)
+        public void Delete(string bucket, string key, string version)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, key);
 
@@ -484,7 +485,7 @@ namespace SiaqodbCloud
 #endif
 
 #if ASYNC
-        internal async Task DeleteAsync(string bucket, string key, string version)
+        public async Task DeleteAsync(string bucket, string key, string version)
         {
             string uriFragment = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", bucket, key);
 

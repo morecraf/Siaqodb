@@ -1,4 +1,5 @@
-﻿using Sqo.Documents;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using Sqo.Documents;
 using Sqo.Documents.Sync;
 using Sqo.Exceptions;
 using System;
@@ -13,7 +14,7 @@ namespace SiaqodbCloud
 {
     public class SiaqodbSync : IDisposable
     {
-        SiaqodbCloudHttpClient httpClient;
+        ISiaqodbCloudClient httpClient;
         public SiaqodbSync(string uri, string access_key_id, string secret_access_key)
         {
             if (!Sqo.Internal._bs._hsy())
@@ -25,6 +26,16 @@ namespace SiaqodbCloud
           LitJson.JsonMapper.RegisterExporter<byte[]>((a,b) => b.Write(System.Convert.ToBase64String(a)));
 #endif
             this.httpClient = new SiaqodbCloudHttpClient(uri, access_key_id, secret_access_key);
+            DownloadBatchSize = 10000;
+        }
+        public SiaqodbSync(CloudTableClient tableClient)
+        {
+            if (!Sqo.Internal._bs._hsy())
+            {
+                throw new SiaqodbException("SiaqodbSync license not valid!");
+            }
+
+            this.httpClient = new AzureTableClient(tableClient);
             DownloadBatchSize = 10000;
         }
 

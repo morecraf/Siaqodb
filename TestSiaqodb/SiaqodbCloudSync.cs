@@ -5,6 +5,9 @@ using TestSiaqodbBuckets;
 using System.Text;
 using SiaqodbCloud;
 using Sqo.Documents;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure;
 
 namespace TestSiaqodbBuckets
 {
@@ -26,7 +29,10 @@ namespace TestSiaqodbBuckets
         }
         private SiaqodbSync GetSyncContext()
         {
-            return new SiaqodbSync("http://localhost:11735/v0/", "97c7835153fd66617fad7b43f4000647", "4362kljh63k4599hhgm");
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            return new SiaqodbSync(tableClient);
+            //return new SiaqodbSync("http://localhost:11735/v0/", "97c7835153fd66617fad7b43f4000647", "4362kljh63k4599hhgm");
         }
         [TestMethod]
         public void Insert()
@@ -49,7 +55,7 @@ namespace TestSiaqodbBuckets
                    
                     Filter f = new Filter("key");
                     f.Value = userName;
-                    var presult = syncContext.Pull(bucket2, f);
+                    var presult = syncContext.Pull(bucket2,f);
                     var fromDB = bucket2.Load(userName);
                     Assert.AreEqual(22, fromDB.GetTag<int>("Age"));
                     var value = fromDB.GetContent<Person>();
