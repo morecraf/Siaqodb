@@ -4,7 +4,6 @@ using Sqo.Documents.Sync;
 using System;
 #if ASYNC
 using System.Collections.Generic;
-using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 #endif
 namespace SiaqodbCloud

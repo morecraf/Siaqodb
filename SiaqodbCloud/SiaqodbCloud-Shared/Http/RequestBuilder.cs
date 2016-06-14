@@ -8,7 +8,6 @@ using System.Text;
 using System.Linq;
 #if ASYNC
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 #endif
 

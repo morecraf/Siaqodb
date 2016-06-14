@@ -9,8 +9,7 @@ using Sqo.Documents;
 using Sqo.Documents.Sync;
 
 #if ASYNC
-using System.Net.Http.Formatting;
-using System.Web;
+
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -91,9 +90,9 @@ namespace SiaqodbCloud
             HttpRequestMessage request = requestBuilder.BuildGetRequestAsync(bucket, parameters);
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ResultSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return (ResultSet)obj;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultSet>(obj);
         }
 #endif
 #if NON_ASYNC
@@ -135,9 +134,9 @@ namespace SiaqodbCloud
             if (httpResponseMessage == null)//document not found
                 return null;
 
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(Document), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return (Document)obj;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Document>(obj);
         }
 #endif
 #if NON_ASYNC
@@ -167,8 +166,9 @@ namespace SiaqodbCloud
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
 
-            var objResp = await httpResponseMessage.Content.ReadAsAsync(typeof(StoreResponse), GetDefaultFormatter());
-            return (StoreResponse)objResp;
+            var objResp = await httpResponseMessage.Content.ReadAsStringAsync();
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<StoreResponse>(objResp);
 
         }
 #endif
@@ -198,8 +198,9 @@ namespace SiaqodbCloud
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
 
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(BatchResponse), GetDefaultFormatter());
-            return (BatchResponse)obj;
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
+
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<BatchResponse>(obj);
 
         }
 #endif
@@ -230,9 +231,9 @@ namespace SiaqodbCloud
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
 
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ResultSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return (ResultSet)obj;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultSet>(obj);
 
         }
 #endif
@@ -316,9 +317,9 @@ namespace SiaqodbCloud
             HttpRequestMessage request = requestBuilder.BuildPostRequestAsync(uriFragment, query, parameters);
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ChangeSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return (ChangeSet)obj;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ChangeSet>(obj);
 
         }
 #endif
@@ -372,9 +373,9 @@ namespace SiaqodbCloud
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
 
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(ChangeSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return (ChangeSet)obj;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ChangeSet>(obj);
 
         }
 
@@ -538,16 +539,7 @@ namespace SiaqodbCloud
             return response;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// 
-        public IEnumerable<MediaTypeFormatter> GetDefaultFormatter()
-        {
-            var formatters = new List<MediaTypeFormatter> { new JsonMediaTypeFormatter() };
-            return formatters;
-        }
+        
 #endif
 
         /// <summary>
@@ -586,9 +578,9 @@ namespace SiaqodbCloud
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(BucketSet), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return (BucketSet)obj;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<BucketSet>(obj);
         }
 #endif
 #if NON_ASYNC
@@ -614,7 +606,7 @@ namespace SiaqodbCloud
 
             HttpResponseMessage httpResponseMessage = await this.SendAsync(request);
             httpResponseMessage.EnsureSuccessStatusCode();
-            var obj = await httpResponseMessage.Content.ReadAsAsync(typeof(string), GetDefaultFormatter());
+            var obj = await httpResponseMessage.Content.ReadAsStringAsync();
 
             return obj.ToString();
         }
