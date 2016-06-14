@@ -91,13 +91,15 @@ namespace SiaqodbCloud
         public PushStatistics SyncStatistics { get; set; }
 
         public List<Conflict> Conflicts { get; set; }
-        public string UploadAnchor  { get; set; }
-        public PushResult(Exception error, PushStatistics syncStatistics, List<Conflict> conflicts,string uploadAnchor)
+        public List<DocumentsWithErrors> ItemsWithErrors { get; set; }
+        public string UploadAnchor { get; set; }
+        public PushResult(Exception error, PushStatistics syncStatistics, List<Conflict> conflicts,List<DocumentsWithErrors> itemsWithErrors, string uploadAnchor)
         {
             Error = error;
             SyncStatistics = syncStatistics;
             Conflicts = conflicts;
             UploadAnchor = uploadAnchor;
+            this.ItemsWithErrors = itemsWithErrors;
         }
     }
     [System.Reflection.Obfuscation(Exclude = true)]
@@ -116,5 +118,12 @@ namespace SiaqodbCloud
 
         public PushResult PushResult { get; set; }
 
+    }
+    [System.Reflection.Obfuscation(Exclude = true)]
+    public class DocumentsWithErrors
+    {
+        public string DocumentKey { get; set; }
+        public string Error { get; set; }
+        
     }
 }

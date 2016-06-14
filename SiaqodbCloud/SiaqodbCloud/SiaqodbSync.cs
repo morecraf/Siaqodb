@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿
 using Sqo.Documents;
 using Sqo.Documents.Sync;
 using Sqo.Exceptions;
@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 #if ASYNC
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
 #endif
 
 namespace SiaqodbCloud
@@ -28,6 +29,7 @@ namespace SiaqodbCloud
             this.httpClient = new SiaqodbCloudHttpClient(uri, access_key_id, secret_access_key);
             DownloadBatchSize = 10000;
         }
+#if !UNITY3D
         public SiaqodbSync(CloudTableClient tableClient)
         {
             if (!Sqo.Internal._bs._hsy())
@@ -38,7 +40,7 @@ namespace SiaqodbCloud
             this.httpClient = new AzureTableClient(tableClient);
             DownloadBatchSize = 10000;
         }
-
+#endif
         public int DownloadBatchSize { get; set; }
 #if NON_ASYNC
         public PushResult Push(IBucket bucket)
@@ -55,6 +57,7 @@ namespace SiaqodbCloud
             syncStatistics.StartTime = DateTime.Now;
             Exception error = null;
             List<Conflict> conflicts = null;
+            List<DocumentsWithErrors> itemsWithErrors = null;
             string uploadAnchor = null;
             try
             {
@@ -94,6 +97,13 @@ namespace SiaqodbCloud
                     {
                         syncStatistics.TotalConflicted = conflicts.Count;
                     }
+                    var errorsResponses = response.BatchItemResponses.Where(a => string.Compare(a.Error, "conflict", StringComparison.OrdinalIgnoreCase) != 0 && !string.IsNullOrEmpty(a.Error));
+                    foreach (var itemWithErr in errorsResponses)
+                    {
+                        if (itemsWithErrors == null)
+                            itemsWithErrors = new List<DocumentsWithErrors>();
+                        itemsWithErrors.Add(new DocumentsWithErrors { DocumentKey = itemWithErr.Key, Error = itemWithErr.Error });
+                    }
                     Sqo.Internal._bs._csm((Bucket)bucket);
                 }
 
@@ -105,7 +115,7 @@ namespace SiaqodbCloud
                 error = err;
             }
             syncStatistics.EndTime = DateTime.Now;
-            return new PushResult(error, syncStatistics, conflicts, uploadAnchor);
+            return new PushResult(error, syncStatistics, conflicts, itemsWithErrors, uploadAnchor);
         }
         private List<Conflict> ManageConflicts(IBucket bucket, IEnumerable<BatchItemResponse> conflictResponses, ChangeSet changeSet, IConflictResolver conflictResolver)
         {
@@ -172,6 +182,7 @@ namespace SiaqodbCloud
             syncStatistics.StartTime = DateTime.Now;
             Exception error = null;
             List<Conflict> conflicts = null;
+            List<DocumentsWithErrors> itemsWithErrors = null;
             string uploadAnchor = null;
             try
             {
@@ -211,6 +222,13 @@ namespace SiaqodbCloud
                     {
                         syncStatistics.TotalConflicted = conflicts.Count;
                     }
+                    var errorsResponses = response.BatchItemResponses.Where(a => string.Compare(a.Error, "conflict", StringComparison.OrdinalIgnoreCase) != 0 && !string.IsNullOrEmpty(a.Error));
+                    foreach (var itemWithErr in errorsResponses)
+                    {
+                        if (itemsWithErrors == null)
+                            itemsWithErrors = new List<DocumentsWithErrors>();
+                        itemsWithErrors.Add(new DocumentsWithErrors { DocumentKey = itemWithErr.Key, Error = itemWithErr.Error });
+                    }
                     Sqo.Internal._bs._csm((Bucket)bucket);
                 }
 
@@ -222,7 +240,7 @@ namespace SiaqodbCloud
                 error = err;
             }
             syncStatistics.EndTime = DateTime.Now;
-            return new PushResult(error, syncStatistics, conflicts, uploadAnchor);
+            return new PushResult(error, syncStatistics, conflicts,itemsWithErrors, uploadAnchor);
         }
         private async Task<List<Conflict>> ManageConflictsAsync(IBucket bucket, IEnumerable<BatchItemResponse> conflictResponses, ChangeSet changeSet, IConflictResolver conflictResolver)
         {

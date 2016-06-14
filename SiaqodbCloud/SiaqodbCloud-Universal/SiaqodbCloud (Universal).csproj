@@ -120,6 +120,12 @@
     <Compile Include="..\SiaqodbCloud\Exceptions\Exceptions.cs">
       <Link>Exceptions\Exceptions.cs</Link>
     </Compile>
+    <Compile Include="..\SiaqodbCloud\Http\AzureTableClient.cs">
+      <Link>Http\AzureTableClient.cs</Link>
+    </Compile>
+    <Compile Include="..\SiaqodbCloud\Http\ISiaqodbCloudClient.cs">
+      <Link>Http\ISiaqodbCloudClient.cs</Link>
+    </Compile>
     <Compile Include="..\SiaqodbCloud\Http\RequestBuilder.cs">
       <Link>Http\RequestBuilder.cs</Link>
     </Compile>
