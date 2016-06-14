@@ -114,6 +114,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BasicsTest.cs" />
     <Compile Include="SiaqodbCloudSync.cs" />
+    <Compile Include="SiaqodbCloudSync_Async.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AuthoringTests.txt" />

@@ -108,45 +108,6 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SiaqodbCloud\CompatibiltyHelper.cs">
-      <Link>CompatibiltyHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Entities\Filter.cs">
-      <Link>Entities\Filter.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Entities\SyncEntities.cs">
-      <Link>Entities\SyncEntities.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Exceptions\Exceptions.cs">
-      <Link>Exceptions\Exceptions.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Http\AzureTableClient.cs">
-      <Link>Http\AzureTableClient.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Http\ISiaqodbCloudClient.cs">
-      <Link>Http\ISiaqodbCloudClient.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Http\RequestBuilder.cs">
-      <Link>Http\RequestBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Http\SiaqodbCloudHttpClient.cs">
-      <Link>Http\SiaqodbCloudHttpClient.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Http\Signature.cs">
-      <Link>Http\Signature.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\IConflictResolver.cs">
-      <Link>IConflictResolver.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\Obfuscation\ObfuscationAttributes.cs">
-      <Link>Obfuscation\ObfuscationAttributes.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\ServerWinResolver.cs">
-      <Link>ServerWinResolver.cs</Link>
-    </Compile>
-    <Compile Include="..\SiaqodbCloud\SiaqodbSync.cs">
-      <Link>SiaqodbSync.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\SiaqodbCloudUniv.rd.xml" />
   </ItemGroup>
@@ -160,6 +121,7 @@
       <Name>Siaqodb %28UWP%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\SiaqodbCloud-Shared\SiaqodbCloud-Shared.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

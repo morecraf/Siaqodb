@@ -6,9 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if !UNITY3D
+using Microsoft.WindowsAzure.Storage.Table;
+#endif
 #if ASYNC
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage.Table;
+
 #endif
 
 namespace SiaqodbCloud

@@ -6,6 +6,9 @@ using System.Text;
 using SiaqodbCloud;
 using Sqo.Documents;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.Azure;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace TestSiaqodbBuckets
 {
@@ -26,7 +29,10 @@ namespace TestSiaqodbBuckets
         }
         private SiaqodbSync GetSyncContext()
         {
-            return new SiaqodbSync("http://localhost:11735/v0/", "7ba65b5855dddb308766b6756b00079a", "kHSFD8ADHFKS8998sxS");
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            return new SiaqodbSync(tableClient);
+            //return new SiaqodbSync("http://localhost:11735/v0/", "7ba65b5855dddb308766b6756b00079a", "kHSFD8ADHFKS8998sxS");
         }
         [TestMethod]
         public async Task Insert()

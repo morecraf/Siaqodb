@@ -43,13 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompatibiltyHelper.cs" />
-    <Compile Include="Entities\SyncEntities.cs" />
-    <Compile Include="Exceptions\Exceptions.cs" />
-    <Compile Include="Entities\Filter.cs" />
-    <Compile Include="Http\ISiaqodbCloudClient.cs" />
-    <Compile Include="Http\SiaqodbCloudHttpClient.cs" />
-    <Compile Include="IConflictResolver.cs" />
     <Compile Include="litjson\IJsonWrapper.cs" />
     <Compile Include="litjson\JsonData.cs" />
     <Compile Include="litjson\JsonException.cs" />
@@ -58,12 +51,7 @@
     <Compile Include="litjson\JsonWriter.cs" />
     <Compile Include="litjson\Lexer.cs" />
     <Compile Include="litjson\ParserToken.cs" />
-    <Compile Include="Obfuscation\ObfuscationAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Http\RequestBuilder.cs" />
-    <Compile Include="ServerWinResolver.cs" />
-    <Compile Include="SiaqodbSync.cs" />
-    <Compile Include="Http\Signature.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -75,6 +63,7 @@
       <Name>Siaqodb %28Unity3D%29 - Windows</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\SiaqodbCloud-Shared\SiaqodbCloud-Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

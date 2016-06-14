@@ -818,6 +818,7 @@ namespace TestSiaqodbBuckets
                     int myint = rndNr;
                     double myFloat = (double)rndNr + 0.55;
                     DateTime myDate = new DateTime(2016, rndNr % 10 + 1, rndNr % 28 + 1);
+                    myDate = DateTime.SpecifyKind(myDate, DateTimeKind.Utc);
                     string myStr = rndNr.ToString();
                     bool myB = true;
                     bucket.Store(p.UserName, p, new { Myint = myint, MyFloat = myFloat, MyDate = myDate, MyStr = myStr, MyBool = myB });

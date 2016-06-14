@@ -60,6 +60,7 @@ namespace SiaqodbCloud
             return null;
         }
 #endif
+#if ASYNC
         public async Task<Document> GetAsync(string bucket, string key, string version = null)
         {
             CloudTable table = tableClient.GetTableReference(bucket);
@@ -98,6 +99,7 @@ namespace SiaqodbCloud
             }
             return null;
         }
+#endif
 #if NON_ASYNC
         public ChangeSet GetChanges(string bucket, int limit, string anchor, string uploadAnchor)
         {
@@ -113,6 +115,7 @@ namespace SiaqodbCloud
             return PrepareChangeSet(dens);
         }
 #endif
+#if ASYNC
         public Task<ChangeSet> GetChangesAsync(string bucket, int limit, string anchor, string uploadAnchor)
         {
             return GetChangesAsync(bucket, null, limit, anchor, uploadAnchor);
@@ -127,6 +130,7 @@ namespace SiaqodbCloud
             IEnumerable<DynamicTableEntity> dens = await table.ExecuteQueryAsync(query);
             return PrepareChangeSet(dens);
         }
+#endif
 
         private ChangeSet PrepareChangeSet(IEnumerable<DynamicTableEntity> dens)
         {
@@ -235,10 +239,8 @@ namespace SiaqodbCloud
             else if (type == typeof(DateTime))
             {
                 DateTime date = (DateTime)value;
-                if (date.Kind == DateTimeKind.Unspecified)
-                    date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
-
-                return TableQuery.GenerateFilterConditionForDate(tagName, oper, date);
+                
+                return TableQuery.GenerateFilterConditionForDate(tagName, oper, date.ToUniversalTime());
             }
             else if (type == typeof(bool))
             {
@@ -308,6 +310,7 @@ namespace SiaqodbCloud
             return br;
         }
 #endif
+#if ASYNC
         public async Task<BatchResponse> PutAsync(string bucket, ChangeSet batch)
         {
             CloudTable table = tableClient.GetTableReference(bucket);
@@ -364,6 +367,7 @@ namespace SiaqodbCloud
             br.Total = br.BatchItemResponses.Count;
             return br;
         }
+#endif
         private void SetError(BatchItemResponse resp, StorageException ex)
         {
             if (ex.RequestInformation.HttpStatusCode == 412)
@@ -408,7 +412,7 @@ namespace SiaqodbCloud
         }
 
 #endif
-
+#if ASYNC
         public async Task<StoreResponse> PutAsync(string bucket, Document d)
         {
 
@@ -436,6 +440,7 @@ namespace SiaqodbCloud
                     throw;
             }
         }
+#endif
         private TableOperation PreparePut(string bucket, Document d, DynamicTableEntity den)
         {
 
@@ -507,6 +512,7 @@ namespace SiaqodbCloud
 
         }
 #endif
+#if ASYNC
         public async Task DeleteAsync(string bucket, string key, string version)
         {
             CloudTable table = tableClient.GetTableReference(bucket);
@@ -532,12 +538,14 @@ namespace SiaqodbCloud
             }
         }
 
+
+#endif
         public void Dispose()
         {
 
         }
-
     }
+#if ASYNC
     internal static class CloudTableExt
     {
         public static async Task<IList<DynamicTableEntity>> ExecuteQueryAsync(this CloudTable table, TableQuery<DynamicTableEntity> query, CancellationToken ct = default(CancellationToken)) 
@@ -557,6 +565,6 @@ namespace SiaqodbCloud
             return items;
         }
     }
-   
-}
+#endif
+    }
 #endif

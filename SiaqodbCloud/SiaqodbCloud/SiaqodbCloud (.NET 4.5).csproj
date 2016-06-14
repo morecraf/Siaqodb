@@ -77,20 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompatibiltyHelper.cs" />
-    <Compile Include="Entities\SyncEntities.cs" />
-    <Compile Include="Exceptions\Exceptions.cs" />
-    <Compile Include="Entities\Filter.cs" />
-    <Compile Include="Http\AzureTableClient.cs" />
-    <Compile Include="Http\ISiaqodbCloudClient.cs" />
-    <Compile Include="Http\SiaqodbCloudHttpClient.cs" />
-    <Compile Include="IConflictResolver.cs" />
-    <Compile Include="Obfuscation\ObfuscationAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Http\RequestBuilder.cs" />
-    <Compile Include="ServerWinResolver.cs" />
-    <Compile Include="SiaqodbSync.cs" />
-    <Compile Include="Http\Signature.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
@@ -106,6 +93,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <Import Project="..\SiaqodbCloud-Shared\SiaqodbCloud-Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

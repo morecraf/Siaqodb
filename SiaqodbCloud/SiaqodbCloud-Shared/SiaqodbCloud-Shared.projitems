@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>eb5107e8-e3bd-48d1-92dc-feea5d703e49</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SiaqodbCloud_Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CompatibiltyHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\Filter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\SyncEntities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\Exceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Http\AzureTableClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Http\ISiaqodbCloudClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Http\RequestBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Http\SiaqodbCloudHttpClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Http\Signature.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IConflictResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Obfuscation\ObfuscationAttributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServerWinResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SiaqodbSync.cs" />
+  </ItemGroup>
+</Project>
