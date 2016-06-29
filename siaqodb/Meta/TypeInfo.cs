@@ -38,9 +38,9 @@ namespace Sqo.Meta
             string onlyTypeName = type.Namespace+"."+type.Name;
             AddGenericsInfo(type, ref onlyTypeName);
 
-            #if SILVERLIGHT
+#if SILVERLIGHT
             string assemblyName = type.Assembly.FullName.Split(',')[0];
-#elif WinRT
+#elif WinRT || NETSTANDARD
             string assemblyName = type.GetTypeInfo().Assembly.GetName().Name;
 #else
             string assemblyName = type.Assembly.GetName().Name;

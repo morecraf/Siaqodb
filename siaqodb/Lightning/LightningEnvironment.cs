@@ -202,7 +202,7 @@ namespace LightningDB
         /// </summary>
         public void Open()
         {
-#if !WinRT
+#if !WinRT && !NETSTANDARD
             if (!System.IO.Directory.Exists(this.Directory))
                 System.IO.Directory.CreateDirectory(this.Directory);
 #endif

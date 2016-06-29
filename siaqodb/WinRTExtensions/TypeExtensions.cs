@@ -7,7 +7,7 @@ namespace Sqo
 {
     static class  TypeExtensions
     {
-#if WinRT
+#if WinRT || NETSTANDARD
         public static bool IsAssignableFrom(this Type type, Type fromType)
         {
             return type.GetTypeInfo().IsAssignableFrom(fromType.GetTypeInfo());

@@ -866,7 +866,7 @@ namespace Sqo.Meta
                 }
             }
 
-#if WinRT
+#if WinRT || NETSTANDARD
             var baseType = t.GetBaseType();
 #else
             var baseType = t.BaseType;
@@ -890,7 +890,7 @@ namespace Sqo.Meta
                 }
             }
 
-#if WinRT
+#if WinRT || NETSTANDARD
             var baseType = t.GetBaseType();
 #else
             var baseType = t.BaseType;

@@ -607,7 +607,7 @@ namespace Sqo
                         return this.VisitBinary(exp);
                     }
                 }
-#if WinRT
+#if WinRT || NETSTANDARD
                 if (m.Member.GetMemberType() == MemberTypes.Property)
 #else
                 if (m.Member.MemberType == System.Reflection.MemberTypes.Property)
@@ -626,7 +626,7 @@ namespace Sqo
 
                         }
 						System.Reflection.PropertyInfo pi = m.Member as System.Reflection.PropertyInfo;
-						#if SILVERLIGHT || CF || UNITY3D || WinRT || MONODROID
+						#if SILVERLIGHT || CF || UNITY3D || WinRT || MONODROID || NETSTANDARD
                         string fieldName = SilverlightPropertyResolver.GetPrivateFieldName(pi, pi.DeclaringType);
                         if (fieldName != null)
                         {
@@ -681,7 +681,7 @@ namespace Sqo
 #endif
 					}
 				}
-#if WinRT
+#if WinRT || NETSTANDARD
                 else if (m.Member.GetMemberType() == MemberTypes.Field)
 #else
                 else if (m.Member.MemberType == System.Reflection.MemberTypes.Field)

@@ -185,7 +185,7 @@ namespace Sqo.Utilities
             throw new SiaqodbException("Field:" + field + " not found as field or as automatic property of Type provided");
 
         }
-#if !WinRT
+#if !WinRT && !NETSTANDARD
         internal static bool FileExists(string dbpath, string typeName, bool useElevatedTrust)
         {
             string extension = ".sqo";
@@ -277,7 +277,7 @@ namespace Sqo.Utilities
 
 #if SILVERLIGHT
             string assemblyName = type.Assembly.FullName.Split(',')[0];
-#elif NETFX_CORE
+#elif NETFX_CORE || NETSTANDARD
             string assemblyName = type.GetTypeInfo().Assembly.GetName().Name;
 #else
             string assemblyName = type.Assembly.GetName().Name;
@@ -295,7 +295,7 @@ namespace Sqo.Utilities
         }
         internal static object GetDefault(Type type)
         {
-#if WinRT
+#if WinRT || NETSTANDARD
             if (type.GetTypeInfo().IsValueType)
 #else
             if (type.IsValueType)
