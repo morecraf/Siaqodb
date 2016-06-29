@@ -1,4 +1,5 @@
 ﻿
+
 using Sqo.Documents;
 using Sqo.Documents.Sync;
 using Sqo.Exceptions;
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 #if !UNITY3D
-using Microsoft.WindowsAzure.Storage.Table;
+using Dotissi.AzureTable.LiteClient;
 #endif
 #if ASYNC
 using System.Threading.Tasks;
@@ -33,14 +34,14 @@ namespace SiaqodbCloud
             DownloadBatchSize = 10000;
         }
 #if !UNITY3D
-        public SiaqodbSync(CloudTableClient tableClient)
+        public SiaqodbSync(AzureTableClient tableClient)
         {
             if (!Sqo.Internal._bs._hsy())
             {
                 throw new SiaqodbException("SiaqodbSync license not valid!");
             }
 
-            this.httpClient = new AzureTableClient(tableClient);
+            this.httpClient = new AzureTableHTTPClient(tableClient);
             DownloadBatchSize = 10000;
         }
 #endif

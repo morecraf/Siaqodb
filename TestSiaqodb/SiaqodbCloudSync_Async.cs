@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage.Table;
+using Dotissi.AzureTable.LiteClient;
 
 namespace TestSiaqodbBuckets
 {
@@ -30,7 +31,7 @@ namespace TestSiaqodbBuckets
         private SiaqodbSync GetSyncContext()
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            AzureTableClient tableClient = new AzureTableClient("ma431698b233164f", @"ncahvuZcQHbWyjKRYv1GkBrs9vmYjHBnVeZj0y9F0C7llQhPrxYv8LlnMkvZ+6+/LqMpG0ojXY3AN4FVplzUrQ==");
             return new SiaqodbSync(tableClient);
             //return new SiaqodbSync("http://localhost:11735/v0/", "7ba65b5855dddb308766b6756b00079a", "kHSFD8ADHFKS8998sxS");
         }
@@ -557,6 +558,267 @@ namespace TestSiaqodbBuckets
 
                     //the live object should be the same as the one stored local
                     Assert.IsNull(liveVersion);
+                }
+            }
+        }
+        [TestMethod]
+        public async Task TestIntFilters()
+        {
+            using (SiaqodbSync syncContext = this.GetSyncContext())
+            {
+                IBucket bucket = siaqodb1.Documents["personas1"];
+                IBucket bucket2 = siaqodb2.Documents["personas1"];
+                {
+
+                    int rndNr = rnd.Next(100000000);
+                    string userName = "userName" + rndNr;
+                    Person p = GetPerson(userName);
+                    int myint = rndNr;
+                    double myFloat = (double)rndNr + 0.55;
+                    DateTime myDate = new DateTime(2016, rndNr % 10 + 1, rndNr % 28 + 1);
+                    string myStr = rndNr.ToString();
+                    bool myB = true;
+                    bucket.Store(p.UserName, p, new { Myint = myint, MyFloat = myFloat, MyDate = myDate, MyStr = myStr, MyBool = myB });
+                    var result = await syncContext.PushAsync(bucket);
+                    if (result.Error != null)
+                        throw result.Error;
+                    if (result.Conflicts != null && result.Conflicts.Count > 0)
+                        throw new Exception("Random not OK retry");
+
+                    Filter f = new Filter("myint");
+                    f.Value = rndNr;
+                    var presult = await syncContext.PullAsync(bucket2, f);
+                    var fromDB = bucket2.Load(userName);
+                    Assert.AreEqual(rndNr, fromDB.GetTag<int>("myint"));
+                    var value = fromDB.GetContent<Person>();
+                    Assert.AreEqual(userName, value.UserName);
+                    Assert.AreEqual(p.FirstName, value.FirstName);
+
+                    f = new Filter("myint");
+                    f.Start = rndNr;
+                    var presultStart = await syncContext.PullAsync(bucket2, f);
+                    Query q = new Query();
+                    q.WhereGreaterThanOrEqual("myint", rndNr);
+                    var all = bucket2.Find(q);
+                    Assert.IsTrue(all.Count > 0);
+                    foreach (Document d in all)
+                    {
+                        Assert.IsTrue(fromDB.GetTag<int>("myint") >= rndNr);
+                    }
+
+                    f = new Filter("myint");
+                    f.End = rndNr;
+                    var presulEnd =await syncContext.PullAsync(bucket2, f);
+                    Query ql = new Query();
+                    ql.WhereLessThanOrEqual("myint", rndNr);
+                    var allEnd = bucket2.Find(ql);
+                    Assert.IsTrue(allEnd.Count > 0);
+                    foreach (Document d in allEnd)
+                    {
+                        Assert.IsTrue(fromDB.GetTag<int>("myint") <= rndNr);
+                    }
+                    f = new Filter("myint");
+                    f.Start = rndNr;
+                    f.End = rndNr;
+                    var psresult = await syncContext.PullAsync(bucket2, f);
+                    Assert.IsTrue(psresult.SyncStatistics.TotalDownloads == 0);
+
+                }
+            }
+        }
+        [TestMethod]
+        public async Task TestFloatFilters()
+        {
+            using (SiaqodbSync syncContext = this.GetSyncContext())
+            {
+                IBucket bucket = siaqodb1.Documents["personas1"];
+                IBucket bucket2 = siaqodb2.Documents["personas1"];
+                {
+
+                    int rndNr = rnd.Next(100000000);
+                    string userName = "userName" + rndNr;
+                    Person p = GetPerson(userName);
+                    int myint = rndNr;
+                    double myFloat = (double)rndNr + 0.55;
+                    DateTime myDate = new DateTime(2016, rndNr % 10 + 1, rndNr % 28 + 1);
+                    string myStr = rndNr.ToString();
+                    bool myB = true;
+                    bucket.Store(p.UserName, p, new { Myint = myint, MyFloat = myFloat, MyDate = myDate, MyStr = myStr, MyBool = myB });
+                    var result = await syncContext.PushAsync(bucket);
+                    if (result.Error != null)
+                        throw result.Error;
+                    if (result.Conflicts != null && result.Conflicts.Count > 0)
+                        throw new Exception("Random not OK retry");
+
+                    Filter f = new Filter("myfloat");
+                    f.Value = myFloat;
+                    var presult = await syncContext.PullAsync(bucket2, f);
+                    var fromDB = bucket2.Load(userName);
+                    Assert.AreEqual(myFloat, fromDB.GetTag<double>("myFloat"));
+                    var value = fromDB.GetContent<Person>();
+                    Assert.AreEqual(userName, value.UserName);
+                    Assert.AreEqual(p.FirstName, value.FirstName);
+
+                    f = new Filter("myfloat");
+                    f.Start = myFloat;
+                    var presultStart = await syncContext.PullAsync(bucket2, f);
+                    Query q = new Query();
+                    q.WhereGreaterThanOrEqual("myfloat", myFloat);
+                    var all = bucket2.Find(q);
+                    Assert.IsTrue(all.Count > 0);
+                    foreach (Document d in all)
+                    {
+                        Assert.IsTrue(fromDB.GetTag<double>("myfloat") >= myFloat);
+                    }
+
+                    f = new Filter("myfloat");
+                    f.End = myFloat;
+                    var presulEnd = await syncContext.PullAsync(bucket2, f);
+                    Query ql = new Query();
+                    ql.WhereLessThanOrEqual("myfloat", myFloat);
+                    var allEnd = bucket2.Find(ql);
+                    Assert.IsTrue(allEnd.Count > 0);
+                    foreach (Document d in allEnd)
+                    {
+                        Assert.IsTrue(fromDB.GetTag<double>("myfloat") <= myFloat);
+                    }
+                    f = new Filter("myfloat");
+                    f.Start = myFloat;
+                    f.End = myFloat;
+                    var psresult = await syncContext.PullAsync(bucket2, f);
+                    Assert.IsTrue(psresult.SyncStatistics.TotalDownloads == 0);
+
+                }
+            }
+        }
+        [TestMethod]
+        public async Task TestDateTimeFilters()
+        {
+            using (SiaqodbSync syncContext = this.GetSyncContext())
+            {
+                IBucket bucket = siaqodb1.Documents["personas1"];
+                IBucket bucket2 = siaqodb2.Documents["personas1"];
+                {
+
+                    int rndNr = rnd.Next(100000000);
+                    string userName = "userName" + rndNr;
+                    Person p = GetPerson(userName);
+                    int myint = rndNr;
+                    double myFloat = (double)rndNr + 0.55;
+                    DateTime myDate = new DateTime(2016, rndNr % 10 + 1, rndNr % 28 + 1);
+                    myDate = DateTime.SpecifyKind(myDate, DateTimeKind.Utc);
+                    string myStr = rndNr.ToString();
+                    bool myB = true;
+                    bucket.Store(p.UserName, p, new { Myint = myint, MyFloat = myFloat, MyDate = myDate, MyStr = myStr, MyBool = myB });
+                    var result = await syncContext.PushAsync(bucket);
+                    if (result.Error != null)
+                        throw result.Error;
+                    if (result.Conflicts != null && result.Conflicts.Count > 0)
+                        throw new Exception("Random not OK retry");
+
+                    Filter f = new Filter("mydate");
+                    f.Value = myDate;
+                    var presult = await syncContext.PullAsync(bucket2, f);
+                    var fromDB = bucket2.Load(userName);
+                    Assert.AreEqual(myDate, fromDB.GetTag<DateTime>("mydate"));
+                    var value = fromDB.GetContent<Person>();
+                    Assert.AreEqual(userName, value.UserName);
+                    Assert.AreEqual(p.FirstName, value.FirstName);
+
+                    f = new Filter("mydate");
+                    f.Start = myDate;
+                    var presultStart = await syncContext.PullAsync(bucket2, f);
+                    Query q = new Query();
+                    q.WhereGreaterThanOrEqual("mydate", myDate);
+                    var all = bucket2.Find(q);
+                    Assert.IsTrue(all.Count > 0);
+                    foreach (Document d in all)
+                    {
+                        Assert.IsTrue(fromDB.GetTag<DateTime>("mydate") >= myDate);
+                    }
+
+                    f = new Filter("mydate");
+                    f.End = myDate;
+                    var presulEnd =await syncContext.PullAsync(bucket2, f);
+                    Query ql = new Query();
+                    ql.WhereLessThanOrEqual("mydate", myDate);
+                    var allEnd = bucket2.Find(ql);
+                    Assert.IsTrue(allEnd.Count > 0);
+                    foreach (Document d in allEnd)
+                    {
+                        Assert.IsTrue(fromDB.GetTag<DateTime>("mydate") <= myDate);
+                    }
+                    f = new Filter("mydate");
+                    f.Start = myDate;
+                    f.End = myDate;
+                    var psresult = await syncContext.PullAsync(bucket2, f);
+                    Assert.IsTrue(psresult.SyncStatistics.TotalDownloads == 0);
+
+                }
+            }
+        }
+        [TestMethod]
+        public async Task TestStringFilters()
+        {
+            using (SiaqodbSync syncContext = this.GetSyncContext())
+            {
+                IBucket bucket = siaqodb1.Documents["personas1"];
+                IBucket bucket2 = siaqodb2.Documents["personas1"];
+                {
+
+                    int rndNr = rnd.Next(100000000);
+                    string userName = "userName" + rndNr;
+                    Person p = GetPerson(userName);
+                    int myint = rndNr;
+                    double myFloat = (double)rndNr + 0.55;
+                    DateTime myDate = new DateTime(2016, rndNr % 10 + 1, rndNr % 28 + 1);
+                    string myStr = rndNr.ToString();
+                    bool myB = true;
+                    bucket.Store(p.UserName, p, new { Myint = myint, MyFloat = myFloat, MyDate = myDate, MyStr = myStr, MyBool = myB });
+                    var result = await syncContext.PushAsync(bucket);
+                    if (result.Error != null)
+                        throw result.Error;
+                    if (result.Conflicts != null && result.Conflicts.Count > 0)
+                        throw new Exception("Random not OK retry");
+
+                    Filter f = new Filter("mystr");
+                    f.Value = myStr;
+                    var presult = await syncContext.PullAsync(bucket2, f);
+                    var fromDB = bucket2.Load(userName);
+                    Assert.AreEqual(myStr, fromDB.GetTag<string>("mystr"));
+                    var value = fromDB.GetContent<Person>();
+                    Assert.AreEqual(userName, value.UserName);
+                    Assert.AreEqual(p.FirstName, value.FirstName);
+
+                    f = new Filter("mystr");
+                    f.Start = myStr;
+                    var presultStart = await syncContext.PullAsync(bucket2, f);
+                    Query q = new Query();
+                    q.WhereGreaterThanOrEqual("mystr", myStr);
+                    var all = bucket2.Find(q);
+                    Assert.IsTrue(all.Count > 0);
+                    foreach (Document d in all)
+                    {
+                        Assert.IsTrue(string.Compare(fromDB.GetTag<string>("mystr"), myStr) >= 0);
+                    }
+
+                    f = new Filter("mystr");
+                    f.End = myStr;
+                    var presulEnd = await syncContext.PullAsync(bucket2, f);
+                    Query ql = new Query();
+                    ql.WhereLessThanOrEqual("mystr", myStr);
+                    var allEnd = bucket2.Find(ql);
+                    Assert.IsTrue(allEnd.Count > 0);
+                    foreach (Document d in allEnd)
+                    {
+                        Assert.IsTrue(string.Compare(fromDB.GetTag<string>("mystr"), myStr) <= 0);
+                    }
+                    f = new Filter("mystr");
+                    f.Start = myStr;
+                    f.End = myStr;
+                    var psresult = await syncContext.PullAsync(bucket2, f);
+                    Assert.IsTrue(psresult.SyncStatistics.TotalDownloads == 0);
+
                 }
             }
         }

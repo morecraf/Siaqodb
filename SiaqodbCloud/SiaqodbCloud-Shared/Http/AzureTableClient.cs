@@ -5,117 +5,72 @@ using System.Linq;
 using System.Text;
 using Sqo.Documents;
 using Sqo.Documents.Sync;
-using Microsoft.WindowsAzure.Storage.Table;
-using Microsoft.WindowsAzure.Storage;
+
 using System.Threading.Tasks;
 using System.Threading;
+using Dotissi.AzureTable.LiteClient;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
+using Dotissi.AzureTable.LiteClient.Exceptions;
+using System.Dynamic;
 
 namespace SiaqodbCloud
 {
-    class AzureTableClient : ISiaqodbCloudClient
+    class AzureTableHTTPClient : ISiaqodbCloudClient
     {
-        CloudTableClient tableClient;
-        public AzureTableClient(CloudTableClient tableClient)
+        AzureTableClient tableClient;
+        public AzureTableHTTPClient(AzureTableClient tableClient)
         {
             this.tableClient = tableClient;
         }
 
-#if NON_ASYNC
-        public Document Get(string bucket, string key, string version = null)
+        private Dictionary<string, bool> createdTables = new Dictionary<string, bool>();
+        private async Task<AzureTable> GetTableReference(string bucket)
         {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            table.CreateIfNotExists();
-            ChangeSet cset = new ChangeSet();
-            string filterString = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, bucket),
-                  TableOperators.And,
-                TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, key));
-
-            TableQuery query = new TableQuery().Where(filterString);
-
-            IEnumerable<DynamicTableEntity> dens = table.ExecuteQuery(query);
-            DynamicTableEntity en = dens.FirstOrDefault();
-            if (en != null)
+            var table = tableClient.GetTableReference(bucket);
+            if (!createdTables.ContainsKey(bucket))
             {
-                Document document = new Document();
-                document.Key = en.RowKey;
-                document.Version = en.ETag;
-                if (en.Properties.ContainsKey("content"))
+                bool created = await table.ExistsTableAsync();
+                if (!created)
                 {
-                    document.Content = en.Properties["content"].BinaryValue;
+                    await table.CreateTableAsync();
                 }
-                foreach (string prKey in en.Properties.Keys)
-                {
-                    if (prKey == "soft_deleted" && en[prKey].BooleanValue == true)
-                    {
-                        return null;
-                    }
-                    if (prKey != "content" && prKey != "soft_deleted")
-                    {
-                        document.SetTag(prKey, en[prKey].PropertyAsObject);
-                    }
-                }
-                return document;
+                createdTables[bucket] = true;
             }
-            return null;
+            return table;
         }
-#endif
-#if ASYNC
         public async Task<Document> GetAsync(string bucket, string key, string version = null)
         {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            await table.CreateIfNotExistsAsync();
+            AzureTable table = await this.GetTableReference(bucket);
             ChangeSet cset = new ChangeSet();
-            string filterString = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, bucket),
-                  TableOperators.And,
-                TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, key));
+            JObject en = await table.FindOneAsync<JObject>(bucket, key);
 
-            TableQuery<DynamicTableEntity> query = new TableQuery<DynamicTableEntity>().Where(filterString);
-
-            IEnumerable<DynamicTableEntity> dens = await table.ExecuteQueryAsync(query);
-            DynamicTableEntity en = dens.FirstOrDefault();
             if (en != null)
             {
                 Document document = new Document();
-                document.Key = en.RowKey;
-                document.Version = en.ETag;
-                if (en.Properties.ContainsKey("content"))
+                document.Key = en["RowKey"].Value<string>();
+                document.Version = ETagHelper.GetETagFromTimestamp(en["Timestamp"].Value<DateTimeOffset>());
+                var contentProp = en.Property("content");
+                if (contentProp != null)
                 {
-                    document.Content = en.Properties["content"].BinaryValue;
+                    document.Content = Convert.FromBase64String(en["content"].Value<string>());
                 }
-                foreach (string prKey in en.Properties.Keys)
+                foreach (JProperty property in en.Properties())
                 {
-                    if (prKey == "soft_deleted" && en.Properties[prKey].BooleanValue == true)
+                    if (property.Name == "soft_deleted" && en["soft_deleted"].Value<bool>() == true)
                     {
                         return null;
                     }
-                    if (prKey != "content" && prKey != "soft_deleted")
+                    if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey")
                     {
-                        document.SetTag(prKey, en.Properties[prKey].PropertyAsObject);
+                        document.SetTag(property.Name, ((JValue)en[property.Name]).Value);
                     }
                 }
                 return document;
             }
             return null;
         }
-#endif
-#if NON_ASYNC
-        public ChangeSet GetChanges(string bucket, int limit, string anchor, string uploadAnchor)
-        {
-            return this.GetChanges(bucket, null, limit, anchor, uploadAnchor);
-        }
-        public ChangeSet GetChanges(string bucket, Filter filter, int limit, string anchor, string uploadAnchor)
-        {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            table.CreateIfNotExists();
 
-            TableQuery<DynamicTableEntity> query = this.GenerateQuery(bucket, filter, limit, anchor);
-            IEnumerable<DynamicTableEntity> dens = table.ExecuteQuery(query);
-            return PrepareChangeSet(dens);
-        }
-#endif
-#if ASYNC
         public Task<ChangeSet> GetChangesAsync(string bucket, int limit, string anchor, string uploadAnchor)
         {
             return GetChangesAsync(bucket, null, limit, anchor, uploadAnchor);
@@ -123,16 +78,15 @@ namespace SiaqodbCloud
 
         public async Task<ChangeSet> GetChangesAsync(string bucket, Filter filter, int limit, string anchor, string uploadAnchor)
         {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            await table.CreateIfNotExistsAsync();
+            AzureTable table = await this.GetTableReference(bucket);
 
-            TableQuery<DynamicTableEntity> query = this.GenerateQuery(bucket, filter, limit, anchor);
-            IEnumerable<DynamicTableEntity> dens = await table.ExecuteQueryAsync(query);
+            string filterStr = this.GenerateQuery(bucket, filter, limit, anchor);
+            IEnumerable<JObject> dens = await table.FindAllAsync<JObject>(filterStr);
             return PrepareChangeSet(dens);
         }
-#endif
 
-        private ChangeSet PrepareChangeSet(IEnumerable<DynamicTableEntity> dens)
+
+        private ChangeSet PrepareChangeSet(IEnumerable<JObject> dens)
         {
             ChangeSet cset = new ChangeSet();
             cset.ChangedDocuments = new List<Document>();
@@ -140,30 +94,34 @@ namespace SiaqodbCloud
             DateTimeOffset maxTimeStamp = DateTimeOffset.MinValue;
             foreach (var den in dens)
             {
-                if (den.Properties.ContainsKey("soft_deleted") && den.Properties["soft_deleted"].BooleanValue == true)
+                JProperty existsSoftDeleted = den.Properties().Where(a => a.Name == "soft_deleted").FirstOrDefault();
+                DateTimeOffset timestamp = den["Timestamp"].Value<DateTime>();
+                if (existsSoftDeleted != null && den["soft_deleted"].Value<bool>() == true)
                 {
-                    //deleted  
-                    cset.DeletedDocuments.Add(new DeletedDocument { Key = den.RowKey, Version = den.ETag });
+                    string k = den["RowKey"].Value<string>();
+                    string etag = ETagHelper.GetETagFromTimestamp(timestamp);
+
+                    cset.DeletedDocuments.Add(new DeletedDocument { Key = k, Version = etag });
                 }
                 else
                 {
 
                     Document document = new Document();
-                    document.Key = den.RowKey;
-                    document.Version = den.ETag;
-                    document.Content = den.Properties["content"].BinaryValue;
-                    foreach (string prKey in den.Properties.Keys)
+                    document.Key = den["RowKey"].Value<string>();
+                    document.Version = ETagHelper.GetETagFromTimestamp(timestamp);
+                    document.Content = Convert.FromBase64String(den["content"].Value<string>());
+                    foreach (JProperty property in den.Properties())
                     {
-                        if (prKey != "content" && prKey != "soft_deleted")
+                        if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey")
                         {
-                            document.SetTag(prKey, den.Properties[prKey].PropertyAsObject);
+                            document.SetTag(property.Name, ((JValue)den[property.Name]).Value);
                         }
                     }
                     cset.ChangedDocuments.Add(document);
                 }
-                if (maxTimeStamp < den.Timestamp)
+                if (maxTimeStamp < timestamp)
                 {
-                    maxTimeStamp = den.Timestamp;
+                    maxTimeStamp = timestamp;
                 }
 
             }
@@ -173,25 +131,25 @@ namespace SiaqodbCloud
             }
             return cset;
         }
-        private TableQuery<DynamicTableEntity> GenerateQuery(string bucket, Filter filter, int limit, string anchor)
+        private string GenerateQuery(string bucket, Filter filter, int limit, string anchor)
         {
-            string filterString = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, bucket);
+            StringBuilder sb = new StringBuilder();
+            string filterString = string.Format("PartitionKey eq '{0}'", bucket);
+            sb.Append(filterString);
             if (!string.IsNullOrEmpty(anchor))
             {
-                filterString = TableQuery.CombineFilters(filterString,
-                TableOperators.And,
-                TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThan, new DateTimeOffset(Convert.ToInt64(anchor), TimeSpan.Zero)));
+                sb.Append(string.Format(" and Timestamp gt datetime'{0}'", (new DateTimeOffset(Convert.ToInt64(anchor), TimeSpan.Zero)).UtcDateTime.ToString("o", CultureInfo.InvariantCulture)));
             }
             if (filter != null)
             {
                 string filterClient = this.GenerateFilter(filter);
                 if (filterClient != null)
                 {
-                    filterString = TableQuery.CombineFilters(filterString, TableOperators.And, filterClient);
+                    sb.Append(filterClient);
                 }
             }
 
-            return new TableQuery<DynamicTableEntity>().Where(filterString).Take(limit);
+            return sb.ToString();
         }
         private string GenerateFilter(Filter query)
         {
@@ -204,22 +162,20 @@ namespace SiaqodbCloud
 
             if (query.Value != null)
             {
-                return GenerateFilterForOpVal(tagName, QueryComparisons.Equal, query.Value);
+                return GenerateFilterForOpVal(tagName, "eq", query.Value);
             }
             else if (query.Start != null && query.End == null)
             {
-                return GenerateFilterForOpVal(tagName, QueryComparisons.GreaterThanOrEqual, query.Start);
+                return GenerateFilterForOpVal(tagName, "ge", query.Start);
             }
             else if (query.Start == null && query.End != null)
             {
-                return GenerateFilterForOpVal(tagName, QueryComparisons.LessThanOrEqual, query.End);
+                return GenerateFilterForOpVal(tagName, "le", query.End);
             }
             else if (query.Start != null && query.End != null)
             {
-                return TableQuery.CombineFilters(
-                                     GenerateFilterForOpVal(tagName, QueryComparisons.GreaterThanOrEqual, query.Start),
-                                         TableOperators.And,
-                                     GenerateFilterForOpVal(tagName, QueryComparisons.LessThanOrEqual, query.End));
+                return GenerateFilterForOpVal(tagName, "ge", query.Start) + GenerateFilterForOpVal(tagName, "le", query.End);
+
             }
             return null;
 
@@ -229,104 +185,62 @@ namespace SiaqodbCloud
             Type type = value.GetType();
             if (type == typeof(int) || type == typeof(long))
             {
-                return TableQuery.GenerateFilterConditionForLong(tagName, oper, Convert.ToInt64(value));
+                return string.Format(" and {0} {1} {2}L", tagName, oper, value);
             }
             else if (type == typeof(double) || type == typeof(float))
             {
-                return TableQuery.GenerateFilterConditionForDouble(tagName, oper, Convert.ToDouble(value));
+                return string.Format(" and {0} {1} {2}", tagName, oper, value);
 
             }
             else if (type == typeof(DateTime))
             {
                 DateTime date = (DateTime)value;
-                
-                return TableQuery.GenerateFilterConditionForDate(tagName, oper, date.ToUniversalTime());
+
+                return string.Format(" and {0} {1} datetime'{2}'", tagName, oper, date.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
             }
             else if (type == typeof(bool))
             {
-                return TableQuery.GenerateFilterConditionForBool(tagName, oper, (bool)value);
+                return string.Format(" and {0} {1} {2}", tagName, oper, value.ToString().ToLower());
             }
             else if (type == typeof(string))
             {
-                return TableQuery.GenerateFilterCondition(tagName, oper, (string)value);
+                return string.Format(" and {0} {1} '{2}'", tagName, oper, value);
             }
             return null;
         }
 
-#if NON_ASYNC
-        public BatchResponse Put(string bucket, ChangeSet batch)
-        {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            table.CreateIfNotExists();
-            BatchResponse br = new BatchResponse();
-            br.BatchItemResponses = new List<BatchItemResponse>();
-            foreach (Document d in batch.ChangedDocuments)
-            {
-                DynamicTableEntity den = new DynamicTableEntity(bucket, d.Key);
-                BatchItemResponse resp = new BatchItemResponse { Key = den.RowKey };
 
-                try
-                {
-                    TableOperation insertOrRepl = PreparePut(bucket, d, den);
-                    var result = table.Execute(insertOrRepl);
-                    resp.Version = den.ETag;
-
-                }
-                catch (StorageException ex)
-                {
-                    SetError(resp, ex);
-                    resp.Version = d.Version;
-                    br.ItemsWithErrors++;
-
-                }
-                br.BatchItemResponses.Add(resp);
-
-
-            }
-            foreach (DeletedDocument d in batch.DeletedDocuments)
-            {
-                DynamicTableEntity den = new DynamicTableEntity(bucket, d.Key);
-                den.ETag = d.Version;
-                den.Properties = new Dictionary<string, EntityProperty>();
-                den.Properties.Add("soft_deleted", new EntityProperty(true));
-                BatchItemResponse resp = new BatchItemResponse { Key = den.RowKey };
-                try
-                {
-                    TableOperation insertOrRepl = TableOperation.Replace(den);
-                    var result = table.Execute(insertOrRepl);
-                    resp.Version = den.ETag;
-
-                }
-                catch (StorageException ex)
-                {
-                    SetError(resp, ex);
-                    resp.Version = d.Version;
-                    br.ItemsWithErrors++;
-                }
-                br.BatchItemResponses.Add(resp);
-
-            }
-            br.Total = br.BatchItemResponses.Count;
-            return br;
-        }
-#endif
-#if ASYNC
         public async Task<BatchResponse> PutAsync(string bucket, ChangeSet batch)
         {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            await table.CreateIfNotExistsAsync();
+            AzureTable table = await this.GetTableReference(bucket);
+
             BatchResponse br = new BatchResponse();
             br.BatchItemResponses = new List<BatchItemResponse>();
             foreach (Document d in batch.ChangedDocuments)
             {
-                DynamicTableEntity den = new DynamicTableEntity(bucket, d.Key);
-                BatchItemResponse resp = new BatchItemResponse { Key = den.RowKey };
-
+                BatchItemResponse resp = new BatchItemResponse { Key = d.Key };
                 try
                 {
-                    TableOperation insertOrRepl = PreparePut(bucket, d, den);
-                    var result = await table.ExecuteAsync(insertOrRepl);
-                    resp.Version = den.ETag;
+                    TableResult result = null;
+                    IDictionary<String, Object> myEn = new ExpandoObject();
+                    myEn["RowKey"] = d.Key;
+                    myEn["PartitionKey"] = bucket;
+                    myEn["content"] = d.Content;
+
+                    foreach (var tagKey in d.Tags)
+                    {
+                        
+                        myEn.Add(tagKey);
+                    }
+                    if (d.Version == null)
+                    {
+                        result = await table.InsertOrReplaceAsync(myEn);
+                    }
+                    else
+                    {
+                        result = await table.ReplaceAsync(myEn, d.Version);
+                    }
+                    resp.Version = result.ETag;
 
                 }
                 catch (StorageException ex)
@@ -342,17 +256,15 @@ namespace SiaqodbCloud
             }
             foreach (DeletedDocument d in batch.DeletedDocuments)
             {
-                DynamicTableEntity den = new DynamicTableEntity(bucket, d.Key);
-                den.ETag = d.Version;
-                den.Properties = new Dictionary<string, EntityProperty>();
-               
-                den.Properties.Add("soft_deleted", EntityProperty.GeneratePropertyForBool(true));
-                BatchItemResponse resp = new BatchItemResponse { Key = den.RowKey };
+                IDictionary<String, Object> myEn = new ExpandoObject();
+                myEn["RowKey"] = d.Key;
+                myEn["PartitionKey"] = bucket;
+                myEn["soft_deleted"] = true;
+                BatchItemResponse resp = new BatchItemResponse { Key = d.Key };
                 try
                 {
-                    TableOperation insertOrRepl = TableOperation.Replace(den);
-                    var result = await table.ExecuteAsync(insertOrRepl);
-                    resp.Version = den.ETag;
+                    var result = await table.ReplaceAsync(myEn, d.Version);
+                    resp.Version = result.ETag;
 
                 }
                 catch (StorageException ex)
@@ -367,10 +279,10 @@ namespace SiaqodbCloud
             br.Total = br.BatchItemResponses.Count;
             return br;
         }
-#endif
+
         private void SetError(BatchItemResponse resp, StorageException ex)
         {
-            if (ex.RequestInformation.HttpStatusCode == 412)
+            if (ex.StatusCode == System.Net.HttpStatusCode.PreconditionFailed)
             {
                 resp.Error = "conflict";
                 resp.ErrorDesc = "conflict";
@@ -383,56 +295,37 @@ namespace SiaqodbCloud
         }
 
 
-#if NON_ASYNC
-        public StoreResponse Put(string bucket, Document d)
-        {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            table.CreateIfNotExists();
-
-            DynamicTableEntity den = new DynamicTableEntity(bucket, d.Key);
-            StoreResponse resp = new StoreResponse { Key = d.Key };
-
-            try
-            {
-                var insertOrRepl = PreparePut(bucket, d, den);
-                var result = table.Execute(insertOrRepl);
-                resp.Version = den.ETag;
-                return resp;
-
-            }
-            catch (StorageException ex)
-            {
-                if (ex.RequestInformation.HttpStatusCode == 412)
-                {
-                    throw new ConflictException("There is a document with the same key and another version already stored");
-                }
-                else
-                    throw;
-            }
-        }
-
-#endif
-#if ASYNC
         public async Task<StoreResponse> PutAsync(string bucket, Document d)
         {
-
-            CloudTable table = tableClient.GetTableReference(bucket);
-            await table.CreateIfNotExistsAsync();
-
-            DynamicTableEntity den = new DynamicTableEntity(bucket, d.Key);
+            AzureTable table = await this.GetTableReference(bucket);
             StoreResponse resp = new StoreResponse { Key = d.Key };
-
             try
             {
-                var insertOrRepl = PreparePut(bucket, d, den);
-                var result = await table.ExecuteAsync(insertOrRepl);
-                resp.Version = den.ETag;
+                TableResult result = null;
+                IDictionary<String, Object> myEn = new ExpandoObject();
+                myEn["RowKey"] = d.Key;
+                myEn["PartitionKey"] = bucket;
+                myEn["content"] = d.Content;
+
+                foreach (var tagKey in d.Tags)
+                {
+                    myEn.Add(tagKey);
+                }
+                if (d.Version == null)
+                {
+                    result = await table.InsertOrReplaceAsync(myEn);
+                }
+                else
+                {
+                    result = await table.ReplaceAsync(myEn, d.Version);
+                }
+                resp.Version = result.ETag;
                 return resp;
 
             }
             catch (StorageException ex)
             {
-                if (ex.RequestInformation.HttpStatusCode == 412)
+                if (ex.StatusCode == System.Net.HttpStatusCode.PreconditionFailed)
                 {
                     throw new ConflictException("There is a document with the same key and another version already stored");
                 }
@@ -440,96 +333,22 @@ namespace SiaqodbCloud
                     throw;
             }
         }
-#endif
-        private TableOperation PreparePut(string bucket, Document d, DynamicTableEntity den)
-        {
 
-            den.ETag = d.Version;
-
-            den.Properties.Add("content", EntityProperty.GeneratePropertyForByteArray(d.Content));
-
-            foreach (string tagKey in d.Tags.Keys)
-            {
-                Type type = d.Tags[tagKey].GetType();
-                if (type == typeof(long))
-                {
-                    den.Properties.Add(tagKey, EntityProperty.GeneratePropertyForLong((long)d.Tags[tagKey]));
-                }
-                else if (type == typeof(double))
-                {
-                    den.Properties.Add(tagKey, EntityProperty.GeneratePropertyForDouble((double)d.Tags[tagKey]));
-                }
-                else if (type == typeof(DateTime))
-                {
-
-                    den.Properties.Add(tagKey, EntityProperty.GeneratePropertyForDateTimeOffset((DateTime)d.Tags[tagKey]));
-                }
-                else if (type == typeof(string))
-                {
-                    den.Properties.Add(tagKey, EntityProperty.GeneratePropertyForString((string)d.Tags[tagKey]));
-                }
-                else if (type == typeof(bool))
-                {
-                    den.Properties.Add(tagKey, EntityProperty.GeneratePropertyForBool((bool)d.Tags[tagKey]));
-                }
-            }
-
-            TableOperation insertOrRepl = null;
-            if (den.ETag == null)
-            {
-                insertOrRepl = TableOperation.InsertOrReplace(den);
-            }
-            else
-            {
-                insertOrRepl = TableOperation.Replace(den);
-            }
-            return insertOrRepl;
-        }
-#if NON_ASYNC
-        public void Delete(string bucket, string key, string version)
-        {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            table.CreateIfNotExists();
-
-            DynamicTableEntity den = new DynamicTableEntity(bucket, key);
-            den.ETag = version;
-
-            den.Properties.Add("soft_deleted", new EntityProperty(true));
-            TableOperation insertOrRepl = TableOperation.Merge(den);
-            try
-            {
-                var result = table.Execute(insertOrRepl);
-            }
-            catch (StorageException ex)
-            {
-                if (ex.RequestInformation.HttpStatusCode == 412)
-                {
-                    throw new ConflictException("There is a document with the same key and another version already stored");
-                }
-                else
-                    throw;
-            }
-
-        }
-#endif
-#if ASYNC
         public async Task DeleteAsync(string bucket, string key, string version)
         {
-            CloudTable table = tableClient.GetTableReference(bucket);
-            await table.CreateIfNotExistsAsync();
-
-            DynamicTableEntity den = new DynamicTableEntity(bucket, key);
-            den.ETag = version;
-
-            den.Properties.Add("soft_deleted", EntityProperty.GeneratePropertyForBool(true));
-            TableOperation insertOrRepl = TableOperation.Merge(den);
+            AzureTable table = await this.GetTableReference(bucket);
             try
             {
-                var result = await table.ExecuteAsync(insertOrRepl);
+                IDictionary<String, Object> myEn = new ExpandoObject();
+                myEn["RowKey"] = key;
+                myEn["PartitionKey"] = bucket;
+                myEn["soft_deleted"] = true;
+
+                await table.ReplaceAsync(myEn, version);
             }
             catch (StorageException ex)
             {
-                if (ex.RequestInformation.HttpStatusCode == 412)
+                if (ex.StatusCode == System.Net.HttpStatusCode.PreconditionFailed)
                 {
                     throw new ConflictException("There is a document with the same key and another version already stored");
                 }
@@ -539,32 +358,12 @@ namespace SiaqodbCloud
         }
 
 
-#endif
+
         public void Dispose()
         {
 
         }
     }
-#if ASYNC
-    internal static class CloudTableExt
-    {
-        public static async Task<IList<DynamicTableEntity>> ExecuteQueryAsync(this CloudTable table, TableQuery<DynamicTableEntity> query, CancellationToken ct = default(CancellationToken)) 
-        {
 
-            var items = new List<DynamicTableEntity>();
-            TableContinuationToken token = null;
-            do
-            {
-
-                TableQuerySegment<DynamicTableEntity> seg = await table.ExecuteQuerySegmentedAsync<DynamicTableEntity>(query, token);
-                token = seg.ContinuationToken;
-                items.AddRange(seg);
-
-            } while (token != null && !ct.IsCancellationRequested);
-
-            return items;
-        }
-    }
-#endif
-    }
+}
 #endif

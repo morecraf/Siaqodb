@@ -121,6 +121,11 @@
       <Name>Siaqodb %28UWP%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Dotissi.AzureTable.LiteClient">
+      <HintPath>..\..\..\AzureTable-LiteClient\src\bin\Debug\Dotissi.AzureTable.LiteClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <Import Project="..\SiaqodbCloud-Shared\SiaqodbCloud-Shared.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
