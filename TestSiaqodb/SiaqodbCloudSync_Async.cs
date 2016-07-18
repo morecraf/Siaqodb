@@ -24,6 +24,7 @@ namespace TestSiaqodbBuckets
             Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2cVvZnIPY8dL9wyf3RMWpjKO0WGBVXmnDc82AKBClJ/u");
             Sqo.SiaqodbConfigurator.SetSyncableBucket("contacts", true);
             Sqo.SiaqodbConfigurator.SetSyncableBucket("persons", true);
+            Sqo.SiaqodbConfigurator.SetSyncableBucket("personas1", true);
             Sqo.SiaqodbConfigurator.SetDocumentSerializer(new MyJsonSerializer());
             this.siaqodb1 = new Siaqodb(@"c:\work\temp\buk_tests\sync1\");
             this.siaqodb2 = new Siaqodb(@"c:\work\temp\buk_tests\sync2\");

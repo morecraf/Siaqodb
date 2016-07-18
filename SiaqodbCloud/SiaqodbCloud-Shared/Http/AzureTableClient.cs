@@ -49,11 +49,11 @@ namespace SiaqodbCloud
             {
                 Document document = new Document();
                 document.Key = en["RowKey"].Value<string>();
-                document.Version = ETagHelper.GetETagFromTimestamp(en["Timestamp"].Value<DateTimeOffset>());
+                document.Version = en["odata.etag"].Value<string>();
                 var contentProp = en.Property("content");
                 if (contentProp != null)
                 {
-                    document.Content = Convert.FromBase64String(en["content"].Value<string>());
+                    document.Content = en["content"].Value<byte[]>();
                 }
                 foreach (JProperty property in en.Properties())
                 {
@@ -61,7 +61,7 @@ namespace SiaqodbCloud
                     {
                         return null;
                     }
-                    if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey")
+                    if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey" && property.Name != "odata.etag")
                     {
                         document.SetTag(property.Name, ((JValue)en[property.Name]).Value);
                     }
@@ -99,7 +99,7 @@ namespace SiaqodbCloud
                 if (existsSoftDeleted != null && den["soft_deleted"].Value<bool>() == true)
                 {
                     string k = den["RowKey"].Value<string>();
-                    string etag = ETagHelper.GetETagFromTimestamp(timestamp);
+                    string etag = den["odata.etag"].Value<string>();
 
                     cset.DeletedDocuments.Add(new DeletedDocument { Key = k, Version = etag });
                 }
@@ -108,11 +108,11 @@ namespace SiaqodbCloud
 
                     Document document = new Document();
                     document.Key = den["RowKey"].Value<string>();
-                    document.Version = ETagHelper.GetETagFromTimestamp(timestamp);
-                    document.Content = Convert.FromBase64String(den["content"].Value<string>());
+                    document.Version = den["odata.etag"].Value<string>();
+                    document.Content = den["content"].Value<byte[]>();
                     foreach (JProperty property in den.Properties())
                     {
-                        if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey")
+                        if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey" && property.Name != "odata.etag")
                         {
                             document.SetTag(property.Name, ((JValue)den[property.Name]).Value);
                         }

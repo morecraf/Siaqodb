@@ -164,7 +164,7 @@
     <Compile Include="..\Indexes\BTree\BTree.cs" />
     <Compile Include="..\Indexes\BTree\IBTree.cs" />
     <Compile Include="..\Indexes\BTree\IndexManager.cs" />
-	 <Compile Include="..\Indexes\ByteConverterIdx.cs" />
+    <Compile Include="..\Indexes\ByteConverterIdx.cs" />
     <Compile Include="..\Internal\_bs.cs" />
     <Compile Include="..\ISqoDataObject.cs" />
     <Compile Include="..\LazyObjectList.cs" />
@@ -241,17 +241,17 @@
     <Compile Include="..\Utilities\Path.cs" />
     <Compile Include="..\Utilities\SqoLicense.cs" />
     <Compile Include="..\Utilities\SqoSortableItem.cs" />
-	 <Compile Include="..\Utilities\EndianBitConverter.cs" />
+    <Compile Include="..\Utilities\EndianBitConverter.cs" />
     <Compile Include="..\WinRTExtensions\MemberInfoExtensions.cs" />
     <Compile Include="..\WinRTExtensions\TypeExtensions.cs" />
     <Compile Include="..\StorageEngine.Loader.cs" />
     <Compile Include="..\Core\ObjectSerializer.Writer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
-      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
-      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
-    </ProjectReference>
+    <Reference Include="SiaqodbPortable, Version=5.0.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SiaqodbPortable\bin\Release\net45\SiaqodbPortable.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
