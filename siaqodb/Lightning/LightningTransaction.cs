@@ -294,8 +294,13 @@ namespace LightningDB
                         return;
                     }
                 }
+#if LIC_U3D_IOS
                 var valueStr = default(ValueStructure);
                 NativeMethods.Execute(lib => lib.mdb_del(_handle, db._handle, ref keyStructure,ref valueStr));
+#else
+                NativeMethods.Execute(lib => lib.mdb_del(_handle, db._handle, ref keyStructure, IntPtr.Zero));
+#endif
+
             }
         }
 
