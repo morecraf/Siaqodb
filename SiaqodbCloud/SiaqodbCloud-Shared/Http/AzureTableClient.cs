@@ -226,11 +226,13 @@ namespace SiaqodbCloud
                     myEn["RowKey"] = d.Key;
                     myEn["PartitionKey"] = bucket;
                     myEn["content"] = d.Content;
-
-                    foreach (var tagKey in d.Tags)
+                    if (d.Tags != null)
                     {
-                        
-                        myEn.Add(tagKey);
+                        foreach (var tagKey in d.Tags)
+                        {
+
+                            myEn.Add(tagKey);
+                        }
                     }
                     if (d.Version == null)
                     {
@@ -306,10 +308,12 @@ namespace SiaqodbCloud
                 myEn["RowKey"] = d.Key;
                 myEn["PartitionKey"] = bucket;
                 myEn["content"] = d.Content;
-
-                foreach (var tagKey in d.Tags)
+                if (d.Tags != null)
                 {
-                    myEn.Add(tagKey);
+                    foreach (var tagKey in d.Tags)
+                    {
+                        myEn.Add(tagKey);
+                    }
                 }
                 if (d.Version == null)
                 {

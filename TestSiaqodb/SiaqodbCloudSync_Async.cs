@@ -6,9 +6,7 @@ using System.Text;
 using SiaqodbCloud;
 using Sqo.Documents;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.Azure;
-using Microsoft.WindowsAzure.Storage.Table;
+
 using Dotissi.AzureTable.LiteClient;
 
 namespace TestSiaqodbBuckets
@@ -31,7 +29,6 @@ namespace TestSiaqodbBuckets
         }
         private SiaqodbSync GetSyncContext()
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
             AzureTableClient tableClient = new AzureTableClient("ma431698b233164f", @"ncahvuZcQHbWyjKRYv1GkBrs9vmYjHBnVeZj0y9F0C7llQhPrxYv8LlnMkvZ+6+/LqMpG0ojXY3AN4FVplzUrQ==");
             return new SiaqodbSync(tableClient);
             //return new SiaqodbSync("http://localhost:11735/v0/", "7ba65b5855dddb308766b6756b00079a", "kHSFD8ADHFKS8998sxS");

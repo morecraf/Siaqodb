@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 #if (UNITY3D && LIC_U3D_IOS)|| LIC_U3D_UNIV
 #else
-[assembly: Obfuscation(Feature = "encrypt symbol names with password code@pwd", Exclude = false)]
+//[assembly: Obfuscation(Feature = "encrypt symbol names with password code@pwd", Exclude = false)]
 #endif
 
 namespace System.Reflection
