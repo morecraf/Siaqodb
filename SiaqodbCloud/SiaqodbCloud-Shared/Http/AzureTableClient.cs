@@ -44,7 +44,7 @@ namespace SiaqodbCloud
             AzureTable table = await this.GetTableReference(bucket);
             ChangeSet cset = new ChangeSet();
             JObject en = await table.FindOneAsync<JObject>(bucket, key);
-
+            
             if (en != null)
             {
                 Document document = new Document();
@@ -61,7 +61,7 @@ namespace SiaqodbCloud
                     {
                         return null;
                     }
-                    if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey" && property.Name != "odata.etag")
+                    if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey" && !property.Name.StartsWith("odata."))
                     {
                         document.SetTag(property.Name, ((JValue)en[property.Name]).Value);
                     }
@@ -112,7 +112,7 @@ namespace SiaqodbCloud
                     document.Content = den["content"].Value<byte[]>();
                     foreach (JProperty property in den.Properties())
                     {
-                        if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey" && property.Name != "odata.etag")
+                        if (property.Name != "content" && property.Name != "soft_deleted" && property.Name != "Timestamp" && property.Name != "RowKey" && property.Name != "PartitionKey" && !property.Name.StartsWith("odata."))
                         {
                             document.SetTag(property.Name, ((JValue)den[property.Name]).Value);
                         }
