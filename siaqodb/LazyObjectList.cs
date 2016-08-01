@@ -8,12 +8,7 @@ using Sqo.Meta;
 
 namespace Sqo
 {
-#if KEVAST
-    internal
-#else
-        public
-#endif
-    class LazyObjectList<T> : IObjectList<T>
+  public class LazyObjectList<T> : IObjectList<T>
     {
         List<int> oids;
         LazyEnumerator<T> enumerator;

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sqo.Meta;
-#if ASYNC
-using System.Threading.Tasks;
-#endif
+
 
 namespace Sqo.Core
 {
@@ -33,17 +31,7 @@ namespace Sqo.Core
         {
             return this.serializer.ReadComplexObject(bytes, ti.Type, fi.Name, transaction);
         }
-#if ASYNC
-        public async Task<byte[]> GetBytesAsync(object obj)
-        {
-            return await this.serializer.GetComplexObjectBytesAsync(obj).ConfigureAwait(false);
-        }
 
-        public async Task<object> GetObjectAsync(byte[] bytes)
-        {
-            return await this.serializer.ReadComplexObjectAsync(bytes, ti.Type, fi.Name).ConfigureAwait(false);
-        }
-#endif
         #endregion
     }
 }

@@ -11,9 +11,7 @@ using Sqo.Utilities;
 using System.Collections;
 using System.Reflection;
 using LightningDB;
-#if ASYNC
-using System.Threading.Tasks;
-#endif
+
 
 namespace Sqo.Core
 {
@@ -73,13 +71,7 @@ namespace Sqo.Core
           return SerializeTypeToBuffer(ti);
 
         }
-#if ASYNC
-        public async Task SerializeTypeAsync(SqoTypeInfo ti)
-        {
-            await file.WriteAsync(0, SerializeTypeToBuffer(ti)).ConfigureAwait(false);
 
-        }
-#endif
         public static SqoTypeInfo DeserializeSqoTypeInfoFromBuffer(byte[] readFullSqoTypeInfo, bool loadRealType)
         {
             SqoTypeInfo tInfo = new SqoTypeInfo();
@@ -312,18 +304,7 @@ namespace Sqo.Core
             return null;
         }
        
-        #if ASYNC
-
-        public async Task<SqoTypeInfo> DeserializeSqoTypeInfoAsync(bool loadRealType)
-        {
-            byte[] headerSizeB = new byte[4];
-            await file.ReadAsync(0, headerSizeB).ConfigureAwait(false);
-            int headerSize = ByteConverter.ByteArrayToInt(headerSizeB);
-            byte[] readFullSqoTypeInfo = new byte[headerSize];
-            await file.ReadAsync(0, readFullSqoTypeInfo).ConfigureAwait(false);
-            return DeserializeSqoTypeInfoFromBuffer(readFullSqoTypeInfo, loadRealType);
-        }
-#endif
+       
         public void Open(bool useElevatedTrust)
         {
 
@@ -342,13 +323,7 @@ namespace Sqo.Core
         {
          
         }
-        #if ASYNC
-        public async Task CloseAsync()
-        {
-            await file.FlushAsync().ConfigureAwait(false);
-            file.Close();
-        }
-        #endif
+       
         
         public bool IsClosed
         {
@@ -358,14 +333,7 @@ namespace Sqo.Core
         {
            
         }
-#if ASYNC
-        public async Task FlushAsync()
-        {
 
-            await file.FlushAsync().ConfigureAwait(false);
-
-        }
-#endif
         private static byte[] GetBuffer(byte[] readFullSqoTypeInfo, int position, int size)
         {
             byte[] b = new byte[size];
@@ -438,7 +406,5 @@ namespace Sqo.Core
         public int DocumentInfoOID { get; set; }
         public SqoTypeInfo TypeInfo { get; set; }
     }
-#if ASYNC
-    internal delegate Task ComplexObjectEventHandler(object sender, ComplexObjectEventArgs args);
-#endif
+
 }

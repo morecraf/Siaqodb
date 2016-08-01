@@ -15,9 +15,6 @@ using Sqo.Transactions;
 using Sqo.Cache;
 using LightningDB;
 
-#if ASYNC
-using System.Threading.Tasks;
-#endif
 
 #if SILVERLIGHT
 	using System.IO.IsolatedStorage;
@@ -92,83 +89,6 @@ namespace Sqo
             }
             return ol;
         }
-#if ASYNC
-        internal async Task<ObjectList<T>> LoadAllAsync<T>(SqoTypeInfo ti)
-        {
-            ObjectList<T> ol = new ObjectList<T>();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-          
-            int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
-            if (rangeSize < 1) rangeSize = 1;
-           
-            for (int i = 0; i < nrRecords; i++)
-            {
-
-
-                int oid = i + 1;
-                if (i % rangeSize == 0)
-                {
-                    int oidEnd = i + rangeSize <= nrRecords ? (i + rangeSize) : nrRecords;
-                    await serializer.PreLoadBytesAsync(oid, oidEnd, ti).ConfigureAwait(false);
-                }
-                if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                {
-                    continue;
-                }
-                if (SiaqodbConfigurator.RaiseLoadEvents)
-                {
-                    LoadingObjectEventArgs args = new LoadingObjectEventArgs(oid, ti.Type);
-                    this.OnLoadingObject(args);
-                    if (args.Cancel)
-                    {
-                        continue;
-                    }
-                    else if (args.Replace != null)
-                    {
-                        ol.Add((T)args.Replace);
-                        continue;
-                    }
-                }
-                T currentObj = default(T);
-                currentObj = Activator.CreateInstance<T>();
-                circularRefCache.Clear();
-                circularRefCache.Add(oid, ti, currentObj);
-                bool exTh = false;
-                try
-                {
-                    await serializer.ReadObjectAsync<T>(currentObj, ti, oid, this.rawSerializer).ConfigureAwait(false);
-                }
-                catch (ArgumentException ex)
-                {
-                    SiaqodbConfigurator.LogMessage("Object with OID:" + oid.ToString() + " seems to be corrupted!", VerboseLevel.Error);
-
-                    if (SiaqodbUtil.IsRepairMode)
-                    {
-                        SiaqodbConfigurator.LogMessage("Object with OID:" + oid.ToString() + " is deleted", VerboseLevel.Warn);
-                        exTh = true;
-                    }
-                    else throw ex;
-                }
-                if (exTh)
-                {
-                    await this.DeleteObjectByOIDAsync(oid, ti).ConfigureAwait(false);
-                    continue;
-
-                }
-                metaCache.SetOIDToObject(currentObj, oid, ti);
-                if (SiaqodbConfigurator.RaiseLoadEvents)
-                {
-                    this.OnLoadedObject(oid, currentObj);
-                }
-                ol.Add(currentObj);
-            }
-            serializer.ResetPreload();
-            return ol;
-        }
-#endif
         internal ObjectTable LoadAll(SqoTypeInfo ti, LightningTransaction transaction)
         {
             ObjectTable obTable = new ObjectTable();
@@ -208,55 +128,7 @@ namespace Sqo
             }
             return obTable;
         }
-#if ASYNC
-        internal async Task<ObjectTable> LoadAllAsync(SqoTypeInfo ti)
-        {
-            ObjectTable obTable = new ObjectTable();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-          
-            int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
-            if (rangeSize < 1) rangeSize = 1;
-            
-            obTable.Columns.Add("OID", 0);
-            int j = 1;
-            foreach (FieldSqoInfo fi in ti.Fields)
-            {
-                obTable.Columns.Add(fi.Name, j);
-                j++;
-            }
 
-            for (int i = 0; i < nrRecords; i++)
-            {
-
-                int oid = i + 1;
-                if (i % rangeSize == 0)
-                {
-                    int oidEnd = i + rangeSize <= nrRecords ? (i + rangeSize) : nrRecords;
-                    await serializer.PreLoadBytesAsync(oid, oidEnd, ti).ConfigureAwait(false);
-                }
-                if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                {
-                    ObjectRow row = obTable.NewRow();
-                    row["OID"] = -oid;
-                    obTable.Rows.Add(row);
-                }
-                else
-                {
-                    ObjectRow row = obTable.NewRow();
-                    row["OID"] = oid;
-                    await serializer.ReadObjectRowAsync(row, ti, oid, rawSerializer).ConfigureAwait(false);
-
-                    obTable.Rows.Add(row);
-                }
-            }
-            serializer.ResetPreload();
-            return obTable;
-        }
-       
-#endif
         internal List<int> LoadFilteredOids(Where where)
         {
             List<int> oids = null;
@@ -300,52 +172,7 @@ namespace Sqo
             return oids;
         }
 
-#if ASYNC
-        internal async Task<List<int>> LoadFilteredOidsAsync(Where where)
-        {
-            List<int> oids = null;
 
-
-            //fix Types problem when a field is declared in a base class and used in a derived class
-            Type type = where.ParentSqoTypeInfo.Type;
-
-            for (int j = (where.AttributeName.Count - 1); j >= 0; j--)
-            {
-                string fieldName = where.AttributeName[j];
-                FieldInfo finfo = MetaExtractor.FindField(type, fieldName);
-                if (finfo != null)
-                {
-                    where.ParentType[j] = type;
-                    type = finfo.FieldType;
-                }
-                else if (fieldName == "OID")
-                {
-                    where.ParentType[j] = type;
-                }
-
-            }
-            int i = 0;
-            foreach (string attName in where.AttributeName)
-            {
-                if (i == 0)//the deepest property
-                {
-                    SqoTypeInfo ti = this.GetSqoTypeInfoSoft(where.ParentType[i]);
-                    oids = await this.LoadFilteredOidsAsync(where, ti).ConfigureAwait(false);
-                }
-                else
-                {
-                    SqoTypeInfo ti = this.GetSqoTypeInfoSoft(where.ParentType[i]);
-                    ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-                    List<int> oidsComplextObj = await this.GetOIDsOfComplexObjAsync(ti, where.AttributeName[i], oids).ConfigureAwait(false);
-                    oids = oidsComplextObj;
-                }
-
-                i++;
-            }
-            return oids;
-        }
-
-#endif
         private List<int> GetOIDsOfComplexObj(SqoTypeInfo ti, string fieldName, List<int> insideOids)
         {
             string dbName=GetFileByType(ti);
@@ -389,34 +216,7 @@ namespace Sqo
            
             return oids;
         }
-#if ASYNC
-        private async Task<List<int>> GetOIDsOfComplexObjAsync(SqoTypeInfo ti, string fieldName, List<int> insideOids)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            insideOids.Sort();
-            int nrRecords = ti.Header.numberOfRecords;
-            List<int> oids = new List<int>();
-            for (int i = 0; i < nrRecords; i++)
-            {
-                int oid = i + 1;
-                if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                {
-                    continue;
-                }
 
-                int oidOfComplex = await serializer.ReadOidOfComplexAsync(ti, oid, fieldName, this.rawSerializer).ConfigureAwait(false);
-
-                int index = insideOids.BinarySearch(oidOfComplex);//intersection
-                if (index >= 0)
-                {
-                    oids.Add(oid);
-                }
-
-
-            }
-            return oids;
-        }
-#endif
         internal List<int> LoadFilteredOids(Where where, SqoTypeInfo ti)
         {
             List<int> oids = new List<int>();
@@ -463,56 +263,7 @@ namespace Sqo
             return oids;
         }
 
-#if ASYNC
-        internal async Task<List<int>> LoadFilteredOidsAsync(Where where, SqoTypeInfo ti)
-        {
-            List<int> oids = new List<int>();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-          
-            int nrRecords = ti.Header.numberOfRecords;
-            bool isOIDField = where.AttributeName[0] == "OID";
-            if (!(await indexManager.LoadOidsByIndexAsync(ti, where.AttributeName[0], where, oids).ConfigureAwait(false)))
-            {
 
-                if (isOIDField)
-                {
-                    await this.FillOidsIndexedAsync(oids, where, ti, serializer).ConfigureAwait(false);
-
-                }
-                else //full scann
-                {
-                    int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
-                    if (rangeSize < 1) rangeSize = 1;
-           
-                    for (int i = 0; i < nrRecords; i++)
-                    {
-                        int oid = i + 1;
-                        if (i % rangeSize == 0)
-                        {
-                            int oidEnd = i + rangeSize <= nrRecords ? (i + rangeSize) : nrRecords;
-                            await serializer.PreLoadBytesAsync(oid, oidEnd, ti).ConfigureAwait(false);
-                        }
-                        if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                        {
-                            continue;
-                        }
-
-                        object val = await serializer.ReadFieldValueAsync(ti, oid, where.AttributeName[0], this.rawSerializer).ConfigureAwait(false);
-                        if (Match(where, val))
-                        {
-                            oids.Add(oid);
-                        }
-
-                    }
-                    serializer.ResetPreload();
-                }
-            }
-            return oids;
-        }
-#endif
-       
 
        
         private bool Match(Where w, object val)
@@ -921,48 +672,7 @@ namespace Sqo
         {
             metaCache.AddDocument(e.TypeInfo, e.ParentObject, e.FieldName, e.DocumentInfoOID);
         }
-#if ASYNC
-        internal async Task<IObjectList<T>> LoadByOIDsAsync<T>(List<int> oids, SqoTypeInfo ti)
-        {
-            ObjectList<T> ol = new ObjectList<T>();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-          
-            //int nrRecords = ti.Header.numberOfRecords;
-            foreach (int oid in oids)
-            {
-                if (SiaqodbConfigurator.RaiseLoadEvents)
-                {
-                    LoadingObjectEventArgs args = new LoadingObjectEventArgs(oid, ti.Type);
-                    this.OnLoadingObject(args);
-                    if (args.Cancel)
-                    {
-                        continue;
-                    }
-                    else if (args.Replace != null)
-                    {
-                        ol.Add((T)args.Replace);
-                        continue;
-                    }
-                }
-                T currentObj = default(T);
-                currentObj = Activator.CreateInstance<T>();
-                circularRefCache.Clear();
-                circularRefCache.Add(oid, ti, currentObj);
-                await serializer.ReadObjectAsync<T>(currentObj, ti, oid, rawSerializer).ConfigureAwait(false);
 
-                metaCache.SetOIDToObject(currentObj, oid, ti);
-                if (SiaqodbConfigurator.RaiseLoadEvents)
-                {
-                    this.OnLoadedObject(oid, currentObj);
-                }
-                ol.Add(currentObj);
-            }
-            return ol;
-        }
-    
-#endif
         void serializer_NeedReadComplexObject(object sender, ComplexObjectEventArgs e)
         {
             
@@ -1013,46 +723,6 @@ namespace Sqo
             }
             
         }
-#if ASYNC
-        async Task serializer_NeedReadComplexObjectAsync(object sender, ComplexObjectEventArgs e)
-        {
-            
-            if (e.TID == 0 && e.SavedOID == 0)//means null
-            {
-                e.ComplexObject = null;
-                return;
-            }
-            else if (e.ParentType != null && SiaqodbConfigurator.LazyLoaded != null && SiaqodbConfigurator.LazyLoaded.ContainsKey(e.ParentType))
-            {
-                if (SiaqodbConfigurator.LazyLoaded[e.ParentType])
-                {
-                    if (!this.ExistsInIncludesCache(e.ParentType, e.FieldName))
-                    {
-                        e.ComplexObject = null;
-                        return;
-                    }
-                }
-            }
-            SqoTypeInfo ti = this.metaCache.GetSqoTypeInfoByTID(e.TID);
-            object cacheObj = this.circularRefCache.GetObject(e.SavedOID, ti);
-            if (cacheObj != null)
-            {
-                e.ComplexObject = cacheObj;
-            }
-            else
-            {
-                ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-                //if there is a Nested object of same type we have to reset
-                serializer.ResetPreload();
-                if (!(await this.IsObjectDeletedAsync(e.SavedOID, ti).ConfigureAwait(false)))
-                {
-                    e.ComplexObject = await this.LoadObjectByOIDAsync(ti, e.SavedOID, false).ConfigureAwait(false);
-                }
-
-            }    
-            
-        }
-#endif
         internal List<object> LoadByOIDs(List<int> oids, SqoTypeInfo ti)
         {
             List<object> ol = new List<object>();
@@ -1105,47 +775,7 @@ namespace Sqo
             return ol;
         }
         
-#if ASYNC
-        internal async Task<List<object>> LoadByOIDsAsync(List<int> oids, SqoTypeInfo ti)
-        {
-            List<object> ol = new List<object>();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-          
 
-            foreach (int oid in oids)
-            {
-                if (SiaqodbConfigurator.RaiseLoadEvents)
-                {
-                    LoadingObjectEventArgs args = new LoadingObjectEventArgs(oid, ti.Type);
-                    this.OnLoadingObject(args);
-                    if (args.Cancel)
-                    {
-                        continue;
-                    }
-                    else if (args.Replace != null)
-                    {
-                        ol.Add(args.Replace);
-                        continue;
-                    }
-                }
-                object currentObj = Activator.CreateInstance(ti.Type);
-                circularRefCache.Clear();
-                circularRefCache.Add(oid, ti, currentObj);
-                await serializer.ReadObjectAsync(currentObj, ti, oid, rawSerializer).ConfigureAwait(false);
-
-                metaCache.SetOIDToObject(currentObj, oid, ti);
-                if (SiaqodbConfigurator.RaiseLoadEvents)
-                {
-                    this.OnLoadedObject(oid, currentObj);
-                }
-                ol.Add(currentObj);
-            }
-            return ol;
-        }
-        
-#endif
         internal object LoadValue(int oid, string fieldName, SqoTypeInfo ti)
         {
             var transaction = transactionManager.GetActiveTransaction();
@@ -1177,20 +807,7 @@ namespace Sqo
 
 
         }
-#if ASYNC
-        internal async Task<object> LoadValueAsync(int oid, string fieldName, SqoTypeInfo ti)
-        {
-            if (fieldName == "OID")
-            {
-                return oid;
-            }
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-          
-            return await serializer.ReadFieldValueAsync(ti, oid, fieldName, this.rawSerializer).ConfigureAwait(false);
-        }
-#endif
+
         internal List<int> LoadAllOIDs(SqoTypeInfo ti)
         {
             List<int> oids = new List<int>();
@@ -1223,26 +840,7 @@ namespace Sqo
             return oids;
 
         }
-#if ASYNC
-        internal async Task<List<int>> LoadAllOIDsAsync(SqoTypeInfo ti)
-        {
-            List<int> oids = new List<int>();
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
-            int nrRecords = ti.Header.numberOfRecords;
-            for (int i = 0; i < nrRecords; i++)
-            {
-                int oid = i + 1;
-                if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                {
-                    continue;
-                }
-                oids.Add(oid);
-            }
-            return oids;
-
-        }
-#endif
         internal List<int> LoadAllOIDs(string typeName)
         {
             SqoTypeInfo ti = GetSqoTypeInfo(typeName);
@@ -1252,17 +850,7 @@ namespace Sqo
             }
             return LoadAllOIDs(ti);
         }
-#if ASYNC
-        internal async Task<List<int>> LoadAllOIDsAsync(string typeName)
-        {
-            SqoTypeInfo ti = await GetSqoTypeInfoAsync(typeName).ConfigureAwait(false);
-            if (ti == null)
-            {
-                return null;
-            }
-            return await LoadAllOIDsAsync(ti).ConfigureAwait(false);
-        }
-#endif
+
         internal object LoadObjectByOID(SqoTypeInfo ti, int oid, List<string> includes)
         {
 
@@ -1314,69 +902,12 @@ namespace Sqo
             return obj;
 
         }
-#if ASYNC
-        internal async Task<object> LoadObjectByOIDAsync(SqoTypeInfo ti, int oid, List<string> includes)
-        {
 
-            if (this.includePropertiesCache == null)
-            {
-                this.includePropertiesCache = new List<ATuple<Type, string>>();
-            }
-            foreach (string path in includes)
-            {
-                string[] arrayPath = path.Split('.');
-
-                PropertyInfo property;
-                Type type = ti.Type;
-                foreach (var include in arrayPath)
-                {
-                    if ((property = type.GetProperty(include)) == null)
-                    {
-                        if (typeof(IList).IsAssignableFrom(type))
-                        {
-                            Type elementType = type.GetElementType();
-                            if (elementType == null)
-                            {
-                                elementType = type.GetProperty("Item").PropertyType;
-                            }
-                            type = elementType;
-                            if ((property = type.GetProperty(include)) == null)
-                            {
-                                throw new Sqo.Exceptions.SiaqodbException("Property:" + include + " does not belong to Type:" + type.FullName);
-                            }
-
-                        }
-                        else
-                        {
-                            throw new Sqo.Exceptions.SiaqodbException("Property:" + include + " does not belong to Type:" + type.FullName);
-                        }
-                    }
-                    string backingField = ExternalMetaHelper.GetBackingField(property);
-                    if (!ExistsInIncludesCache(type, backingField))
-                    {
-                        includePropertiesCache.Add(new ATuple<Type, string>(type, backingField));
-                    }
-                    type = property.PropertyType;
-                }
-
-            }
-            object obj = await this.LoadObjectByOIDAsync(ti, oid).ConfigureAwait(false);
-            this.includePropertiesCache.Clear();
-
-            return obj;
-
-        }
-#endif
         internal object LoadObjectByOID(SqoTypeInfo ti, int oid)
         {
             return this.LoadObjectByOID(ti, oid, true,transactionManager.GetActiveTransaction());
         }
-#if ASYNC
-        internal async Task<object> LoadObjectByOIDAsync(SqoTypeInfo ti, int oid)
-        {
-            return await this.LoadObjectByOIDAsync(ti, oid, true).ConfigureAwait(false);
-        }
-#endif
+
 
         internal object LoadObjectByOID(SqoTypeInfo ti, int oid, bool clearCache, LightningDB.LightningTransaction transaction)
         {
@@ -1432,83 +963,14 @@ namespace Sqo
             }
             return currentObj;
         }
-#if ASYNC
-        internal async Task<object> LoadObjectByOIDAsync(SqoTypeInfo ti, int oid, bool clearCache)
-        {
-            object currentObj = null;
 
-            if (SiaqodbConfigurator.RaiseLoadEvents)
-            {
-                LoadingObjectEventArgs args = new LoadingObjectEventArgs(oid, ti.Type);
-                this.OnLoadingObject(args);
-                if (args.Cancel)
-                {
-                    return null;
-                }
-                else if (args.Replace != null)
-                {
-                    return args.Replace;
-
-                }
-            }
-
-            currentObj = Activator.CreateInstance(ti.Type);
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            serializer.NeedReadComplexObjectAsync += new ComplexObjectEventHandler(serializer_NeedReadComplexObjectAsync);
-            serializer.NeedCacheDocument += new EventHandler<DocumentEventArgs>(serializer_NeedCacheDocument);
-          
-            if (clearCache)
-            {
-                circularRefCache.Clear();
-            }
-            circularRefCache.Add(oid, ti, currentObj);
-            bool exTh = false;
-            try
-            {
-                await serializer.ReadObjectAsync(currentObj, ti, oid, rawSerializer).ConfigureAwait(false);
-            }
-            catch (ArgumentException ex)
-            {
-                SiaqodbConfigurator.LogMessage("Object with OID:" + oid.ToString() + " seems to be corrupted!", VerboseLevel.Error);
-
-                if (SiaqodbUtil.IsRepairMode)
-                {
-                    SiaqodbConfigurator.LogMessage("Object with OID:" + oid.ToString() + " is deleted", VerboseLevel.Warn);
-
-                    exTh = true;
-                }
-                else throw ex;
-            }
-            if (exTh)
-            {
-                await this.DeleteObjectByOIDAsync(oid, ti).ConfigureAwait(false);
-                return null;
-
-            }
-            metaCache.SetOIDToObject(currentObj, oid, ti);
-
-            if (SiaqodbConfigurator.RaiseLoadEvents)
-            {
-                this.OnLoadedObject(oid, currentObj);
-            }
-            return currentObj;
-        }
-        
-#endif
         internal T LoadObjectByOID<T>(SqoTypeInfo ti, int oid)
         {
 
             return this.LoadObjectByOID<T>(ti, oid, true);
 
         }
-#if ASYNC
-        internal async Task<T> LoadObjectByOIDAsync<T>(SqoTypeInfo ti, int oid)
-        {
 
-            return await this.LoadObjectByOIDAsync<T>(ti, oid, true).ConfigureAwait(false);
-
-        }
-#endif
         internal T LoadObjectByOID<T>(SqoTypeInfo ti, int oid, bool clearCache)
         {
             return this.LoadObjectByOID<T>(ti, oid, clearCache, transactionManager.GetActiveTransaction());
@@ -1531,26 +993,7 @@ namespace Sqo
 
 
         }
-#if ASYNC
-        internal async Task<T> LoadObjectByOIDAsync<T>(SqoTypeInfo ti, int oid, bool clearCache)
-        {
 
-
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-
-            if (oid > 0 && oid <= ti.Header.numberOfRecords && !(await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false)))
-            {
-                return (T)(await this.LoadObjectByOIDAsync(ti, oid, clearCache).ConfigureAwait(false));
-            }
-            else
-            {
-                return default(T);
-            }
-
-
-
-        }
-#endif
         internal int Count(SqoTypeInfo ti)
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
@@ -1583,34 +1026,7 @@ namespace Sqo
 
             return count;
         }
-#if ASYNC
-        internal async Task<int> CountAsync(SqoTypeInfo ti)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
-            int nrRecords = ti.Header.numberOfRecords;
-            int rangeSize = Convert.ToInt32((SiaqodbConfigurator.BufferingChunkPercent * nrRecords / 100));
-            if (rangeSize < 1) rangeSize = 1;
-           
-            int count = 0;
-            for (int i = 0; i < nrRecords; i++)
-            {
-                int oid = i + 1;
-                if (i % rangeSize == 0)
-                {
-                    int oidEnd = i + rangeSize <= nrRecords ? (i + rangeSize) : nrRecords;
-                    await serializer.PreLoadBytesAsync(oid, oidEnd, ti).ConfigureAwait(false);
-                }
-                if (await serializer.IsObjectDeletedAsync(oid, ti).ConfigureAwait(false))
-                {
-                    continue;
-                }
-                count++;
-            }
-            serializer.ResetPreload();
-            return count;
-        }
-#endif
         private bool ExistsInIncludesCache(Type type, string fieldName)
         {
             if (this.includePropertiesCache == null)
@@ -1641,13 +1057,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        internal async Task<KeyValuePair<int, int>> LoadOIDAndTIDAsync(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            return await serializer.ReadOIDAndTIDAsync(ti, oid, fi).ConfigureAwait(false);
-        }
-#endif
+
         internal List<KeyValuePair<int, int>> LoadComplexArray(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
@@ -1662,13 +1072,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        internal async Task<List<KeyValuePair<int, int>>> LoadComplexArrayAsync(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            return await serializer.ReadComplexArrayOidsAsync(oid, fi, ti, this.rawSerializer).ConfigureAwait(false);
-        }
-#endif
+
         internal int LoadComplexArrayTID(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
         {
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
@@ -1683,13 +1087,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        internal async Task<int> LoadComplexArrayTIDAsync(int oid, FieldSqoInfo fi, SqoTypeInfo ti)
-        {
-            ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-            return await serializer.ReadFirstTIDAsync(oid, fi, ti, this.rawSerializer).ConfigureAwait(false);
-        }
-#endif
+
        
          
          internal List<int> LoadOidsByField(SqoTypeInfo ti, string fieldName, object obj)

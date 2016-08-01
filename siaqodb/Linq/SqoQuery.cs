@@ -10,12 +10,8 @@ using System.Threading.Tasks;
 
 namespace Sqo
 {
-    #if KEVAST
-    internal
-#else
-        public
-#endif
-        class SqoQuery<T>: ISqoQuery<T>
+  
+        public class SqoQuery<T>: ISqoQuery<T>
     {
         Siaqodb siaqodb;
         Expression expression;

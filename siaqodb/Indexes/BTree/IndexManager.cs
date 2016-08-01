@@ -10,10 +10,7 @@ using Sqo.MetaObjects;
 using Sqo.Exceptions;
 using LightningDB;
 using Sqo.Core;
-#if ASYNC
-using System.Threading.Tasks;
 
-#endif
 namespace Sqo.Indexes
 {
     class IndexManager

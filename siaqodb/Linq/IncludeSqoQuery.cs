@@ -9,12 +9,9 @@ using System.Threading.Tasks;
 
 namespace Sqo
 {
-    #if KEVAST
-    internal
-#else
-        public
-#endif
-        class IncludeSqoQuery<T> : ISqoQuery<T>
+
+
+        public class IncludeSqoQuery<T> : ISqoQuery<T>
     {
         internal List<string> includes=new List<string>();
         SqoQuery<T> originalQuery;

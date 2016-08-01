@@ -6,9 +6,7 @@ using Sqo.Meta;
 using Sqo.Core;
 using Sqo.Exceptions;
 using LightningDB;
-#if ASYNC
-using System.Threading.Tasks;
-#endif
+
 
 namespace Sqo.Transactions
 {

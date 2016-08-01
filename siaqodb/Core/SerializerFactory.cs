@@ -5,9 +5,7 @@ using System.Text;
 using Sqo.Meta;
 using System.IO;
 
-#if ASYNC
-using System.Threading.Tasks;
-#endif
+
 
 namespace Sqo.Core
 {
@@ -50,9 +48,7 @@ namespace Sqo.Core
                 }
             }
         }
-#if WinRT
 
-#endif
         public static void CloseAll()
         {
             lock (_syncRoot)
@@ -65,19 +61,7 @@ namespace Sqo.Core
             }
 
         }
-#if ASYNC
-        public static async Task CloseAllAsync()
-        {
 
-            foreach (string key in serializers.Keys)
-            {
-                await serializers[key].CloseAsync().ConfigureAwait(false);
-            }
-
-
-        }
-
-#endif
 		public static void FlushAll()
 		{
             lock (_syncRoot)
@@ -89,18 +73,7 @@ namespace Sqo.Core
             }
 
 		}
-#if ASYNC
-        public static async Task FlushAllAsync()
-        {
 
-            foreach (string key in serializers.Keys)
-            {
-                await serializers[key].FlushAsync().ConfigureAwait(false);
-            }
-
-        }
-
-#endif
         public static void ClearCache(string folderName)
         {
             lock (_syncRoot)

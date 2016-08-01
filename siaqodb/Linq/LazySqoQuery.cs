@@ -9,12 +9,8 @@ using System.Threading.Tasks;
 
 namespace Sqo
 {
-#if KEVAST
-    internal
-#else
-        public
-#endif
-    class LazySqoQuery<T> : ISqoQuery<T>
+
+        public class LazySqoQuery<T> : ISqoQuery<T>
     {
         protected List<int> oids;
         private Siaqodb siaqodb;

@@ -60,39 +60,6 @@ namespace Sqo.Core
 
         #endregion
 
-#if ASYNC
-        public async System.Threading.Tasks.Task<byte[]> GetBytesAsync(object obj)
-        {
-            DictionaryInfo dInfo = null;
 
-            if (parentOID > 0)
-            {
-                dInfo = await serializer.GetDictInfoOfFieldAsync(ti, parentOID, fi).ConfigureAwait(false);
-            }
-            else
-            {
-                if (obj != null)
-                {
-                    IDictionary actualDict = (IDictionary)obj;
-                    Type[] keyValueType = actualDict.GetType().GetGenericArguments();
-                    if (keyValueType.Length != 2)
-                    {
-                        throw new Sqo.Exceptions.NotSupportedTypeException("Type:" + actualDict.GetType().ToString() + " is not supported");
-                    }
-                    int keyTypeId = MetaExtractor.GetAttributeType(keyValueType[0]);
-                    int valueTypeId = MetaExtractor.GetAttributeType(keyValueType[1]);
-                    dInfo = new DictionaryInfo();
-                    dInfo.KeyTypeId = keyTypeId;
-                    dInfo.ValueTypeId = valueTypeId;
-                }
-            }
-            return await rawSerializer.SerializeDictionaryAsync(obj, fi.Header.Length, ti.Header.version, dInfo, serializer).ConfigureAwait(false);
-        }
-
-        public async System.Threading.Tasks.Task<object> GetObjectAsync(byte[] bytes)
-        {
-            return await rawSerializer.DeserializeDictionaryAsync(fi.AttributeType, bytes, ti.Header.version, serializer, ti.Type, fi.Name).ConfigureAwait(false);
-        }
-#endif
     }
 }

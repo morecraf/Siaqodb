@@ -6,9 +6,7 @@ using System.Collections;
 using LightningDB;
 using Sqo.Core;
 using Sqo.Utilities;
-#if ASYNC
-using System.Threading.Tasks;
-#endif
+
 
 namespace Sqo.Indexes
 {

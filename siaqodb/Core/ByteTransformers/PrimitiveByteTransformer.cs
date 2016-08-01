@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sqo.Meta;
-#if ASYNC
-using System.Threading.Tasks;
-#endif
+
 namespace Sqo.Core
 {
     class PrimitiveByteTransformer:IByteTransformer
@@ -32,17 +30,6 @@ namespace Sqo.Core
 
         
 
-#if ASYNC
-        public async Task<byte[]> GetBytesAsync(object obj)
-        {
-            return ByteConverter.SerializeValueType(obj, fi.AttributeType, fi.Header.Length, fi.Header.RealLength, ti.Header.version);
-        }
-
-        public async Task<object> GetObjectAsync(byte[] bytes)
-        {
-            return ByteConverter.DeserializeValueType(fi.AttributeType, bytes, true, ti.Header.version);
-        }
-#endif
         #endregion
     }
 }

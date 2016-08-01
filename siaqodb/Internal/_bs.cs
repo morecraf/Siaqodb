@@ -11,12 +11,8 @@ namespace Sqo.Internal
     /// <summary>
     /// Do NOT use it!, it is used only internally
     /// </summary>
-    #if KEVAST
-    internal
-#else
-        public
-#endif
-        static class _bs
+
+        public static class _bs
     {
 #if !WinRT
             /// <summary>

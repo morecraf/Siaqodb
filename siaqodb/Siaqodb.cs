@@ -14,9 +14,6 @@ using System.Reflection;
 using System.Threading;
 using Sqo.Indexes;
 
-#if ASYNC
-using System.Threading.Tasks;
-#endif
 
 
 namespace Sqo
@@ -30,9 +27,7 @@ namespace Sqo
 	{
 
         readonly object _syncRoot = new object();
-#if ASYNC
-        private readonly AsyncLock _lockerAsync = new AsyncLock();
-#endif
+
         private readonly object _locker = new object();
 
         
@@ -281,9 +276,7 @@ namespace Sqo
             storageEngine.indexManager = indexManager;
 
             storageEngine.NeedSaveComplexObject += new EventHandler<Core.ComplexObjectEventArgs>(storageEngine_NeedSaveComplexObject);
-#if ASYNC
-            storageEngine.NeedSaveComplexObjectAsync += storageEngine_NeedSaveComplexObjectAsync;
-#endif
+
 
             storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
             storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
@@ -294,7 +287,7 @@ namespace Sqo
 #endif
             this.metaCache = new MetaCache();
             storageEngine.metaCache = this.metaCache;
-            storageEngine.LoadMetaDataTypesForManager();
+            
             cacheForManager = new Sqo.Cache.CacheForManager();
         }
 #endif
@@ -316,9 +309,6 @@ namespace Sqo
             storageEngine.indexManager = indexManager;
 
             storageEngine.NeedSaveComplexObject += new EventHandler<Core.ComplexObjectEventArgs>(storageEngine_NeedSaveComplexObject);
-#if ASYNC
-            storageEngine.NeedSaveComplexObjectAsync += storageEngine_NeedSaveComplexObjectAsync;
-#endif
 
             storageEngine.LoadedObject+=new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
             storageEngine.LoadingObject+=new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
@@ -373,9 +363,6 @@ namespace Sqo
 
             storageEngine.metaCache = this.metaCache;
             storageEngine.NeedSaveComplexObject += new EventHandler<Core.ComplexObjectEventArgs>(storageEngine_NeedSaveComplexObject);
-#if ASYNC
-            storageEngine.NeedSaveComplexObjectAsync += storageEngine_NeedSaveComplexObjectAsync;
-#endif
             storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
             storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
 #if UNITY3D || CF || MONODROID
@@ -392,69 +379,7 @@ namespace Sqo
             }
 
         }
-        #if ASYNC
-        public async Task OpenAsync(string path)
-        {
-            this.opened = true;
-            this.path = path;
-            this.metaCache = new MetaCache();
-            storageEngine = new StorageEngine(this.path);
-            indexManager = new IndexManager(this);
-            storageEngine.indexManager = indexManager;
-
-            storageEngine.metaCache = this.metaCache;
-            storageEngine.NeedSaveComplexObject += new EventHandler<Core.ComplexObjectEventArgs>(storageEngine_NeedSaveComplexObject);
-            storageEngine.NeedSaveComplexObjectAsync += storageEngine_NeedSaveComplexObjectAsync;
-            storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
-            storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
-#if UNITY3D || CF || MONODROID
-#else
-            storageEngine.IndexesSaveAsyncFinished += new EventHandler<IndexesSaveAsyncFinishedArgs>(storageEngine_IndexesSaveAsyncFinished);
-#endif
-            await storageEngine.LoadAllTypesAsync().ConfigureAwait(false);
-            List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
-            await this.indexManager.BuildAllIndexesAsync(typesForIndexes);
-            this.RecoverAfterCrash();
-            cacheForManager = new Sqo.Cache.CacheForManager();
-        }
-       #endif
-
-
-#if SL4
-        /// <summary>
-        /// Open database
-        /// </summary>
-        /// <param name="folderName">the name of folder where datafiles will be saved</param>
-        /// <param name="specialFolder">special folder for OOB mode,ex:MyDocuments,MyPictures etc</param>
-        public void Open(string folderName, Environment.SpecialFolder specialFolder)
-        {
-            string specF = Environment.GetFolderPath(specialFolder);
-            if (specF == null)
-            {
-                throw new SiaqodbException("Siaqodb can run in OOB mode only if specialFolder is set");
-            }
-            string path = specF + System.IO.Path.DirectorySeparatorChar + folderName;
-
-            this.opened = true;
-            this.path = path;
-            this.metaCache = new MetaCache();
-            storageEngine = new StorageEngine(this.path,true);
-            indexManager = new IndexManager(this);
-            storageEngine.indexManager = indexManager;
-            storageEngine.metaCache = this.metaCache;
-            storageEngine.NeedSaveComplexObject += new EventHandler<Core.ComplexObjectEventArgs>(storageEngine_NeedSaveComplexObject);
-            storageEngine.LoadingObject += new EventHandler<LoadingObjectEventArgs>(storageEngine_LoadingObject);
-            storageEngine.LoadedObject += new EventHandler<LoadedObjectEventArgs>(storageEngine_LoadedObject);
-
-            storageEngine.LoadAllTypes();
-            List<SqoTypeInfo> typesForIndexes = this.metaCache.DumpAllTypes();
-            this.indexManager.BuildAllIndexes(typesForIndexes);
-            this.RecoverAfterCrash();
-            cacheForManager = new Sqo.Cache.CacheForManager();
-        }
-
         
-#endif
 
         #region EVENTs_HND
 
@@ -545,50 +470,7 @@ namespace Sqo
                 e.TID = ti.Header.TID;
             }
         }
-#if ASYNC
-        async Task storageEngine_NeedSaveComplexObjectAsync(object sender, Core.ComplexObjectEventArgs e)
-        {
-            if (e.ComplexObject == null)
-            {
-                return;
-            }
-            SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(e.ComplexObject);
-            if (ti != null)
-            {
 
-                int oid = -1;
-                if (e.ReturnOnlyOid_TID)
-                {
-                    oid = metaCache.GetOIDOfObject(e.ComplexObject, ti);
-                }
-                else if (circularRefCache.Contains(e.ComplexObject))
-                {
-                    oid = metaCache.GetOIDOfObject(e.ComplexObject, ti);
-                }
-                else
-                {
-                    circularRefCache.Add(e.ComplexObject);
-
-                    oid = metaCache.GetOIDOfObject(e.ComplexObject, ti);
-                    bool inserted = oid == 0;
-                    if (this.storeOnlyReferencesOfListItems && !inserted)
-                    {
-                        //skip save object and keep only reference
-                    }
-                    else
-                    {
-                        oid = await storageEngine.SaveObjectAsync(e.ComplexObject, ti);
-                    }
-                    SavedEventsArgs saved = new SavedEventsArgs(e.ComplexObject.GetType(), e.ComplexObject);
-                    saved.Inserted = inserted;
-                    this.OnSavedObject(saved);
-                }
-                e.SavedOID = oid;
-                e.TID = ti.Header.TID;
-
-            }
-        }
-#endif
 #if UNITY3D
         protected virtual void OnSavingObject(SavingEventsArgs e)
 		{
@@ -707,56 +589,7 @@ namespace Sqo
                 }
             }
 		}
-#if ASYNC
-        /// <summary>
-        /// Insert or update object; if object is loaded from database and this method is called then update will occur, if object is new created then insert will occur
-        /// </summary>
-        /// <param name="obj">Object to be stored</param>
-        public async Task StoreObjectAsync(object obj)
-        {
-            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
 
-            try
-            {
-                SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(obj);
-                if (ti != null)
-                {
-                    if ((ti.Type.IsGenericType() && ti.Type.GetGenericTypeDefinition() == typeof(Indexes.BTreeNode<>)) || ti.Type == typeof(IndexInfo2))
-                    { }
-                    else
-                    {
-                        circularRefCache.Clear();
-                    }
-                    circularRefCache.Add(obj);
-                    bool inserted = false;
-#if UNITY3D
-                    if (this.savedObject != null)//optimization 
-                    {
-                        inserted = metaCache.GetOIDOfObject(obj, ti) == 0;
-                    }
-#else
-                    if (this.SavedObject != null)//optimization 
-                    {
-                        inserted = metaCache.GetOIDOfObject(obj, ti) == 0;
-                    }
-#endif
-                    await storageEngine.SaveObjectAsync(obj, ti);
-                    SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
-                    saved.Inserted = inserted;
-                    this.OnSavedObject(saved);
-
-
-                }
-            }
-            finally
-            {
-
-                if (locked) _lockerAsync.Release();
-
-            }
-
-        }
-#endif
      /// <summary>
      ///  Insert or update object partially, only provided properties are saved
      /// </summary>
@@ -766,17 +599,7 @@ namespace Sqo
         {
             this.StoreObjectPartially(obj, false, properties);
         }
-#if ASYNC
-        /// <summary>
-        ///  Insert or update object partially, only provided properties are saved
-        /// </summary>
-        /// <param name="obj">object of which properties will be stored</param>
-        /// <param name="properties">properties to be stored</param>
-        public async Task StoreObjectPartiallyAsync(object obj, params string[] properties)
-        {
-            await this.StoreObjectPartiallyAsync(obj, false, properties);
-        }
-#endif
+
         /// <summary>
         ///  Insert or update object partially, only provided properties are saved 
         /// </summary>
@@ -804,35 +627,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        /// <summary>
-        ///  Insert or update object partially, only provided properties are saved 
-        /// </summary>
-        /// <param name="obj">object of which properties will be stored</param>
-        /// <param name="properties">properties to be stored</param>
-        ///<param name="onlyReferences">if true,it will store only references to complex objects</param>
-        public async Task StoreObjectPartiallyAsync(object obj, bool onlyReferences, params string[] properties)
-        {
-             bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
-             try
-             {
-                 this.storeOnlyReferencesOfListItems = onlyReferences;
-                 SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(obj);
-                 if (ti != null)
-                 {
-                     circularRefCache.Clear();
-                     circularRefCache.Add(obj);
-                     await storageEngine.SaveObjectPartiallyAsync(obj, ti, properties);
 
-                 }
-                 this.storeOnlyReferencesOfListItems = false;
-             }
-             finally
-             {
-                 if (locked) _lockerAsync.Release();
-             }
-        }
-#endif
         /// <summary>
         /// Insert or update object by a Transaction; if object is loaded from database and this method is called then update will occur, if object is new created then insert will occur
         /// </summary>
@@ -870,46 +665,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Insert or update object by a Transaction; if object is loaded from database and this method is called then update will occur, if object is new created then insert will occur
-        /// </summary>
-        /// <param name="obj">Object to be stored</param>
-        /// <param name="transaction">Transaction object</param>
 
-        public async Task StoreObjectAsync(object obj, Transactions.ITransaction transaction)
-        {
-
-            if (transaction == null)
-            {
-                throw new ArgumentNullException("transaction");
-            }
-            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
-            try
-            {
-                SqoTypeInfo ti = await this.GetSqoTypeInfoToStoreObjectAsync(obj);
-                if (ti != null)
-                {
-                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
-                    {
-                        throw new SiaqodbException("Transaction closed!");
-                    }
-                    //circularRefCache.Clear();
-                    //circularRefCache.Add(obj); 
-
-                    //circularRefCache is filled with obj just before Commit in TransactionManager, so not need to be added here
-                    await storageEngine.SaveObjectAsync(obj, ti, null, (Transactions.Transaction)transaction);
-
-                    SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
-                    this.OnSavedObject(saved);
-                }
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
-        }
-#endif
        
         private SqoTypeInfo GetSqoTypeInfoToStoreObject(object obj)
         {
@@ -928,25 +684,7 @@ namespace Sqo
 
             return this.GetSqoTypeInfoToStoreObject(obj.GetType());
         }
-#if ASYNC
-        private async Task<SqoTypeInfo> GetSqoTypeInfoToStoreObjectAsync(object obj)
-        {
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            Type objType = obj.GetType();
-            SavingEventsArgs ev = new SavingEventsArgs(objType, obj);
 
-            this.OnSavingObject(ev);
-            if (ev.Cancel)
-            {
-                return null;
-            }
-
-            return await this.GetSqoTypeInfoToStoreObjectAsync(obj.GetType());
-        }
-#endif
 
         private SqoTypeInfo GetSqoTypeInfoToStoreObject(Type objType)
         {
@@ -976,35 +714,7 @@ namespace Sqo
             }
             return ti;
         }
-#if ASYNC
-        private async Task<SqoTypeInfo> GetSqoTypeInfoToStoreObjectAsync(Type objType)
-        {
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            SqoTypeInfo ti = null;
 
-
-            if (this.metaCache.Contains(objType))
-            {
-                ti = this.metaCache.GetSqoTypeInfo(objType);
-            }
-            else
-            {
-                ti = MetaExtractor.GetSqoTypeInfo(objType);
-                await storageEngine.SaveTypeAsync(ti);
-                this.metaCache.AddType(objType, ti);
-                await this.indexManager.BuildIndexesAsync(ti);
-
-            }
-            if (ti.IsOld)
-            {
-                throw new TypeChangedException("Actual runtime Type:" + ti.Type.Name + "is different than Type stored in DB, in current version is not supported automatically type changing, to fix this, modify your class like it was when u saved objects in DB");
-            }
-            return ti;
-        }
-#endif
         /// <summary>
         /// 
         /// </summary>
@@ -1034,42 +744,6 @@ namespace Sqo
             }
 
         }
-#if ASYNC
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        internal async Task<IObjectList<T>> LoadAsync<T>(System.Linq.Expressions.Expression expression)
-        {
-            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-            SqoTypeInfo ti = null;
-            try
-            {
-                ti = CheckDBAndGetSqoTypeInfo<T>();
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
-            List<int> oids = await LoadOidsAsync<T>(expression);
-
-            locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-            try
-            {
-                return await storageEngine.LoadByOIDsAsync<T>(oids, ti);
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
-        }
-#endif
-        //public IObjectList<T> Objects<T>()
-        //{
-        //    return this.LoadAll<T>();
-        //}
         /// <summary>
         /// Load all objects of Type provided
         /// </summary>
@@ -1105,26 +779,6 @@ namespace Sqo
                 return storageEngine.LoadAll<T>(ti);
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Load all objects of Type provided
-        /// </summary>
-        /// <typeparam name="T">Type of objects to be loaded from database</typeparam>
-        /// <returns>List of objects retrieved from database</returns>
-        public async Task<IObjectList<T>> LoadAllAsync<T>()
-        {
-             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-             try
-             {
-                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                 return await storageEngine.LoadAllAsync<T>(ti);
-             }
-             finally
-             {
-                 if (locked) _lockerAsync.Release();
-             }
-        }
-#endif
         /// <summary>
         /// Load object from database by OID provided
         /// </summary>
@@ -1152,28 +806,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Load object from database by OID provided
-        /// </summary>
-        /// <typeparam name="T">The Type of object to be loaded</typeparam>
-        /// <param name="oid">oid of object</param>
-        /// <returns>the object stored in database with oid provided</returns>
-        public async Task<T> LoadObjectByOIDAsync<T>(int oid)
-        {
-             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-             try
-             {
-                 SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                 return await storageEngine.LoadObjectByOIDAsync<T>(ti, oid);
-             }
-             finally
-             {
-                 if (locked) _lockerAsync.Release();
-             }
 
-        }
-#endif
         internal T LoadObjectByOID<T>(int oid,List<string> properties)
         {
             lock (_locker)
@@ -1193,23 +826,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        internal async Task<T> LoadObjectByOIDAsync<T>(int oid, List<string> properties)
-        {
-            bool locked;
-            await _lockerAsync.LockAsync(typeof(T),out locked);
-            try
-            {
-                SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                return (T)(await storageEngine.LoadObjectByOIDAsync(ti, oid, properties));
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
 
-        }
-#endif
         /// <summary>
         /// Close database
         /// </summary>
@@ -1231,20 +848,7 @@ namespace Sqo
             this.storageEngine.Close();
             
         }
-#if ASYNC
-        /// <summary>
-        /// Close database
-        /// </summary>
-        public async Task CloseAsync()
-        {
 
-            this.opened = false;
-            this.metaCache = null;
-            await this.storageEngine.CloseAsync();
-            this.indexManager.Close();
-
-        }
-#endif
         /// <summary>
         /// Flush buffered data to database
         /// </summary>
@@ -1255,23 +859,7 @@ namespace Sqo
                 this.storageEngine.Flush();
             }
 		}
-#if ASYNC
-        /// <summary>
-        /// Flush buffered data to database
-        /// </summary>
-        public async Task FlushAsync()
-        {
-            await _lockerAsync.LockAsync();
-            try
-            {
-                await this.storageEngine.FlushAsync();
-            }
-            finally
-            {
-                _lockerAsync.Release();
-            }
-        }
-#endif
+
         /// <summary>
         /// Cast method to be used in LINQ queries
         /// </summary>
@@ -1324,33 +912,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Load OIDs by expression
-        /// </summary>
-        /// <typeparam name="T">Type for which OIDs will be loaded</typeparam>
-        /// <param name="expression">filter expression</param>
-        /// <returns>List of OIDs</returns>
-        public async Task<List<int>> LoadOidsAsync<T>(System.Linq.Expressions.Expression expression)
-        {
-            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-            try
-            {
-                if (expression == null)
-                {
-                    throw new ArgumentNullException("expression");
-                }
-                SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                QueryTranslator t = new QueryTranslator(this.storageEngine, ti);
-                ICriteria criteria = t.Translate(expression);
-                return await criteria.GetOIDsAsync();
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
-        }
-#endif
+
 		internal List<int> LoadAllOIDs<T>()
 		{
             lock (_locker)
@@ -1364,21 +926,7 @@ namespace Sqo
                 }
             }
 		}
-#if ASYNC
-        internal async Task<List<int>> LoadAllOIDsAsync<T>()
-        {
-            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-            try
-            {
-                SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                return await storageEngine.LoadAllOIDsAsync(ti);
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
-        }
-#endif
+
 
 		/// <summary>
 		/// Load all object OIDs of MetaType provided
@@ -1402,22 +950,7 @@ namespace Sqo
                 }
             }
 		}
-#if ASYNC
-        /// <summary>
-        /// Load all object OIDs of MetaType provided
-        /// </summary>
-        /// <param name="type">meta type Load by method GetAllTypes()</param>
-        /// <returns></returns>
-        public async Task<List<int>> LoadAllOIDsAsync(MetaType type)
-        {
 
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            return await storageEngine.LoadAllOIDsAsync(type.Name);
-        }
-#endif
         internal SqoTypeInfo GetSqoTypeInfo<T>()
         {
            
@@ -1442,28 +975,7 @@ namespace Sqo
 
 
        
-#if ASYNC
-        internal async Task<List<KeyValuePair<int, int>>> LoadOidsForJoinAsync<TResult, TOuter, TInner>(SqoQuery<TOuter> outer, SqoQuery<TInner> inner, System.Linq.Expressions.Expression outerExpression, System.Linq.Expressions.Expression innerExpression)
-        {
 
-            SqoTypeInfo tiOuter = this.GetSqoTypeInfo<TOuter>();
-            SqoTypeInfo tiInner = this.GetSqoTypeInfo<TInner>();
-
-            JoinTranslator t = new JoinTranslator();
-            string criteriaOuter = t.Translate(outerExpression);
-
-            string criteriaInner = t.Translate(innerExpression);
-            List<int> oidOuter = outer.GetFilteredOids();
-            List<int> oidInner = inner.GetFilteredOids();
-
-            List<KeyValuePair<int, int>> oidsPairs = await storageEngine.LoadJoinAsync(tiOuter, criteriaOuter, oidOuter, tiInner, criteriaInner, oidInner);
-
-            return oidsPairs;
-
-
-        }
-
-#endif
 
         internal object LoadValue(int oid, string fieldName, Type type)
         {
@@ -1487,15 +999,7 @@ namespace Sqo
             return storageEngine.LoadValue(oid, fieldName, ti,transaction);
 
         }
-#if ASYNC
-        internal async Task<object> LoadValueAsync(int oid, string fieldName, Type type)
-        {
 
-            SqoTypeInfo ti = this.GetSqoTypeInfo(type);
-            return await storageEngine.LoadValueAsync(oid, fieldName, ti);
-
-        }
-#endif
 		/// <summary>
 		/// Load value of a field of an object identified by OID provided
 		/// </summary>
@@ -1526,36 +1030,7 @@ namespace Sqo
             }
 
 		}
-#if ASYNC
-        /// <summary>
-        /// Load value of a field of an object identified by OID provided
-        /// </summary>
-        /// <param name="oid">OID of object</param>
-        /// <param name="fieldName">fieldName</param>
-        /// <param name="mt">MetaType</param>
-        /// <returns></returns>
-        public async Task<object> LoadValueAsync(int oid, string fieldName, MetaType mt)
-        {
 
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            if (!cacheForManager.Contains(mt.Name))
-            {
-                SqoTypeInfo ti = await storageEngine.GetSqoTypeInfoAsync(mt.Name);
-                cacheForManager.AddType(mt.Name, ti);
-            }
-            SqoTypeInfo tinf = cacheForManager.GetSqoTypeInfo(mt.Name);
-            bool locked = false;
-            await _lockerAsync.LockAsync(tinf.Type,out locked);
-            try
-            {
-                return await storageEngine.LoadValueAsync(oid, fieldName, tinf);
-            }
-            finally { if (locked) _lockerAsync.Release(); }
-        }
-#endif
         /// <summary>
         /// Delete an object from database
         /// </summary>
@@ -1577,27 +1052,7 @@ namespace Sqo
                 }
             }
 		}
-#if ASYNC
-        /// <summary>
-        /// Delete an object from database
-        /// </summary>
-        /// <param name="obj">Object to be deleted</param>
-        public async Task DeleteAsync(object obj)
-        {
-            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
-            try
-            {
-                if (!opened)
-                {
-                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
-                }
-                Type t = obj.GetType();
-                SqoTypeInfo ti = this.GetSqoTypeInfo(t);
-                bool deleted = await DeleteObjInternalAsync(obj, ti, null);
-            }
-            finally { if (locked) _lockerAsync.Release(); }
-        }
-#endif
+
         /// <summary>
         /// Delete an object from database using a Transaction
         /// </summary>
@@ -1626,37 +1081,7 @@ namespace Sqo
                 DeleteObjInternal(obj, ti, transaction);
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Delete an object from database using a Transaction
-        /// </summary>
-        /// <param name="obj">Object to be deleted</param>
-        /// <param name="transaction">Transaction</param>
-        public async Task DeleteAsync(object obj, Transactions.ITransaction transaction)
-        {
-            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
-            try
-            {
-                if (!opened)
-                {
-                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
-                }
-                if (transaction == null)
-                {
-                    throw new ArgumentNullException("transaction");
-                }
-                if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
-                {
-                    throw new SiaqodbException("Transaction closed!");
-                }
-                Type t = obj.GetType();
-                SqoTypeInfo ti = this.GetSqoTypeInfo(t);
-                await DeleteObjInternalAsync(obj, ti, transaction);
 
-            }
-            finally { if (locked) _lockerAsync.Release(); }
-        }
-#endif
         /// <summary>
         /// Delete an object from database by a certain field(ex:ID that come from server)
         /// </summary>
@@ -1666,17 +1091,7 @@ namespace Sqo
         {
             return this.DeleteObjectBy(obj, fieldName);
         }
-#if ASYNC
-        /// <summary>
-        /// Delete an object from database by a certain field(ex:ID that come from server)
-        /// </summary>
-        /// <param name="obj">Object to be deleted</param>
-        /// <param name="fieldName">Names of field that this method will lookup for object to delete it</param>
-        public async Task<bool> DeleteObjectByAsync(string fieldName, object obj)
-        {
-            return await this.DeleteObjectByAsync(obj, fieldName);
-        }
-#endif
+
         /// <summary>
         /// Delete an object from database by a certain field(ex:ID that come from server)
         /// </summary>
@@ -1694,17 +1109,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Delete an object from database by a certain field(ex:ID that come from server)
-        /// </summary>
-        /// <param name="obj">Object to be deleted</param>
-        /// <param name="fieldNames">Names of fields that this method will lookup for object to delete it</param>
-        public async Task<bool> DeleteObjectByAsync(object obj, params string[] fieldNames)
-        {
-            return await this.DeleteObjectByAsync(obj, null, fieldNames);
-        }
-#endif
+
         /// <summary>
         /// Delete an object from database by a certain field(ex:ID that come from server)
         /// </summary>
@@ -1750,57 +1155,7 @@ namespace Sqo
                 return OID_deleted > 0;
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Delete an object from database by a certain field(ex:ID that come from server)
-        /// </summary>
-        /// <param name="obj">Object to be deleted</param>
-        /// <param name="fieldNames">Names of fields that this method will lookup for object to delete it</param>
-        /// <param name="transaction">Transaction object</param>
 
-        public async Task<bool> DeleteObjectByAsync(object obj, Transactions.ITransaction transaction, params string[] fieldNames)
-        {
-
-
-            if (fieldNames == null || fieldNames.Length == 0)
-            {
-                throw new ArgumentNullException("fieldNames");
-            }
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
-            try
-            {
-                if (transaction != null)
-                {
-                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
-                    {
-                        throw new SiaqodbException("Transaction closed!");
-                    }
-                }
-                Type t = obj.GetType();
-                SqoTypeInfo ti = this.GetSqoTypeInfo(t);
-                DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, -1);//we don't know it
-                this.OnDeletingObject(delEv);
-                if (delEv.Cancel)
-                {
-                    return false;
-                }
-
-                int OID_deleted = await storageEngine.DeleteObjectByAsync(fieldNames, obj, ti, (Transactions.Transaction)transaction);
-                DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, OID_deleted);
-                this.OnDeletedObject(deletedEv);
-
-                return OID_deleted>0;
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
-        }
-#endif
          /// <summary>
         /// Delete an object from database by a criteria
         /// </summary>
@@ -1851,60 +1206,7 @@ namespace Sqo
         {
             return DeleteObjectBy(typeof(T), criteria);
         }
-#if ASYNC
-        /// <summary>
-        /// Delete an object from database by a criteria
-        /// </summary>
-        /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
-        /// <returns>Number of objects deleted</returns>
 
-        public async Task<int> DeleteObjectByAsync(Type objectType,Dictionary<string, object> criteria)
-        {
-            if (criteria == null || criteria.Keys.Count == 0)
-            {
-                throw new ArgumentNullException("criteria");
-            }
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            bool locked = false; await _lockerAsync.LockAsync(objectType, out locked);
-            try
-            {
-                SqoTypeInfo ti = this.GetSqoTypeInfo(objectType);
-                DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, -1);//we don't know it
-                this.OnDeletingObject(delEv);
-                if (delEv.Cancel)
-                {
-                    return 0;
-                }
-
-                List<int> oidsDeleted = await storageEngine.DeleteObjectByAsync(ti, criteria);
-                foreach (int oid in oidsDeleted)
-                {
-                    DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
-                    this.OnDeletedObject(deletedEv);
-                }
-                return oidsDeleted.Count;
-
-            }
-            finally
-            {
-                if (locked) _lockerAsync.Release();
-            }
-        }
-
-        /// <summary>
-        /// Delete an object from database by a criteria
-        /// </summary>
-        /// <param name="criteria">Pairs of fields-values to lookup for object to delete it</param>
-        /// <returns>Number of objects deleted</returns>
-        public async Task<int> DeleteObjectByAsync<T>(Dictionary<string, object> criteria)
-        {
-            return await DeleteObjectByAsync(typeof(T), criteria);
-            
-        }
-#endif
         
         /// <summary>
         /// Delete all objects of Type provided
@@ -1914,16 +1216,7 @@ namespace Sqo
 		{
             this.DropType(typeof(T));
 		}
-#if ASYNC
-        /// <summary>
-        /// Delete all objects of Type provided
-        /// </summary>
-        /// <typeparam name="T">Type of objects to be deleted</typeparam>
-        public async Task DropTypeAsync<T>()
-        {
-            await this.DropTypeAsync(typeof(T));
-        }
-#endif
+
         /// <summary>
         /// Delete all objects of Type provided
         /// </summary>
@@ -1967,37 +1260,8 @@ namespace Sqo
                 this.metaCache.Remove(type);
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Delete all objects of Type provided
-        /// </summary>
-        /// <param name="type">Type of objects to be deleted</param>>
-        public async Task DropTypeAsync(Type type)
-        {
-            await this.DropTypeAsync(type, false);
-        }
-#endif
-        
-#if ASYNC
-        /// <summary>
-        ///  Delete all objects of Type provided
-        /// </summary>
-        /// <param name="type">Type of objects to be deleted</param>
-        /// <param name="claimFreespace">If this is TRUE all dynamic length data associated with objects will be marked as free and Shrink method is able to free the space</param>
-        public async Task DropTypeAsync(Type type, bool claimFreespace)
-        {
 
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            SqoTypeInfo ti = GetSqoTypeInfo(type);
-            await storageEngine.DropTypeAsync(ti, claimFreespace);
-            await indexManager.DropIndexesAsync(ti, claimFreespace);
-            this.metaCache.Remove(type);
 
-        }
-#endif
 		internal object LoadObjectByOID(Type type,int oid)
 		{
             using (var transaction = transactionManager.BeginTransaction())
@@ -2008,13 +1272,7 @@ namespace Sqo
                 return obj;
             }
 		}
-#if ASYNC
-        internal async Task<object> LoadObjectByOIDAsync(Type type, int oid)
-        {
-            SqoTypeInfo ti = this.GetSqoTypeInfo(type);
-            return await storageEngine.LoadObjectByOIDAsync(ti, oid);
-        }
-#endif
+
         /// <summary>
         /// Return all Types from database folder
         /// </summary>
@@ -2051,38 +1309,7 @@ namespace Sqo
             }
 
 		}
-#if ASYNC
-        /// <summary>
-        /// Return all Types from database folder
-        /// </summary>
-        /// <returns>List of MetaType objects</returns>
-        public async Task<List<MetaType>> GetAllTypesAsync()
-        {
-            if (!opened)
-            {
-                throw new SiaqodbException("Database is closed, call method Open() to open it!");
-            }
-            List<MetaType> list = new List<MetaType>();
-            List<SqoTypeInfo> tiList = await storageEngine.LoadAllTypesForObjectManagerAsync();
-            foreach (SqoTypeInfo ti in tiList)
-            {
-                MetaType mt = new MetaType();
-                mt.Name = ti.TypeName;
-                mt.TypeID = ti.Header.TID;
-                mt.FileName = ti.FileNameForManager;
-                foreach (FieldSqoInfo fi in ti.Fields)
-                {
-                    MetaField mf = new MetaField();
 
-                    mf.FieldType = fi.AttributeType;
-                    mf.Name = fi.Name;
-                    mt.Fields.Add(mf);
-                }
-                list.Add(mt);
-            }
-            return list;
-        }
-#endif
         /// <summary>
         /// Return number of objects of Type provided
         /// </summary>
@@ -2105,28 +1332,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Return number of objects of Type provided
-        /// </summary>
-        /// <typeparam name="T">Type of objects</typeparam>
-        /// <returns></returns>
-        public async Task<int> CountAsync<T>()
-        {
-             bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-             try
-             {
-                 if (!opened)
-                 {
-                     throw new SiaqodbException("Database is closed, call method Open() to open it!");
-                 }
-                 SqoTypeInfo ti = this.GetSqoTypeInfo<T>();
-                 return await storageEngine.CountAsync(ti);
-             }
-             finally { if (locked) _lockerAsync.Release(); }
 
-        }
-#endif
         
      
         
@@ -2141,19 +1347,7 @@ namespace Sqo
         {
             return this.UpdateObjectBy(obj, fieldName);
         }
-#if ASYNC
 
-        /// <summary>
-        /// Update an object in database by a certain Field(eq: ID that come from a server)
-        /// </summary>
-        /// <param name="fieldName">FieldName by which update is made(eq an ID)</param>
-        /// <param name="obj">object that has all values but not OID to update it in database</param>
-        /// <returns>true if object was updated and false if object was not found in database</returns>
-        public async Task<bool> UpdateObjectByAsync(string fieldName, object obj)
-        {
-            return await this.UpdateObjectByAsync(obj, fieldName);
-        }
-#endif
         /// <summary>
         /// Update an object in database by certain Fields(eq: ID that come from a server)
         /// </summary>
@@ -2173,19 +1367,7 @@ namespace Sqo
                 }
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Update an object in database by certain Fields(eq: ID that come from a server)
-        /// </summary>
-        /// <param name="fieldNames">name of fields by which update is made(eq an ID)</param>
-        /// <param name="obj">object that has all values but not OID to update it in database</param>
-        /// <returns>true if object was updated and false if object was not found in database</returns>
 
-        public async Task<bool> UpdateObjectByAsync(object obj, params string[] fieldNames)
-        {
-            return await this.UpdateObjectByAsync(obj, null, fieldNames);
-        }
-#endif
         /// <summary>
         /// Update an object in database by certain Fields(eq: ID that come from a server)
         /// </summary>
@@ -2226,48 +1408,7 @@ namespace Sqo
                 return false;
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Update an object in database by certain Fields(eq: ID that come from a server)
-        /// </summary>
-        /// <param name="fieldNames">name of fields by which update is made(eq an ID)</param>
-        /// <param name="obj">object that has all values but not OID to update it in database</param>
-        /// <param name="transaction">Transaction object</param>
-        /// <returns>true if object was updated and false if object was not found in database</returns>
-        public async Task<bool> UpdateObjectByAsync(object obj, Sqo.Transactions.ITransaction transaction, params string[] fieldNames)
-        {
-            bool locked = false; await _lockerAsync.LockAsync(obj.GetType(), out locked);
-            try
-            {
-                if (fieldNames == null || fieldNames.Length == 0)
-                {
-                    throw new ArgumentNullException("fieldsName");
-                }
-                if (transaction != null)
-                {
-                    if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
-                    {
-                        throw new SiaqodbException("Transaction closed!");
-                    }
-                }
 
-                SqoTypeInfo ti = await GetSqoTypeInfoToStoreObjectAsync(obj);
-                if (ti != null)
-                {
-
-                    bool stored = await storageEngine.UpdateObjectByAsync(fieldNames, obj, ti, (Transactions.Transaction)transaction);
-
-                    SavedEventsArgs saved = new SavedEventsArgs(obj.GetType(), obj);
-                    saved.Inserted = false;
-                    this.OnSavedObject(saved);
-
-                    return stored;
-                }
-                return false;
-            }
-            finally { if (locked) _lockerAsync.Release(); }
-        }
-#endif
         internal bool UpdateField(int oid,MetaType metaType, string field, object value)
         {
             using (var transaction = transactionManager.BeginTransaction())
@@ -2315,34 +1456,7 @@ namespace Sqo
             this.OnDeletedObject(deletedEv);
             return true;
         }
-#if ASYNC
-        private async Task<bool> DeleteObjInternalAsync(object obj, SqoTypeInfo ti, Transactions.ITransaction transaction)
-        {
-            int oid = metaCache.GetOIDOfObject(obj, ti);
-            if (oid <= 0 || oid > ti.Header.numberOfRecords)
-            {
-                throw new SiaqodbException("Object not exists in database!");
-            }
 
-            DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, oid);
-            this.OnDeletingObject(delEv);
-            if (delEv.Cancel)
-            {
-                return false;
-            }
-            if (transaction == null)
-            {
-                await storageEngine.DeleteObjectAsync(obj, ti);
-            }
-            else
-            {
-                await storageEngine.DeleteObjectAsync(obj, ti, (Transactions.Transaction)transaction, null);
-            }
-            DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
-            this.OnDeletedObject(deletedEv);
-            return true;
-        }
-#endif
         internal SqoTypeInfo CheckDBAndGetSqoTypeInfo<T>()
         {
             if (!opened)
@@ -2395,33 +1509,7 @@ namespace Sqo
                 return this.storageEngine.LoadByOIDs(oidsDirty, ti);
             }
         }
-#if ASYNC
-        internal async Task<List<object>> LoadDirtyObjectsAsync(Type type)
-        {
-            bool locked = false; 
-            await _lockerAsync.LockAsync(type,out locked);
-            try
-            {
-                SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo(type);
-                Where w = new Where("isDirty", OperationType.Equal, true);
-                w.StorageEngine = this.storageEngine;
-                w.ParentSqoTypeInfo = ti;
-                w.ParentType.Add(w.ParentSqoTypeInfo.Type);
-                List<int> oidsDirty = await w.GetOIDsAsync();
 
-                Where wDelete = new Where("isTombstone", OperationType.Equal, true);
-                wDelete.StorageEngine = this.storageEngine;
-                wDelete.ParentSqoTypeInfo = ti;
-                wDelete.ParentType.Add(wDelete.ParentSqoTypeInfo.Type);
-                List<int> oidsDeleted = await this.storageEngine.LoadFilteredDeletedOidsAsync(wDelete, ti);
-
-                oidsDirty.AddRange(oidsDeleted);
-
-                return await this.storageEngine.LoadByOIDsAsync(oidsDirty, ti);
-            }
-            finally { if (locked) _lockerAsync.Release(); }
-        }
-#endif
 
         /// <summary>
         /// return current database path
@@ -2445,16 +1533,7 @@ namespace Sqo
         }
       
         
-#if ASYNC
-        private async Task RecoverAfterCrashAsync()
-        {
-            SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<Transactions.TransactionObjectHeader>();
 
-            SqoTypeInfo tiTypeHeader = CheckDBAndGetSqoTypeInfo<Transactions.TransactionTypeHeader>();
-
-            await storageEngine.RecoverAfterCrashAsync(ti, tiTypeHeader);
-        }
-#endif
       
        
         internal void Flush<T>()
@@ -2463,14 +1542,7 @@ namespace Sqo
             storageEngine.Flush(ti);
 
         }
-#if ASYNC
-        internal async Task FlushAsync<T>()
-        {
-            SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-            await storageEngine.FlushAsync(ti);
 
-        }
-#endif
 
         internal void DeleteObjectByMeta(int oid, MetaType metaType)
         {
@@ -2530,25 +1602,7 @@ namespace Sqo
                 return new LazyObjectList<T>(this, oids);
             }
         }
-#if ASYNC
-        /// <summary>
-        /// Load all objects in Lazy mode, objects are activated/read from db when it is accessed
-        /// by index or by enumerator
-        /// </summary>
-        /// <typeparam name="T">Type of objects to be loaded from database</typeparam>
-        /// <returns>LazyObjectList of objects</returns>
-        public async Task<IObjectList<T>> LoadAllLazyAsync<T>()
-        {
-            bool locked = false; await _lockerAsync.LockAsync(typeof(T), out locked);
-            try
-            {
-                SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();
-                List<int> oids = await storageEngine.LoadAllOIDsAsync(ti);
-                return new LazyObjectList<T>(this, oids);
-            }
-            finally { if (locked) _lockerAsync.Release(); }
-        }
-#endif
+
         internal void LoadObjectOIDAndTID(int oid, string fieldName, MetaType mt,ref List<int> listOIDs,ref int TID)
         {
             using (var transaction = transactionManager.BeginTransaction())

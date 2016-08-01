@@ -9,12 +9,8 @@ using System.Threading.Tasks;
 
 namespace Sqo
 {
-#if KEVAST
-    internal
-#else
-        public
-#endif
-    class LazyEnumerator<T> : IEnumerator<T>, IEnumerator
+
+        public class LazyEnumerator<T> : IEnumerator<T>, IEnumerator
 #if ASYNC_LMDB
 , ISqoAsyncEnumerator<T>
 #endif

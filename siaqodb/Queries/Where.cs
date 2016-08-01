@@ -5,9 +5,7 @@ using System.Text;
 using System.Linq.Expressions;
 using Sqo.Queries;
 using Sqo.Meta;
-#if ASYNC
-using System.Threading.Tasks;
-#endif
+
 namespace Sqo.Queries
 {
     class Where :ICriteria
@@ -61,14 +59,7 @@ namespace Sqo.Queries
 
         #endregion
 
-#if ASYNC
-        public async Task<List<int>> GetOIDsAsync()
-        {
-            List<int> oids = await StorageEngine.LoadFilteredOidsAsync(this).ConfigureAwait(false);
 
-            return oids;
-        }
-#endif
     }
     internal enum OperationType { Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual ,StartWith,EndWith,Contains,ContainsKey,ContainsValue}
 }
