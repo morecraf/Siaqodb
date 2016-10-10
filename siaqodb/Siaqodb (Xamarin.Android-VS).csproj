@@ -192,10 +192,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedNativeLibrary Include="lib\x86\liblmdb.so" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedNativeLibrary Include="lib\armeabi\liblmdb.so" />
-  </ItemGroup>
+    <EmbeddedNativeLibrary Include="lib\armeabi-v7a\liblmdb.so" />
+ </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

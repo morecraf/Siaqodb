@@ -52,7 +52,8 @@ namespace TestSiaqodb
            // SiaqodbConfigurator.VerboseLevel = VerboseLevel.Info;
             SiaqodbConfigurator.LoggingMethod = this.LogWarns;
             //Sqo.SiaqodbConfigurator.SetEncryptor(Sqo.BuildInAlgorithm.AES);
-            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+            var lic = string.Format("QHL0KapKSI4W7dBGrUtLO8lAc0ug0XZNxwFcVVC6KikS2RG+e+qTW0ow+MiuhJRMes+og9xAhYUGO80wI2GbZw==");
+            Sqo.SiaqodbConfigurator.SetLicense(lic);
 #if __MOBILE__
 			objPath=Environment.GetFolderPath (Environment.SpecialFolder.Personal);
 #else
@@ -363,7 +364,7 @@ namespace TestSiaqodb
             {
                 nop.DropType<D40>();
                
-               
+             
                 nop.StoreObject(d);
 
                 IObjectList<D40> all1 = nop.LoadAll<D40>();
@@ -3209,337 +3210,370 @@ namespace TestSiaqodb
                 Assert.AreEqual(5, sq.LoadAll<MyPrivate>().Count);
             }
         }
-                /* TODO LMDB uncomment
-                 #if __MOBILE__
-                [Test]
-                #else
-                [TestMethod]
+#if __MOBILE__
+		[Test]
+#else
+        [TestMethod]
 
-                #endif
-                public void TestShrink()
+#endif
+        public void TestFloatNegative()
+        {
+            using (Siaqodb sq = new Siaqodb(objPath))
+            {
+                sq.DropType<TestFloat>();
+                for (int i = 0; i < 5; i++)
                 {
-                    DateTime dt = new DateTime(2010, 1, 1);
-                    Guid guid = Guid.NewGuid();
-                    TimeSpan tspan = new TimeSpan();
-                    using(  Siaqodb sq = new Siaqodb(objPath)) {
-                    sq.DropType<D40WithLists>();
+                    TestFloat tf = new TestFloat();
+                    tf.MyFloat = -2300f - i;
+                    
 
-
-                    for (int i = 0; i < 10; i++)
-                    {
-                        D40WithLists d = new D40WithLists();
-                        d.b = new List<byte>(); d.b.Add(Convert.ToByte(i));
-
-                        d.bo = new bool[] { true, false };
-                        d.c = new char[] { 'c', 'd' };
-                        d.d = new double[] { i, i };
-                        d.de = new decimal[] { i, i };
-                        d.dt = new List<DateTime>(); d.dt.Add(dt);
-                        d.f = new float[] { i, i };
-                        d.g = new List<Guid>(); d.g.Add(guid);
-                        d.ID = i;
-                        d.iu = new List<uint>(); d.iu.Add(10);
-                        d.l = null;
-                        d.s = new List<short>(); d.s.Add(1);
-                        d.sb = new List<sbyte>(); d.sb.Add(1);
-                        d.ts = new List<TimeSpan>(); d.ts.Add(tspan);
-                        d.ul = new List<ulong>(); d.ul.Add(10);
-                        d.us = new List<ushort>();
-                        d.enn = new List<myEnum>(); d.enn.Add(myEnum.unu);
-                        d.str = new List<string>(); d.str.Add("Abramé");
-
-                        sq.StoreObject(d);
-                    }
-
-                    IObjectList<D40WithLists> all = sq.LoadAll<D40WithLists>();
-                    for (int i = 5; i < 10; i++)
-                    {
-                        sq.Delete(all[i]);
-                    }
-                   }
-
-                    SiaqodbUtil.Shrink(objPath, ShrinkType.Normal);
-                    SiaqodbUtil.Shrink(objPath, ShrinkType.ForceClaimSpace);
-
-                    using (Siaqodb sq = new Siaqodb(objPath))
-                    {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        D40WithLists d = new D40WithLists();
-                        d.b = new List<byte>(); d.b.Add(Convert.ToByte(i));
-
-                        d.bo = new bool[] { true, false };
-                        d.c = new char[] { 'c', 'd' };
-                        d.d = new double[] { i, i };
-                        d.de = new decimal[] { i, i };
-                        d.dt = new List<DateTime>(); d.dt.Add(dt);
-                        d.f = new float[] { i, i };
-                        d.g = new List<Guid>(); d.g.Add(guid);
-                        d.ID = i;
-                        d.iu = new List<uint>(); d.iu.Add(10);
-                        d.l = null;
-                        d.s = new List<short>(); d.s.Add(1);
-                        d.sb = new List<sbyte>(); d.sb.Add(1);
-                        d.ts = new List<TimeSpan>(); d.ts.Add(tspan);
-                        d.ul = new List<ulong>(); d.ul.Add(10);
-                        d.us = new List<ushort>();
-                        d.enn = new List<myEnum>(); d.enn.Add(myEnum.unu);
-                        d.str = new List<string>(); d.str.Add("Abramé");
-
-                        sq.StoreObject(d);
-                    }
-                    IObjectList<D40WithLists> all1 = sq.LoadAll<D40WithLists>();
-
-
-                    int ii = 0;
-                    bool firstTime = false;
-                    foreach (D40WithLists dL in all1)
-                    {
-                        if (ii == 5 && !firstTime)
-                        {
-                            ii = 0;
-                            firstTime = true;
-                        }
-                        Assert.AreEqual(Convert.ToByte(ii), dL.b[0]);
-                        Assert.AreEqual(true, dL.bo[0]);
-                        Assert.AreEqual(false, dL.bo[1]);
-                        Assert.AreEqual('c', dL.c[0]);
-                        Assert.AreEqual('d', dL.c[1]);
-                        Assert.AreEqual(ii, dL.d[1]);
-                        Assert.AreEqual(ii, dL.de[0]);
-
-                        Assert.AreEqual(dt, dL.dt[0]);
-                        Assert.AreEqual(ii, dL.f[0]);
-                        Assert.AreEqual(guid, dL.g[0]);
-                        Assert.AreEqual((uint)10, dL.iu[0]);
-                        Assert.AreEqual(null, dL.l);
-                        Assert.AreEqual((short)1, dL.s[0]);
-                        Assert.AreEqual((sbyte)1, dL.sb[0]);
-                        Assert.AreEqual(tspan, dL.ts[0]);
-                        Assert.AreEqual((ulong)10, dL.ul[0]);
-                        Assert.AreEqual(0, dL.us.Count);
-                        Assert.AreEqual(myEnum.unu, dL.enn[0]);
-                        Assert.AreEqual("Abramé", dL.str[0]);
-
-                        ii++;
-
-                    }
-
-                    var q21 = (from D40WithLists dll in sq
-                               where dll.g.Contains(guid)
-                               select dll).ToList();
-
-                    Assert.AreEqual(15, q21.Count);
-                   }
-
+                    sq.StoreObject(tf);
                 }
 
-                #if __MOBILE__
-                [Test]
-                #else
-                [TestMethod]
+                var queryBigger = sq.Query<TestFloat>().Where(a => a.MyFloat >= -2304f).ToList();
+                Assert.AreEqual(5, queryBigger.Count);
 
-                #endif
-                public void TestIndexShrink()
-                {
-                  using(  Siaqodb sq = new Siaqodb(objPath)) {
-                    sq.DropType<D40WithIndexes>();
+                var queryLess = sq.Query<TestFloat>().Where(a => a.MyFloat <= -2300f).ToList();
+                Assert.AreEqual(5, queryLess.Count);
 
-                    DateTime dt = new DateTime(2010, 1, 1);
-                    Guid guid = Guid.NewGuid();
-                    TimeSpan tspan = new TimeSpan();
-                    for (int i = 0; i < 10; i++)
-                    {
-                        D40WithIndexes d = new D40WithIndexes();
-                        d.b = Convert.ToByte(i);
-
-                        d.bo = true;
-                        d.c = 'c';
-                        d.d = i;
-                        d.de = i;
-                        d.dt = dt;
-                        d.f = i;
-                        d.g = guid;
-                        d.ID = i;
-                        d.iu = 10;
-                        d.l = i;
-                        d.s = 1;
-                        d.sb = 1;
-                        d.ts = tspan;
-                        d.ul = 10;
-                        d.us = 1;
-                        d.enn = myEnum.unu;
-                        d.str = "Abramé";
-
-
-                        sq.StoreObject(d);
-                    }
-                    sq.DropType<ClassIndexes>();
-                    for (int i = 0; i < 100; i++)
-                    {
-                        ClassIndexes cls = new ClassIndexes();
-                        cls.one = i % 10;
-                        cls.two = i % 10 + 1;
-                        cls.ID = i;
-                        cls.ID2 = i;
-                        sq.StoreObject(cls);
-                    }
-                    IList<D40WithIndexes> all30 = sq.LoadAll<D40WithIndexes>();
-                    for (int i = 5; i < 10; i++)
-                    {
-                        sq.Delete(all30[i]);  
-                    }
-                   }
-
-                    SiaqodbUtil.Shrink(objPath, ShrinkType.Normal);
-                    SiaqodbUtil.Shrink(objPath, ShrinkType.ForceClaimSpace);
-
-                    sq = new Siaqodb(objPath);
-                    byte byt = 3;
-                    var q1 = from D40WithIndexes di in sq
-                             where di.b == byt
-                             select di;
-
-                    Assert.AreEqual(1, q1.ToList().Count);
-
-                    var q2 = from D40WithIndexes di in sq
-                             where di.bo == true
-                             select di;
-
-                    Assert.AreEqual(5, q2.ToList().Count);
-
-                    var q3 = from D40WithIndexes di in sq
-                             where di.c == 'c'
-                             select di;
-
-                    Assert.AreEqual(5, q3.ToList().Count);
-
-                    var q4 = from D40WithIndexes di in sq
-                             where di.d == 3
-                             select di;
-
-                    Assert.AreEqual(1, q4.ToList().Count);
-
-                    var q5 = from D40WithIndexes di in sq
-                             where di.de == 3
-                             select di;
-
-                    Assert.AreEqual(1, q5.ToList().Count);
-
-                    var q6 = from D40WithIndexes di in sq
-                             where di.dt == dt
-                             select di;
-
-                    Assert.AreEqual(5, q6.ToList().Count);
-
-                    var q7 = from D40WithIndexes di in sq
-                             where di.enn == myEnum.unu
-                             select di;
-
-                    Assert.AreEqual(5, q7.ToList().Count);
-
-                    var q8 = from D40WithIndexes di in sq
-                             where di.f == 3
-                             select di;
-
-                    Assert.AreEqual(1, q8.ToList().Count);
-
-                    var q9 = from D40WithIndexes di in sq
-                             where di.g == guid
-                             select di;
-
-                    Assert.AreEqual(5, q9.ToList().Count);
-
-                    var q10 = from D40WithIndexes di in sq
-                              where di.iu == 10
-                              select di;
-
-                    Assert.AreEqual(5, q10.ToList().Count);
-
-                    var q11 = from D40WithIndexes di in sq
-                              where di.l == 2
-                              select di;
-
-                    Assert.AreEqual(1, q11.ToList().Count);
-
-                    var q12 = from D40WithIndexes di in sq
-                              where di.s == 1
-                              select di;
-
-                    Assert.AreEqual(5, q12.ToList().Count);
-
-                    var q13 = from D40WithIndexes di in sq
-                              where di.sb == 1
-                              select di;
-
-                    Assert.AreEqual(5, q13.ToList().Count);
-
-                    var q14 = from D40WithIndexes di in sq
-                              where di.str.StartsWith("Abr")
-                              select di;
-
-                    Assert.AreEqual(5, q14.ToList().Count);
-
-                    var q15 = from D40WithIndexes di in sq
-                              where di.ts == tspan
-                              select di;
-
-                    Assert.AreEqual(5, q15.ToList().Count);
-
-                    var q16 = from D40WithIndexes di in sq
-                              where di.ul == 10
-                              select di;
-
-                    Assert.AreEqual(5, q16.ToList().Count);
-
-                    var q17 = from D40WithIndexes di in sq
-                              where di.us == 1
-                              select di;
-
-                    Assert.AreEqual(5, q17.ToList().Count);
-
-                    var q18 = from ClassIndexes clss in sq
-                              where clss.two == 7
-                              select clss;
-
-                    Assert.AreEqual(10, q18.ToList().Count);
-
-                    var q19 = from D40WithIndexes di in sq
-                              where di.Text == "text longgg"
-                              select di;
-
-                    Assert.AreEqual(5, q19.ToList().Count);
-                   }
-                }
-
-                #if __MOBILE__
-                [Test]
-                #else
-                [TestMethod]
-
-                #endif
-                public void TestInsertBufferChunk()
-                {
-                    SiaqodbConfigurator.BufferingChunkPercent = 2;
-                    Siaqodb nop = new Siaqodb(objPath);
-                    nop.DropType<Customer>();
-
-                    for (int i = 0; i < 10000; i++)
-                    {
-                        Customer c = new Customer();
-                        c.ID = i;
-                        c.Name = "NOR" + i.ToString();
-
-                        nop.StoreObject(c);
-                    }
-                    nop.Flush();
-                    IObjectList<Customer> listC = nop.LoadAll<Customer>();
-                    Assert.AreEqual(listC.Count, 10000);
-
-                    nop.Close();
-
-                }*/
             }
+        }
+        /* TODO LMDB uncomment
+         #if __MOBILE__
+        [Test]
+        #else
+        [TestMethod]
+
+        #endif
+        public void TestShrink()
+        {
+            DateTime dt = new DateTime(2010, 1, 1);
+            Guid guid = Guid.NewGuid();
+            TimeSpan tspan = new TimeSpan();
+            using(  Siaqodb sq = new Siaqodb(objPath)) {
+            sq.DropType<D40WithLists>();
+
+
+            for (int i = 0; i < 10; i++)
+            {
+                D40WithLists d = new D40WithLists();
+                d.b = new List<byte>(); d.b.Add(Convert.ToByte(i));
+
+                d.bo = new bool[] { true, false };
+                d.c = new char[] { 'c', 'd' };
+                d.d = new double[] { i, i };
+                d.de = new decimal[] { i, i };
+                d.dt = new List<DateTime>(); d.dt.Add(dt);
+                d.f = new float[] { i, i };
+                d.g = new List<Guid>(); d.g.Add(guid);
+                d.ID = i;
+                d.iu = new List<uint>(); d.iu.Add(10);
+                d.l = null;
+                d.s = new List<short>(); d.s.Add(1);
+                d.sb = new List<sbyte>(); d.sb.Add(1);
+                d.ts = new List<TimeSpan>(); d.ts.Add(tspan);
+                d.ul = new List<ulong>(); d.ul.Add(10);
+                d.us = new List<ushort>();
+                d.enn = new List<myEnum>(); d.enn.Add(myEnum.unu);
+                d.str = new List<string>(); d.str.Add("Abramé");
+
+                sq.StoreObject(d);
+            }
+
+            IObjectList<D40WithLists> all = sq.LoadAll<D40WithLists>();
+            for (int i = 5; i < 10; i++)
+            {
+                sq.Delete(all[i]);
+            }
+           }
+
+            SiaqodbUtil.Shrink(objPath, ShrinkType.Normal);
+            SiaqodbUtil.Shrink(objPath, ShrinkType.ForceClaimSpace);
+
+            using (Siaqodb sq = new Siaqodb(objPath))
+            {
+            for (int i = 0; i < 10; i++)
+            {
+                D40WithLists d = new D40WithLists();
+                d.b = new List<byte>(); d.b.Add(Convert.ToByte(i));
+
+                d.bo = new bool[] { true, false };
+                d.c = new char[] { 'c', 'd' };
+                d.d = new double[] { i, i };
+                d.de = new decimal[] { i, i };
+                d.dt = new List<DateTime>(); d.dt.Add(dt);
+                d.f = new float[] { i, i };
+                d.g = new List<Guid>(); d.g.Add(guid);
+                d.ID = i;
+                d.iu = new List<uint>(); d.iu.Add(10);
+                d.l = null;
+                d.s = new List<short>(); d.s.Add(1);
+                d.sb = new List<sbyte>(); d.sb.Add(1);
+                d.ts = new List<TimeSpan>(); d.ts.Add(tspan);
+                d.ul = new List<ulong>(); d.ul.Add(10);
+                d.us = new List<ushort>();
+                d.enn = new List<myEnum>(); d.enn.Add(myEnum.unu);
+                d.str = new List<string>(); d.str.Add("Abramé");
+
+                sq.StoreObject(d);
+            }
+            IObjectList<D40WithLists> all1 = sq.LoadAll<D40WithLists>();
+
+
+            int ii = 0;
+            bool firstTime = false;
+            foreach (D40WithLists dL in all1)
+            {
+                if (ii == 5 && !firstTime)
+                {
+                    ii = 0;
+                    firstTime = true;
+                }
+                Assert.AreEqual(Convert.ToByte(ii), dL.b[0]);
+                Assert.AreEqual(true, dL.bo[0]);
+                Assert.AreEqual(false, dL.bo[1]);
+                Assert.AreEqual('c', dL.c[0]);
+                Assert.AreEqual('d', dL.c[1]);
+                Assert.AreEqual(ii, dL.d[1]);
+                Assert.AreEqual(ii, dL.de[0]);
+
+                Assert.AreEqual(dt, dL.dt[0]);
+                Assert.AreEqual(ii, dL.f[0]);
+                Assert.AreEqual(guid, dL.g[0]);
+                Assert.AreEqual((uint)10, dL.iu[0]);
+                Assert.AreEqual(null, dL.l);
+                Assert.AreEqual((short)1, dL.s[0]);
+                Assert.AreEqual((sbyte)1, dL.sb[0]);
+                Assert.AreEqual(tspan, dL.ts[0]);
+                Assert.AreEqual((ulong)10, dL.ul[0]);
+                Assert.AreEqual(0, dL.us.Count);
+                Assert.AreEqual(myEnum.unu, dL.enn[0]);
+                Assert.AreEqual("Abramé", dL.str[0]);
+
+                ii++;
+
+            }
+
+            var q21 = (from D40WithLists dll in sq
+                       where dll.g.Contains(guid)
+                       select dll).ToList();
+
+            Assert.AreEqual(15, q21.Count);
+           }
+
+        }
+
+        #if __MOBILE__
+        [Test]
+        #else
+        [TestMethod]
+
+        #endif
+        public void TestIndexShrink()
+        {
+          using(  Siaqodb sq = new Siaqodb(objPath)) {
+            sq.DropType<D40WithIndexes>();
+
+            DateTime dt = new DateTime(2010, 1, 1);
+            Guid guid = Guid.NewGuid();
+            TimeSpan tspan = new TimeSpan();
+            for (int i = 0; i < 10; i++)
+            {
+                D40WithIndexes d = new D40WithIndexes();
+                d.b = Convert.ToByte(i);
+
+                d.bo = true;
+                d.c = 'c';
+                d.d = i;
+                d.de = i;
+                d.dt = dt;
+                d.f = i;
+                d.g = guid;
+                d.ID = i;
+                d.iu = 10;
+                d.l = i;
+                d.s = 1;
+                d.sb = 1;
+                d.ts = tspan;
+                d.ul = 10;
+                d.us = 1;
+                d.enn = myEnum.unu;
+                d.str = "Abramé";
+
+
+                sq.StoreObject(d);
+            }
+            sq.DropType<ClassIndexes>();
+            for (int i = 0; i < 100; i++)
+            {
+                ClassIndexes cls = new ClassIndexes();
+                cls.one = i % 10;
+                cls.two = i % 10 + 1;
+                cls.ID = i;
+                cls.ID2 = i;
+                sq.StoreObject(cls);
+            }
+            IList<D40WithIndexes> all30 = sq.LoadAll<D40WithIndexes>();
+            for (int i = 5; i < 10; i++)
+            {
+                sq.Delete(all30[i]);  
+            }
+           }
+
+            SiaqodbUtil.Shrink(objPath, ShrinkType.Normal);
+            SiaqodbUtil.Shrink(objPath, ShrinkType.ForceClaimSpace);
+
+            sq = new Siaqodb(objPath);
+            byte byt = 3;
+            var q1 = from D40WithIndexes di in sq
+                     where di.b == byt
+                     select di;
+
+            Assert.AreEqual(1, q1.ToList().Count);
+
+            var q2 = from D40WithIndexes di in sq
+                     where di.bo == true
+                     select di;
+
+            Assert.AreEqual(5, q2.ToList().Count);
+
+            var q3 = from D40WithIndexes di in sq
+                     where di.c == 'c'
+                     select di;
+
+            Assert.AreEqual(5, q3.ToList().Count);
+
+            var q4 = from D40WithIndexes di in sq
+                     where di.d == 3
+                     select di;
+
+            Assert.AreEqual(1, q4.ToList().Count);
+
+            var q5 = from D40WithIndexes di in sq
+                     where di.de == 3
+                     select di;
+
+            Assert.AreEqual(1, q5.ToList().Count);
+
+            var q6 = from D40WithIndexes di in sq
+                     where di.dt == dt
+                     select di;
+
+            Assert.AreEqual(5, q6.ToList().Count);
+
+            var q7 = from D40WithIndexes di in sq
+                     where di.enn == myEnum.unu
+                     select di;
+
+            Assert.AreEqual(5, q7.ToList().Count);
+
+            var q8 = from D40WithIndexes di in sq
+                     where di.f == 3
+                     select di;
+
+            Assert.AreEqual(1, q8.ToList().Count);
+
+            var q9 = from D40WithIndexes di in sq
+                     where di.g == guid
+                     select di;
+
+            Assert.AreEqual(5, q9.ToList().Count);
+
+            var q10 = from D40WithIndexes di in sq
+                      where di.iu == 10
+                      select di;
+
+            Assert.AreEqual(5, q10.ToList().Count);
+
+            var q11 = from D40WithIndexes di in sq
+                      where di.l == 2
+                      select di;
+
+            Assert.AreEqual(1, q11.ToList().Count);
+
+            var q12 = from D40WithIndexes di in sq
+                      where di.s == 1
+                      select di;
+
+            Assert.AreEqual(5, q12.ToList().Count);
+
+            var q13 = from D40WithIndexes di in sq
+                      where di.sb == 1
+                      select di;
+
+            Assert.AreEqual(5, q13.ToList().Count);
+
+            var q14 = from D40WithIndexes di in sq
+                      where di.str.StartsWith("Abr")
+                      select di;
+
+            Assert.AreEqual(5, q14.ToList().Count);
+
+            var q15 = from D40WithIndexes di in sq
+                      where di.ts == tspan
+                      select di;
+
+            Assert.AreEqual(5, q15.ToList().Count);
+
+            var q16 = from D40WithIndexes di in sq
+                      where di.ul == 10
+                      select di;
+
+            Assert.AreEqual(5, q16.ToList().Count);
+
+            var q17 = from D40WithIndexes di in sq
+                      where di.us == 1
+                      select di;
+
+            Assert.AreEqual(5, q17.ToList().Count);
+
+            var q18 = from ClassIndexes clss in sq
+                      where clss.two == 7
+                      select clss;
+
+            Assert.AreEqual(10, q18.ToList().Count);
+
+            var q19 = from D40WithIndexes di in sq
+                      where di.Text == "text longgg"
+                      select di;
+
+            Assert.AreEqual(5, q19.ToList().Count);
+           }
+        }
+
+        #if __MOBILE__
+        [Test]
+        #else
+        [TestMethod]
+
+        #endif
+        public void TestInsertBufferChunk()
+        {
+            SiaqodbConfigurator.BufferingChunkPercent = 2;
+            Siaqodb nop = new Siaqodb(objPath);
+            nop.DropType<Customer>();
+
+            for (int i = 0; i < 10000; i++)
+            {
+                Customer c = new Customer();
+                c.ID = i;
+                c.Name = "NOR" + i.ToString();
+
+                nop.StoreObject(c);
+            }
+            nop.Flush();
+            IObjectList<Customer> listC = nop.LoadAll<Customer>();
+            Assert.AreEqual(listC.Count, 10000);
+
+            nop.Close();
+
+        }*/
+    }
+    public class TestFloat
+    {
+        public int OID { get; set; }
+        public float MyFloat { get; set; }
+    }
     public class RealPOCO
     {
         public int ID { get; set; }
