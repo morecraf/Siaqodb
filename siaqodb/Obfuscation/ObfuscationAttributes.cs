@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 #if (UNITY3D && LIC_U3D_IOS)|| LIC_U3D_UNIV||WinRT||XIOS
 #else
-[assembly: Obfuscation(Feature = "encrypt symbol names with password alisia_21", Exclude = false)]
+[assembly: Obfuscation(Feature = "encrypt symbol names with password port_355", Exclude = false)]
 #endif
 [assembly: Obfuscation(Feature = "Apply to LightningDB.*: all", Exclude = true, ApplyToMembers = true)]
 #if UNITY3D
