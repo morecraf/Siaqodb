@@ -109,6 +109,9 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Obfuscation\ObfuscationAttributes.cs">
+      <Link>ObfuscationAttributes.cs</Link>
+    </Compile>
     <Compile Include="..\Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Siaqodb__UWP_.rd.xml" />
   </ItemGroup>
@@ -213,7 +216,6 @@
     <Compile Include="..\Meta\ObjectInfo.cs" />
     <Compile Include="..\Meta\TypeHeader.cs" />
     <Compile Include="..\Meta\TypeInfo.cs" />
-    <Compile Include="..\Obfuscation\ObfuscationAttributes.cs" />
     <Compile Include="..\ObjectList.cs" />
     <Compile Include="..\PropertyResolver\SilverlightPropertyResolver.cs" />
     <Compile Include="..\Queries\And.cs" />
@@ -239,7 +241,6 @@
     <Compile Include="..\Utilities\ObjectTable.cs" />
     <Compile Include="..\Utilities\ObjectTableHelper.cs" />
     <Compile Include="..\Utilities\Path.cs" />
-    <Compile Include="..\Utilities\SqoLicense.cs" />
     <Compile Include="..\Utilities\SqoSortableItem.cs" />
     <Compile Include="..\Utilities\EndianBitConverter.cs" />
     <Compile Include="..\WinRTExtensions\MemberInfoExtensions.cs" />
@@ -248,10 +249,10 @@
     <Compile Include="..\Core\ObjectSerializer.Writer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="SiaqodbPortable, Version=5.0.0.6, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SiaqodbPortable\bin\Release\net45\SiaqodbPortable.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\SiaqodbPortable\SiaqodbPortable %28.NET 4.5%29.csproj">
+      <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
+      <Name>SiaqodbPortable %28.NET 4.5%29</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
