@@ -241,6 +241,9 @@
     <Compile Include="..\Utilities\ObjectTable.cs" />
     <Compile Include="..\Utilities\ObjectTableHelper.cs" />
     <Compile Include="..\Utilities\Path.cs" />
+    <Compile Include="..\Utilities\SqoLicense.cs">
+      <Link>SqoLicense.cs</Link>
+    </Compile>
     <Compile Include="..\Utilities\SqoSortableItem.cs" />
     <Compile Include="..\Utilities\EndianBitConverter.cs" />
     <Compile Include="..\WinRTExtensions\MemberInfoExtensions.cs" />

@@ -15516,16 +15516,16 @@
   },
   "project": {
     "restore": {
-      "projectUniqueName": "D:\\morecraf\\Siaqodb2\\siaqodb\\UWP\\Siaqodb (UWP).csproj",
+      "projectUniqueName": "c:\\work\\SIAQODB_SOURCES\\SiaqodbALLSources.v.5.5.0.8\\Siaqodb_SourceCode\\siaqodb\\UWP\\Siaqodb (UWP).csproj",
       "projectName": "Siaqodb (UWP)",
-      "projectPath": "D:\\morecraf\\Siaqodb2\\siaqodb\\UWP\\Siaqodb (UWP).csproj",
-      "projectJsonPath": "D:\\morecraf\\Siaqodb2\\siaqodb\\UWP\\project.json",
+      "projectPath": "c:\\work\\SIAQODB_SOURCES\\SiaqodbALLSources.v.5.5.0.8\\Siaqodb_SourceCode\\siaqodb\\UWP\\Siaqodb (UWP).csproj",
+      "projectJsonPath": "c:\\work\\SIAQODB_SOURCES\\SiaqodbALLSources.v.5.5.0.8\\Siaqodb_SourceCode\\siaqodb\\UWP\\project.json",
       "projectStyle": "ProjectJson",
       "frameworks": {
         "uap10.0": {
           "projectReferences": {
-            "D:\\morecraf\\Siaqodb2\\SiaqodbPortable\\SiaqodbPortable (.NET 4.5).csproj": {
-              "projectPath": "D:\\morecraf\\Siaqodb2\\SiaqodbPortable\\SiaqodbPortable (.NET 4.5).csproj"
+            "c:\\work\\SIAQODB_SOURCES\\SiaqodbALLSources.v.5.5.0.8\\Siaqodb_SourceCode\\SiaqodbPortable\\SiaqodbPortable (.NET 4.5).csproj": {
+              "projectPath": "c:\\work\\SIAQODB_SOURCES\\SiaqodbALLSources.v.5.5.0.8\\Siaqodb_SourceCode\\SiaqodbPortable\\SiaqodbPortable (.NET 4.5).csproj"
             }
           }
         }
