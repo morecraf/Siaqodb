@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("siaqodb")]
 [assembly: AssemblyDescription("NoSQL embedded database for .NET")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dotissi")]
+[assembly: AssemblyCompany("CCSTM Computing LLC")]
 [assembly: AssemblyProduct("siaqodb")]
-[assembly: AssemblyCopyright("Copyright © Dotissi 2016")]
+[assembly: AssemblyCopyright("Copyright © CCSTM Computing LLC 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("5.5.0.8")]
+[assembly: AssemblyVersion("5.5.0.9")]
 /*#if XIOS
 [assembly: System.Runtime.Versioning.TargetFramework("MonoTouch,Version=v1.0", FrameworkDisplayName="Xamarin.iOS Support")]
 #endif

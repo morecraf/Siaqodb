@@ -266,6 +266,24 @@ namespace Sqo
             });
         }
 
+        public Task StoreObjectPartiallyAsync(object obj, Transactions.ITransaction transaction, params string[] properties)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                this.StoreObjectPartially(obj, transaction, properties);
+
+            });
+        }
+
+        public Task StoreObjectPartiallyAsync(object obj, bool onlyReferences, Transactions.ITransaction transaction, params string[] properties)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                this.StoreObjectPartially(obj, onlyReferences, transaction, properties);
+
+            });
+        }
+
         public Task<bool> UpdateObjectByAsync(object obj, params string[] fieldNames)
         {
             return Task.Factory.StartNew(() =>

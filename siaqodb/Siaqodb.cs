@@ -590,14 +590,25 @@ namespace Sqo
             }
 		}
 
-     /// <summary>
-     ///  Insert or update object partially, only provided properties are saved
-     /// </summary>
-     /// <param name="obj">object of which properties will be stored</param>
-     /// <param name="properties">properties to be stored</param>
+        /// <summary>
+        ///  Insert or update object partially, only provided properties are saved
+        /// </summary>
+        /// <param name="obj">object of which properties will be stored</param>
+        /// <param name="properties">properties to be stored</param>
         public void StoreObjectPartially(object obj,params string[] properties)
         {
             this.StoreObjectPartially(obj, false, properties);
+        }
+
+        /// <summary>
+        /// Insert or update object partially by a Transaction, only provided properties are saved 
+        /// </summary>
+        /// <param name="obj">object of which properties will be stored</param>
+        /// <param name="transaction">Transaction object</param>
+        /// <param name="properties">properties to be stored</param>
+        public void StoreObjectPartially(object obj, Transactions.ITransaction transaction, params string[] properties)
+        {
+            this.StoreObjectPartially(obj, false, transaction, properties);
         }
 
         /// <summary>
@@ -625,6 +636,29 @@ namespace Sqo
                     transaction.Commit();
                     this.storeOnlyReferencesOfListItems = false;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Insert or update object partially by a Transaction, only provided properties are saved 
+        /// </summary>
+        /// <param name="obj">object of which properties will be stored</param>
+        /// <param name="onlyReferences">if true,it will store only references to complex objects</param>
+        /// <param name="transaction">Transaction object</param>
+        /// <param name="properties">properties to be stored</param>
+        public void StoreObjectPartially(object obj, bool onlyReferences, Transactions.ITransaction transaction, params string[] properties)
+        {
+            lock (_locker)
+            {
+                this.storeOnlyReferencesOfListItems = onlyReferences;
+                SqoTypeInfo ti = this.GetSqoTypeInfoToStoreObject(obj);
+                if (ti != null)
+                {
+                    circularRefCache.Clear();
+                    circularRefCache.Add(obj);
+                    storageEngine.SaveObjectPartially(obj, ti, properties);
+                }
+                this.storeOnlyReferencesOfListItems = false;
             }
         }
 

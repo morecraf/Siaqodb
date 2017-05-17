@@ -30,7 +30,7 @@ namespace Sqo
         internal static DateTimeKind? DateTimeKindToSerialize;
         internal static bool OptimisticConcurrencyEnabled = true;
         internal static Configurator defaultConfigurator;
-        internal static KeyValuePair<int, DateTime> CurrentVersion = new KeyValuePair<int, DateTime>(55, new DateTime(2016, 5, 20));
+        internal static KeyValuePair<int, DateTime> CurrentVersion = new KeyValuePair<int, DateTime>(56, new DateTime(2017, 5, 10));
 
         /// <summary>
         /// Add an index for a field or automatic property of a certain Type,an Index can be added also by using Attribute: Sqo.Attributes.Index;
