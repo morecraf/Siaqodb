@@ -40,11 +40,12 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>siaqodb.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>siaqodb_ccstm.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
     <None Include="siaqodb.pfx" />
+    <None Include="siaqodb_ccstm.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\DocumentAttribute.cs" />

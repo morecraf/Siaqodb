@@ -42,11 +42,11 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(346, 277);
+            this.label8.Location = new System.Drawing.Point(282, 277);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(124, 13);
+            this.label8.Size = new System.Drawing.Size(183, 13);
             this.label8.TabIndex = 15;
-            this.label8.Text = "Copyright © Dotissi 2015";
+            this.label8.Text = "Copyright © CCSTM Computing 2017";
             // 
             // label2
             // 

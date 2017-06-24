@@ -201,12 +201,6 @@
     <Compile Include="Obfuscation\ObfuscationAttributes.cs" />
     <Compile Include="ObjectList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyResolver\MethodBasedRocks.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PropertyResolver\PropertyResolver.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Queries\And.cs" />
     <Compile Include="Queries\ICriteria.cs" />
     <Compile Include="Queries\Or.cs" />
@@ -241,6 +235,9 @@
       <Project>{34780267-6fb3-4f87-b61d-04f81a9f83a7}</Project>
       <Name>SiaqodbPortable %28.NET 4.5%29</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PropertyResolver\" />
   </ItemGroup>
   <Import Condition=" '$(EAZFUSCATOR_NET_HOME)' != '' and Exists('$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets') " Project="$(EAZFUSCATOR_NET_HOME)\Integration\MSBuild\Eazfuscator.NET.Common.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
