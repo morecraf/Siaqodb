@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Dotissi\**" />
+    <Compile Remove="ExpressionCompiler\**" />
+    <Compile Remove="lib\**" />
+    <Compile Remove="native\**" />
+    <Compile Remove="Resources\**" />
+    <Compile Remove="UWP\**" />
+    <EmbeddedResource Remove="Dotissi\**" />
+    <EmbeddedResource Remove="ExpressionCompiler\**" />
+    <EmbeddedResource Remove="lib\**" />
+    <EmbeddedResource Remove="native\**" />
+    <EmbeddedResource Remove="Resources\**" />
+    <EmbeddedResource Remove="UWP\**" />
+    <None Remove="Dotissi\**" />
+    <None Remove="ExpressionCompiler\**" />
+    <None Remove="lib\**" />
+    <None Remove="native\**" />
+    <None Remove="Resources\**" />
+    <None Remove="UWP\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="SiaqodbUtil.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Siaqodb %28UniversalApp%29.v12.suo" />
+    <None Remove="Siaqodb %28WP 8.1%29.v12.suo" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SiaqodbPortable\SiaqodbPortable (.NET 4.5).csproj" />
+  </ItemGroup>
+
+</Project>

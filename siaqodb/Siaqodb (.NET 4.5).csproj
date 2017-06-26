@@ -185,6 +185,7 @@
     <Compile Include="Siaqodb.cs" />
     <Compile Include="SiaqodbAsync.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
+    <Compile Include="SiaqodbFactory.cs" />
     <Compile Include="SqoDataObject.cs" />
     <Compile Include="StorageEngine.cs" />
     <Compile Include="StorageEngine.Loader.cs" />

@@ -1295,6 +1295,26 @@ namespace Sqo
             }
         }
 
+        /// <summary>
+        /// Delete all objects in ALL types
+        /// NOTE: This call clears and resets your entire database; please use with caution!
+        /// </summary>
+        public void DropAllTypes()
+        {
+            lock (_locker)
+            {
+                using (var transaction = transactionManager.BeginTransaction())
+                {
+                    List<SqoTypeInfo> tiList = storageEngine.LoadAllTypesForObjectManager();
+                    foreach (SqoTypeInfo ti in tiList)
+                    {
+                        this.DropType(Type.GetType(ti.TypeName), transaction);
+                    }
+                    transaction.Commit();
+                }
+            }
+        }
+
 
 		internal object LoadObjectByOID(Type type,int oid)
 		{

@@ -132,6 +132,7 @@
     <Compile Include="Queries\Where.cs" />
     <Compile Include="Siaqodb.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
+    <Compile Include="SiaqodbFactory.cs" />
     <Compile Include="SqoDataObject.cs" />
     <Compile Include="StorageEngine.cs" />
     <Compile Include="StorageEngine.Loader.cs" />
@@ -194,7 +195,7 @@
     <EmbeddedNativeLibrary Include="lib\x86\liblmdb.so" />
     <EmbeddedNativeLibrary Include="lib\armeabi\liblmdb.so" />
     <EmbeddedNativeLibrary Include="lib\armeabi-v7a\liblmdb.so" />
- </ItemGroup>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -103,6 +103,7 @@
     <Compile Include="Queries\ICriteria.cs" />
     <Compile Include="Queries\Or.cs" />
     <Compile Include="Queries\Where.cs" />
+    <Compile Include="SiaqodbFactory.cs" />
     <Compile Include="Transactions\Transaction.cs" />
     <Compile Include="Transactions\TransactionInternal.cs" />
     <Compile Include="Transactions\TransactionManager.cs" />

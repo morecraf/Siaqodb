@@ -217,6 +217,7 @@
     <Compile Include="PropertyResolver\PropertyResolver.cs" />
     <Compile Include="PropertyResolver\SilverlightPropertyResolver.cs" />
     <Compile Include="SiaqodbConfigurator.cs" />
+    <Compile Include="SiaqodbFactory.cs" />
     <Compile Include="SqoDataObject.cs" />
     <Compile Include="Exceptions\LINQUnoptimizeException.cs" />
     <Compile Include="Exceptions\SiaqodbException.cs" />

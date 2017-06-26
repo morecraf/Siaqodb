@@ -18,6 +18,7 @@ namespace Sqo
         event EventHandler<DeletingEventsArgs> DeletingObject;
         void DropType(Type type);
         void DropType<T>();
+        void DropAllTypes();
         
 
         void Flush();

@@ -226,6 +226,9 @@
     <Compile Include="..\Siaqodb.cs" />
     <Compile Include="..\SiaqodbAsync.cs" />
     <Compile Include="..\SiaqodbConfigurator.cs" />
+    <Compile Include="..\SiaqodbFactory.cs">
+      <Link>SiaqodbFactory.cs</Link>
+    </Compile>
     <Compile Include="..\SqoDataObject.cs" />
     <Compile Include="..\StorageEngine.cs" />
     <Compile Include="..\StorageEngine.Saver.cs" />
