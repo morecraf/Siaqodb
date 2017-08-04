@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("LicenseActivation")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dotissi")]
+[assembly: AssemblyCompany("CCSTM Computing")]
 [assembly: AssemblyProduct("LicenseActivation")]
-[assembly: AssemblyCopyright("Copyright © Dotissi 2015")]
+[assembly: AssemblyCopyright("Copyright © CCSTM Computing LLC 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
