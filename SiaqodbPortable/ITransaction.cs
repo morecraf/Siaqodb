@@ -7,6 +7,8 @@ namespace Sqo.Transactions
 {
     public interface ITransaction:IDisposable
     {
+        string Name { get; set; }
+        Guid ID { get; set; }
         void Commit();
         void Rollback();
 #if ASYNC

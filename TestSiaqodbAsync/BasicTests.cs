@@ -17,10 +17,10 @@ namespace SiaqodbUnitTests
     [TestClass]
     public class BasicTests
     {
-        string dbFolder = @"c:\work\temp\unitTests_siaqodbLMDB_ASYNC\";
+        string dbFolder = @"D:\morecraf\temp\SqoUnitTests\";
         public BasicTests()
         {
-            Sqo.SiaqodbConfigurator.SetLicense(@" vxkmLEjihI7X+S2ottoS2Zaj8cKVLxLozBmFerFg6P8OWQqrY4O2s0tk+UnwGI6z");
+            Sqo.SiaqodbConfigurator.SetLicense(@"VpMKWZsHgtvrUfEPCu0WDGLk5nlVs2+5yN8youWUSixTKvmLnjsVUq9r9kdfFMuCMGtT9uyrBHNQAv+V2KkxOg==");
         }
         [TestMethod]
         public async Task TestInsert()

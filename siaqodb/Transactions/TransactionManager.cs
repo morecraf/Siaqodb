@@ -51,6 +51,10 @@ namespace Sqo.Transactions
 
         public  readonly object _SyncRoot = new object();
 
+        /// <summary>
+        /// Start a transaction
+        /// </summary>
+        /// <returns></returns>
         public Transaction BeginTransaction()
         {
             lock (_SyncRoot)
@@ -65,8 +69,29 @@ namespace Sqo.Transactions
 
                 return trans;
             }
-
         }
+
+        /// <summary>
+        /// Start a named transaction
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Transaction BeginTransaction(string name)
+        {
+            lock (_SyncRoot)
+            {
+                if (transactions.Count > 0)
+                    throw new SiaqodbException("There is an active transactions, Commit or Abort it first");
+                LightningDB.LightningTransaction transaction = env.BeginTransaction();
+                Transaction trans = new Transaction(this, name);
+                TransactionInternal trInt = new TransactionInternal(trans, transaction);
+
+                transactions.Add(trans.ID, trInt);
+
+                return trans;
+            }
+        }
+
         public Transaction GetActiveTransaction(out bool started)
         {
             lock (_SyncRoot)
@@ -104,18 +129,29 @@ namespace Sqo.Transactions
 
         internal void CommitTransaction(Guid id)
         {
-
-
             lock (_SyncRoot)
             {
-                TransactionInternal transactionInternal = transactions[id];
+                TransactionInternal transactionInternal = null;
+                try
+                {
+                    transactionInternal = transactions[id];
 
-                transactionInternal.lmdbTransaction.Commit();
-                transactionInternal.transaction.status = TransactionStatus.Closed;
-                transactions.Remove(id);
+                    transactionInternal.lmdbTransaction.Commit();
+                    transactionInternal.transaction.status = TransactionStatus.Closed;
+                    transactions.Remove(id);
+                }
+                catch(Exception err)
+                {
+                    if (transactionInternal != null)
+                    {
+                        throw new SiaqodbException("Error committing transaction", err, transactionInternal.transaction.Name, transactionInternal.transaction.ID);
+                    }
+                    else
+                    {
+                        throw new SiaqodbException("Error committing transaction", err);
+                    }
+                }
             }
-
-
         }
 
 

@@ -15,7 +15,5 @@ namespace Sqo.Transactions
             this.transaction = sTransaction;
             this.lmdbTransaction = lmdbTransaction;
         }
-       
-
     }
 }

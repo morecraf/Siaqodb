@@ -10,17 +10,33 @@ using System.Threading.Tasks;
 
 namespace Sqo.Transactions
 {
+    /// <summary>
+    /// Siaqodb uses transactions internally for each call to StoreObject and StoreObjectPartially.
+    /// This makes each call commit records and index updates to the database.
+    /// This is normally not a problem, however if you application needs to update many records at once, 
+    /// then a transaction will improve your performace considerably.
+    /// </summary>
     public class Transaction:ITransaction
     {
-        internal Guid ID;
+        public Guid ID { get; set; }
         internal TransactionStatus status;
+        public string Name { get; set; }
         TransactionManager transactionManager;
         
         internal Transaction(TransactionManager manager)
         {
             ID = Guid.NewGuid();
+            Name = ID.ToString();
             this.transactionManager = manager;
         }
+
+        internal Transaction(TransactionManager manager, string name)
+        {
+            ID = Guid.NewGuid();
+            Name = name;
+            this.transactionManager = manager;
+        }
+
         /// <summary>
         /// Commit transaction to database
         /// </summary>
@@ -28,7 +44,7 @@ namespace Sqo.Transactions
         {
             if (this.status == TransactionStatus.Closed)
             {
-                throw new SiaqodbException("Transaction closed");
+                throw new SiaqodbException("Transaction already closed", null, Name, ID);
             }
             transactionManager.CommitTransaction(this.ID);
 
@@ -43,10 +59,7 @@ namespace Sqo.Transactions
             return Task.Factory.StartNew(() =>
             {
                 this.Commit();
-
             });
-
-
         }
 #endif
 
@@ -57,7 +70,7 @@ namespace Sqo.Transactions
         {
             if (this.status == TransactionStatus.Closed)
             {
-                throw new SiaqodbException("Transaction closed");
+                throw new SiaqodbException("Transaction already closed", null, Name, ID);
             }
             transactionManager.RollbackTransaction(this.ID);
         }
@@ -74,8 +87,6 @@ namespace Sqo.Transactions
             });
         }
 #endif
-
-
 
         public void Dispose()
         {

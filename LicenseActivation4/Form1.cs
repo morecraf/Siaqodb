@@ -24,13 +24,13 @@ namespace LicenseActivation
         {
             if (string.IsNullOrEmpty(this.txtNetCustomerCode.Text))
             {
-                MessageBox.Show("Fill CustomerCode");
+                MessageBox.Show("Please enter your Customer Code");
                 return;
             }
             this.Cursor = Cursors.WaitCursor;
             try
             {
-                string k = sla4.SilvLicActivator.GetLicenseKey(this.txtNetCustomerCode.Text);
+                string k = GetLicenseKey(this.txtNetCustomerCode.Text);
                 this.txtLic.Text = k;
                 if (!k.Trim().StartsWith("ERR"))
                 {
@@ -61,6 +61,21 @@ namespace LicenseActivation
 
                 }
             }
+        }
+
+        public static string GetLicenseKey(string customerCode)
+        {
+            string hostname = Environment.MachineName;
+            WebRequest request = WebRequest.Create(@"https://siaqodb.com/licensor/licensorv40.php?c=" + customerCode + "&m=" + hostname + "&l=1");
+            request.Credentials = CredentialCache.DefaultCredentials;
+            WebResponse response = request.GetResponse();
+            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+            Stream dataStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(dataStream);
+            string responseFromServer = reader.ReadToEnd();
+            reader.Close();
+            response.Close();
+            return responseFromServer;
         }
     }
 }

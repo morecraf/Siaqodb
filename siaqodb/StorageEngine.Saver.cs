@@ -23,7 +23,6 @@ namespace Sqo
 {
     partial class StorageEngine
     {
-        
         internal int SaveObject(object oi, SqoTypeInfo ti)
         {
            
@@ -279,13 +278,35 @@ namespace Sqo
 
         }
 
+        private bool _deletingNested = false;
+        private List<string> _cachedObjectTypesForDelete;
+        /// <summary>
+        /// Get a list of all types names without the comma
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetListOfAllTypeNames()
+        {
+            if (_cachedObjectTypesForDelete == null || !_deletingNested)
+            {
+                List<string> tiList = this.LoadAllTypesForObjectManager().Select(x => x.TypeName).ToList();
+                _cachedObjectTypesForDelete = new List<string>();
+                foreach (var item in tiList)
+                {
+                    _cachedObjectTypesForDelete.Add(item.Substring(0, item.IndexOf(",")));
+                }
+
+            }
+
+            return _cachedObjectTypesForDelete;
+        }
         
-        internal void DeleteObject(object obj, SqoTypeInfo ti,LightningTransaction transaction)
+        internal void DeleteObject(object obj, SqoTypeInfo ti,LightningTransaction transaction, bool delete_nested)
         {
             ObjectInfo objInfo = MetaExtractor.GetObjectInfo(obj, ti,metaCache);
 
             ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
 
+            List<object> _deleteNestedCache = new List<object>();
             lock (_syncRoot)
             {
 
@@ -296,7 +317,6 @@ namespace Sqo
                 this.indexManager.UpdateIndexesAfterDelete(objInfo, ti, transaction);
 
                 metaCache.SetOIDToObject(obj, -1, ti);
-
 
             }
         }
@@ -348,7 +368,7 @@ namespace Sqo
                 metaCache.SetOIDToObject(obj, oids[0], ti);
 
                 ObjectSerializer serializer = SerializerFactory.GetSerializer(this.path, GetFileByType(ti), useElevatedTrust);
-                this.DeleteObject(obj, ti, transaction);
+                this.DeleteObject(obj, ti, transaction, false);
                 
                 return oids[0];
             }

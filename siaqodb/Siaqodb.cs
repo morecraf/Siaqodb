@@ -19,9 +19,8 @@ using Sqo.Indexes;
 namespace Sqo
 {
     /// <summary>
-    /// Main class of siaqodb database engine responsible for storing, retrieving ,deleting objects on database files
+    /// Main class of Siaqodb database engine responsible for storing, retrieving ,deleting objects on database files
     /// </summary>
-
     [Obfuscation(Feature = "Apply to member * when event: all", Exclude = false,ApplyToMembers=true)]
     public partial class Siaqodb : Sqo.ISiaqodb
 	{
@@ -1081,11 +1080,34 @@ namespace Sqo
                 using (var transaction = transactionManager.BeginTransaction())
                 {
                     SqoTypeInfo ti = this.GetSqoTypeInfo(t);
-                    bool deleted = DeleteObjInternal(obj, ti, transaction);
+                    bool deleted = DeleteObjInternal(obj, ti, transaction, false);
                     transaction.Commit();
                 }
             }
 		}
+
+        /// <summary>
+        /// Delete an object from database
+        /// </summary>
+        /// <param name="obj">Object to be deleted</param>
+        /// <param name="delete_nested">Should Siaqodb also delete any nested objects? (Default is to NOT delete child objects)</param>
+        public void Delete(object obj, bool delete_nested)
+        {
+            lock (_locker)
+            {
+                if (!opened)
+                {
+                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
+                }
+                Type t = obj.GetType();
+                using (var transaction = transactionManager.BeginTransaction())
+                {
+                    SqoTypeInfo ti = this.GetSqoTypeInfo(t);
+                    bool deleted = DeleteObjInternal(obj, ti, transaction, delete_nested);
+                    transaction.Commit();
+                }
+            }
+        }
 
         /// <summary>
         /// Delete an object from database using a Transaction
@@ -1112,7 +1134,37 @@ namespace Sqo
                 }
                 Type t = obj.GetType();
                 SqoTypeInfo ti = this.GetSqoTypeInfo(t);
-                DeleteObjInternal(obj, ti, transaction);
+                DeleteObjInternal(obj, ti, transaction, false);
+            }
+        }
+
+        /// <summary>
+        /// Delete an object from database using a Transaction
+        /// </summary>
+        /// <param name="obj">Object to be deleted</param>
+        /// <param name="transaction">Transaction</param>
+        /// <param name="delete_nested">Should Siaqodb also delete any nested objects? (Default is to NOT delete child objects)</param>
+        public void Delete(object obj, Transactions.ITransaction transaction, bool delete_nested)
+        {
+            lock (_locker)
+            {
+                if (!opened)
+                {
+                    throw new SiaqodbException("Database is closed, call method Open() to open it!");
+                }
+
+                if (transaction == null)
+                {
+                    throw new ArgumentNullException("transaction");
+                }
+
+                if (((Transactions.Transaction)transaction).status == Transactions.TransactionStatus.Closed)
+                {
+                    throw new SiaqodbException("Transaction closed!");
+                }
+                Type t = obj.GetType();
+                SqoTypeInfo ti = this.GetSqoTypeInfo(t);
+                DeleteObjInternal(obj, ti, transaction, delete_nested);
             }
         }
 
@@ -1489,12 +1541,12 @@ namespace Sqo
         
 
         #region private methods
-        private bool DeleteObjInternal(object obj, SqoTypeInfo ti, Transactions.ITransaction transaction)
+        private bool DeleteObjInternal(object obj, SqoTypeInfo ti, Transactions.ITransaction transaction, bool delete_nested)
         {
             int oid = metaCache.GetOIDOfObject(obj, ti);
             if (oid <= 0 || oid > ti.Header.numberOfRecords)
             {
-                throw new SiaqodbException("Object not exists in database!");
+                throw new SiaqodbException("Object does not exists in database!", null, transaction.Name, transaction.ID);
             }
 
             DeletingEventsArgs delEv = new DeletingEventsArgs(ti.Type, oid);
@@ -1504,10 +1556,53 @@ namespace Sqo
                 return false;
             }
            
-            storageEngine.DeleteObject(obj, ti, transactionManager.GetActiveTransaction());
+            storageEngine.DeleteObject(obj, ti, transactionManager.GetActiveTransaction(), delete_nested);
+
+            if (delete_nested)
+            {
+                var finalTypeList = storageEngine.GetListOfAllTypeNames();
+                // see if we have this field stored in the db or not
+                foreach (var field in ti.Fields)
+                {
+                    var nestedObjectToDelete = field.FInfo.GetValue(obj);
+                    if (finalTypeList.Contains(field.AttributeType.FullName))
+                    {
+                        if (nestedObjectToDelete != null)
+                        {
+                            Type tx = nestedObjectToDelete.GetType();
+                            SqoTypeInfo tix = this.GetSqoTypeInfo(tx);
+                            this.DeleteObjInternal(nestedObjectToDelete, tix, transaction, delete_nested);
+                        }
+                    }
+                    else if(nestedObjectToDelete != null)
+                    {
+                        Type tx = nestedObjectToDelete.GetType();
+                        if (tx.IsGenericType && (tx.GetGenericTypeDefinition() == typeof(List<>)))
+                        {
+                            try
+                            {
+                                // we have a list!  find out if this is a list of objects that we store in the db
+                                Type listItemType = tx.GetGenericArguments()[0];
+                                if (finalTypeList.Contains(listItemType.FullName))
+                                {
+                                    foreach(var listItem in (nestedObjectToDelete as IList))
+                                    {
+                                        Type tx2 = listItem.GetType();
+                                        SqoTypeInfo tix2 = this.GetSqoTypeInfo(tx2);
+                                        this.DeleteObjInternal(listItem, tix2, transaction, delete_nested);
+                                    }
+                                }
+                                string x = listItemType.Name;
+                            }
+                            catch { }
+                        }
+                    }
+                }
+            }
 
             DeletedEventsArgs deletedEv = new DeletedEventsArgs(ti.Type, oid);
             this.OnDeletedObject(deletedEv);
+
             return true;
         }
 
@@ -1573,6 +1668,7 @@ namespace Sqo
         {
             return this.path;
         }
+
         /// <summary>
         /// Start a database Transaction to be used on insert/update/delete objects
         /// </summary>
@@ -1585,11 +1681,22 @@ namespace Sqo
                 return transactionManager.BeginTransaction();
             }
         }
-      
-        
 
-      
-       
+        /// <summary>
+        /// Start a database Transaction to be used on insert/update/delete objects
+        /// </summary>
+        /// <param name="name">Provide a name for this transaction</param>
+        /// <returns> Transaction object</returns>
+        public Transactions.ITransaction BeginTransaction(string name)
+        {
+            lock (_locker)
+            {
+                this.circularRefCache.Clear();
+                return transactionManager.BeginTransaction(name);
+            }
+        }
+
+
         internal void Flush<T>()
         {
             SqoTypeInfo ti = CheckDBAndGetSqoTypeInfo<T>();

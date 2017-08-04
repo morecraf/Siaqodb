@@ -2,14 +2,13 @@
 using System.Text;
 using System.Collections.Generic;
 using Sqo;
+using Sqo.Documents;
 #if __MOBILE__
 using NUnit.Framework;
 #else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #endif
-using Sqo.Documents;
-using Sqo;
 
 using System.Linq;
 using Sqo.Transactions;
