@@ -85,6 +85,8 @@ namespace SiaqodbManager
                
             }
         }
+        int currentSortedColumn = -1;
+        System.Windows.Forms.SortOrder currentSortOrder;
         private void SetGridDesigner()
         {
 
@@ -105,7 +107,7 @@ namespace SiaqodbManager
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.VirtualMode = true;
             this.dataGridView1.CellValueNeeded += dataGridView1_CellValueNeeded;
-
+            this.dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
             dataGridView1.Columns.Clear();
             dataGridView1.Columns.Add("TypeName", "TypeName");
             dataGridView1.Columns.Add("NrTotalObjects", "Total Objects");
@@ -115,6 +117,78 @@ namespace SiaqodbManager
             myhost.Child = dataGridView1;
 
         }
+        void dataGridView1_ColumnHeaderMouseClick(object sender, System.Windows.Forms.DataGridViewCellMouseEventArgs e)
+        {
+            if (e.ColumnIndex > 0)
+            {
+
+            }
+            if (currentSortedColumn != -1)
+            {
+                dataGridView1.Columns[currentSortedColumn].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.None;
+                dataGridView1.Columns[currentSortedColumn].HeaderCell.Style.BackColor = System.Drawing.SystemColors.Control;
+            }
+            if (e.ColumnIndex == currentSortedColumn)
+            {
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Descending;
+                    currentSortOrder = System.Windows.Forms.SortOrder.Descending;
+                }
+                else
+                {
+                    dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                    currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                dataGridView1.Columns[e.ColumnIndex].HeaderCell.SortGlyphDirection = System.Windows.Forms.SortOrder.Ascending;
+                currentSortOrder = System.Windows.Forms.SortOrder.Ascending;
+            }
+            dataGridView1.Columns[e.ColumnIndex].HeaderCell.Style.BackColor = System.Drawing.SystemColors.ControlDark;
+            currentSortedColumn = e.ColumnIndex;
+            this.SortByColumn();
+        }
+        private void SortByColumn()
+        {
+            if (currentSortedColumn == 0)
+            {
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    typesList = typesList.OrderBy(a => a.Name).Select(a => a).ToList();
+                }
+                else
+                {
+                    typesList = typesList.OrderByDescending(a => a.Name).Select(a => a).ToList();
+                }
+
+            }
+            else if (currentSortedColumn == 1)
+            {
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    typesList = typesList.OrderBy(a => siaqodb.LoadAllOIDs(a).Count).Select(a => a).ToList();
+                }
+                else
+                {
+                    typesList = typesList.OrderByDescending(a => siaqodb.LoadAllOIDs(a).Count).Select(a => a).ToList();
+                }
+            }
+            else if (currentSortedColumn == 2)
+            {
+                if (currentSortOrder == System.Windows.Forms.SortOrder.Ascending)
+                {
+                    typesList = typesList.OrderBy(a => a.Fields.Count).Select(a => a).ToList();
+                }
+                else
+                {
+                    typesList = typesList.OrderByDescending(a => a.Fields.Count).Select(a => a).ToList();
+                }
+            }
+            dataGridView1.Refresh();
+        }
+
         public static long DirSize(DirectoryInfo d)
         {
             long Size = 0;
@@ -142,7 +216,7 @@ namespace SiaqodbManager
         inner JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE ccu ON tc.CONSTRAINT_NAME = ccu.Constraint_name
 		inner join sys.tables tbls on tbls.name=ccu.TABLE_NAME 
     WHERE tc.CONSTRAINT_TYPE = 'Primary Key'  and tbls.[type]='u' and tbls.name not like '%tracking'
-	and  exists(select  * from sys.tables tbls2 where tbls2.name like tbls.name+'_tracking')";
+	and  exists(select  * from sys.tables tbls2 where tbls2.name like tbls.name+'_tracking') ORDER BY tbls.name";
 
             try
             {
