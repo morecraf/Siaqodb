@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Siaqodb", "Siaqodb", "{077ABD81-B485-42B4-807F-0D7AFFA185BE}"
 EndProject
@@ -66,6 +66,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiaqodbCloud (UWP)", "SiaqodbCloud\SiaqodbCloud (UWP)\SiaqodbCloud (UWP).csproj", "{923866F2-5FAC-4CFB-A3A1-1747750D3C96}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleThreadApp", "..\temp\Boris\SampleThreadApp\SampleThreadApp.csproj", "{6C84668D-6672-4386-B975-68DB59B13AEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiaqodbManager", "SiaqodbManager3\SiaqodbManager\SiaqodbManager.csproj", "{0EE54C15-148D-4CDE-B642-34B52FC452DA}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -1430,6 +1432,44 @@ Global
 		{6C84668D-6672-4386-B975-68DB59B13AEC}.Release|x64.Build.0 = Release|Any CPU
 		{6C84668D-6672-4386-B975-68DB59B13AEC}.Release|x86.ActiveCfg = Release|Any CPU
 		{6C84668D-6672-4386-B975-68DB59B13AEC}.Release|x86.Build.0 = Release|Any CPU
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|Any CPU.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|Any CPU.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|ARM.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|ARM.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|iPhone.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|iPhone.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|iPhoneSimulator.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|x64.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|x64.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|x86.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Ad-Hoc|x86.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|Any CPU.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|Any CPU.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|ARM.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|ARM.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|iPhone.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|iPhone.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|iPhoneSimulator.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|iPhoneSimulator.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|x64.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|x64.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|x86.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.AppStore|x86.Build.0 = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Debug|ARM.ActiveCfg = Debug|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Debug|iPhone.ActiveCfg = Debug|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Debug|iPhoneSimulator.ActiveCfg = Debug|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Debug|x64.ActiveCfg = Debug|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Debug|x86.ActiveCfg = Debug|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Debug|x86.Build.0 = Debug|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Release|Any CPU.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Release|ARM.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Release|iPhone.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Release|iPhoneSimulator.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Release|x64.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Release|x86.ActiveCfg = Release|x86
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1462,5 +1502,9 @@ Global
 		{1E494432-18B0-4566-A6EB-0802E6178319} = {65E844B0-3D43-467A-9FDA-4D74AAA59C4F}
 		{923866F2-5FAC-4CFB-A3A1-1747750D3C96} = {65E844B0-3D43-467A-9FDA-4D74AAA59C4F}
 		{6C84668D-6672-4386-B975-68DB59B13AEC} = {8542B8FB-3280-4826-8921-9444983735D3}
+		{0EE54C15-148D-4CDE-B642-34B52FC452DA} = {85CB3845-0EFF-4953-92AD-5FCBC13FF93D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {927912C1-E330-4D1D-B6BE-B47EA5A104EA}
 	EndGlobalSection
 EndGlobal

@@ -3,6 +3,8 @@ using SiaqodbManager.Entities;
 using Sqo;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -55,6 +57,7 @@ namespace SiaqodbManager
            
            
             dataGridView1.RowCount = typesList.Count;
+            this.FillTables();
         }
 
         void dataGridView1_CellValueNeeded(object sender, System.Windows.Forms.DataGridViewCellValueEventArgs e)
@@ -130,5 +133,170 @@ namespace SiaqodbManager
             return (Size);
         }
 
+        List<TablePK> tablesList = new List<TablePK>();
+        private void FillTables()
+        {
+
+            string sql = @"SELECT tbls.name as Table_Name,ccu.COLUMN_NAME
+    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+        inner JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE ccu ON tc.CONSTRAINT_NAME = ccu.Constraint_name
+		inner join sys.tables tbls on tbls.name=ccu.TABLE_NAME 
+    WHERE tc.CONSTRAINT_TYPE = 'Primary Key'  and tbls.[type]='u' and tbls.name not like '%tracking'
+	and  exists(select  * from sys.tables tbls2 where tbls2.name like tbls.name+'_tracking')";
+
+            try
+            {
+                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["SyncServer"].ConnectionString);
+                connection.Open();
+                SqlCommand cmd = new SqlCommand(sql);
+                cmd.Connection = connection;
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    TablePK tp = tablesList.FirstOrDefault(a => a.TableName == reader[0].ToString());
+                    if (tp == null)
+                    {
+                        tp = new TablePK();
+                        tp.ColumnNames = new List<string>();
+                        tp.TableName = reader[0].ToString();
+                        lstTables.Items.Add(tp);
+                        tablesList.Add(tp);
+                    }
+
+                    tp.ColumnNames.Add(reader[1].ToString());
+
+
+                }
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to access your SQL Database server; please ensure the SyncServer connection string is set in your app.config file.\n" + ex.Message);
+            }
+            lstTables.Items.SortDescriptions.Add(
+            new System.ComponentModel.SortDescription("",
+            System.ComponentModel.ListSortDirection.Ascending));
+
+            lstTables.SelectAll();
+        }
+
+        private void btnChkDuplicates_Click(object sender, RoutedEventArgs e)
+        {
+
+
+            string fileName = System.IO.Path.GetTempFileName() + ".txt";
+            bool exists = false;
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(fileName))
+            {
+
+                foreach (TablePK tk in lstTables.SelectedItems)
+                {
+                    MetaType mType = typesList.FirstOrDefault(a => a.Name.Contains("." + tk.TableName, StringComparison.OrdinalIgnoreCase));
+                    if (mType != null)
+                    {
+                        List<int> oids = siaqodb.LoadAllOIDs(mType);
+                        int j = 0;
+                        Dictionary<int, List<object>> oidsAndValues = new Dictionary<int, List<object>>();
+
+                        foreach (string pkColumn in tk.ColumnNames)
+                        {
+                            MetaField mf = mType.Fields.FirstOrDefault(a => string.Compare(a.Name, "_" + pkColumn, true) == 0);
+                            if (mf != null)
+                            {
+
+                                foreach (int oid in oids)
+                                {
+                                    if (j == 0)
+                                        oidsAndValues[oid] = new List<object>();
+
+                                    object val = siaqodb.LoadValue(oid, mf.Name, mType);
+                                    oidsAndValues[oid].Add(val);
+                                }
+
+                            }
+                            j++;
+                        }
+                        int i = 0;
+                        foreach (int oidKey in oidsAndValues.Keys)
+                        {
+                            foreach (int oidKeyInner in oidsAndValues.Keys)
+                            {
+                                if (oidKeyInner != oidKey)
+                                {
+                                    bool allEqual = true;
+                                    for (int u = 0; u < oidsAndValues[oidKey].Count; u++)
+                                    {
+                                        if (((IComparable)oidsAndValues[oidKey][u]).CompareTo((IComparable)oidsAndValues[oidKeyInner][u]) != 0)
+                                        {
+                                            allEqual = false;
+                                            break;
+                                        }
+                                    }
+                                    if (allEqual)
+                                    {
+                                        exists = true;
+                                        if (i == 0)
+                                        {
+                                            file.WriteLine("Duplicates for type:" + mType.Name + ":");
+                                        }
+                                        StringBuilder sb = new StringBuilder();
+                                        foreach (object objDuplicate in oidsAndValues[oidKeyInner])
+                                        {
+                                            sb.Append(objDuplicate.ToString() + ";");
+                                        }
+                                        file.WriteLine("OID=(" + oidKey + "," + oidKeyInner + ") | Values=" + sb.ToString());
+                                        i++;
+                                    }
+                                }
+                            }
+
+                        }
+
+                        if (i > 0)
+                        {
+                            file.WriteLine("============================================================");
+                            file.WriteLine("");
+                        }
+                    }
+                }
+            }
+            if (exists)
+            {
+                System.Diagnostics.Process.Start(fileName);
+            }
+            else
+            {
+
+                System.Windows.Forms.MessageBox.Show("No duplicates found!");
+            }
+
+        }
+
+        private class TablePK : IComparable
+        {
+            public string TableName { get; set; }
+            public List<string> ColumnNames { get; set; }
+            public override string ToString()
+            {
+                return TableName;
+            }
+
+
+            public int CompareTo(object obj)
+            {
+                return this.TableName.CompareTo(((TablePK)obj).TableName);
+            }
+        }
+
+        private void chkSelectAll_Checked(object sender, RoutedEventArgs e)
+        {
+            lstTables.SelectAll();
+
+
+        }
+        private void chkSelectAll_Unchecked(object sender, RoutedEventArgs e)
+        {
+            lstTables.UnselectAll();
+        }
     }
 }

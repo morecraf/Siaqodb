@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Sqo.Exceptions;
 using Sqo.Transactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using TestSiaqodbAsync.Models;
 
 namespace SiaqodbUnitTests
 {
@@ -45,6 +47,60 @@ namespace SiaqodbUnitTests
             
 
         }
+
+        [TestMethod]
+        public void TestListOfStrings()
+        {
+            ListType x = new ListType();
+            x.listString = new List<string>();
+            x.listString.Add("100wFF6xWfHFPeBpEjmQiP7kTGCiYIn6MSq39VvLN0S5HKRnQjofnponjbqQKEZtlFq8jRVLI9hOscMt6CAstyggw9h9rBn6RJ7kxMzEND");
+            x.listString.Add("200CqEj5tAzvbODRAqLvBxCeQcKSwA9jlqJJbZT42suJTN88gK7InWoiDCIgr6VaPvWtZUr6DC5IfjP8AhN0WpCGupqjp6pisoR4BWlNqw9roveJ9tzJzoJEB14fUspAIgFkA5Cjn2YwNTRgMsYaVCYkFZzIYQ6yUCyEcpsypG5QYthPElJoDMsXDhAurp27v4TzLXQFUfSEND");
+            x.listString.Add("500tEe9lSKyZacVNOINvanVvbvfN6MzUDwfXSqTVYCRKaXcjY0rDTE3C9OVhTMgGn3iUzgDGhuU5ADm4xEginXvSBP7f7DDsNbmpRzhDxqIolHDvr6yam82z7c95Nl0fHbBV7EMggINFtqK5OsCUrBz4yvRXD4yexVOomTTJKZh7Y8pz77NP5WIsjfEwauiSZyw8rOYRfejxhfli2yeJrcvL5oFgpb3kpSD9KNHXfMewl9goNvfsOiOOOAReltjnW4uog8SPn0JxBoXBvNbGKaNbaKev3eyLU1ny0BjwUeg9CmCsaXIgElPiaSSzs2uHyMuRl4vZEiai78y5A75sZA9RYhyMR8U3ciporDfTQayjm40KCvmfvIyLWXefl3ZNragmG18Ozy8X2Vt1RsHhhyJ8ZLz89M30vH0pUZT20E8nobBI9jkBaLbxKKbNNsLCIr7Jm4K2yKFj1s91YD1vhtZsSIig6GkfxJugTirzrwUU8EuxTTV47VIEND");
+            Siaqodb nop = new Siaqodb();
+
+            nop.Open(dbFolder);
+
+            var f = nop.LoadAll<ListType>();
+
+            nop.DropType<ListType>();
+            nop.StoreObject(x);
+            nop.Close();
+        }
+
+        [TestMethod]
+        public void TestMultiThreading()
+        {
+            using (Siaqodb _database = new Siaqodb(dbFolder))
+            {
+                _database.Open(dbFolder);
+                _database.DropType<Customer>();
+                Stopwatch stopWa = new Stopwatch();
+                stopWa.Start();
+
+                System.Threading.Tasks.Task[] tasks = new System.Threading.Tasks.Task[10];
+                for (int i = 0; i < 10; i++)
+                {
+                    tasks[i] = System.Threading.Tasks.Task.Factory.StartNew(() =>
+                    {
+                        Customer c = new Customer();
+                        c.Name = "sssd";
+                        _database.StoreObject(c);
+
+                        var all = _database.LoadAll<Customer>();
+
+                        var q = (from Customer ct in _database
+                                 where ct.Name == "sssd"
+                                 select ct).ToList();
+
+                        var result = _database.Query<Customer>().Select(a => a.OID).Count();
+                    });
+                }
+                System.Threading.Tasks.Task.WaitAll(tasks);
+                stopWa.Stop();
+                Console.WriteLine("done in: {0} seconds", stopWa.Elapsed.TotalSeconds);
+            }
+        }
+
         [TestMethod]
         public async Task TestStringWithoutAttribute()
         {

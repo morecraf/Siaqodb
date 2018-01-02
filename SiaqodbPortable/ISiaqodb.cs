@@ -8,7 +8,9 @@ namespace Sqo
         void Close();
         int Count<T>();
         void Delete(object obj);
+        void Delete(object obj, bool delete_nested);
         void Delete(object obj, Sqo.Transactions.ITransaction transaction);
+        void Delete(object obj, Sqo.Transactions.ITransaction transaction, bool delete_nested);
         event EventHandler<DeletedEventsArgs> DeletedObject;
         bool DeleteObjectBy(object obj, params string[] fieldNames);
         bool DeleteObjectBy(object obj, Sqo.Transactions.ITransaction transaction, params string[] fieldNames);

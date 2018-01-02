@@ -30,20 +30,33 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            SiaqodbFactory.SetPath(Directory.GetCurrentDirectory());
-            var db = SiaqodbFactory.GetInstance();
+            string root_path = @"D:\morecraf\temp\bjorn";
+            var db_list = new List<Siaqodb>();
+            if (!Directory.Exists(root_path))
+            {
+                Directory.CreateDirectory(root_path);
+            }
 
-            Company company = new Company();
-            company.Name = "MyCompany";
-            Employee employee = new Employee();
-            employee.FirstName = "John";
-            employee.LastName = "Walter";
-            employee.Age = 31;
-            employee.HireDate = new DateTime(2008, 10, 12);
-            employee.Employer = company;
-            db.StoreObject(employee);
+            //-- Generate and open some database files
+            for (int i = 0; i < 100; i++)
+            {
+                string db_dir = Path.Combine(root_path, i.ToString("0000"));
+                Directory.CreateDirectory(db_dir);
+                var d = new Siaqodb(db_dir, 1024 * 1024 * 50, 50);
+                db_list.Add(d);
+            }
 
-            db.DropAllTypes();
+            //Company company = new Company();
+            //company.Name = "MyCompany";
+            //Employee employee = new Employee();
+            //employee.FirstName = "John";
+            //employee.LastName = "Walter";
+            //employee.Age = 31;
+            //employee.HireDate = new DateTime(2008, 10, 12);
+            //employee.Employer = company;
+            //db.StoreObject(employee);
+
+            //db.DropAllTypes();
         }
     }
 }

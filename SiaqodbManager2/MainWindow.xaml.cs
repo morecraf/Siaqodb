@@ -81,8 +81,8 @@ namespace SiaqodbManager
                     System.Windows.Forms.MessageBox.Show(ex.Message);
                 }
             }
-            Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTQ9J7I0xVsr5/glyn/JzNY4yVy640fieqvjNywXzj9og");
-
+            //VpMKWZsHgtvrUfEPCu0WDGLk5nlVs2+5yN8youWUSixTKvmLnjsVUq9r9kdfFMuCMGtT9uyrBHNQAv+V2KkxOg==Sqo.SiaqodbConfigurator.SetLicense(@" qU3TtvA4T4L30VSlCCGUTQ9J7I0xVsr5/glyn/JzNY4yVy640fieqvjNywXzj9og");
+            Sqo.SiaqodbConfigurator.SetLicense(@"VpMKWZsHgtvrUfEPCu0WDGLk5nlVs2+5yN8youWUSixTKvmLnjsVUq9r9kdfFMuCMGtT9uyrBHNQAv+V2KkxOg==");
 
             using (Sqo.Siaqodb siaqodbConfig = new Sqo.Siaqodb(App.ConfigDbPath))
             {
@@ -446,8 +446,9 @@ namespace SiaqodbManager
                     bucketNode.UnselectedImage = ImageTreeViewItem.Createimage(@"pack://application:,,/Resources/bucket.png");
                     documentsNode.Items.Add(bucketNode);
 
-                    btnDBInfo.IsEnabled = true;
+                    
                 }
+                btnDBInfo.IsEnabled = true;
             }
             else
             {

@@ -60,9 +60,11 @@
     <Compile Include="ChildObjectTests.cs" />
     <Compile Include="Models\AddressADO.cs" />
     <Compile Include="Models\AddressItemADO.cs" />
+    <Compile Include="Models\ListType.cs" />
     <Compile Include="Models\ParentObject.cs" />
     <Compile Include="Models\PropertyADO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestMigration.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lmdb32.dll">

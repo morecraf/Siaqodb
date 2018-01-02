@@ -82,8 +82,8 @@ namespace TestSiaqodbAsync
             p.PropData.Address.Address1 = "Address1";
             p.PropData.Address.Address2 = "Address2";
             p.PropData.Address.AddressItems = new List<AddressItemADO>();
-            p.PropData.Address.AddressItems.Add(new AddressItemADO() { Prop1 = "Test1", Prop2 = "Test1p2" } );
-            p.PropData.Address.AddressItems.Add(new AddressItemADO() { Prop1 = "Test2", Prop2 = "Test2p2" } );
+            //p.PropData.Address.AddressItems.Add(new AddressItemADO() { Prop1 = "Test1", Prop2 = "Test1p2" } );
+            //p.PropData.Address.AddressItems.Add(new AddressItemADO() { Prop1 = "Test2", Prop2 = "Test2p2" } );
             db.StoreObject(p);
 
             Assert.AreEqual(db.Count<ParentObject>(), 1);

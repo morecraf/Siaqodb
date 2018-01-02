@@ -28,7 +28,13 @@
                     <WindowsFormsHost Name="myhost" ></WindowsFormsHost>
                 </Grid>
             </TabItem>
-          
+            <TabItem Header="Duplicates info" Name="tabItem2">
+                <Grid >
+                    <Button Content="Check for duplicates" Name="btnChkDuplicates" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="174" Click="btnChkDuplicates_Click" Height="24"  />
+                    <ListBox x:Name="lstTables" Margin="10,30,10,30" Width="774" SelectionMode="Multiple"/>
+                    <CheckBox Content="Select all"  HorizontalAlignment="Left" Name="chkSelectAll" Margin="0,0,0,0" VerticalAlignment="Top" Checked="chkSelectAll_Checked" IsChecked="True" Unchecked="chkSelectAll_Unchecked"/>
+                </Grid>
+            </TabItem>
         </TabControl>
         
 
